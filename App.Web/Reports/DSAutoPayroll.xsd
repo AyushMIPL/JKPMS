@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="DSAutoPayroll" targetNamespace="http://tempuri.org/DSAutoPayroll.xsd" xmlns:mstns="http://tempuri.org/DSAutoPayroll.xsd" xmlns="http://tempuri.org/DSAutoPayroll.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+        </Connections>
+        <Tables>
+        </Tables>
+        <Sources>
+        </Sources>
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="DSAutoPayroll" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="DSAutoPayroll" msprop:Generator_DataSetName="DSAutoPayroll">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="styemplr" msprop:Generator_UserTableName="styemplr" msprop:Generator_RowDeletedName="styemplrRowDeleted" msprop:Generator_RowChangedName="styemplrRowChanged" msprop:Generator_RowClassName="styemplrRow" msprop:Generator_RowChangingName="styemplrRowChanging" msprop:Generator_RowEvArgName="styemplrRowChangeEvent" msprop:Generator_RowEvHandlerName="styemplrRowChangeEventHandler" msprop:Generator_TableClassName="styemplrDataTable" msprop:Generator_TableVarName="tablestyemplr" msprop:Generator_RowDeletingName="styemplrRowDeleting" msprop:Generator_TablePropName="styemplr">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="v_empl_code" msprop:Generator_UserColumnName="v_empl_code" msprop:Generator_ColumnPropNameInRow="v_empl_code" msprop:Generator_ColumnVarNameInTable="columnv_empl_code" msprop:Generator_ColumnPropNameInTable="v_empl_codeColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="v_first_name" msprop:Generator_UserColumnName="v_first_name" msprop:Generator_ColumnPropNameInRow="v_first_name" msprop:Generator_ColumnVarNameInTable="columnv_first_name" msprop:Generator_ColumnPropNameInTable="v_first_nameColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="v_middle_name" msprop:Generator_UserColumnName="v_middle_name" msprop:Generator_ColumnPropNameInRow="v_middle_name" msprop:Generator_ColumnVarNameInTable="columnv_middle_name" msprop:Generator_ColumnPropNameInTable="v_middle_nameColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="v_last_name" msprop:Generator_UserColumnName="v_last_name" msprop:Generator_ColumnPropNameInRow="v_last_name" msprop:Generator_ColumnVarNameInTable="columnv_last_name" msprop:Generator_ColumnPropNameInTable="v_last_nameColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="v_eop_date" msprop:Generator_UserColumnName="v_eop_date" msprop:Generator_ColumnPropNameInRow="v_eop_date" msprop:Generator_ColumnVarNameInTable="columnv_eop_date" msprop:Generator_ColumnPropNameInTable="v_eop_dateColumn" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="v_pay_date" msprop:Generator_UserColumnName="v_pay_date" msprop:Generator_ColumnPropNameInRow="v_pay_date" msprop:Generator_ColumnVarNameInTable="columnv_pay_date" msprop:Generator_ColumnPropNameInTable="v_pay_dateColumn" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="v_cash_acct" msprop:Generator_UserColumnName="v_cash_acct" msprop:Generator_ColumnPropNameInRow="v_cash_acct" msprop:Generator_ColumnVarNameInTable="columnv_cash_acct" msprop:Generator_ColumnPropNameInTable="v_cash_acctColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="v_department" msprop:Generator_UserColumnName="v_department" msprop:Generator_ColumnPropNameInRow="v_department" msprop:Generator_ColumnVarNameInTable="columnv_department" msprop:Generator_ColumnPropNameInTable="v_departmentColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="v_total_hours" msprop:Generator_UserColumnName="v_total_hours" msprop:Generator_ColumnPropNameInRow="v_total_hours" msprop:Generator_ColumnVarNameInTable="columnv_total_hours" msprop:Generator_ColumnPropNameInTable="v_total_hoursColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_inc_gross" msprop:Generator_UserColumnName="v_inc_gross" msprop:Generator_ColumnPropNameInRow="v_inc_gross" msprop:Generator_ColumnVarNameInTable="columnv_inc_gross" msprop:Generator_ColumnPropNameInTable="v_inc_grossColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_inc_taxable" msprop:Generator_UserColumnName="v_inc_taxable" msprop:Generator_ColumnPropNameInRow="v_inc_taxable" msprop:Generator_ColumnVarNameInTable="columnv_inc_taxable" msprop:Generator_ColumnPropNameInTable="v_inc_taxableColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_inc_expense" msprop:Generator_UserColumnName="v_inc_expense" msprop:Generator_ColumnPropNameInRow="v_inc_expense" msprop:Generator_ColumnVarNameInTable="columnv_inc_expense" msprop:Generator_ColumnPropNameInTable="v_inc_expenseColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_check_amount" msprop:Generator_UserColumnName="v_check_amount" msprop:Generator_ColumnPropNameInRow="v_check_amount" msprop:Generator_ColumnVarNameInTable="columnv_check_amount" msprop:Generator_ColumnPropNameInTable="v_check_amountColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_inc_net" msprop:Generator_UserColumnName="v_inc_net" msprop:Generator_ColumnPropNameInRow="v_inc_net" msprop:Generator_ColumnVarNameInTable="columnv_inc_net" msprop:Generator_ColumnPropNameInTable="v_inc_netColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_ded_fica" msprop:Generator_UserColumnName="v_ded_fica" msprop:Generator_ColumnPropNameInRow="v_ded_fica" msprop:Generator_ColumnVarNameInTable="columnv_ded_fica" msprop:Generator_ColumnPropNameInTable="v_ded_ficaColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_ded_medicare" msprop:Generator_UserColumnName="v_ded_medicare" msprop:Generator_ColumnPropNameInRow="v_ded_medicare" msprop:Generator_ColumnVarNameInTable="columnv_ded_medicare" msprop:Generator_ColumnPropNameInTable="v_ded_medicareColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_ded_fedtax" msprop:Generator_UserColumnName="v_ded_fedtax" msprop:Generator_ColumnPropNameInRow="v_ded_fedtax" msprop:Generator_ColumnVarNameInTable="columnv_ded_fedtax" msprop:Generator_ColumnPropNameInTable="v_ded_fedtaxColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_ded_statax" msprop:Generator_UserColumnName="v_ded_statax" msprop:Generator_ColumnPropNameInRow="v_ded_statax" msprop:Generator_ColumnVarNameInTable="columnv_ded_statax" msprop:Generator_ColumnPropNameInTable="v_ded_stataxColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_ded_loctax" msprop:Generator_UserColumnName="v_ded_loctax" msprop:Generator_ColumnPropNameInRow="v_ded_loctax" msprop:Generator_ColumnVarNameInTable="columnv_ded_loctax" msprop:Generator_ColumnPropNameInTable="v_ded_loctaxColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_ded_other" msprop:Generator_UserColumnName="v_ded_other" msprop:Generator_ColumnPropNameInRow="v_ded_other" msprop:Generator_ColumnVarNameInTable="columnv_ded_other" msprop:Generator_ColumnPropNameInTable="v_ded_otherColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_obl_fica" msprop:Generator_UserColumnName="v_obl_fica" msprop:Generator_ColumnPropNameInRow="v_obl_fica" msprop:Generator_ColumnVarNameInTable="columnv_obl_fica" msprop:Generator_ColumnPropNameInTable="v_obl_ficaColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_obl_medicare" msprop:Generator_UserColumnName="v_obl_medicare" msprop:Generator_ColumnPropNameInRow="v_obl_medicare" msprop:Generator_ColumnVarNameInTable="columnv_obl_medicare" msprop:Generator_ColumnPropNameInTable="v_obl_medicareColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_obl_futa" msprop:Generator_UserColumnName="v_obl_futa" msprop:Generator_ColumnPropNameInRow="v_obl_futa" msprop:Generator_ColumnVarNameInTable="columnv_obl_futa" msprop:Generator_ColumnPropNameInTable="v_obl_futaColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_obl_other" msprop:Generator_UserColumnName="v_obl_other" msprop:Generator_ColumnPropNameInRow="v_obl_other" msprop:Generator_ColumnVarNameInTable="columnv_obl_other" msprop:Generator_ColumnPropNameInTable="v_obl_otherColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_ded_total" msprop:Generator_UserColumnName="v_ded_total" msprop:Generator_ColumnPropNameInRow="v_ded_total" msprop:Generator_ColumnVarNameInTable="columnv_ded_total" msprop:Generator_ColumnPropNameInTable="v_ded_totalColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_obl_total" msprop:Generator_UserColumnName="v_obl_total" msprop:Generator_ColumnPropNameInRow="v_obl_total" msprop:Generator_ColumnVarNameInTable="columnv_obl_total" msprop:Generator_ColumnPropNameInTable="v_obl_totalColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="ErrorMessage1" msprop:Generator_UserColumnName="ErrorMessage1" msprop:Generator_ColumnPropNameInRow="ErrorMessage1" msprop:Generator_ColumnVarNameInTable="columnErrorMessage1" msprop:Generator_ColumnPropNameInTable="ErrorMessage1Column" type="xs:string" minOccurs="0" />
+              <xs:element name="ErrorMessage2" msprop:Generator_UserColumnName="ErrorMessage2" msprop:Generator_ColumnPropNameInRow="ErrorMessage2" msprop:Generator_ColumnVarNameInTable="columnErrorMessage2" msprop:Generator_ColumnPropNameInTable="ErrorMessage2Column" type="xs:string" minOccurs="0" />
+              <xs:element name="ErrorMessage3" msprop:Generator_UserColumnName="ErrorMessage3" msprop:Generator_ColumnPropNameInRow="ErrorMessage3" msprop:Generator_ColumnVarNameInTable="columnErrorMessage3" msprop:Generator_ColumnPropNameInTable="ErrorMessage3Column" type="xs:string" minOccurs="0" />
+              <xs:element name="SearchCriteria" msprop:Generator_UserColumnName="SearchCriteria" msprop:Generator_ColumnPropNameInRow="SearchCriteria" msprop:Generator_ColumnVarNameInTable="columnSearchCriteria" msprop:Generator_ColumnPropNameInTable="SearchCriteriaColumn" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

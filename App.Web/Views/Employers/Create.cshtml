@@ -1,0 +1,205 @@
+﻿@model App.Data.Entities.MasterEmployer
+@{
+  ViewBag.Title = "Create";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Add Details
+      
+    </h4>
+  </div>
+  <div class="panel-body">
+    @using (Html.BeginForm("Create", "Employers", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+    <div class="row">
+
+
+      <div class="col-sm-3 mb-3">
+        @Html.LabelFor(model => model.UniqueID, new { @class = "mb-2 control-label" })
+        @Html.TextBoxFor(m => m.UniqueID, new { @class = "form-control input-sm", placeholder = "UniqueID", @readonly = "readonly" })
+      </div>
+
+
+
+      <div class="col-sm-3 mb-3">
+        @Html.LabelFor(model => model.EmployerName, new { @class = "mb-2 control-label" })
+        @Html.TextBoxFor(m => m.EmployerName, new { @class = "form-control input-sm", placeholder = "Employer Name" })
+      </div>
+
+
+      <div class="col-sm-3 mb-3">
+        @Html.LabelFor(model => model.EmployerTypeID, "Employer Type *", new { @class = "mb-2 control-label" })
+        @Html.DropDownList("EmployerTypeID", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+      </div>
+
+
+
+      <div class="col-sm-3 mb-3">
+        @Html.LabelFor(model => model.EmployerAddress, new { @class = "mb-2 control-label" })
+        @Html.TextBoxFor(m => m.EmployerAddress, new { @class = "form-control input-sm", placeholder = "Employer Address" })
+      </div>
+
+
+
+      <div class="col-sm-3 mb-3">
+        @Html.LabelFor(model => model.CountryID, new { @class = "mb-2 control-label" })
+        @Html.DropDownList("CountryID", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+      </div>
+
+
+
+      <div class="col-sm-3 mb-3">
+      @Html.LabelFor(model => model.CityID, new { @class = "mb-2 control-label" })
+      @Html.DropDownList("CityID1",null, "---Select---", htmlAttributes: new { @class = "form-control" })
+    </div>
+
+   
+
+
+
+      @*<div class="form-group">
+      @Html.LabelFor(model => model.ZipCode, new { @class = "col-sm-4 control-label" })
+      <div class="col-sm-8">
+        @Html.TextBoxFor(m => m.ZipCode, new { @class = "form-control input-sm", placeholder = "ZipCode" })
+      </div>
+    </div>*@
+
+
+      <div class="col-sm-3 mb-3">
+        @Html.LabelFor(model => model.POBoxNo, new { @class = "mb-2 control-label" })
+        @Html.TextBoxFor(m => m.POBoxNo, new { @class = "form-control input-sm", placeholder = "PO.Box No." })
+      </div>
+
+
+
+      <div class="col-sm-3 mb-3">
+        @Html.LabelFor(model => model.ContactPerson, new { @class = "mb-2 control-label" })
+        @Html.TextBoxFor(m => m.ContactPerson, new { @class = "form-control input-sm", placeholder = "Contact Person" })
+      </div>
+
+
+
+      <div class="col-sm-3 mb-3">
+        @Html.LabelFor(model => model.Mobile, new { @class = "mb-2 control-label" })
+        @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control input-sm", placeholder = "Mobile" })
+      </div>
+
+
+
+      <div class="col-sm-3 mb-3">
+        @Html.LabelFor(model => model.PFRateID, "PF For *", new { @class = "mb-2 control-label" })
+        @Html.DropDownList("PFRateID", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+      </div>
+
+
+
+      <div class="col-sm-3 mb-3">
+        @Html.LabelFor(model => model.PFRate, new { @class = "mb-2 control-label" })
+        @Html.TextBoxFor(m => m.PFRate, new { @class = "form-control input-sm", placeholder = "PF Rate" }) @*@readonly = "readonly"*@
+      </div>
+
+
+      <div class="form-group row col-sm-3 mb-3">
+        <div class="control-label mb-2 mt-3" for="Name"> &nbsp; </div>
+        <label for="IsActive" class="col-sm-3 mb-3 mb-2 control-label">Status:</label>
+        <div class="col-sm-5">
+          <div class="checkbox">
+            @Html.CheckBoxFor(m => m.IsActive, new { @class = "form-control input-sm", @checked = "checked" })
+          </div>
+        </div>
+      </div>
+
+      @*<div class="form-group row col-sm-3 mb-3">
+        <label for="IsActive" class="col-sm-3 mb-3 mb-2 control-label">Status:</label>
+        <div class="col-sm-2">
+            <div class="checkbox">
+                <input checked="checked" class="form-control input-sm" data-val="true" data-val-required="The Status field is required." id="IsActive" name="IsActive" type="checkbox" value="true"><input name="IsActive" type="hidden" value="false">
+            </div>
+        </div>
+    </div>*@
+
+      <div class="form-group row">
+        <div class="col-sm-12 text-right">
+          <div class="control-label mb-2 mt-3" for="Name"> &nbsp; </div>
+          <button type="submit" class="btn btn-success px-5 height"><i class="fa fa-save"> </i> Create</button>
+          <a href="/Employers/Index" class="btn btn-primary height border-radius line-height"><i class="fa fa-reply"> </i> Back to List</a>
+
+        </div>
+      </div>
+    </div>
+   
+      @*<div class="custom-popup width-100 confirmClass" id="checkUnique" style="display:none;">
+          <div class="padding-md">
+            <h4 class="m-top-none" id="popupText"> </h4>
+          </div>
+          <div class="text-center">
+            <a class="btn btn-success m-right-sm" onclick="onClickYes()">Yes</a>
+            <a class="btn btn-danger" onclick="onClickNo()">No</a>
+          </div>
+        </div>*@
+    }
+  </div>
+</div>
+@section scripts{
+  <style>
+    .control-label {
+      text-align: left;
+    }
+  </style>
+  <script src="~/Scripts/Master.js"></script>
+  <script src="~/Scripts/Employers.js"></script>
+  <script nonce="@ViewBag.StyleNonce">
+
+    $(function () {
+      $('select').select2({
+        placeholder: "---Select---",
+        allowClear: true
+      });
+      $.ajax({
+        url: "@Url.Action("UniqueIDAjax", "Employers")",
+        type: 'Get',
+        dataType: 'json'
+      }).done(function (result) {
+        //var id = "E0000" + (result + 1);
+        $("#UniqueID").val(result);
+      });
+      //var id = $("#CountryID").val();
+      countryChange($("#CountryID").val());
+      cityChange($("#CityID").val());
+    })
+
+    $("#Mobile").on('blur', function () {
+      if ($(this).val() != "" || $("#EmployerAddress").val() != "" || $("#EmployerName").val() != "") {
+        var employerAddress = $("#EmployerAddress").val();
+        var employerName = $("#EmployerName").val();
+        var mobile = $("#Mobile").val();
+        $.ajax({
+          url: "@Url.Action("EmployerNameAjax", "Employers")?EmployerName=" + employerName + "&EmployerAddress=" + employerAddress + "&Mobile=" + mobile,
+          type: "Get"
+        }).done(function (result) {
+          debugger
+          if (result > 0) {
+            toasterErrorMessage(employerName + " already Exist With this address " + employerAddress + " and mobile number " + mobile);
+            $("#Mobile").val("");
+            $("#EmployerName").val("");
+            $("#EmployerAddress").val("");
+          }
+        })
+      }
+      else {
+        toasterErrorMessage("Please check employer name, Address and Mobile Number.");
+      }
+    })
+    //function onClickYes() {
+    //  $("#checkUnique").popup("hide");
+    //}
+    //function onClickNo() {
+    //  $("#EmployerName").val("");
+    //  $("#checkUnique").popup("hide");
+    //}
+
+  </script>
+}

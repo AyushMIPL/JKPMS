@@ -1,0 +1,521 @@
+﻿@model IEnumerable<JKPS.COMMON.DVOMasterEmpBankDetails>
+
+@{
+    Layout = "~/Views/Shared/_LayoutPensioner.cshtml";
+}
+@{
+    // Assuming ViewBag.Email has a value
+    var PensionerID = ViewBag.PensionerID as string;
+}
+
+
+
+@section profilePensioner
+{@Html.Hidden("PensionerID")
+
+
+@*<style>
+    select {
+        height: 30px;
+        line-height: 30px;
+        border: 1px solid #aaa;
+        font-size: 16px !important;
+        border-radius: 20px !important;
+        -moz-border-radius: 20px !important;
+        -webkit-border-radius: 20px !important;
+        margin: 0;
+        padding: 6px 10px;
+        box-shadow: inset 3px 3px 6px #BFC3CF, inset -3px -3px 6px #ffffff;
+        background-color: transparent !important;
+        box-shadow: inset 3px 3px 6px #BFC3CF, inset -3px -3px 6px #ffffff;
+        cursor: default;
+        display: -ms-flexbox;
+        -ms-flex-wrap: wrap;
+        -webkit-justify-content: space-between;
+        -ms-flex-pack: justify;
+        -webkit-transition: all 100ms;
+        transition: all 100ms;
+        border: none !important;
+        height: 40px !important;
+        color: #aeadad !important;
+    }
+</style>*@
+
+<div class="panel panel-default">
+
+    <div class="panel-heading clearfix">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <div class="col-sm-6">
+                        <h4 class="headline Dash_contributorSummary">
+                            Bank Details:@string.Format("{0} ({1})", ViewBag.Name, ViewBag.ApplicationReferenceNo)
+                        </h4>
+                    </div>
+                    <div class="col-sm-6">
+                        <h4 class="headline Dash_contributorSummary  dash_button_right">
+                            Scheme Type:@string.Format("({0})", ViewBag.TypeCode)
+                            @*<ul class="tool-bar">
+                                    <li><a href="/MasterPensioner/AddBankDetails/@ViewBag.CId" data-toggle="tooltip" data-placement="bottom" title="Add details" data-original-title="Add Details"><i class="fa fa-plus"></i></a></li>
+                                </ul>*@
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table class="table dataTable" id="tbl">
+                <thead>
+                    <tr>
+                        <th>Bank Code</th>
+                        @*<th>Account Type<br /> (C - Current<br />S - Savings)</th>*@
+                        <th>Account NO</th>
+                        <th>CBS Name</th>
+                        <th>CBS Branch Code</th>
+                        <th>CBS Account Status</th>
+                        <th>Aadhar Status</th>
+                        <th>Account Scheme Type</th>
+                        @*<th>Type<br />(P- Percentage <br /> A - Amount <br /> R - Remainder )</th>*@
+                        @*<th>Amount<br />(Amount/%)</th>*@
+                        <th>Description</th>
+                        <th>Remarks</th>
+                        <th>Document</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@*code by Himanshu Rajput*@
+
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <div class="col-sm-12">
+                        <h4 class="headline Dash_contributorSummary">
+                            Audit Log-Bank history:@string.Format("{0} ({1})", ViewBag.Name, ViewBag.ApplicationReferenceNo)
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-body">
+        <table class="table dataTable" id="tblBankDetails">
+            <thead>
+                <tr>
+                    @*<th>Created By</th>
+                        <th>Created On</th>*@
+                    <th>Modified By</th>
+                    <th>Modified On</th>
+                    @*<th>Event Type</th>*@
+                    @*<th>Table Name</th>*@
+                    <th>Field Name</th>
+                    <th>Old Value</th>
+                    <th>New Value</th>
+                    @*<th>Url</th>
+                        <th>Controller</th>
+                        <th>Action</th>
+                        <th>Area</th>
+                        <th>IP Address</th>
+                        <th>Record Id</th>
+                        <th>Old SystemId</th>
+                        <th>Message</th>*@
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+<div class="custom-popup confirmClass PopUpShowLargeMessage_index p-0" data-keyboard="false" data-backdrop="static" id="PopUpShowLargeMessage">
+    <div class="">
+        <!-- Update Payment Section -->
+        <h3 class="m-top-none py-3 text-white uploadfile_background" id="MHeader"></h3>
+        <!-- Header Section -->
+        <div class="row incomindexmodal2">
+            <label id="MessageText"></label>
+        </div>
+    </div>
+</div>
+}
+@section Scripts {
+    <script src="~/Content/endless/js/jquery.dataTables.min.js"></script>
+    <script nonce="@ViewBag.StyleNonce">
+        ////$(function () {
+        ////  var pensionerID = $("#PensionerID").val();
+        ////  var oTable = $('#tbl').dataTable({
+        ////    "bJQueryUI": true,
+        ////    "sPaginationType": "full_numbers",
+        ////    "bServerSide": true,
+        ////    "bDestroy": true,
+        ////    "sAjaxSource": "/MasterPensioner/BankDetailsAjaxHandler/?PensionerID=" + pensionerID,
+        ////    "aoColumns": [
+
+        ////      { "sName": "bank_code" },
+        ////      { "sName": "bank_desc" },
+        ////      { "sName": "typeofacct" },
+        ////      { "sName": "bank_acct_no" },
+        ////      { "sName": "type" },
+        ////      { "sName": "amount" },
+
+
+        ////      {
+        ////        "sName": "ID",
+        ////        "bSearchable": false,
+        ////        "bSortable": false,
+        ////        "fnRender": function (oObj) {
+        ////          var strstring = '<a href="/masterpensioner/editbankdetails/' + oObj.aData[6] + '\" class="btn btn-info btn-xs" title="edit" enable><i class="fa fa-pencil"></i> Edit</a>';
+
+        ////          return strstring;
+        ////        }
+        ////      }
+
+        ////      //{
+        ////      //    "sname": "id",
+        ////      //    "bsearchable": false,
+        ////      //    "bsortable": false,
+        ////      //    "fnrender": function (oObj) {
+        ////      //        var strstring = '<a href="/masterpensioner/editbankdetails/' + oObj.aData[6] + '\" class="btn btn-info btn-xs" title="edit" disabled><i class="fa fa-pencil"></i> edit</a>';
+
+        ////      //        return strstring;
+        ////      //    }
+        ////      //}
+
+
+        ////    ]
+        ////  });
+
+        ////})
+
+
+
+        //$(document).ready(function () {
+
+        //  $(function () {
+        //    var pensionerID = $("#PensionerID").val();
+        //    var oTable = $('#tbl').dataTable({
+        //      "bJQueryUI": true,
+        //      "sPaginationType": "full_numbers",
+        //      "bServerSide": true,
+        //      "bDestroy": true,
+        //      "sAjaxSource": "/MasterPensioner/BankDetailsAjaxHandler/?PensionerID=" + pensionerID,
+        //      "aoColumns": [
+
+        //        { "sName": "bank_code" },
+        //        { "sName": "bank_acct_no" },
+        //        { "sName": "CBS_NAME" },
+        //        { "sName": "BRANCH_CODE" },
+        //        {
+        //          "sName": "ACCOUNT_STATUS",
+        //          "fnRender": function (oObj) {
+        //            var status = oObj.aData[4];
+        //            var statusClass = 'unknown';
+        //            var statusIcon = '<i class="fa fa-question-circle"></i>';
+        //            var statusTooltip = 'Unknown Status';
+        //            if (status === "N") {
+        //              statusClass = 'badge badge-success';
+        //              statusIcon = '<i class="fa fa-check-circle text-success" title="Active"></i>';
+        //              statusTooltip = 'Active';
+        //            } else if (status === "Y") {
+        //              statusClass = 'badge badge-danger';
+        //              statusIcon = '<i class="fa fa-times-circle text-success" title="Not Active"></i>';
+        //              statusTooltip = 'Not Active';
+        //            }
+        //            return '<span class="' + statusClass + '" title="' + statusTooltip + '">' + statusIcon + ' ' + statusTooltip + '</span>';
+        //          }
+        //        },
+
+        //        /*{ "sName": "ACCOUNT_STATUS" },*/
+        //        { "sName": "AADHAAR_STATUS" },
+        //        /*{ "sName": "typeofacct", "visible":false },*/
+        //        /* { "sName": "bank_acct_no" }, */
+        //        { "sName": "type" },
+        //        / { "sName": "amount" },/
+        //        { "sName": "bank_desc" },
+        //        { "sName": "Remarks" },
+        //        {
+        //          "sName": "ID",
+        //          "bSearchable": false,
+        //          "bSortable": false,
+        //          "fnRender": function (oObj) {
+        //            var strstring = '<a href="/masterpensioner/editbankdetails/' + oObj.aData[9] + '\" class="btn btn-info btn-xs" title="edit" enable><i class="fa fa-pencil"></i> Edit</a>';
+
+        //            return strstring;
+        //          }
+        //        }
+
+        //        //{
+        //        //    "sname": "id",
+        //        //    "bsearchable": false,
+        //        //    "bsortable": false,
+        //        //    "fnrender": function (oObj) {
+        //        //        var strstring = '<a href="/masterpensioner/editbankdetails/' + oObj.aData[6] + '\" class="btn btn-info btn-xs" title="edit" disabled><i class="fa fa-pencil"></i> edit</a>';
+
+        //        //        return strstring;
+        //        //    }
+        //        //}
+
+
+        //      ]
+        //    });
+
+        //  })
+
+
+        //  $(function () {
+        //    debugger;
+        //    var pensionerID = $("#PensionerID").val();
+        //    var oTable = $('#tblBankDetails').dataTable({
+        //      "bJQueryUI": true,
+        //      "sPaginationType": "full_numbers",
+        //      "bServerSide": true,
+        //      "bDestroy": true,
+        //      "sAjaxSource": "/MasterPensioner/_OldBankHistoryAjaxHandler/?PensionerID=" + pensionerID,
+        //      "aoColumns": [
+
+        //        //{ "sName": "CreatedBy" },
+        //        //{ "sName": "CreatedOn" },
+        //        { "sName": "ModifiedBy" },
+        //        { "sName": "ModifiedOn" },
+        //        //{ "sName": "EventType" },
+        //        //{ "sName": "TableName" },
+        //        //{ "sName": "ColumnName" },
+        //        { "sName": "OldValue" },
+        //        { "sName": "NewValue" },
+        //        //{ "sName": "Url" },
+        //        //{ "sName": "Controller" },
+        //        //{ "sName": "Action" },
+        //        //{ "sName": "Area" },
+        //        //{ "sName": "IPAddress" },
+        //        //{ "sName": "RecordId" },
+        //        //{ "sName": "OldSystemId" },
+        //        //{ "sName": "Message" }
+        //      ]
+        //    });
+        //  })
+        //});
+
+        $(document).ready(function () {
+          var RemarkArr = [];
+            $(function () {
+                var pensionerID = $("#PensionerID").val();
+                var oTable = $('#tbl').dataTable({
+                    "bJQueryUI": true,
+                    "sPaginationType": "full_numbers",
+                    "bServerSide": true,
+                    "bDestroy": true,
+                  "sAjaxSource": "/MasterPensioner/BankDetailsAjaxHandler/?PensionerID=" + pensionerID,
+                  "fnDrawCallback": function (setting) {
+                    RemarkArr.forEach(function (item, index) {
+                      debugger
+                      var itemArray = item.split('_')[1];
+                      var Remark = "Remark";
+                      document.getElementById(item).addEventListener("click", function () {
+                        OpenMessagePopup(Remark, itemArray);
+                      });
+
+                    });
+                  },
+                    "aoColumns": [
+
+                        { "sName": "bank_code" },
+                        { "sName": "bank_acct_no" },
+                        { "sName": "CBS_NAME" },
+                        { "sName": "BRANCH_CODE" },
+
+                        {
+                            "sName": "ACCOUNT_STATUS",
+                            "fnRender": function (oObj) {
+                                var status = oObj.aData[4];
+                                var statusClass = 'unknown';
+                                var statusIcon = '<i class="fa fa-question-circle"></i>';
+                                var statusTooltip = 'Unknown Status';
+                                if (status === "ACTIVE") {
+                                    statusClass = 'badge badge-success';
+                                    statusIcon = '<i class="fa fa-check-circle text-success" title="Active"></i>';
+                                    statusTooltip = 'Active';
+                                } else {
+                                    statusClass = 'badge badge-danger';
+                                    statusIcon = '<i class="fa fa-times-circle text-success" title="Not Active"></i>';
+                                    statusTooltip = 'Not Active';
+                                }
+                                return '<span class="' + statusClass + '" title="' + statusTooltip + '">' + statusIcon + ' ' + statusTooltip + '</span>';
+                            }
+                        },
+
+                        /*{ "sName": "ACCOUNT_STATUS" },*/
+                        { "sName": "AADHAAR_STATUS" },
+                        /*{ "sName": "typeofacct", "visible":false },*/
+                        /*   { "sName": "bank_acct_no" },*/
+                        { "sName": "type" },
+                        /* { "sName": "amount" },*/
+                        { "sName": "bank_desc" },
+                        /*{ "sName": "Remarks" },*/
+                        {
+                            "sname": "Remarks",
+                            "bsearchable": false,
+                            "bsortable": false,
+                            "fnRender": function (oObj) {
+                                if (oObj.aData[8].length > 10) {
+                                    // Get the first 10 characters
+                                  var firstTenCharacters = oObj.aData[8].substring(2, 10);
+                                  var id = "OpenMessagePopup_" + oObj.aData[8].replace(/\s\s+/g, ' ');
+                                  RemarkArr.push(id);
+                                  return ('<a href="#" class="MPCursor1" id="' + id + '" >' + firstTenCharacters + '...</a>');                                    
+                                } else {
+                                    return (oObj.aData[8]);
+                                }
+                            }
+                        },
+                        {
+                            "sName": "Bank_documentD",
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "fnRender": function (oObj) {
+                                var strString = ''; // Corrected variable name
+                                var fileName = oObj.aData[9];
+                                debugger;
+                                if (fileName != '' && fileName != null) {
+                                    if (fileName.split('.')[1] == 'pdf')
+                                        strString += '<a class="dropdown-item mt-1 ml-2" href="/DataFiles/Supportivedocument/' + oObj.aData[9] + '\"  download><i class="fa fa-file-pdf-o" aria-hidden="true"></i> ' + fileName.split('~')[1] + '</a>';
+                                    else
+                                        strString += '<a class="dropdown-item mt-1 ml-2" href="/DataFiles/Supportivedocument/' + oObj.aData[9] + '\"  download><i class="fa fa-picture-o" aria-hidden="true"></i> ' + fileName.split('~')[1] + '</a>';
+                                }
+
+                                return strString; // Corrected return variable name
+                            }
+                        },
+
+                        {
+                            "sName": "ID",
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "fnRender": function (oObj) {
+                                var strstring = '<a href="/MasterPensioner/EditBankDetails/' + oObj.aData[10] + '\" class="btn btn-info btn-xs" title="edit" enable><i class="fa fa-pencil"></i> Edit</a>';
+
+                                return strstring;
+                            }
+                        }
+
+                        //{
+                        //    "sname": "id",
+                        //    "bsearchable": false,
+                        //    "bsortable": false,
+                        //    "fnrender": function (oObj) {
+                        //        var strstring = '<a href="/masterpensioner/editbankdetails/' + oObj.aData[6] + '\" class="btn btn-info btn-xs" title="edit" disabled><i class="fa fa-pencil"></i> edit</a>';
+
+                        //        return strstring;
+                        //    }
+                        //}
+
+
+                    ]
+                });
+
+            })
+
+          var OpenMessagePopupArr = [];
+            $(function () {
+                debugger;
+                var pensionerID = $("#PensionerID").val();
+                var oTable = $('#tblBankDetails').dataTable({
+                    "bJQueryUI": true,
+                    "sPaginationType": "full_numbers",
+                    "bServerSide": true,
+                    "bDestroy": true,
+                  "sAjaxSource": "/MasterPensioner/_OldBankHistoryAjaxHandler/?PensionerID=" + pensionerID,
+                  "fnDrawCallback": function (setting) {
+                    OpenMessagePopupArr.forEach(function (item, index) {
+                      debugger
+                      var itemArray = item.split('_');
+                      var oldNew = "Old Remark";
+                      if (itemArray[1] == 2) {
+                        oldNew = "New Remark";
+                      }
+                      document.getElementById(item).addEventListener("click", function () {
+                        OpenMessagePopup(oldNew, itemArray[2]);
+                      });
+
+                    });
+
+                  },
+                    "aoColumns": [
+
+                        //{ "sName": "CreatedBy" },
+                        //{ "sName": "CreatedOn" },
+                        { "sName": "ModifiedBy" },
+                        { "sName": "ModifiedOn" },
+                        //{ "sName": "EventType" },
+                        //{ "sName": "TableName" },
+                        { "sName": "ColumnName" },
+                        // { "sName": "OldValue" },
+
+                        {
+                            "sname": "OldValue",
+                            "bsearchable": false,
+                            "bsortable": false,
+                            "fnRender": function (oObj) {
+                                debugger;
+                                if (oObj.aData[3].length > 10) {
+                                    // Get the first 10 characters
+                                  var firstTenCharacters = oObj.aData[3].substring(2, 10);
+                                  var id = "OpenMessagePopup_1_" + oObj.aData[3].replace(/\s\s+/g, ' ');
+                                  OpenMessagePopupArr.push(id);
+                                  return ('<a href="#" class="MPCursor1" id="' + id + '" >' + firstTenCharacters + '...</a>');  
+                                } else {
+                                    return (oObj.aData[3]);
+                                }
+                            }
+                        },
+                        {
+                            "sname": "NewValue",
+                            "bsearchable": false,
+                            "bsortable": false,
+                            "fnRender": function (oObj) {
+                                debugger;
+                                if (oObj.aData[4].length > 10) {
+                                    // Get the first 10 characters
+                                  var firstTenCharacters = oObj.aData[4].substring(2, 10);
+                                  var id = "OpenMessagePopup_2_" + oObj.aData[4].replace(/\s\s+/g, ' ');
+                                  OpenMessagePopupArr.push(id);
+                                  return ('<a href="#" class="MPCursor1" id="' + id + '" >' + firstTenCharacters + '...</a>');                                 
+                                } else {
+                                    return (oObj.aData[4]);
+                                }
+                            }
+                        },
+
+                        //{ "sName": "NewValue" },
+                        //{ "sName": "Url" },
+                        //{ "sName": "Controller" },
+                        //{ "sName": "Action" },
+                        //{ "sName": "Area" },
+                        //{ "sName": "IPAddress" },
+                        //{ "sName": "RecordId" },
+                        //{ "sName": "OldSystemId" },
+                        //{ "sName": "Message" }
+                    ]
+                });
+            })
+        });
+
+        function OpenMessagePopup(heading, message) {
+          $("#MHeader").html(heading + '<button  type="button" class="close MPSClose" title="Close" aria-label="Close MPSClose" id="ClosePopupWindow"><span aria-hidden="true">&times;</span>');
+            $("#MessageText").html(message);
+            $("#PopUpShowLargeMessage").popup('show');
+          document.getElementById("ClosePopupWindow").addEventListener("click", ClosePopupWindow);
+        }
+        function ClosePopupWindow() {
+            $("#PopUpShowLargeMessage").popup("hide");
+        }
+
+    </script>
+}

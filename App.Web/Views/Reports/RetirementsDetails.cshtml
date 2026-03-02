@@ -1,0 +1,75 @@
+﻿
+@{
+    ViewBag.Title = "RetirementsDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Retirements Details
+      
+      @*<ul class="tool-bar">
+        
+      </ul>*@
+    </h4>
+  </div>
+  @using (Html.BeginForm())
+  {
+    <div class="panel-body">
+      <div class="row">
+        @*<div class="col-sm-12">
+          <div class="form-group">
+            <div class="col-sm-3">
+              @Html.DropDownList("ContributorId", null, "---Select---", new { @class = "form-control select-sm", @id = "ddlContributor" })
+            </div>
+            <div class="col-sm-3">
+              @Html.DropDownList("Month", null, "---Select---", new { @class = "form-control select-sm", @id = "ddlMonth" })
+            </div>
+            <div class="col-sm-3">
+              @Html.DropDownList("Year", null, "---Select---", new { @class = "form-control select-sm", @id = "ddlYear" })
+            </div>
+            <div class="col-sm-2">
+              <button type="button" class="btn btn-success btn-group-sm" onclick="javascript:return ShowReportUpdate()"><i class="fa fa-search"></i> Search</button>
+            </div>
+          </div>
+        </div>*@
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        @*<div class="col-sm-2">
+          </div>*@
+        @*<div class="col-sm-12">
+          
+          <iframe id="reportData" style="border: 0px;height:700px;width:100%;"></iframe>
+        </div>*@
+      </div>
+    </div>
+  }
+</div>
+@section Scripts {
+  <script nonce="@ViewBag.StyleNonce">
+    $(document).ready(function () {
+      ShowReport();
+    });
+    function ShowReport() {     
+      $.ajax({
+        url: "@Url.Action("retReport", "Reports")",
+        type: "GET",
+      async: true,
+      })
+    .done(function (result) {
+      var actionRes = result;
+      if (actionRes == "1") {
+        $('#reportData').attr('src', '/ReportForms/ContributionByEmployer.aspx');
+        return false;
+      }
+      else {
+        toasterInfoMessage("Result not found on this search criteria.");
+        return false;
+      }
+    });     
+    }
+  </script>
+}
+}

@@ -1,0 +1,233 @@
+﻿@model App.Data.Entities.MasterContributor
+
+@{
+  ViewBag.Title = "ContributorDetails";
+}
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Active Contributor Details
+      @*<ul class="tool-bar">
+        
+      </ul>*@
+    </h4>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-sm-4">
+        <dl class="dl-horizontal">
+          <dt>
+            Contributor Id
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.PersonID)
+          </dd>
+          <dt>Contributor Name</dt>
+          <dd>
+            @Html.DisplayFor(model => model.FullName)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.Gender)
+          </dt>
+
+          @if (Model.Gender == "M")
+          {
+          <dd>Male</dd>}
+          else
+          {
+          <dd>Female</dd>}
+
+
+
+          <dt>
+            @Html.DisplayNameFor(model => model.DateOfBirth)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.DateOfBirth)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.Mobile)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.Mobile)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.Phone)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.Phone)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.Email)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.Email)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.SalaryAmount)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.SalaryAmount)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.Country.CountryCode)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.Country.CountryCode)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.Employer.UniqueID)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.Employer.UniqueID)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.Nationality.Name)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.Nationality.Name)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.PermanentCity.Name)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.PermanentCity.Name)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.Prefix.Name)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.Prefix.Name)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.Suffix.Name)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.Suffix.Name)
+          </dd>
+
+
+
+          <dt>
+            @Html.DisplayNameFor(model => model.SocialSecurityNo)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.SocialSecurityNo)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.MaidenName)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.MaidenName)
+          </dd>
+
+
+
+
+          <dt>
+            @Html.DisplayNameFor(model => model.PermanentAddress)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.PermanentAddress)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.PostalAddress)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.PostalAddress)
+          </dd>
+
+
+
+          <dt>
+            @Html.DisplayNameFor(model => model.PhoneOffice)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.PhoneOffice)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.MasterPFRate.Name)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.MasterPFRate.Name)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.PFRate)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.PFRate)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.Balance)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.Balance)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.QuarterlyAmount)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.QuarterlyAmount)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.AnnualAmount)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.AnnualAmount)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.ExpectedRetirementDate)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.ExpectedRetirementDate)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.Status.Name)
+          </dt>
+
+          <dd>
+            <span class='badge badge-success'>@Html.DisplayFor(model => model.Status.Name)</span>
+          </dd>
+
+        </dl>
+      </div>
+
+    </div>
+  </div>
+  <div class="panel-footer">
+    @Html.ActionLink("Back to List", "ActiveContributor", "MasterPensioner", null, new { @class = "btn btn-primary" })
+  </div>
+</div>

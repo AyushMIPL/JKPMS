@@ -1,0 +1,176 @@
+﻿@model App.Data.Entities.MasterContributorJobDetails
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create</h2>
+
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+
+  <div class="panel panel-default">
+    <form class="form-horizontal no-margin form-border" id="formWizard1">
+      <div class="panel-heading">
+        Dependants Details
+      </div>
+      <div class="panel-tab">
+        <ul class="wizard-steps wizard-demo" id="wizardDemo1">
+          <li>
+            @Html.ActionLink("Contributor Personal Details", "Create", "ContributorPersonalDetails")
+            @*<a href="#wizardContent1" data-toggle="tab">Contributor Personal Details</a>*@
+          </li>
+          <li>
+            @Html.ActionLink("Marriage Details", "Create", "MarriageDetails")
+            @*<a href="#wizardContent2" data-toggle="tab">Marriage Details</a>*@
+          </li>
+          <li >
+            @Html.ActionLink("Dependants Details", "Create", "DependantDetails")
+            @*<a href="#wizardContent3" data-toggle="tab">Dependants Details</a>*@
+          </li>
+          <li class="active">
+            @Html.ActionLink("Job Details", "Create", "JobDetails")
+            @*<a href="#wizardContent4" data-toggle="tab">Job Details</a>*@
+          </li>
+        </ul>
+      </div>
+
+      <div class="panel-body">
+        <div class="tab-content">
+          <div class="tab-pane fade" id="wizardContent1">
+
+          </div>
+          <div class="tab-pane fade padding-md" id="wizardContent2">
+          </div>
+          <div class="tab-pane fade padding-md" id="wizardContent3">
+          </div>
+          <div class="tab-pane fade active in" id="wizardContent4">
+            <div class="form-horizontal">
+              <h4>Job Details</h4>
+              <hr />
+              @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+              <div class="form-group">
+                @Html.LabelFor(model => model.PersonId, htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.EditorFor(model => model.PersonId, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.PersonId, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.EmployerID, "EmployerID", htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.DropDownList("EmployerID", null, htmlAttributes: new { @class = "form-control" })
+                  @Html.ValidationMessageFor(model => model.EmployerID, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.EmploymentType, htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.EditorFor(model => model.EmploymentType, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.EmploymentType, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.DepartmentId, "DepartmentId", htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.DropDownList("DepartmentId", null, htmlAttributes: new { @class = "form-control" })
+                  @Html.ValidationMessageFor(model => model.DepartmentId, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.DesignationId, "DesignationId", htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.DropDownList("DesignationId", null, htmlAttributes: new { @class = "form-control" })
+                  @Html.ValidationMessageFor(model => model.DesignationId, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.JobTitle, htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.EditorFor(model => model.JobTitle, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.JobTitle, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.GradeId, "GradeId", htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.DropDownList("GradeId", null, htmlAttributes: new { @class = "form-control" })
+                  @Html.ValidationMessageFor(model => model.GradeId, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.HireDate, htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.EditorFor(model => model.HireDate, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.HireDate, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.PresentSalary, htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.EditorFor(model => model.PresentSalary, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.PresentSalary, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.JobDescription, htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.EditorFor(model => model.JobDescription, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.JobDescription, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.IsActive, htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  <div class="checkbox">
+                    @Html.EditorFor(model => model.IsActive)
+                    @Html.ValidationMessageFor(model => model.IsActive, "", new { @class = "text-danger" })
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                  <input type="submit" value="Create" class="btn btn-success" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer clearfix">
+        <div class="pull-left">
+          <button class="btn btn-success btn-sm" id="prevStep1">Previous</button>
+          <button type="submit" class="btn btn-sm btn-success" id="nextStep1">Next</button>
+        </div>
+
+        <div class="pull-right" style="width:30%">
+          <div class="progress progress-striped active m-top-sm m-bottom-none">
+            <div class="progress-bar progress-bar-success" id="wizardProgress" style="width: 100%;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

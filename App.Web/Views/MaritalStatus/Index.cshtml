@@ -1,0 +1,188 @@
+﻿@model IEnumerable<App.Data.Entities.MasterMaritalStatus>
+
+@{
+  ViewBag.Title = "Index";
+}
+
+<style>
+  a.disabled {
+    color: gray;
+    pointer-events: none;
+    opacity: .8;
+  }
+
+  table.dataTable thead th, table.dataTable tfoot th, table.dataTable tbody td {
+    text-align: left !important;
+  }
+</style>
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline headline-maritalstatusindex">
+      Marital Status
+
+      <ul class="tool-bar">
+        <li>
+          <a href="/MaritalStatus/Create" data-toggle="tooltip"
+             class="@(ViewBag.AddPermission == true ? "" : "disabled")"
+             data-placement="bottom"
+             title="Add details"
+             data-original-title="Add Details">
+            <i class="fa fa-plus"></i>
+          </a>
+        </li>
+
+      </ul>
+    </h4>
+  </div>
+  <div class="panel-body">
+    <table class="table dataTable" id="tbl">
+      <thead>
+        <tr>
+
+          <th>Name</th>
+          <th>Status</th>
+          <th class="action-buttonmaritalstatus"></th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+@section Scripts {
+  <script nonce="@ViewBag.StyleNonce">
+    $(function () {
+      doBindData();
+    });
+
+      var MaritalStatusTableId = [];
+
+    function doBindData() {
+      var oTable = $('#tbl').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "sAjaxSource": "/MaritalStatus/AjaxHandler",
+
+
+        "fnDrawCallback": function (setting) {
+  debugger;
+
+          MaritalStatusTableId.forEach(function (item,index) {
+            debugger
+
+            if (document.getElementById("EditMaritalBtn_" + item) != null && document.getElementById("EditMaritalBtn_" + item) != undefined) {
+              document.getElementById("EditMaritalBtn_" + item).addEventListener("click", function () {
+                EditMarital(item);
+              });
+            }
+            if (document.getElementById("DetailsMaritalStatusBtn_" + item) != null && document.getElementById("DetailsMaritalStatusBtn_" + item) != undefined) {
+              document.getElementById("DetailsMaritalStatusBtn_" + item).addEventListener("click", function () {
+                DetailsMaritalStatus(item);
+              });
+            }
+            if (document.getElementById("DeteleMaritalStatusBtn_" + item) != null && document.getElementById("DeteleMaritalStatusBtn_" + item) != undefined) {
+              document.getElementById("DeteleMaritalStatusBtn_" + item).addEventListener("click", function () {
+                del(item);
+              });
+            }
+
+  });
+
+},
+
+        "aoColumns": [
+
+						{ "sName": "Name" },
+						{
+						  "sName": "ActiveStatus",
+						  "bSearchable": false,
+						  "bSortable": false,
+						  "fnRender": function (oObj) {
+						    if (oObj.aData[1] == "False")
+						      return '<span class="badge badge-danger">inactive</span>';
+						    else
+						      return '<span class="badge badge-success">active</span>';
+						  }
+						},
+						{
+						  "sName": "ID",
+						  "bSearchable": false,
+						  "bSortable": false,
+              "fnRender": function (oObj) {
+
+                var EditPermission = ("@ViewBag.EditPermission").toLowerCase();
+                var DeletePermission = ("@ViewBag.DeletePermission").toLowerCase();
+
+                //  var strString = '<button onclick="EditMarital(\'' + oObj.aData[2] + '\');" class="btn btn-info btn-xs ' + (EditPermission == "false" ? "disabled" : "") + '" title="Edit"><i class="fa fa-pencil"></i> Edit</button>';
+
+                //  strString += '&nbsp;<button onclick="DetailsMaritalStatus(\'' + oObj.aData[2] + '\');" class="btn btn-xs btn-primary" title="Detail"><i class="fa fa-list"></i> Details</button>';
+
+                //strString += '&nbsp;<button href="javascript:;" onclick="javascript:del(\'' + oObj.aData[2] + '\');" class="btn btn-xs btn-danger ' + (DeletePermission == "false" ? "disabled" : "") + '" title="Delete"><i class="fa fa-trash-o fa-lg"></i> Delete</button>';
+
+
+
+                var strString = '<button id="EditMaritalBtn_' + oObj.aData[2] + '"  class="btn btn-info btn-xs ' + (EditPermission == "false" ? "disabled" : "") + '" title="Edit"><i class="fa fa-pencil"></i> Edit</button>';
+
+                strString += '&nbsp;<button id="DetailsMaritalStatusBtn_' + oObj.aData[2] + '"  class="btn btn-xs btn-primary" title="Detail"><i class="fa fa-list"></i> Details</button>';
+
+                strString += '&nbsp;<button id="DeteleMaritalStatusBtn_' + oObj.aData[2] + '" href="javascript:;"  class="btn btn-xs btn-danger ' + (DeletePermission == "false" ? "disabled" : "") + '" title="Delete"><i class="fa fa-trash-o fa-lg"></i> Delete</button>';
+
+                MaritalStatusTableId.push(oObj.aData[2]);
+						    return strString;
+						  }
+						}
+        ]
+      });
+    }
+
+
+	  /// **** Code By Himanshu Rajput *****
+
+        function EditMarital(id) {
+     window.location.href = "@Url.Action("Edit", "MaritalStatus")?Id=" + id ;
+}
+
+        function DetailsMaritalStatus(id) {
+     window.location.href = "@Url.Action("Details", "MaritalStatus")?Id=" + id ;
+}
+
+
+
+
+    function del(ctrlId) {
+      $("#hdDocumentId").val(ctrlId);
+      $('#confirmDelete').popup("show");
+    }
+    const Confirm_Delete_ClassBtn = document.querySelectorAll('.Confirm_Delete_Class');
+    debugger
+    Confirm_Delete_ClassBtn.forEach(button => {
+      button.addEventListener('click', onDeleteConfirm);
+    });
+    function onDeleteConfirm() {
+      var id = $("#hdDocumentId").val();
+      var name = "MaritalStatusId";
+      $.ajax({
+        url: "@Url.Action("Remove", "MaritalStatus")?Id=" + id + "&name=" + name,
+        type: "GET",
+      })
+		.done(function (result) {
+		  var actionRes = result;
+		  if (actionRes == "0") {
+		    toasterErrorMessage("There is some error, please try again.");
+		    return actionRes;
+		  }
+		  else if (actionRes == "1") {
+		    toasterSuccessMessage("Status changed sucessfully.");
+		    $('#confirmDelete').popup("hide");
+		    doBindData();
+		  } else {
+        toasterSuccessMessage("Record deleted successfully.");
+        $('#confirmDelete').popup("hide");
+        doBindData();
+		  }
+		});
+    }
+  </script>
+}

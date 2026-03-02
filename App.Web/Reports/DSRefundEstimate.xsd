@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_DataSetName="NewDataSet" msprop:Generator_UserDSName="NewDataSet">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Table1" msprop:Generator_TableClassName="Table1DataTable" msprop:Generator_TableVarName="tableTable1" msprop:Generator_TablePropName="Table1" msprop:Generator_RowDeletingName="Table1RowDeleting" msprop:Generator_RowChangingName="Table1RowChanging" msprop:Generator_RowEvHandlerName="Table1RowChangeEventHandler" msprop:Generator_RowDeletedName="Table1RowDeleted" msprop:Generator_UserTableName="Table1" msprop:Generator_RowChangedName="Table1RowChanged" msprop:Generator_RowEvArgName="Table1RowChangeEvent" msprop:Generator_RowClassName="Table1Row">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" msprop:Generator_UserColumnName="Name" type="xs:string" minOccurs="0" />
+              <xs:element name="FirstAppointmentDate" msprop:Generator_ColumnVarNameInTable="columnFirstAppointmentDate" msprop:Generator_ColumnPropNameInRow="FirstAppointmentDate" msprop:Generator_ColumnPropNameInTable="FirstAppointmentDateColumn" msprop:Generator_UserColumnName="FirstAppointmentDate" type="xs:string" minOccurs="0" />
+              <xs:element name="TotalMonth" msprop:Generator_ColumnVarNameInTable="columnTotalMonth" msprop:Generator_ColumnPropNameInRow="TotalMonth" msprop:Generator_ColumnPropNameInTable="TotalMonthColumn" msprop:Generator_UserColumnName="TotalMonth" type="xs:string" minOccurs="0" />
+              <xs:element name="TotalInterest" msprop:Generator_ColumnVarNameInTable="columnTotalInterest" msprop:Generator_ColumnPropNameInRow="TotalInterest" msprop:Generator_ColumnPropNameInTable="TotalInterestColumn" msprop:Generator_UserColumnName="TotalInterest" type="xs:string" minOccurs="0" />
+              <xs:element name="Total_Monthly_Cont" msprop:Generator_ColumnVarNameInTable="columnTotal_Monthly_Cont" msprop:Generator_ColumnPropNameInRow="Total_Monthly_Cont" msprop:Generator_ColumnPropNameInTable="Total_Monthly_ContColumn" msprop:Generator_UserColumnName="Total_Monthly_Cont" type="xs:string" minOccurs="0" />
+              <xs:element name="Total_Refund_Amt" msprop:Generator_ColumnVarNameInTable="columnTotal_Refund_Amt" msprop:Generator_ColumnPropNameInRow="Total_Refund_Amt" msprop:Generator_ColumnPropNameInTable="Total_Refund_AmtColumn" msprop:Generator_UserColumnName="Total_Refund_Amt" type="xs:string" minOccurs="0" />
+              <xs:element name="RetirementOrResignationDate" msprop:Generator_ColumnVarNameInTable="columnRetirementOrResignationDate" msprop:Generator_ColumnPropNameInRow="RetirementOrResignationDate" msprop:Generator_ColumnPropNameInTable="RetirementOrResignationDateColumn" msprop:Generator_UserColumnName="RetirementOrResignationDate" type="xs:string" minOccurs="0" />
+              <xs:element name="Post" msprop:Generator_ColumnVarNameInTable="columnPost" msprop:Generator_ColumnPropNameInRow="Post" msprop:Generator_ColumnPropNameInTable="PostColumn" msprop:Generator_UserColumnName="Post" type="xs:string" minOccurs="0" />
+              <xs:element name="SubmittedBy" msprop:Generator_ColumnVarNameInTable="columnSubmittedBy" msprop:Generator_ColumnPropNameInRow="SubmittedBy" msprop:Generator_ColumnPropNameInTable="SubmittedByColumn" msprop:Generator_UserColumnName="SubmittedBy" type="xs:string" minOccurs="0" />
+              <xs:element name="ApprovedBy" msprop:Generator_ColumnVarNameInTable="columnApprovedBy" msprop:Generator_ColumnPropNameInRow="ApprovedBy" msprop:Generator_ColumnPropNameInTable="ApprovedByColumn" msprop:Generator_UserColumnName="ApprovedBy" type="xs:string" minOccurs="0" />
+              <xs:element name="CertifiedforPayment" msprop:Generator_ColumnVarNameInTable="columnCertifiedforPayment" msprop:Generator_ColumnPropNameInRow="CertifiedforPayment" msprop:Generator_ColumnPropNameInTable="CertifiedforPaymentColumn" msprop:Generator_UserColumnName="CertifiedforPayment" type="xs:string" minOccurs="0" />
+              <xs:element name="AuditedBy" msprop:Generator_ColumnVarNameInTable="columnAuditedBy" msprop:Generator_ColumnPropNameInRow="AuditedBy" msprop:Generator_ColumnPropNameInTable="AuditedByColumn" msprop:Generator_UserColumnName="AuditedBy" type="xs:string" minOccurs="0" />
+              <xs:element name="Items" msprop:Generator_ColumnVarNameInTable="columnItems" msprop:Generator_ColumnPropNameInRow="Items" msprop:Generator_ColumnPropNameInTable="ItemsColumn" msprop:Generator_UserColumnName="Items" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

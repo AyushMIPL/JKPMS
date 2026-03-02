@@ -1,0 +1,185 @@
+﻿@model List<App.Data.Entities.MasterContributor>
+
+    @using App.Web.Helper
+    @{
+        ViewBag.Title = "Index";
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row py-4">
+
+            <div class="col-sm-3">
+                @Html.DropDownList("EmployerName", null, "---All---", htmlAttributes: new { @class = "form-control input-sm" })
+            </div>
+            <div class="col-sm-3">
+                @Html.DropDownList("Status", null, "---All---", htmlAttributes: new { @class = "form-control input-sm" })
+            </div>
+
+            <div class="col-sm-3">
+                <button type="button" class="btn btn-success height px-5" onclick="detailSearch()"><i class="fa fa-search"></i> Search</button>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+    <div class="panel panel-default">
+        <div class="panel-heading clearfix">
+            <h4>Resignee & Pensioner</h4>
+            <ul class="tool-bar inline" style="margin-top: -30px;">
+                <li style="margin-right:5px;"></li>
+                <li style="margin-right:5px;"></li>
+            </ul>
+
+        </div>
+        <div class="panel-body">
+            <table class="table dataTable" id="tbl">
+                <thead>
+                    <tr>
+                        <th style="width:100px">Photo</th>
+                        <th>JKPS ID</th>
+                        <th>Person ID</th>
+                        <th>Name</th>
+                        <th>Employer Name</th>
+                        <th>S.S.#</th>
+                        <th>Gender</th>
+                        <th>D.O.B.</th>
+                        <th>Postal Address</th>
+                        <th>Phone</th>
+                        <th>Office Phone</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    @section Scripts {
+        <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+        <style>
+            .employer {
+                float: right;
+                margin-right: 35%;
+            }
+        </style>
+        <script nonce="@ViewBag.StyleNonce">
+
+
+            $(function () {
+                debugger
+                doBindData();
+            });
+            function doBindData() {
+                var Id = $("#EmployerName").val();
+                var status = $("#Status").val();
+                if (Id == "")
+                    Id = 2;
+                if (status == "")
+                    status = 3;
+                var oTable = $('#tbl').dataTable({
+                    "bJQueryUI": true,
+                    "sPaginationType": "full_numbers",
+                    "bServerSide": true,
+                    "bDestroy": true,
+                    //"bProcessing": true,
+                    "sAjaxSource": "/ContributorResignee/ContributorPersonalDetailsAjaxHandler/?Id=" + parseInt(Id) + "&status=" + status,
+                    "aoColumns": [
+                      {
+                          "sName": "Photo",
+                          "bSearchable": false,
+                          "bSortable": false,
+                          "fnRender": function (oObj) {
+                              if (oObj.aData[0] != null)
+                                  return '<div class="pstyle"><img src="../UserFiles/ProfileImages/' + oObj.aData[0] + '" /></div>';
+                              else
+                                  return '<div class="pstyle"><img src="../Images/noimage.jpg" /></div>';
+
+                          }
+                      },
+                      { "sName": "PersonID" },
+                        { "sName": "OldPersonID" },
+                        { "sName": "Name" },
+                        { "sName": "EmployerName" },
+                        { "sName": "SocialSecurityNo" },
+                        {
+                            "sName": "Gender",
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "fnRender": function (oObj) {
+                                if (oObj.aData[6] != "M")
+                                    return '<span > Female </span>';
+                                else
+                                    return '<span >Male</span>';
+                            }
+                        },
+                        { "sName": "DateOfBirth" },
+                        { "sName": "PostalAddress" },
+                    { "sName": "Phone" },
+                    { "sName": "PhoneOffice" },
+                    {
+                        "sName": "Status",
+                        "bSearchable": false,
+                        "bSortable": false,
+                        "fnRender": function (oObj) {
+                            if (oObj.aData[11] != "Rejoined")
+                                return '<span class="badge badge-danger">' + oObj.aData[11] + '</span>';
+                            else
+                                return '<span class="badge badge-success">' + oObj.aData[11] + '</span>';
+                        }
+                    },
+                        {
+                            "sName": "ID",
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "fnRender": function (oObj, data, row) {
+                                var strString = "";
+                                if (oObj.aData[11].indexOf("Rejoined") == "-1")
+                                    strString = '<a href="/ContributorResignee/AddRejoin/' + oObj.aData[12] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i> Rejoin</a>';
+                                return strString;
+                            }
+                        }
+                    ]
+                }).rowGrouping({
+                    bExpandableGrouping: false,
+                    iGroupingColumnIndex: 4,
+                    bHideGroupingColumn: true
+
+                })
+                //.columnFilter({
+                //  sPlaceHolder: "head:before",
+                //  aoColumns: [null,
+                //		    	 		null,
+                //                            			null,
+                //                                  null,
+                //		    	 		null,
+                //                            			null,
+                //                                  null,
+                //		    	 		null,
+                //                            			null,
+                //                                  null,
+                //                                  { type: "select", values: ['Active Contributor', 'Death In Service', 'Pensioner', 'Resignee', 'Supernumerary'] },
+                //  ]
+
+                //});
+            }
+
+            $("#EmployerName").on('change', function () {
+                var Id = $("#EmployerName").val();
+                if (Id != "") {
+                    doBindData();
+                }
+            })
+            $("#Status").on('change', function () {
+                var Id = $("#Status").val();
+                if (Id != "") {
+                    doBindData();
+                }
+            })
+
+        </script>
+    }

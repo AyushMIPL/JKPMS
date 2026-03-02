@@ -1,0 +1,64 @@
+﻿@model App.Data.Entities.ReportText
+
+@{
+    ViewBag.Title = "Edit";
+}
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+            Update Details
+
+            @*<ul class="tool-bar">
+
+                </ul>*@
+        </h4>
+    </div>
+    <div class="panel-body">
+        @using (Html.BeginForm("Edit", "ReportText", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "form1" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary("", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.Id)
+            <div class="row">
+                <div class="col-sm-4">
+                   
+                        @Html.LabelFor(model => model.ModuleId, new { @class = "mb-2 control-label" })
+                    
+                            @Html.DropDownList("ModuleId", null, "---Select---", new { @class = "form-control" })
+                        </div>
+                   
+                 
+                       
+                <div class="col-sm-4">
+                  @Html.LabelFor(model => model.Field, new { @class = "control-label mb-2" })
+                  @Html.TextBoxFor(m => m.Field, new { @class = "form-control input-sm", placeholder = "Field", @readonly = "readonly" })
+                </div>
+                   
+                   
+                        
+            <div class="col-sm-4 mb-4">
+              @Html.LabelFor(model => model.Signature, new { @class = "control-label mb-2" })
+              @Html.TextBoxFor(m => m.Signature, new { @class = "form-control input-sm", placeholder = "Signature" })
+            </div>
+                   
+          
+                        <div class="col-sm-12 pt-4 text-right">
+                            <button type="button" class="btn btn-success height px-5" onclick="saveDetails()"><i class="fa fa-save"> </i> Update</button>
+                            <a href="/ReportText/Index" class="btn btn-primary border-radius height line-height"><i class="fa fa-reply"> </i> Back to List</a>
+                        </div>
+                 
+                </div>
+         
+        }
+    </div>
+</div>
+@section scripts{
+    <script nonce="@ViewBag.StyleNonce">
+        $(function () {
+            $("#ModuleId").prop("disabled", "disabled");
+        })
+        function saveDetails() {
+            if ($("#form1").valid()) { $("#ModuleId").prop("disabled", ""); $('#form1').submit(); }
+        }
+    </script>
+}

@@ -1,0 +1,258 @@
+﻿@model App.Data.ViewModels.GeneratePensionProcessModel
+
+@using JKPS.COMMON
+@{
+    ViewBag.Title = "BeneficiaryPayment";
+    var year = DateTime.Now.Year + "-" + DateTime.Now.AddYears(1).Year;
+}
+
+<div class="panel panel-default">
+
+    @using (Html.BeginForm())
+    {
+        <div class="panel-body">
+            <div class="row pb-4">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <div id="formToDateDiv" class="hidden">
+                            <div class="col-sm-4">
+                                <label>Date From</label>
+                                <div>
+                                    <input type="date" id="From" class="form-control" placeholder="select date">
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <label>To</label>
+                                <div>
+                                    <input type="date" id="to" class="form-control" placeholder="select date">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Batch No</label>
+                        <select class="form-control width-100" id="BatchDropdown"></select>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="control-label mb-2 mt-3" for="Name"> &nbsp; </div>
+                        <button type="button" class="btn btn-success px-5 height display-none" title="Please Wait While We Process Your Request" id="btn_Yearly_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                        <button type="button" class="btn btn-success height px-5" id="Idbtnyearly"><i class="fa fa-search"></i> Search </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    }
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline headlineMonthlyPensionSummary">
+            Beneficiary Payment Details
+
+            <ul class="tool-bar">
+            </ul>
+
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="alert alert-warning display-none">
+                    <h4 class="mb-0"> There is no Record Found</h4>
+                </div>
+                <iframe id="reportData" class="reportDataAction1MonthlyPensionSummary"></iframe>
+            </div>
+        </div>
+    </div>
+
+</div>@section Scripts {
+    <script nonce="@ViewBag.StyleNonce">
+
+        document.getElementById("Idbtnyearly").addEventListener("click", ShowReportData);
+
+  $(function () {
+    debugger
+    $(".alert-warning").hide();
+  });
+
+  jQuery(document).ready(function ($) {
+
+      // set from to as per selected financial year
+      var formattedFirstDay = $("#hdn_FinancialYearStartDate").val();
+      var formattedLastDay = $("#hdn_FinancialYearEndDate").val();
+      $('#From').val(formattedFirstDay);
+      $('#to').val(formattedLastDay);
+    BindFinancialYear();
+    GetBatchNo();
+  });
+    function BindFinancialYear() {
+      // Get Current Month
+      var currentMonth = new Date().getMonth();
+      // Get the current year
+      var currentYear = new Date().getFullYear();
+      // Set start financial years
+      var financialYearCount = currentYear - 2022;
+      if (currentMonth < 3) {
+        currentYear = currentYear - 1;
+      }
+      // Create a dropdown element
+      var dropdown = $('#FinancialYearDropdown');
+      // Populate the dropdown with the last 10 years
+      for (var i = 0; i < financialYearCount; i++) {
+        var year = currentYear - i;
+        dropdown.append($('<option>', { value: year + '_' + (year + 1), text: year + '-' + (year + 1) }));
+      }
+    }
+        function SetFromAndToDateValues() {
+            debugger
+        var finacialYear = $("#FinancialYearDropdown").val().split('_');
+        // Create a new Date object
+        var specificDate = new Date();
+        // Set the year to 2020
+        specificDate.setFullYear(finacialYear[0]);
+        // Set the month to 3 (April, zero-based index)
+        specificDate.setMonth(3);
+        // Set the date to 1
+        specificDate.setDate(1);
+        // Format the date as a string (optional)
+        //var formattedDate = specificDate.toDateString();
+        var formattedFirstDay = $.datepicker.formatDate('yy-mm-dd', specificDate);
+        $('#From').val(formattedFirstDay);
+        // Create a new Date object
+        var specificDateL = new Date();
+        // Set the year to 2020
+        specificDateL.setFullYear(finacialYear[1]);
+        // Set the month to 2 (March, zero-based index)
+        specificDateL.setMonth(2);
+        // Set the date to 31
+        specificDateL.setDate(31);
+        // Format the date as a string (optional)
+        //var formattedDateL = specificDateL.toDateString();
+        var formattedLastDay = $.datepicker.formatDate('yy-mm-dd', specificDateL);
+        $('#to').val(formattedLastDay);
+
+
+            // set from to as per selected financial year
+            var formattedFirstDay = $("#hdn_FinancialYearStartDate").val();
+            var formattedLastDay = $("#hdn_FinancialYearEndDate").val();
+            $('#From').val(formattedFirstDay);
+            $('#to').val(formattedLastDay);
+    }
+
+
+    function GetBatchNo() {
+      debugger;
+        $("#BatchDropdown").empty();
+        $("#BatchDropdown").val(null).trigger('change');
+      /*SetFromAndToDateValues();*/
+      var Date1 = $("#From").val();
+      var Date2 = $("#to").val();
+      $.ajax({
+        url: "@Url.Action("GetBatchAjax", "Reports")?date1=" + Date1 + "&date2=" + Date2 ,
+        method: "GET",
+        success: function (result) {
+          $("#BatchDropdown").empty();
+          debugger;
+          if (result && result.listCounts && Array.isArray(result.listCounts)) {
+            $("#BatchDropdown").empty();
+            var staticOption = '<option value="" selected>Select a Batch</option>';
+            $("#BatchDropdown").append(staticOption);
+            // Add dynamic options
+            for (var l = 0; l < result.listCounts.length; l++) {
+              var option = '<option value="' + result.listCounts[l].pybatchid + '">' + result.listCounts[l].pybatchid + '</option>';
+              $("#BatchDropdown").append(option);
+            }
+          }
+        },
+      });
+    }
+    function ShowReportData(evt) {
+      debugger;
+        $(evt).find("i.fa-spinner").show();
+
+     /* var financialYear = $("#FinancialYearDropdown").val().split('_')[0];*/
+      var Batchno = $("#BatchDropdown").val();
+        //var FinacialYear = $("#FinancialYearDropdown").val();
+        var FinacialYear = $("#hdn_FinancialYear").val();
+
+        if (Batchno == null || Batchno == "" | Batchno == undefined) {
+            Batchno = 0;
+        }
+        if (FinacialYear == null || FinacialYear == "" | FinacialYear == undefined) {
+            FinacialYear = "";
+        }
+
+        $("#btn_Yearly_loading").show();
+        $("#Idbtnyearly").hide();
+       $.ajax({
+          @*url: "@Url.Action("BeneficiaryPaymentAjax", "Reports")?financialYear=" + FinancialYear + "&batchno=" + Batchno,*@
+         url: "@Url.Action("BeneficiaryPaymentAjax", "Reports")?batchno=" + Batchno + "&finacialYear=" + FinacialYear,
+          type: "GET",
+         }).done(function (result) {
+             $("#Idbtnyearly").show();
+             $("#btn_Yearly_loading").hide();
+            var actionRes = result;
+           $(evt).find("i.fa-spinner").hide();
+          if (actionRes == "1") {
+            $('#reportData').show();
+            $(".alert-warning").hide();
+            $('#reportData').attr('src', '/ReportForms/ContributionByEmployer.aspx');
+            $(evt).find("i.fa-spinner").hide();
+        return false;
+      }
+      else {
+        $(".alert-warning").show();
+        $('#reportData').hide();
+          toasterInfoMessage("Result not found on this search criteria.");
+          $(evt).find("i.fa-spinner").hide();
+      }
+    });
+  }
+  function downloadExcel(evt) {
+      try {
+        $(evt.target).find("i.fa-spinner").show();
+        $('#btn_downloadExcel_loading').show();
+        $('#IddownloadExcel').hide();
+        $.ajax({
+          type: "POST",
+          /*data: {Tehsil: $("#Tehsil").val(), BeneficiariesType: $("#BeneficiariesType").val(), Gender: $("#Gender").val(), RegionNames: $("#RegionNames").val(),isDownload: true },*/
+          data: { isDownload: true},
+          url: '@Url.Action("BeneficiaryPaymentDetailsAjaxHandler", "PensionProcess")',
+          cache: false,
+          success: function (result) {
+            $('#IddownloadExcel').show();
+            $('#btn_downloadExcel_loading').hide();
+            if (result != null) {
+              var bytes = new Uint8Array(result.FileContents);
+              var blob = new Blob([bytes], { type: '@System.Net.Mime.MediaTypeNames.Application.Octet' });
+              if (window.navigator.msSaveOrOpenBlob) {
+                // IE11
+                window.navigator.msSaveOrOpenBlob(blob, result.FileDownloadName);
+              } else {
+                debugger
+                // Google chome, Firefox, ....
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = result.FileDownloadName;
+                link.click();
+                $(evt.target).find("i.fa-spinner").hide();
+              }
+            }
+            else {
+
+            }
+          },
+          error: function (xhr, status, error) {
+          }
+        });
+
+      }
+      catch (e) {
+      }
+    }
+
+    </script>
+}

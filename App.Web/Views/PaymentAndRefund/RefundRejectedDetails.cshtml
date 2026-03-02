@@ -1,0 +1,132 @@
+﻿@model App.Data.Entities.RefundApplications
+@using App.Web.Helper
+@{
+    ViewBag.Title = "RefundDetails";
+}
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+            Refund Application Rejected Details
+        </h4>
+    </div>
+
+    <div class="panel panel-default">
+
+        <div class="panel-body">
+            @using (Html.BeginForm("RefundRejectedDetails", "PaymentAndRefund", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+            {
+                @Html.HiddenFor(model => model.Id)
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary("", new { @class = "text-danger" })
+                @Html.Hidden("EditAllowed")
+                <div class="row">
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.EmployerID, "Employer *", htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-sm-8">
+                                @Html.DropDownList("EmployerID", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PersonID, "Name of Officer *", htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-sm-8">
+                                @Html.DropDownList("PersonID", null, "---Select---", htmlAttributes: new { @class = "form-control " })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DesignationId, "Post", htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-sm-8">
+                                @Html.DropDownList("DesignationId", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.FirstAppointmentDate, "Date of Appointment", htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-sm-8">
+                                @{string firstDate = String.Format("{0:MM/dd/yyyy}", Model.FirstAppointmentDate);
+                                @Html.TextBoxFor(model => model.FirstAppointmentDate, new { @class = "form-control input-sm", @readonly = "readonly", @Value = firstDate })}
+
+                                @*@Html.TextBoxFor(model => model.FirstAppointmentDate, new { @class = "form-control input-sm", @readonly = "readonly" })*@
+                                @*@Html.EditorFor(model => model.FirstAppointmentDate, new { shtmlAttributes = new { @class = "form-control" } })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-4 TextRight">
+                                @Html.LabelFor(model => model.RetirementOrResignationDate, "Action Date *", htmlAttributes: new { @class = "control-label" })
+                                &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Date of Retirement/Resignation/ Termination "></i>
+                            </div>
+                            <div class="col-sm-8">                               
+                                    @Html.EditorFor(model => model.RetirementOrResignationDate, new { htmlAttributes = new { @class = "form-control" } })
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.JobStatus, "Job Status *", htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-sm-8">
+                                @Html.DropDownList("JobStatus", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-4 TextRight">
+                                @Html.LabelFor(model => model.LengthOfServiceInMonths, "Service Length(From Jan, 2004)", htmlAttributes: new { @class = "control-label" })
+                                &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Length of Service in Months(From 1 Jan, 2004)"></i>
+                            </div>
+                            <div class="col-sm-8">
+                                @Html.TextBoxFor(model => model.LengthOfServiceInMonths, new { @class = "form-control input-sm", @readonly = "readonly" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-4 TextRight">
+                                @Html.LabelFor(model => model.TotalEmployeeContribution, "Emp. Contribution", htmlAttributes: new { @class = "control-label" })
+                                &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Total Employee Contribution to Pension Fund"></i>
+                            </div>
+                            <div class="col-sm-8">
+                                @Html.TextBoxFor(model => model.TotalEmployeeContribution, new { @class = "form-control input-sm", @readonly = "readonly" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-4 TextRight">
+                                @Html.LabelFor(model => model.AnnualInterest, "Compound Interest (Annual)", htmlAttributes: new { @class = "control-label " })
+                                &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Total Interest compounded annually at 3%"></i>
+                            </div>
+                            <div class="col-sm-8">
+                                @Html.TextBoxFor(model => model.AnnualInterest, new { @class = "form-control input-sm", @readonly = "readonly" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-4 TextRight">
+                                @Html.LabelFor(model => model.TotalEmployeeContributionWithInterest, "Contribution(with interest)", htmlAttributes: new { @class = "control-label" })
+                                &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Total Employee Contribution to Pension Fund with interest compounded annually"></i>
+                            </div>
+                            <div class="col-sm-8">
+                                @Html.TextBoxFor(model => model.TotalEmployeeContributionWithInterest, new { @class = "form-control input-sm", @readonly = "readonly" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label"></label>
+                            <div class="col-sm-8">
+                                
+                                <a href="/PaymentAndRefund/RefundApplicationApprovalIndex" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+                                @*<input type="submit" class="btn btn-success" id="EditApplication" value="save" />
+                                    @Html.ActionLink("Back", "Index", "PaymentAndRefund", null, new { @class = "btn btn-primary" })*@
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            }
+        </div>
+    </div>
+
+</div>
+@section scripts{
+    <script nonce="@ViewBag.StyleNonce">
+        $(".form-control").attr("disabled", true);
+    </script>
+    }

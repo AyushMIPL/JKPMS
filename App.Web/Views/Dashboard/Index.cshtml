@@ -1,0 +1,1466 @@
+﻿@model App.Data.ViewModels.WidgetsViewModel
+@{
+  ViewBag.Title = "Admin Dashboard";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row display_none">
+  <div class="col-sm-6 col-md-3">
+    <div class="panel-stat3 bg-danger panel_dashord">
+      <h2 class="m-top-none" id="userCount">@ViewBag.NewContributor</h2>
+      <h5>Newly Contributors</h5>
+      <i class="fa fa-arrow-circle-o-up fa-lg"></i><span class="m-left-xs">Added in Current month</span>
+      <div class="stat-icon">
+        <i class="fa fa-user fa-3x"></i>
+      </div>
+      <div class="loading-overlay">
+        <i class="loading-icon fa fa-refresh fa-spin fa-lg"></i>
+      </div>
+    </div>
+  </div><!-- /.col -->
+  <div class="col-sm-6 col-md-3">
+    <a href="#Contributor">
+      <div class="panel-stat3 bg-success">
+        @*<h2 class="m-top-none" id="visitorCount">@ViewBag.Contributor</h2>*@
+        <h5>Contributor's Service</h5>
+        <i class="fa fa-arrow-circle-o-up fa-lg"></i><span class="m-left-xs">Being Mature in next 3 months</span>
+        <div class="stat-icon">
+          <i class="fa fa-briefcase fa-3x"></i>
+        </div>
+        <div class="loading-overlay">
+          <i class="loading-icon fa fa-refresh fa-spin fa-lg"></i>
+        </div>
+      </div>
+    </a>
+  </div><!-- /.col -->
+  <div class="col-sm-6 col-md-3">
+    <a href="#Dependant">
+      <div class="panel-stat3 bg-info">
+        @*<h2 class="m-top-none"><span id="serverloadCount">@ViewBag.Dependant</span></h2>*@
+        <h5>Dependants</h5>
+        <i class="fa fa-arrow-circle-o-up fa-lg"></i><span class="m-left-xs">Terminating in next 3 months</span>
+        <div class="stat-icon">
+          <i class="fa fa-sitemap fa-3x"></i>
+        </div>
+        <div class="loading-overlay">
+          <i class="loading-icon fa fa-refresh fa-spin fa-lg"></i>
+        </div>
+      </div>
+    </a>
+  </div><!-- /.col -->
+  <div class="col-sm-6 col-md-3">
+    <a href="#Survivor">
+      <div class="panel-stat3 bg-warning">
+        @*<h2 class="m-top-none" id="orderCount">@ViewBag.Survivor</h2>*@
+        <h5>Survivor Pensioner</h5>
+        <i class="fa fa-arrow-circle-o-up fa-lg"></i><span class="m-left-xs">Terminating in next 3 months</span>
+        <div class="stat-icon">
+          <i class="fa fa-sitemap fa-3x"></i>
+        </div>
+        <div class="loading-overlay">
+          <i class="loading-icon fa fa-refresh fa-spin fa-lg"></i>
+        </div>
+      </div>
+    </a>
+  </div><!-- /.col -->
+</div>
+<div class="row home1 home11">
+
+</div>
+<div class="row home5 mb-4">
+
+  @if (@Model.Total_Registered)
+  {
+    <div>
+      <div class="col-lg-3 px-2">
+        <section data-stellar-background-ratio="0.3" class="counter_feature px-3">
+          <div class="container">
+            <div class="row text-center">
+              <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+                <div class="single-project">
+                  <i class="fa fa-wheelchair"></i>
+                  <h2 class="counter-num">PCP</h2>
+                  @if (@ViewBag.RPCP > 0)
+                  {
+                    <a class="text-white" href="~/ContributorPersonalDetails/ContributionExcelUpload?BeneficiariesType=PHYSICALLY CHALLENGED PERSON"><h4>@ViewBag.RPCP</h4></a>
+                  }
+                  else
+                  {
+                    <a class="text-white"><a class="text-white PMTransander_Class" href="#"><h4>@ViewBag.RPCP</h4></a> </a>
+                  }
+                </div>
+              </div>
+              <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                <div class="single-project">
+                  <i class="fa fa-user"></i>
+                  <h2 class="counter-num">Old  Age</h2>
+                  @if (@ViewBag.ROAP > 0)
+                  {
+                    <a class="text-white" href="~/ContributorPersonalDetails/ContributionExcelUpload?BeneficiariesType=OLD AGE PENSION"><h4>@ViewBag.ROAP</h4></a>
+                  }
+                  else
+                  {
+                    <a class="text-white"><a class="text-white PMTransander_Class" href="#"><h4>@ViewBag.ROAP</h4></a> </a>
+                  }
+                </div>
+              </div>
+              <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+                <div class="single-project">
+                  <i class="fa fa-female"></i>
+                  <h2 class="counter-num">Widow</h2>
+                  @if (@ViewBag.RWID > 0)
+                  {
+                    <a class="text-white" href="~/ContributorPersonalDetails/ContributionExcelUpload?BeneficiariesType=WOMEN IN DISTRESS"><h4>@ViewBag.RWID</h4></a>
+                  }
+                  else
+                  {
+                    <a class="text-white"><a class="text-white PMTransander_Class" href="#"><h4>@ViewBag.RWID</h4></a> </a>
+                  }
+                </div>
+              </div>
+              <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+                <div class="single-project">
+                  <i class="fa fa-venus"></i>
+                  <h2 class="counter-num">TransG</h2>
+                  @if (@ViewBag.RTransgender > 0)
+                  {
+                    <a class="text-white" href="~/ContributorPersonalDetails/ContributionExcelUpload?BeneficiariesType=TRANSGENDER PERSON"><h4>@ViewBag.RTransgender</h4></a>
+                  }
+                  else
+                  {
+                    <a class="text-white"><a class="text-white PMTransander_Class" href="#"><h4>@ViewBag.RTransgender</h4></a> </a>
+                  }
+                </div>
+              </div>
+            </div>
+            <div class="row text-center mt-3">
+              <div class="col-sm-12 col-xs-12 wow fadeInUp">
+                <div class="video_btn pt-1 pb-0" style="">
+                  <div class="row">
+
+                    <!--@if (@ViewBag.TotalRegisteredBeneficiary > 0)
+                    {
+                            <h3 class="bg-circle mt_4 bg-white"><a class="text-white" href="~/ContributorPersonalDetails/ContributionExcelUpload?BeneficiariesType">@ViewBag.TotalRegisteredBeneficiary</a></h3>
+                    }
+                    else
+                    {
+                            <h3 class="bg-circle mt_4 bg-white"><a class="text-white" href="#">@ViewBag.TotalRegisteredBeneficiary</a></h3>
+                    }
+                    </div>-->
+                    <div class="col-md-12 p-0 col-xs-12">
+                      @*<label class="font-12">Gender</label>*@
+                      @if (@ViewBag.TotalRegisteredBeneficiary > 0)
+                      {
+                        <div class="video_btn">
+                          @*<div class="col-md-4">*@
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Registered Beneficiary Male">M</label>
+                            @*<h3 class="bg-circle"><a class="text-white" href="#">@ViewBag.TotalRegBenefMale</a></h3>*@
+                            @if (@ViewBag.TotalRegBenefMale > 0)
+                            {
+                              <h3 class="bg-circle"><a class="text-white" href="~/ContributorPersonalDetails/ContributionExcelUpload?gender=MALE">@ViewBag.TotalRegBenefMale</a></h3>
+                            }
+                            else
+                            {
+                              <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalRegBenefMale</a></h3>
+                            }
+
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Registered Beneficiary Female">F</label>
+                            @*<h3 class="bg-circle"><a class="text-white" href="#">@ViewBag.TotalRegBenefFemale</a></h3>*@
+                            @if (@ViewBag.TotalRegBenefFemale > 0)
+                            {
+                              <h3 class="bg-circle mt_4"><a class="text-white" href="~/ContributorPersonalDetails/ContributionExcelUpload?gender=FEMALE">@ViewBag.TotalRegBenefFemale</a></h3>
+                            }
+                            else
+                            {
+                              <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalRegBenefFemale</a></h3>
+                            }
+
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Registered Beneficiary Transgender">T</label>
+                            @*<h3 class="bg-circle"><a class="text-white" href="#">@ViewBag.TotalRegBenefTrans</a></h3>*@
+                            @if (@ViewBag.TotalRegBenefTrans > 0)
+                            {
+                              <h3 class="bg-circle mt_4"><a class="text-white" href="~/ContributorPersonalDetails/ContributionExcelUpload?gender=TRANSGENDER">@ViewBag.TotalRegBenefTrans</a></h3>
+                            }
+                            else
+                            {
+                              <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalRegBenefTrans</a></h3>
+                            }
+
+                          </div>
+                        </div>
+                      }
+                      else
+                      {
+                        <div class="video_btn">
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Registered Beneficiary Male">M</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalRegBenefMale</a></h3>
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Registered Beneficiary Female">F</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalRegBenefFemale</a></h3>
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Registered Beneficiary Transgender">T</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalRegBenefTrans</a></h3>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                </div>
+                <div class="row mb-3 Dashboard_TotalRegistered">
+                  <div class="col-md-12 text-left px-2">
+                    <label class="font-12 text-left text-white pt-1">Total Registered Beneficiary |</label>
+                    @if (@ViewBag.TotalRegisteredBeneficiary > 0)
+                    {
+                      <a class="text-white" href="~/ContributorPersonalDetails/ContributionExcelUpload?BeneficiariesType">@ViewBag.TotalRegisteredBeneficiary</a>
+                    }
+                    else
+                    {
+                      <a class="text-white PMTransander_Class" href="#">@ViewBag.TotalRegisteredBeneficiary</a>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  }
+
+  @if (Model.Total_Approved)
+  {
+    <div>
+      <div class="col-lg-3 px-2">
+        <section data-stellar-background-ratio="0.3" class="counter_feature px-3">
+          <div class="container">
+            <div class="row text-center">
+              <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+                <div class="single-project">
+                  <i class="fa fa-wheelchair"></i>
+                  <h2 class="counter-num">PCP</h2>
+                  @if (@ViewBag.APCP > 0)
+                  {
+                    <a class="text-white" href="~/MasterPensioner/Index?BeneficiariesType=PCP"> <h4>@ViewBag.APCP</h4> </a>
+
+                    @*<a class="text-white" href="~/MasterPensioner/Index?BeneficiariesType=PCP&AccountStatus=ACTIVE">
+                          <h4>@ViewBag.APCP</h4>
+                      </a>*@
+
+
+
+                  }
+                  else
+                  {
+                    <a class="text-white"><a class="text-white PMTransander_Class" href="#"><h4>@ViewBag.APCP </h4></a> </a>
+                  }
+                </div>
+              </div>
+              <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                <div class="single-project">
+                  <i class="fa fa-user"></i>
+                  <h2 class="counter-num">Old  Age</h2>
+                  @if (@ViewBag.AOAP > 0)
+                  {
+                    @*<a class="text-white" href="~/MasterPensioner/Index?BeneficiariesType=OAP"><h4>@ViewBag.AOAP</h4></a>*@
+                    <a class="text-white" href="~/MasterPensioner/Index?BeneficiariesType=OAP&AccountStatus=ACTIVE"><h4>@ViewBag.AOAP</h4></a>
+                  }
+                  else
+                  {
+                    <a class="text-white"><a class="text-white PMTransander_Class" href="#"><h4>@ViewBag.AOAP</h4></a> </a>
+                  }
+                </div>
+              </div>
+              <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+                <div class="single-project">
+                  <i class="fa fa-female"></i>
+                  <h2 class="counter-num">Widow</h2>
+                  @if (@ViewBag.AWID > 0)
+                  {
+                    @*<a class="text-white" href="~/MasterPensioner/Index?BeneficiariesType=WID"><h4>@ViewBag.AWID</h4></a>*@
+                    <a class="text-white" href="~/MasterPensioner/Index?BeneficiariesType=WID&AccountStatus=ACTIVE"><h4>@ViewBag.AWID</h4></a>
+                  }
+                  else
+                  {
+                    <a class="text-white"><a class="text-white PMTransander_Class" href="#"><h4>@ViewBag.AWID</h4></a> </a>
+                  }
+                </div>
+              </div>
+              <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+                <div class="single-project">
+                  <i class="fa fa-venus"></i>
+                  <h2 class="counter-num">TransG</h2>
+                  @if (@ViewBag.ATransgender > 0)
+                  {
+                    @*<a class="text-white" href="~/MasterPensioner/Index?BeneficiariesType=TGR"> <h4>@ViewBag.ATransgender</h4> </a>*@
+                    <a class="text-white" href="~/MasterPensioner/Index?BeneficiariesType=TGR&AccountStatus=ACTIVE"> <h4>@ViewBag.ATransgender</h4> </a>
+                  }
+                  else
+                  {
+                    <a class="text-white"><a class="text-white PMTransander_Class" href="#"><h4>@ViewBag.ATransgender</h4></a> </a>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="row text-center mt-3">
+              <div class="col-sm-12 col-xs-12 wow fadeInUp">
+                <div class="video_btn pt-1 pb-0" style="">
+                  <div class="row">
+                    <!--<div class="col-md-3 col-xs-3" style="background-color: #097eaa; border-radius: 8px 8px 0px 0px;">-->
+                    @*<label class="font-12">Total Approved Beneficiary</label>*@
+                    <!--@if (@ViewBag.TotalApprovedBeneficiary > 0)
+                    {
+                            <h3 class="bg-circle mt_4 bg-white"><a class="text-white" href="~/MasterPensioner/Index?AccountStatus=ACTIVE"> @ViewBag.TotalApprovedBeneficiary </a></h3>
+                    }
+                    else
+                    {
+                            <h3 class="bg-circle mt_4 bg-white"><a class="text-white" href="#">@ViewBag.TotalApprovedBeneficiary</a> </h3>
+                    }
+                    </div>-->
+                    <div class="col-md-12 p-0 col-xs-12">
+                      @*<label class="font-12">Gender</label>*@
+                      @if (@ViewBag.TotalApprovedBeneficiary > 0)
+                      {
+                        <div class="video_btn">
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Approved Beneficiary Male">M</label>
+                            @*<h3 class="bg-circle"><a class="text-white" href="#">@ViewBag.TotalApprBenefMale</a></h3>*@
+                            @if (@ViewBag.TotalApprBenefMale > 0)
+                            {
+                              <h3 class="bg-circle"><a class="text-white" href="~/MasterPensioner/Index?gender=M&AccountStatus=ACTIVE">@ViewBag.TotalApprBenefMale</a></h3>
+                            }
+                            else
+                            {
+                              <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalApprBenefMale</a></h3>
+                            }
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Approved Beneficiary Female">F</label>
+                            @*<h3 class="bg-circle"><a class="text-white" href="#">@ViewBag.TotalApprBenefFemale</a></h3>*@
+                            @if (@ViewBag.TotalApprBenefFemale > 0)
+                            {
+                              <h3 class="bg-circle"><a class="text-white" href="~/MasterPensioner/Index?gender=F&AccountStatus=ACTIVE">@ViewBag.TotalApprBenefFemale</a></h3>
+                            }
+                            else
+                            {
+                              <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalApprBenefFemale</a></h3>
+                            }
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Approved Beneficiary Transgender">T</label>
+                            @*<h3 class="bg-circle"><a class="text-white" href="#">@ViewBag.TotalApprBenefTrans</a></h3>*@
+                            @if (@ViewBag.TotalApprBenefTrans > 0)
+                            {
+                              <h3 class="bg-circle"><a class="text-white" href="~/MasterPensioner/Index?gender=T&AccountStatus=ACTIVE">@ViewBag.TotalApprBenefTrans</a></h3>
+                            }
+                            else
+                            {
+                              <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalApprBenefTrans</a></h3>
+                            }
+                          </div>
+                        </div>
+                      }
+                      else
+                      {
+                        <div class="video_btn pb-3">
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Approved Beneficiary Male">M</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalApprBenefMale</a></h3>
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Approved Beneficiary Female">F</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalApprBenefFemale</a></h3>
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Approved Beneficiary Transgender">T</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalApprBenefTrans</a></h3>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="row mb-3 Dashboard_TotalRegistered">
+                    <div class="col-md-12 text-left pl-3">
+                      <label class="font-12 text-left text-white pt-1">
+                        Total Approved Beneficiary |
+                      </label>
+                      @if (@ViewBag.TotalApprovedBeneficiary > 0)
+                      {
+
+                        <a class="text-white" href="~/MasterPensioner/Index?AccountStatus=ACTIVE"> @ViewBag.TotalApprovedBeneficiary </a>
+                      }
+                      else
+                      {
+                        <a class="text-white PMTransander_Class" href="#">@ViewBag.TotalApprovedBeneficiary</a>
+                      }
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  }
+
+
+  @if (Model.Total_Unapproved)
+  {
+    <div>
+      <div class="col-lg-3 px-2">
+        <section data-stellar-background-ratio="0.3" class="counter_feature px-3">
+          <div class="container">
+
+            <div class="row text-center">
+              <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+                <div class="single-project">
+                  <i class="fa fa-wheelchair"></i>
+                  <h2 class="counter-num">PCP</h2>
+                  @if (@ViewBag.UPCP > 0)
+                  {
+                    <a class="text-white" href="~/ContributorPersonalDetails/ContributionExcelUpload?BeneficiariesType=PHYSICALLY CHALLENGED PERSON&ACCOUNT_STATUS=FAIl"><h4>@ViewBag.UPCP</h4></a>
+                  }
+                  else
+                  {
+                    <a class="text-white"><a class="text-white PMTransander_Class" href="#"><h4>@ViewBag.UPCP</h4></a> </a>
+                  }
+                </div>
+              </div>
+              <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                <div class="single-project">
+                  <i class="fa fa-user"></i>
+                  <h2 class="counter-num">Old  Age</h2>
+                  @if (@ViewBag.UOAP > 0)
+                  {
+                    <a class="text-white" href="~/ContributorPersonalDetails/ContributionExcelUpload?BeneficiariesType=OLD AGE PENSION&ACCOUNT_STATUS=FAIl"><h4>@ViewBag.UOAP</h4></a>
+
+                  }
+                  else
+                  {
+                    <a class="text-white"><a class="text-white PMTransander_Class" href="#"><h4>@ViewBag.UOAP</h4></a> </a>
+                  }
+                </div>
+              </div>
+              <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+                <div class="single-project">
+                  <i class="fa fa-female"></i>
+                  <h2 class="counter-num">Widow</h2>
+                  @if (@ViewBag.UWID > 0)
+                  {
+                    <a class="text-white" href="~/ContributorPersonalDetails/ContributionExcelUpload?BeneficiariesType=WOMEN IN DISTRESS&ACCOUNT_STATUS=FAIl"><h4>@ViewBag.UWID</h4></a>
+
+                  }
+                  else
+                  {
+                    <a class="text-white"><a class="text-white PMTransander_Class" href="#"><h4>@ViewBag.UWID</h4></a> </a>
+                  }
+                </div>
+              </div>
+              <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+                <div class="single-project">
+                  <i class="fa fa-venus"></i>
+                  <h2 class="counter-num">TransG</h2>
+                  @if (@ViewBag.UTransgender > 0)
+                  {
+                    <a class="text-white" href="~/ContributorPersonalDetails/ContributionExcelUpload?BeneficiariesType=TRANSGENDER PERSON&ACCOUNT_STATUS=FAIl"><h4>@ViewBag.UTransgender</h4></a>
+                  }
+                  else
+                  {
+                    <a class="text-white"><a class="text-white PMTransander_Class" href="#"><h4>@ViewBag.UTransgender</h4></a> </a>
+                  }
+
+                </div>
+              </div>
+            </div>
+
+
+            <div class="row text-center">
+              <div class="col-sm-12 col-xs-12 wow fadeInUp">
+                <div class="video_btn pt-1 pb-0">
+                  <div class="row text-center">
+                    <div class="col-sm-12 col-xs-12 wow fadeInUp">
+                      <div class="video_btn pt-1 pb-0" style="">
+                        <div class="row mt-3">
+                          <div class="col-md-12 p-0 col-xs-12">
+                            @*<label class="font-12">Gender</label>*@
+                            @if (@ViewBag.TotalUnapprovedBeneficiary > 0)
+                            {
+                              <div class="video_btn">
+                                <div class="col-md-4 col-xs-4 px-1">
+                                  <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Unapproved Beneficiary Male">M</label>
+                                  @*<h3 class="bg-circle"><a class="text-white" href="#">@ViewBag.TotalUnapprBenefMale</a></h3>*@
+                                  @if (@ViewBag.TotalUnapprBenefMale > 0)
+                                  {
+                                    <h3 class="bg-circle"><a class="text-white" href="~/ContributorPersonalDetails/ContributionExcelUpload?ACCOUNT_STATUS=FAIl&gender=MALE">@ViewBag.TotalUnapprBenefMale</a></h3>
+                                  }
+                                  else
+                                  {
+                                    <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalUnapprBenefMale</a></h3>
+                                  }
+                                </div>
+                                <div class="col-md-4 col-xs-4 px-1">
+                                  <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Unapproved Beneficiary Female">F</label>
+                                  @*<h3 class="bg-circle"><a class="text-white" href="#">@ViewBag.TotalUnapprBenefFemale</a></h3>*@
+                                  @if (@ViewBag.TotalUnapprBenefFemale > 0)
+                                  {
+                                    <h3 class="bg-circle"><a class="text-white" href="~/ContributorPersonalDetails/ContributionExcelUpload?ACCOUNT_STATUS=FAIl&gender=FEMALE">@ViewBag.TotalUnapprBenefFemale</a></h3>
+                                  }
+                                  else
+                                  {
+                                    <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalUnapprBenefFemale</a></h3>
+                                  }
+                                </div>
+                                <div class="col-md-4 col-xs-4 px-1">
+                                  <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Unapproved Beneficiary Transgender">T</label>
+                                  @*<h3 class="bg-circle"><a class="text-white" href="#">@ViewBag.TotalUnapprBenefTrans</a></h3>*@
+                                  @if (@ViewBag.TotalUnapprBenefTrans > 0)
+                                  {
+                                    <h3 class="bg-circle"><a class="text-white" href="~/ContributorPersonalDetails/ContributionExcelUpload?ACCOUNT_STATUS=FAIl&gender=TRANSGENDER">@ViewBag.TotalUnapprBenefTrans</a></h3>
+                                  }
+                                  else
+                                  {
+                                    <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalUnapprBenefTrans</a></h3>
+                                  }
+
+                                </div>
+                              </div>
+                            }
+                            else
+                            {
+                              <div class="video_btn">
+                                <div class="col-md-4 col-xs-4 px-1">
+                                  <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Unapproved Beneficiary Male">M</label>
+                                  <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalUnapprBenefMale</a></h3>
+                                </div>
+                                <div class="col-md-4 col-xs-4 px-1">
+                                  <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Unapproved Beneficiary Female">F</label>
+                                  <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalUnapprBenefFemale</a></h3>
+                                </div>
+                                <div class="col-md-4 col-xs-4 px-1">
+                                  <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Unapproved Beneficiary Transgender">T</label>
+                                  <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.TotalUnapprBenefTrans</a></h3>
+                                </div>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mb-3 Dashboard_TotalRegistered">
+                    <div class="col-md-12 text-left pl-3">
+                      <label class="font-12 text-left text-white pt-1">Total Unapproved Beneficiary |</label>
+
+                      @if (@ViewBag.TotalUnapprovedBeneficiary > 0)
+                      {
+                        <a class="text-white" href="~/ContributorPersonalDetails/ContributionExcelUpload?ACCOUNT_STATUS=FAIl">@ViewBag.TotalUnapprovedBeneficiary</a>
+                      }
+                      else
+                      {
+                        <a class="text-white PMTransander_Class" href="#">@ViewBag.TotalUnapprovedBeneficiary</a>
+                      }
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+      </div>
+    </div>
+
+  }
+  @if (Model.Beneficiary_Paid)
+  {
+    <div>
+      <div class="col-lg-3 px-2">
+        <section data-stellar-background-ratio="0.3" class="counter_feature px-3">
+          <div class="container">
+            <div class="row text-center">
+              <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+                <div class="single-project">
+                  <i class="fa fa-wheelchair"></i>
+                  <h2 class="counter-num">PCP</h2>
+                  @if (@ViewBag.PMPCP > 0)
+                  {
+                    <a class="text-white" href="~/Reports/PaymentsSummary?BeneficiariesType=PHYSICALLY CHALLENGED PERSON&ACCOUNT_STATUS=ACTIVE"><h4>@ViewBag.PMPCP</h4></a>
+                  }
+                  else
+                  {
+                    <a class="text-white PMTransander_Class" href="#"><h4>@ViewBag.PMPCP</h4></a>
+                  }
+                </div>
+              </div>
+              <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                <div class="single-project">
+                  <i class="fa fa-user"></i>
+                  <h2 class="counter-num">Old  Age</h2>
+                  @if (@ViewBag.PMOAP > 0)
+                  {
+                    <a class="text-white" href="~/Reports/PaymentsSummary?BeneficiariesType=OLD AGE PENSION&ACCOUNT_STATUS=ACTIVE"> <h4>@ViewBag.PMOAP</h4></a>
+                  }
+                  else
+                  {
+                    <a class="text-white PMTransander_Class" href="#"><h4>@ViewBag.PMOAP</h4></a>
+                  }
+                </div>
+              </div>
+              <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+                <div class="single-project">
+                  <i class="fa fa-female"></i>
+                  <h2 class="counter-num">Widow</h2>
+                  @if (@ViewBag.PMWID > 0)
+                  {
+                    <a class="text-white" href="~/Reports/PaymentsSummary?BeneficiariesType=WOMEN IN DISTRESS&ACCOUNT_STATUS=ACTIVE"><h4>@ViewBag.PMWID</h4></a>
+                  }
+                  else
+                  {
+                    <a class="text-white PMTransander_Class" href="#"><h4>@ViewBag.PMWID</h4></a>
+                  }
+                </div>
+              </div>
+              <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+                <div class="single-project">
+                  <i class="fa fa-venus"></i>
+                  <h2 class="counter-num">TransG</h2>
+                  @if (ViewBag.PMTransgender > 0)
+                  {
+                    <a class="text-white" href="~/Reports/PaymentsSummary?BeneficiariesType=TRANSGENDER PERSON&ACCOUNT_STATUS=ACTIVE"><h4>@ViewBag.PMTransgender</h4></a>
+                  }
+                  else
+                  {
+                    <a class="text-white PMTransander_Class" href="#"><h4>@ViewBag.PMTransgender</h4></a>
+                  }
+                </div>
+              </div>
+            </div>
+            <div class="row text-center">
+              <div class="col-sm-12 col-xs-12 wow fadeInUp">
+                <div class="video_btn pt-1 pb-0">
+                  <div class="row mt-3">
+                    <!--<div class="col-md-3 col-xs-3" style="background-color: #097eaa; border-radius: 8px 8px 0px 0px;">-->
+                    @*<label class="font-12">Beneficiary Paid Last Month</label>*@
+                    <!--@if (@ViewBag.BeneficiaryPaidLastMonth > 0)
+                    {
+                            <h3 class="bg-circle mt_4 bg-white">
+                                <a class="text-white" href="~/Reports/PaymentsSummary?ACCOUNT_STATUS=ACTIVE">@ViewBag.BeneficiaryPaidLastMonth</a>
+                            </h3>
+                    }
+                    else
+                    {
+                            <h3 class="bg-circle mt_4 bg-white">
+                                <a class="text-white" href="#">@ViewBag.BeneficiaryPaidLastMonth</a>
+                            </h3>
+                    }
+                    </div>-->
+                    <div class="col-md-12 p-0 col-xs-12">
+                      @*<label class="font-12">Gender</label>*@
+                      @if (@ViewBag.BeneficiaryPaidLastMonth > 0)
+                      {
+                        <div class="video_btn">
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Beneficiary Paid Last Month Male">M</label>
+                            @*<h3 class="bg-circle"><a class="text-white" href="#">@ViewBag.BenefPaidLastMonthMale</a></h3>*@
+                            @if (@ViewBag.BenefPaidLastMonthMale > 0)
+                            {
+                              <h3 class="bg-circle"><a class="text-white" href="~/Reports/PaymentsSummary?ACCOUNT_STATUS=ACTIVE&Gender=MALE">@ViewBag.BenefPaidLastMonthMale</a></h3>
+                            }
+                            else
+                            {
+                              <h3 class="bg-circle"><a class="text-white" href="#">@ViewBag.BenefPaidLastMonthMale</a></h3>
+                            }
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Beneficiary Paid Last Month Female">F</label>
+                            @*<h3 class="bg-circle"><a class="text-white" href="#">@ViewBag.BenefPaidLastMonthFemale</a></h3>*@
+                            @if (@ViewBag.BenefPaidLastMonthFemale > 0)
+                            {
+                              <h3 class="bg-circle"><a class="text-white" href="~/Reports/PaymentsSummary?ACCOUNT_STATUS=ACTIVE&Gender=FEMALE">@ViewBag.BenefPaidLastMonthFemale</a></h3>
+                            }
+                            else
+                            {
+                              <h3 class="bg-circle"><a class="text-white" href="#">@ViewBag.BenefPaidLastMonthFemale</a></h3>
+                            }
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Beneficiary Paid Last Month Transgender">T</label>
+                            @*<h3 class="bg-circle"><a class="text-white" href="#">@ViewBag.BenefPaidLastMonthTrans</a></h3>*@
+                            @if (@ViewBag.BenefPaidLastMonthTrans > 0)
+                            {
+                              <h3 class="bg-circle"><a class="text-white" href="~/Reports/PaymentsSummary?ACCOUNT_STATUS=ACTIVE&Gender=TRANSGENDER">@ViewBag.BenefPaidLastMonthTrans</a></h3>
+                            }
+                            else
+                            {
+                              <h3 class="bg-circle"><a class="text-white" href="#">@ViewBag.BenefPaidLastMonthTrans</a></h3>
+                            }
+                          </div>
+                        </div>
+                      }
+                      else
+                      {
+                        <div class="video_btn">
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Beneficiary Paid Last Month Male">M</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.BenefPaidLastMonthMale</a></h3>
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Beneficiary Paid Last Month Female">F</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.BenefPaidLastMonthFemale</a></h3>
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Beneficiary Paid Last Month Transgender">T</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">@ViewBag.BenefPaidLastMonthTrans</a></h3>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="row mb-3 Dashboard_TotalRegistered">
+                    <div class="col-md-12 text-left pl-3">
+                      <label class="font-12 text-left text-white pt-1">
+                        Beneficiary Paid Last Month |
+                        @*Beneficiary Paid Last Month | <span class="text-right">1000000</span>*@
+                      </label>
+                      @if (@ViewBag.BeneficiaryPaidLastMonth > 0)
+                      {
+                        <a class="text-white" href="~/Reports/PaymentsSummary?ACCOUNT_STATUS=ACTIVE">@ViewBag.BeneficiaryPaidLastMonth</a>
+
+                      }
+                      else
+                      {
+                        <a class="text-white PMTransander_Class" href="#">@ViewBag.BeneficiaryPaidLastMonth</a>
+
+                      }
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  }
+
+</div>
+
+@*/// *** Code End By Himanshu Rajput *****@
+@if (Model.RegisteredBeneficiary_DistrictWise)
+{
+  <div class="row">
+    <div class="col-lg-12" id="employerGraph">
+      <div class="panel panel-default" id="dicttbl">
+        <div class="panel-heading clearfix">
+          <div class="col-md-9"><h4>Registered Beneficiary District Wise Details</h4></div>
+          <div class="col-md-3">
+            <select class="form-control" id="BeneficiaryDetails" @*onchange="BindBeneficiaryDetails()"*@>
+              <option value="1">Total Registered Beneficiary</option>
+              <option value="2">Total Approved Beneficiary</option>
+              <option value="3">Total Unapproved Beneficiary</option>
+              <option value="4">Beneficiary Paid Last Month</option>
+            </select>
+          </div>
+
+
+        </div>
+        <div class="_dash_padding">
+          <div class="scroller">
+            <table class="tbl " id="tblJAMMUCounts">
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+}
+@if (Model.Beneficiaries_PaymentSummary)
+{
+<div class="row">
+
+  <div class="col-lg-12">
+    <div class="loader display_none" id="loader"></div>
+    @Html.Action("_ContributionSummaryAjax", "Dashboard")
+  </div>
+</div>
+}
+<div class="row dash_displaynone">
+  <div class="col-lg-12" id="divDependant">
+    <a name="Dependant"></a>
+    @Html.Action("_DependantDetails", "Dashboard")
+  </div>
+</div>
+<div class="row dash_displaynone">
+  <div class="col-lg-12" id="divSurvivor">
+    <a name="Survivor"></a>
+    @Html.Action("_SurvivorDetails", "Dashboard")
+  </div>
+</div>
+<div class="custom-popup width-100% confirmClass dash_displaynonee" id="PaymentDetails">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="row pb-4">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <h4 class="m-top-none dashleft">Payment Detail</h4>
+            @*<button class="btn btn-info" style="float: right; text-align: right;" onclick="downloadExcel()">Download Excel</button>*@
+            <a href="#" class="dash_float_rigt  data_bs_dismiss"><i class="fa fa-times fa-2x"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="row pb-4">
+        <div class="col-sm-14">
+          <div class="form-group table-responsive">
+            <table class="table dashboard_table paymentEx" id="PaymentExampleTbl">
+              <thead>
+                <tr>
+                  <th>ApplicationReferenceNo</th>
+                  <th>Name</th>
+                  <th>Gender</th>
+                  <th>Age</th>
+                  <th>Address</th>
+                  <th>Phone</th>
+                  <th>Mailid</th>
+                  <th>Account No</th>
+                  <th>IFSC Code</th>
+                  <th>Bank Name</th>
+                  <th>Last Verified</th>
+                  <th>Scheme Type</th>
+                  <th>Remarks/Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+@section scripts{
+  <script src="~/Scripts/dashboardChart.js"></script>
+  <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+
+
+  <link href="~/Content/endless/LatestJS/jquery.dataTables.min.css" rel="stylesheet" />
+  <link href="~/Content/endless/LatestJS/buttons.dataTables.min.css" rel="stylesheet" />
+
+  <script src="~/Content/endless/LatestJS/jquery.dataTables.min.js"></script>
+  <script src="~/Content/endless/LatestJS/dataTables.buttons.min.js"></script>
+  <script src="~/Content/endless/LatestJS/jszip.min.js"></script>
+  <script src="~/Content/endless/LatestJS/pdfmake.min.js"></script>
+  <script src="~/Content/endless/LatestJS/vfs_fonts.js"></script>
+  <script src="~/Content/endless/LatestJS/buttons.html5.min.js"></script>
+
+  <script nonce="@ViewBag.StyleNonce">
+    BindBeneficiaryDetails();
+
+      const PMTransander_ClassBtn = document.querySelectorAll('.PMTransander_Class');
+    PMTransander_ClassBtn.forEach(button => {
+        button.addEventListener('click', PMTransander);
+      });
+
+    const data_bs_dismiss_ClassBtn = document.querySelectorAll('.data_bs_dismiss');
+    data_bs_dismiss_ClassBtn.forEach(button => {
+      button.addEventListener('click', ClosePopup);
+    });
+
+    function PMTransander() {
+      toasterErrorMessage("Beneficiary Records is not available");
+      return false;
+    }
+
+
+    $(function () {
+      survivor();
+      Contributor();
+      Dependant();
+      BindFinancialYear();
+      ContributionSummary();
+
+    });
+    function ReBindDashboardPaymentSummary() {
+      ContributionSummary();
+    }
+    function ShowGrandTotalFooterValue(data) {
+      var totalValueOfSuccess = 0;
+      var totalValueOfFailed = 0;
+      var totalValueOfStatusNotUpdated = 0;
+      var totalValueOfBeneficiaries = 0;
+      var totalValueOfMonthAmount = 0;
+      var totalValueOfYearAmount = 0;
+      var PayMonthInYear = "";
+      var LastPayMonthInYear = "";
+
+      data.aaData.forEach(function (item) {
+        totalValueOfSuccess = totalValueOfSuccess + parseFloat(item[2]);
+        totalValueOfFailed = totalValueOfFailed + parseFloat(item[3]);
+        totalValueOfStatusNotUpdated = totalValueOfStatusNotUpdated + parseFloat(item[4]);
+        totalValueOfBeneficiaries = totalValueOfBeneficiaries + parseFloat(item[5]);
+        totalValueOfMonthAmount = totalValueOfMonthAmount + parseFloat(item[6]);
+          totalValueOfYearAmount = totalValueOfYearAmount + parseFloat(item[7]);
+          if (PayMonthInYear == "") {
+              PayMonthInYear = item[8];
+          }
+          if (LastPayMonthInYear == "") {
+              LastPayMonthInYear = item[9]
+          }
+      });
+      totalValueOfMonthAmount = totalValueOfMonthAmount.toFixed(2);
+      totalValueOfYearAmount = totalValueOfYearAmount.toFixed(2);
+
+      $("#totalValueOfSuccess").text(totalValueOfSuccess);
+      $("#totalValueOfFailed").text(totalValueOfFailed);
+      $("#totalValueOfStatusNotUpdated").text(totalValueOfStatusNotUpdated);
+      $("#totalValueOfBeneficiaries").text(totalValueOfBeneficiaries);
+      $("#totalValueOfMonthAmount").text(totalValueOfMonthAmount);
+      $("#totalValueOfYearAmount").text(totalValueOfYearAmount);
+
+      var words = PayMonthInYear.split(',');
+
+      // Insert line breaks after every 4 words
+      var formattedText = words.map(function (word, index) {
+        return (index % 3 === 2) ? word + '<br>' : word;
+      }).join(', ');
+
+      $("#PayMonthInYear").html(formattedText);
+      $("#LastPayMonthInYear").html(LastPayMonthInYear);
+
+    }
+
+    var ContributionSummaryAjaxHandler = [];
+
+    function ContributionSummary() {
+      if (document.getElementById("loader") != null) {
+        document.getElementById("loader").style.display = "block";
+      }
+      //var financialYear = $("#FinancialYearDropdown").val().split('_')[0];
+      debugger
+      var financialYear = 0;
+      $("#tblPaymentCounts").dataTable({
+        "bJQueryUI": true,
+        "paging": false,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "bAutoWidth": false,
+        "sAjaxSource": "/Dashboard/ContributionSummaryAjaxHandler?financialYear=" + financialYear,
+        "fnDrawCallback": function (settings) {
+          debugger
+          document.getElementById("loader").style.display = "none";
+          ShowGrandTotalFooterValue(settings.json);
+          // remove duplicates
+          ContributionSummaryAjaxHandler = ContributionSummaryAjaxHandler.filter((value, index) => ContributionSummaryAjaxHandler.indexOf(value) === index);
+          ContributionSummaryAjaxHandler.forEach(function (item, index) {
+            debugger
+            var splittedArray = item.split('_');
+            document.getElementById(item).addEventListener("click", function () {
+              GetPaymentList('', splittedArray[1], splittedArray[2], splittedArray[3]);
+            });
+          });
+          //do whatever
+
+          debugger
+          GroupDataTable(this.api(), 0, 8);
+        },
+        "columnDefs": [
+          {
+            "targets": [0], // Index of the column to hide
+            "visible": false // Set visibility to false
+          }
+        ],
+        "aoColumns": [
+          { "sName": "EmployerId" },
+          { "sName": "EmployerName" },
+          {
+            "sName": "TotalContributorContribution",
+            "bSearchable": false,
+            "bSortable": false,
+            "render": function (oObj, el, aData) {
+              var Region = aData[0];
+              var District = aData[1];
+              var DataCount = aData[2];
+              if (oObj != "0") {
+                debugger
+                var id = "paymentList_ok_" + District + "_" + Region;
+                ContributionSummaryAjaxHandler.push(id);
+                return '<span class="badge badge-success cursor_pointernotimportent" id="' + id + '">' + DataCount + '</span>';
+              }
+              /* return '<span href="" class="badge badge-success" style="cursor: pointer;" id="paymentList_(this,\'ok\',\'' + District + '\',\'' + Region + '\')">' + DataCount + '</span>';*/
+              else {
+                return '<span class="badge badge-success">' + DataCount + '</span>';
+              }
+            }
+          },
+          {
+            "sName": "TotalMonthAmount",
+            "bSearchable": false,
+            "bSortable": false,
+            "render": function (oObj, el, aData) {
+              var Region = aData[0];
+              var District = aData[1];
+              var DataCount = aData[3];
+              if (oObj != "0") {
+                var id = "paymentList_fail_" + District + "_" + Region;
+                ContributionSummaryAjaxHandler.push(id);
+                return '<span class="badge badge-danger cursor_pointernotimportent" id="' + id + '">' + DataCount + '</span>';
+                /* return '<span href="" class="badge badge-danger" style="cursor: pointer;" onclick="GetPaymentList(this,\'fail\',\'' + District + '\',\'' + Region + '\')">' + DataCount + '</span>';*/
+              }
+              else {
+                return '<span class="badge badge-danger">' + DataCount + '</span>';
+              }
+            }
+          },
+          {
+            "sName": "NotUpdated",
+            "bSearchable": false,
+            "bSortable": false,
+            "render": function (oObj, el, aData) {
+              var Region = aData[0];
+              var District = aData[1];
+              var DataCount = aData[4];
+              if (oObj != "0") {
+                var id = "paymentList_statusnotupdated_" + District + "_" + Region;
+                ContributionSummaryAjaxHandler.push(id);
+                return '<span class="badge badge-primary cursor_pointernotimportent"  id="' + id + '">' + DataCount + '</span>';
+              }
+              else {
+                return '<span class="badge badge-primary">' + DataCount + '</span>';
+              }
+            }
+          },
+          {
+            "sName": "NotUpdated",
+            "bSearchable": false,
+            "bSortable": false,
+            "render": function (oObj, el, aData) {
+              var total = aData[5];
+              return '<span class="tableTdTextCenter">' + total + '</span>';
+            }
+          },
+          { "sName": "status" },
+          { "sName": "TotalEmployerContribution" },
+        ]
+      });
+      //.rowGrouping({
+      //  bExpandableGrouping: true,
+      //  iGroupingColumnIndex: 0,
+      //  bHideGroupingColumn: true
+      //});
+    }
+    function GetPaymentList(element, Status, District, Region) {
+      debugger
+      $(element).find("i.fa-spinner").show();
+      $('#PaymentExampleTbl').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "iDisplayLength": 10,
+        "bDestroy": true,
+        //"bProcessing": true,
+        "sAjaxSource": "/Dashboard/PaymentDetailsAjaxHandler?Status=" + Status + "&District=" + District,
+        "aoColumns": [
+          { "sname": "ApplicationReferenceNo" },
+          { "sname": "FirstName" },
+          { "sname": "Gender" },
+          { "sname": "AgeInYears" },
+          { "sname": "Address1" },
+          { "sname": "Phone" },
+          { "sname": "mailid" },
+          { "sname": "BankAcctNo" },
+          { "sname": "IFSCCode" },
+          { "sname": "BankName" },
+          { "sname": "LastVerified" },
+          { "sname": "type_desc" },
+          { "sname": "ReasonForChange" }
+        ],
+          dom: 'Bflrtip',
+        buttons: [
+          {
+            text: '<i class="fa fa-spinner fa-spin display_none"></i> Download Excel',
+            autoFilter: true,
+            action: function (e, dt, node, config) {
+              $(node).find("i.fa-spinner").removeClass("display_none");
+                try {
+                    debugger
+                    var xhr = new XMLHttpRequest();
+
+                    // Configure it: POST-request for the URL
+                    xhr.open('POST', '@Url.Action("PaymentDetailsAjaxHandler", "Dashboard")', true);
+                    xhr.responseType = 'arraybuffer'; // Expect binary data
+
+                    // Set up event handlers
+                    xhr.onload = function () {
+                        debugger
+                        if (xhr.status === 200) {
+                            debugger
+                            $("#PaymentDetails").popup("hide");
+                            // Success: Convert arraybuffer to blob and initiate download
+                            var blob = new Blob([xhr.response], { type: 'application/octet-stream' });
+                            var url = window.URL.createObjectURL(blob);
+                            var a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'Payment Details Report.xlsx'; // Default filename
+
+                            // Check Content-Disposition header for filename if available
+                            var disposition = xhr.getResponseHeader('Content-Disposition');
+                            if (disposition) {
+                                var matches = /filename="([^"]*)"/.exec(disposition);
+                                if (matches != null && matches[1]) {
+                                    a.download = matches[1];
+                                }
+                            }
+                            a.target = '_blank'; // Open in a new context to avoid modal closing
+
+                            // Append the anchor to the document body and trigger the download
+                            document.body.appendChild(a);
+                            a.click();
+
+                            // Clean up
+                            window.URL.revokeObjectURL(url);
+                            document.body.removeChild(a);
+
+                            (node).find("i.fa-spinner").addClass("display_none");
+                        } else {
+                            debugger
+                            // Handle HTTP errors
+                            console.error('Error downloading file:', xhr.statusText);
+                            (node).find("i.fa-spinner").addClass("display_none");
+                        }
+                    };
+
+                    xhr.onerror = function () {
+                        debugger
+                        // Handle network errors
+                        console.error('Network error.');
+                        (node).find("i.fa-spinner").addClass("display_none");
+                    };
+
+                    // Prepare form data and send
+                    var formData = new FormData();
+                    formData.append('Status', Status);
+                    formData.append('District', District);
+                    formData.append('isDownload', true);
+
+                    // Send the request with form data
+                    xhr.send(formData);
+
+                   @*$.ajax({
+                       type: "POST",
+                     data: { param: dt.ajax.params(), Status: Status, District: District,isDownload: true },
+                       url: '@Url.Action("PaymentDetailsAjaxHandler", "Dashboard")',
+                         cache: false,
+                         success: function (result) {
+                             if (result != null) {
+                                 var bytes = new Uint8Array(result.FileContents);
+                                 var blob = new Blob([bytes], { type: '@System.Net.Mime.MediaTypeNames.Application.Octet' });
+                                 if (window.navigator.msSaveOrOpenBlob) {
+                                     // IE11
+                                     window.navigator.msSaveOrOpenBlob(blob, result.FileDownloadName);
+                                 } else {
+                                     // Google chome, Firefox, ....
+                                     var link = document.createElement('a');
+                                     link.href = window.URL.createObjectURL(blob);
+                                     link.download = result.FileDownloadName;
+                                     link.click();
+                                 }
+                             }
+                             else {
+                               (node).find("i.fa-spinner").addClass("display_none");
+                           }
+                           (node).find("i.fa-spinner").addClass("display_none");
+                         },
+                          error: function (xhr, status, error) {
+                        (node).find("i.fa-spinner").addClass("display_none");
+                         }
+                     });*@
+                  }
+                 catch (e) {
+                (node).find("i.fa-spinner").addClass("display_none");
+              }
+            }
+          }
+        ]
+      });
+      setTimeout(function () {
+        $("#PaymentDetails").popup("show");
+        $(element).find("i.fa-spinner").hide();
+      }, 3000);
+    }
+    function ClosePopup() {
+      $("#PaymentDetails").popup("hide");
+    }
+    var table = $("#PaymentExampleTbl").DataTable({
+      "sScrollY": "150px",
+      //"bAutoWidth": false // Disable the auto width calculation
+    });
+
+    $(window).resize(function () {
+      table.columns.adjust();
+    });
+
+
+    const download_Excel_ClassBtn = document.querySelectorAll('.download_Excel');
+    download_Excel_ClassBtn.forEach(button => {
+      button.addEventListener('click', downloadExcelDashboard);
+    });
+
+
+        function downloadExcelDashboard() {
+            debugger
+            let table = $('#tblPaymentCounts');
+            $("#IddownloadExcel").html('<i class="fa fa-spinner fa-spin"></i> Downloading');
+          TableToExcel.convert(table[0], {
+          name: `BeneficiariesPaymentSummary.xlsx`,
+        sheet: {
+          name: 'Usermanagement'
+        }
+      });
+            $("#IddownloadExcel").html('Download Excel');
+    }
+
+    function BindFinancialYear() {
+      // Get Current Month
+      var currentMonth = new Date().getMonth();
+      // Get the current year
+      var currentYear = new Date().getFullYear();
+      // Set start financial years
+      var financialYearCount = currentYear - 2022;
+      if (currentMonth < 3) {
+        currentYear = currentYear - 1;
+      }
+      // Create a dropdown element
+      var dropdown = $('#FinancialYearDropdown');
+      // Populate the dropdown with the last 10 years
+      for (var i = 0; i < financialYearCount; i++) {
+        var year = currentYear - i;
+        dropdown.append($('<option>', { value: year + '_' + (year + 1), text: year + '-' + (year + 1) }));
+      }
+      }
+    // new function
+      $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+      });
+
+    $("#BeneficiaryDetails").on("change", function () {
+      OnchangeBindBeneficiaryDetails();
+    });
+
+    function OnchangeBindBeneficiaryDetails() {
+      //$("#mydivth").hide();
+      //$("#mydivtd").hide();
+      if (document.getElementById("loader") != null) {
+        document.getElementById("loader").style.display = "block";
+      }
+      var Beneficiary = $("#BeneficiaryDetails").val();
+      $.ajax({
+        type: "POST",
+        data: { BeneficiaryData: Beneficiary },
+        url: "/Dashboard/BeneficiaryDetails_summAjaxHandler",
+        dataType: "json",
+        success: function (data) {
+          debugger;
+          document.getElementById("loader").style.display = "none";
+          console.log(data);
+          var tableContainer = $('#tblJAMMUCounts');
+          tableContainer.empty();
+
+          var tableHtml = '<table class="tbl"><thead class="thr">';
+
+          // Print headers
+          tableHtml += '<tr>';
+          for (let i = 0; i < data.length; i++) {
+            tableHtml += '<th colspan="3">' + data[i].District + '</th>';
+          }
+          tableHtml += '</tr>';
+          tableHtml += '</thead>';
+
+          tableHtml += '<tbody class="tbr">';
+          tableHtml += '<tr>';
+          let j = 0;
+
+          for (let i = 0; i < data.length; i++) {
+            var empStatusList = data[i].EmpStatusList;
+            for (let j = 0; j < empStatusList.length; j++) {
+              tableHtml += '<td>' + empStatusList[j].gender1 + '</td>';
+            }
+            if (empStatusList.length == 1) {
+              if (empStatusList[j].gender1 != "F") {
+                tableHtml += '<td>F</td>';
+              }
+              if (empStatusList[j].gender1 != "M") {
+                tableHtml += '<td>M</td>';
+              }
+              if (empStatusList[j].gender1 != "T") {
+                tableHtml += '<td>T</td>';
+              }
+            }
+            if (empStatusList.length == 2 && empStatusList[j].gender1 != "T") {
+              tableHtml += '<td>T</td>';
+            }
+          }
+          tableHtml += '</tr>';
+
+          tableHtml += '<tr>';
+          for (let i = 0; i < data.length; i++) {
+            var empStatusList = data[i].EmpStatusList;
+            for (let j = 0; j < empStatusList.length; j++) {
+
+              tableHtml += '<td>' + empStatusList[j].count1 + '</td>';
+            }
+            if (empStatusList.length == 1) {
+              if (empStatusList[j].gender1 != "F") {
+                tableHtml += '<td>0</td>';
+              }
+              if (empStatusList[j].gender1 != "M") {
+                tableHtml += '<td>0</td>';
+              }
+              if (empStatusList[j].gender1 != "T") {
+                tableHtml += '<td>0</td>';
+              }
+            }
+
+            if (empStatusList.length == 2) {
+              tableHtml += '<td>0</td>';
+            }
+          }
+
+          tableHtml += '</tr>';
+
+          // Close table structure
+          tableHtml += '</tbody></table>';
+
+          // Append table to container element
+          tableContainer.append(tableHtml);
+
+          if (data.length == 0) {
+            // If no data is found, display an error message
+            var errorMessage = $('<p class="error-message">No data available in table</p>').css({
+              'text-align': 'center'
+            });
+            tableContainer.append(errorMessage);
+            return;
+          }
+        }
+      });
+    }
+
+
+
+      function BindBeneficiaryDetails() {
+        //$("#mydivth").hide();
+        //$("#mydivtd").hide();
+        var Beneficiary = $("#BeneficiaryDetails").val();
+        $.ajax({
+          type: "POST",
+          data: { BeneficiaryData: Beneficiary },
+          url: "/Dashboard/BeneficiaryDetails_summAjaxHandler",
+          dataType: "json",
+          success: function (data) {
+            console.log(data);
+            var tableContainer = $('#tblJAMMUCounts');
+            tableContainer.empty();
+
+            var tableHtml = '<table class="tbl"><thead class="thr">';
+
+            // Print headers
+            tableHtml += '<tr>';
+            for (let i = 0; i < data.length; i++) {
+              tableHtml += '<th colspan="3">' + data[i].District + '</th>';
+            }
+            tableHtml += '</tr>';
+            tableHtml += '</thead>';
+
+            tableHtml += '<tbody class="tbr">';
+            tableHtml += '<tr>';
+            let j = 0;
+
+            for (let i = 0; i < data.length; i++) {
+              var empStatusList = data[i].EmpStatusList;
+              for (let j = 0; j < empStatusList.length; j++) {
+                tableHtml += '<td>' + empStatusList[j].gender1 + '</td>';
+              }
+              if (empStatusList.length == 1) {
+                if (empStatusList[j].gender1 != "F") {
+                  tableHtml += '<td>F</td>';
+                }
+                if (empStatusList[j].gender1 != "M") {
+                  tableHtml += '<td>M</td>';
+                }
+                if (empStatusList[j].gender1 != "T") {
+                  tableHtml += '<td>T</td>';
+                }
+              }
+              if (empStatusList.length == 2 && empStatusList[j].gender1 != "T") {
+                tableHtml += '<td>T</td>';
+              }
+            }
+            tableHtml += '</tr>';
+
+            tableHtml += '<tr>';
+            for (let i = 0; i < data.length; i++) {
+              var empStatusList = data[i].EmpStatusList;
+              for (let j = 0; j < empStatusList.length; j++) {
+
+                tableHtml += '<td>' + empStatusList[j].count1 + '</td>';
+              }
+              if (empStatusList.length == 1) {
+                if (empStatusList[j].gender1 != "F") {
+                  tableHtml += '<td>0</td>';
+                }
+                if (empStatusList[j].gender1 != "M") {
+                  tableHtml += '<td>0</td>';
+                }
+                if (empStatusList[j].gender1 != "T") {
+                  tableHtml += '<td>0</td>';
+                }
+              }
+
+              if (empStatusList.length == 2) {
+                tableHtml += '<td>0</td>';
+              }
+            }
+
+            tableHtml += '</tr>';
+
+            // Close table structure
+            tableHtml += '</tbody></table>';
+
+            // Append table to container element
+            tableContainer.append(tableHtml);
+
+            if (data.length == 0) {
+              // If no data is found, display an error message
+              var errorMessage = $('<p class="error-message">No data available in table</p>').css({
+                'text-align': 'center'
+              });
+              tableContainer.append(errorMessage);
+              return;
+            }
+          }
+        });
+      }
+  </script>
+}

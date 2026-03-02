@@ -1,0 +1,129 @@
+﻿@using App.Web.Models
+@model ChooseFinancialYearViewModel
+@{
+    ViewBag.Title = "Select Financial Year";
+    Layout = "~/Views/Shared/_WithoutLayout.cshtml";
+}
+<style>
+    .span#togglePassword-2-p {
+        position: relative;
+    }
+
+    .span#togglePassword-2 {
+        position: absolute;
+        right: 0;
+    }
+
+    span#togglePassword {
+        position: absolute;
+        right: 25px;
+        top: 40px;
+        z-index: 99;
+    }
+
+    .form-group.span\#togglePassword-2-p {
+        position: relative;
+    }
+
+    .dropdowncolor {
+        background-color: white !important;
+    }
+
+    .required-field::after {
+        content: "*";
+        color: red;
+        margin-left: 5px;
+    }
+
+    .captcha {
+        background-color: #ffffff;
+        padding: 5px;
+        margin-top: 15px;
+        border-top: 2px solid #3c8dbc;
+    }
+
+    img#CaptchaImage {
+        width: 130px;
+    }
+
+    input#CaptchaInputText {
+        width: 100%;
+    }
+
+    .validation-summary-valid ul li {
+        display: none !important;
+    }
+
+    .ChooseFinancialYearForm-btn {
+        box-shadow: 3px 3px 3px #cecece, -3px -3px 3px #fff;
+        border-radius: 61px !important;
+        background: -webkit-linear-gradient(left, #35d3e1 -45%, #264a9f 110%, #195dff 140%);
+        background: linear-gradient(90deg, #35d3e1 -45%, #264a9f 110%, #195dff 140%);
+        box-shadow: 3px 3px 6px #bfc3cf, -3px -3px 6px #fff;
+        color: #fff;
+        width: 100%;
+        height: 40px;
+        padding: 8px;
+        font-size: 14px;
+        border: 0px;
+    }
+</style>
+<div class="account-pages mt-5">
+    <div class="panel panel-default">
+        <div class="panel-body px-5 py-5">
+            @using (Html.BeginForm("ChooseFinancialYear", "Account", FormMethod.Post, new { id = "ChooseFinancialYearForm", @class = "form-login", role = "form" }))
+            {
+                @*<form id="ChooseFinancialYearForm" class="form-login" method="post">*@
+                @Html.ValidationSummary("", new { @class = "text-danger" })
+
+
+                <div class="col-ms-12" id="divFinancialYear">
+                    <label class="required-field">Financial Year</label>
+                    @if (ViewBag.FinancialYear != null)
+                    {
+                        @Html.DropDownList("FinancialYear", new SelectList(ViewBag.FinancialYear), "Select Financial Year", new { @class = "form-control input-sm dropdowncolor" })
+                    }
+                    else
+                    {
+                        @Html.DropDownList("FinancialYear", new SelectList(""), "Select Financial Year", new { @class = "form-control input-sm dropdowncolor" })
+                    }
+                </div>
+                <hr />
+                @*<a class="btn btn-success btn-sm bounceIn animation-delay5  pull-right mb-5 ChooseFinancialYearForm-btn" href="javascript:document.getElementById('ChooseFinancialYearForm').submit();">*@
+                <a class="btn btn-success btn-sm bounceIn animation-delay5  pull-right mb-5 ChooseFinancialYearForm-btn" id="ChooseFinancialYearFormBtn">
+                    <i class="fa fa-sign-in"></i> Continue
+                </a>
+                @*</form>*@
+            }
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script nonce="@ViewBag.StyleNonce">
+
+        document.getElementById("ChooseFinancialYearFormBtn").addEventListener("click", SubmitChooseFinancialYearForm);
+        $(document).ready(function () {
+            debugger
+
+
+        });
+
+        function SubmitChooseFinancialYearForm() {
+            debugger
+            document.getElementById('ChooseFinancialYearForm').submit();
+        }
+    </script>
+
+}
+
+
+
+
+
+
+
+
+
+
+

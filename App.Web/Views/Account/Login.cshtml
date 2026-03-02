@@ -1,0 +1,296 @@
+﻿@using App.Web.Models
+@using CaptchaMvc.HtmlHelpers
+@model LoginViewModel
+@{
+    ViewBag.Title = "Log in";
+    Layout = "~/Views/Shared/_WithoutLayout.cshtml";
+    var xx = Model;
+    var y = xx;
+}
+<style nonce="@ViewBag.StyleNonce">
+    .span#togglePassword-2-p {
+        position: relative;
+    }
+
+    .span#togglePassword-2 {
+        position: absolute;
+        right: 0;
+    }
+
+    span#togglePassword {
+        position: absolute;
+        right: 25px;
+        top: 40px;
+        z-index: 99;
+    } 
+    .form-group.span\#togglePassword-2-p {
+        position: relative;
+    }
+
+    .dropdowncolor {
+        background-color: white !important;
+    }
+
+    .required-field::after {
+        content: "*";
+        color: red;
+        margin-left: 5px;
+    }
+
+    .captcha {
+        background-color: #ffffff;
+        padding: 5px;
+        margin-top: 15px;
+        border-top: 2px solid #3c8dbc;
+    }
+
+    img#CaptchaImage {
+        width: 130px;
+    }
+
+    input#CaptchaInputText {
+        width: 100%;
+    }
+
+    .loginUserName {
+        margin-top: 10px;
+    }
+
+    .validation-summary-valid ul li {
+        display: none !important;
+    }
+  .spinnerdisplaynone{
+    display:none;
+  }
+  .speck_btn {
+    box-shadow: 3px 3px 3px #cecece, -3px -3px 3px #fff;
+    border-radius: 61px !important;
+    background: -webkit-linear-gradient(left, #35d3e1 -45%, #264a9f 110%, #195dff 140%);
+    background: linear-gradient(90deg, #35d3e1 -45%, #264a9f 110%, #195dff 140%);
+    box-shadow: 3px 3px 6px #bfc3cf, -3px -3px 6px #fff;
+    color: #fff;
+    width: 100%;
+    height: 40px;
+    padding: 14px;
+    font-size: 14px;
+    border: 0px;
+  }
+</style>
+<div class="account-pages mt-5">
+    <div class="panel panel-default">
+      <div class="panel-body px-5 py-5">
+        @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl}, FormMethod.Post, new { id = "loginForm", @class = "form-login", role = "form" }))
+        {
+          @Html.AntiForgeryToken()
+          @Html.ValidationSummary("", new { @class = "text-danger" })
+
+          <div class="form-group mb-4 loginUserName">
+            <label class="required-field">User Name</label>
+            <input type="hidden" value="" id="hdnUserName" name="UserName" />
+            <input type="hidden" value="" id="hdnEnteredUserName" name="EnteredUserName" />
+            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control input-sm bounceIn animation-dela", placeholder = "UserName" })
+          </div>
+          <div class="form-group span#togglePassword-2-p">
+            <label class="required-field">Password</label>
+            <span class="input-group-text span#togglePassword-2" id="togglePassword">
+              <i class="fa fa-eye"></i>
+            </span>
+            <input type="hidden" value="" id="hdnPassword" name="Password" />
+            <input type="hidden" value="" id="hdnEnteredPassword" name="EnteredPassword" />
+            @Html.PasswordFor(m => m.Password, new { @class = "form-control input-sm bounceIn animation-delay2 ", placeholder = "Password", Value = Model.Password })
+          </div>
+          <div class="col-ms-12" id="divregion">
+            <label class="required-field">Region</label>
+            @if (ViewBag.RegionNames != null)
+            {
+              @Html.DropDownList("Region", new SelectList(ViewBag.RegionNames), "Select Region", new { @class = "form-control input-sm dropdowncolor" })
+            }
+            else
+            {
+              @Html.DropDownList("Region", new SelectList(""), "Select Region", new { @class = "form-control input-sm dropdowncolor" })
+            }
+          </div>
+          <div class="col-md-12 p-0 mt-3">
+            <label class="required-field">
+              Captcha
+            </label>
+            <div class="form-group">
+              <div class="col-md-5 p-0">
+                <img src="@Url.Action("GenerateCaptcha", "Account")" alt="CAPTCHA" id="captchaImage" />
+                <br />
+                <a href="javascript:void();" id="reloadCaptchaBtn">Try Another</a>
+              </div>
+              <div class="col-md-3 p-0 mt-4">
+                <a href="javascript:void(0);" class="speck_btn" id="playAudioCaptcha"><i class="fa fa-volume-up" aria-hidden="true"></i> Speak</a>
+              </div>
+                <audio id="captchaAudio" class="display-none"></audio>
+                @Html.TextBoxFor(m => m.CaptchaCode, new { @class = "form-control input-sm bounceIn animation-dela mt-4", placeholder = "Captcha" })
+              </div>
+            </div>
+
+
+          @*<div class="form-group mb-4">
+            <div class="col-md-4 p-0 mt-3">
+              <a href="javascript:void(0);" id="SendOtpEmail" class="btn btn-success btn-sm bounceIn animation-delay5 login-link pull-right mb-5"><i id="spinner" class="fa fa-spinner fa-spin spinnerdisplaynone"></i>  Send Otp</a>
+            </div>
+              <div class="col-md-8  mt-3">
+                @Html.TextBoxFor(m => m.OTP, new { @class = "form-control input-sm bounceIn animation-dela", placeholder = "Fill Otp" })
+              </div>
+            </div>*@
+
+
+              <hr />
+              <a class="btn btn-success btn-sm bounceIn animation-delay5 login-link pull-right mb-5" href="javascript:void(0);" id="LoginFormSubmit_Btn">
+                <i class="fa fa-sign-in"></i> Sign in
+              </a>
+              }
+            </div>
+    </div>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/jqueryval")
+    <script nonce="@ViewBag.StyleNonce">
+      //$("#UserName").val("");
+        //$("#Password").val("");
+        $("#hdnUserName").val("");
+        $("#hdnPassword").val("");
+        $("#hdnEnteredUserName").val("");
+        $("#hdnEnteredPassword").val("");
+        $("#CaptchaCode").val("");
+        document.getElementById("LoginFormSubmit_Btn").addEventListener("click", LoginSubmit);
+        document.getElementById("reloadCaptchaBtn").addEventListener("click", reloadCaptcha);       
+        document.getElementById("CaptchaCode").addEventListener("keydown", checkEnter);
+
+        function reloadCaptcha()
+        {
+            document.getElementById("captchaImage").src = '@Url.Action("GenerateCaptcha", "Account")' + '?' + new Date().getTime();
+      }
+
+
+      document.getElementById('playAudioCaptcha').addEventListener('click', function () {
+        const audio = document.getElementById('captchaAudio');
+        debugger
+        if (audio) {
+          audio.src = '/Account/GetCaptchaAudio'; 
+          audio.load(); 
+          audio.play()
+            .then(() => console.log('Audio is playing'))
+            .catch(error => console.error('Error playing audio:', error)); 
+        } else {
+          console.error('Audio element not found.');
+        }
+      });
+
+      //document.getElementById('SendOtpEmail').addEventListener('click', function () {
+      //  sendOtpEmail();
+      //});
+
+
+      function sendOtpEmail() {
+        debugger;
+        const email = document.getElementById("UserName").value; 
+        if (!email) {
+          toastr.error("Please enter your UserName.");
+          return;
+        }
+        document.getElementById("spinner").style.display = "inline-block"; 
+        $.ajax({
+          url: "/Account/SendotpEmail",
+          type: "POST",
+          data: { username: email}, 
+          success: function (response) {
+            document.getElementById("spinner").style.display = "none"; // Hide spinner
+            if (response.success) {
+              toastr.success("OTP sent successfully!");
+            } else {
+              toastr.error("Error: " + response.message);
+            }
+          },
+          error: function (xhr, status, error) {
+            toastr.error("An error occurred: " + error);
+          }
+        });
+      }
+
+
+
+        $(function () {
+            $('.btn-success').focus();
+        })
+        $("input").keypress(function (event) {
+            if (event.which == 13) {
+                event.preventDefault();
+                $("form").submit();
+            }
+        });
+
+        $(document).ready(function () {
+            debugger
+            var userName = '@Model.UserName';
+            $("#UserName").val(userName);
+
+            $(".validation-summary-valid ul li").removeAttr("style");
+
+            if (window.location.search) {
+                window.history.replaceState(null, null, window.location.pathname);
+            }
+            $('#togglePassword').click(function () {
+                const passwordField = $('#Password');
+                const type = passwordField.attr('type') === 'password' ? 'text' : 'password';
+                passwordField.attr('type', type);
+                $(this).find('i').toggleClass('fa-eye fa-eye-slash');
+            });
+
+            var inputElement = $("#CaptchaInputText");
+            var anchorElement = inputElement.prevAll('a');
+            anchorElement.css({
+                'display': 'inline',
+            });
+            anchorElement.attr('href', 'javascript:void(0)');
+        });
+
+        function showregion() {
+            $("#divregion").show();
+        }
+
+        function checkEnter(event) {
+            if (event.key === "Enter") { // Or use event.keyCode === 13 in older browsers
+                LoginSubmit();
+            }
+        }
+
+        async function LoginSubmit() {
+            debugger;
+            var form = $('#loginForm');
+            if (!form.valid()) {
+                return;
+            }
+            var UsernameInput = $('#UserName').val();
+            var base64username = btoa(UsernameInput);
+
+            var passwordInput = $('#Password').val();
+            var base64Encoded = btoa(passwordInput);
+            //$('#UserName').val(base64username);
+            //$('#Password').val(base64Encoded);
+
+            $('#hdnUserName').val(base64username);
+            $('#hdnPassword').val(base64Encoded);
+            $("#hdnEnteredUserName").val($('#UserName').val());
+            $("#hdnEnteredPassword").val($('#Password').val());
+            $("#loginForm").submit();
+      }     
+    </script>
+
+}
+
+
+
+
+
+
+
+
+
+
+

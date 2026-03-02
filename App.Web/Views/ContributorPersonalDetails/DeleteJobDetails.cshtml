@@ -1,0 +1,138 @@
+﻿@model App.Data.Entities.MasterContributorJobDetails
+
+@{
+  ViewBag.Title = "Delete Job Details";
+  Layout = "~/Views/Shared/_LayoutProfile.cshtml";
+}
+
+@section profileContainer
+{
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+        Contributor Job Details
+        
+      </h4>
+    </div>
+    <dl class="dl-horizontal">
+      <dt>
+        @Html.DisplayNameFor(model => model.Department.Name)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.Department.Name)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.Designation.Name)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.Designation.Name)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.Employer.EmployerName)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.Employer.EmployerName)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.Grade.Name)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.Grade.Name)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.PersonId)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.PersonId)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.EmploymentType)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.EmploymentType)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.JobTitle)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.JobTitle)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.HireDate)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.HireDate)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.PresentSalary)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.PresentSalary)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.JobDescription)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.JobDescription)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.IsActive)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.IsActive)
+      </dd>
+
+    </dl>
+    @using (Html.BeginForm("DeleteJobDetails", "ContributorPersonalDetails", new { ID = Model.Id }, FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+    {
+      <div class="row">
+        <div class="panel-body">
+          <div class="col-sm-12">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+              <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Delete" class="btn btn-sm btn-success" />
+                <button type="submit" class="btn btn-success btn-sm" id="btnCancelInfo" onclick="javascript: return RefreshView();">Cancel</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+@section Scripts {
+
+  <script type="text/javascript">
+  function RefreshView() {
+    /*window.location.reload();
+    return false;*/
+    window.location.href = "ContributorPersonalDetails/JobDetailsList/"+@ViewBag.PersonId;
+    return false;
+  }
+  </script>
+
+}

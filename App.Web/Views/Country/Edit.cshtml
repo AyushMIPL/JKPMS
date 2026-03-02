@@ -1,0 +1,128 @@
+﻿@model App.Data.Entities.MasterCountry
+
+@{
+  ViewBag.Title = "Edit";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline headline-countryedit">
+      Update Details
+
+      @*<ul class="tool-bar">
+
+        </ul>*@
+    </h4>
+  </div>
+  <div class="panel-body">
+    @using (Html.BeginForm("Edit", "Country", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "EditCountry" }))
+    {
+      @Html.AntiForgeryToken()
+      @*@Html.ValidationSummary("", new { @class = "text-danger" })*@
+      @Html.HiddenFor(model => model.Id)
+      <div class="row">
+        <div class="col-sm-4">
+
+
+
+          @Html.LabelFor(model => model.CountryCode, htmlAttributes: new { @class = "control Color-Red-asterisk" })
+          @Html.EditorFor(model => model.CountryCode, new { htmlAttributes = new { @class = "form-control" } })
+          @Html.ValidationMessageFor(model => model.CountryCode, "", new { @class = "text-danger" })
+        </div>
+
+
+
+
+        <div class="col-sm-4">
+          @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control Color-Red-asterisk" })
+          @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+          @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+        </div>
+
+
+
+
+        <div class="col-sm-4">
+          @Html.LabelFor(model => model.ISDCode, htmlAttributes: new { @class = " control Color-Red-asterisk" })
+          @Html.EditorFor(model => model.ISDCode, new { htmlAttributes = new { @class = "form-control" } })
+          @Html.ValidationMessageFor(model => model.ISDCode, "", new { @class = "text-danger" })
+        </div>
+
+
+        @*<div class="form-group">
+            @Html.LabelFor(model => model.IsActive, htmlAttributes: new { @class = "col-sm-4 control-label" })
+            <div class="col-sm-8">
+              <div class="checkbox">
+                @Html.EditorFor(model => model.IsActive)
+                @Html.ValidationMessageFor(model => model.IsActive, "", new { @class = "text-danger" })
+              </div>
+            </div>
+          </div>*@
+      </div>
+      <div class="row mt-4">
+        <div class="col-sm-12 text-right ">
+          <button type="submit" id="IdUpdate1" class="btn btn-success px-5 height"><i class="fa fa-save"> </i> Update</button>
+          <button type="button" class="btn btn-success px-5 height button-countryedit" title="Please Wait While We Process Your Request" id="btn_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+          <a href="/Country/Index" class="btn btn-primary height border-radius line-height"><i class="fa fa-reply"> </i> Back to List</a>
+        </div>
+      </div>
+
+
+    }
+  </div>
+</div>
+@section scripts{
+
+  <script src="~/Scripts/Master.js"></script>
+  @Scripts.Render("~/bundles/jqueryval")
+  <script nonce="@ViewBag.StyleNonce">
+    document.getElementById("IdUpdate1").addEventListener("click", EditSubmit);
+    async function EditSubmit() {
+          $('#IdUpdate1').hide();
+          $('#btn_loading').show();
+          var form = $('#EditCountry');
+          if (!form.valid()) {
+            $('#IdUpdate1').show();
+            $('#btn_loading').hide();
+            return;
+          }
+        }
+    $(document).ready(function () {
+      //$('form').submit(function () {
+      //      $('#IdUpdate1').hide();
+      //    $('#btn_loading').show();
+      //    var form = $("#EditCountry");
+      //    if (!form.valid()) {
+      //        $('#IdUpdate1').show();
+      //        $('#btn_loading').hide();
+      //        return false;
+      //    }
+      //});
+
+        var error = '@TempData["error"]';
+        if (error && error.length > 0) {
+            $('#IdUpdate1').show();
+            $('#btn_loading').hide();
+        }
+        $('#btn_loading').hide();
+    });
+  </script>
+  @*<script nonce="@ViewBag.StyleNonce">
+      $("#IdUpdate1").show();
+        $("#IdUpdate1").on('click', function () {
+          var button = document.getElementById("IdUpdate1");
+          $("#btn_loading").show();
+          button.style.display = "none";
+            setTimeout(function () {
+              $("#btn_loading").hide();
+              $("#IdUpdate1").show();
+            }, 3000);
+        });
+
+    </script>*@
+
+}
+
+
+
+
+

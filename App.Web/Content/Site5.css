@@ -1,0 +1,363 @@
+﻿
+/*<!-- Country Page Index/Create/Edit/Delete -->*/
+
+.headline-countryindex {
+  margin:0px;
+  padding:0px;
+  border:none;
+}
+
+.button-countryindex {
+  width:240px;
+}
+
+.headline-countrycreate {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+
+.button-countrycreate {
+ display: none;
+}
+.headline-countrydetails {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+
+.headline-countrydelete {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.headline-countryedit {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.button-countryedit {
+  display: none;
+}
+
+
+/*<!-- State Page Index/Create/Edit/Delete -->*/
+
+.headline-stateindex {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.headline-statecreate {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.button-statecreate {
+  display: none;
+}
+.headline-ststeedit {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.button-statecreate {
+  display: none;
+}
+.headline-statedetails {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.headline-ststedelete {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+
+
+
+/*<!-- City Page Index/Create/Edit/Delete -->*/
+
+.headline-cityindex {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.action-cityindex {
+  width: 240px;
+}
+.headline-citycreate {
+  margin:0px;padding:0px;border:none;
+}
+button-cityloaders {
+  display: none;
+}
+/*.button-citycreates {
+  display:none;
+}*/
+.headline-cityedit {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+
+.headline-citydetails {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.headline-citydelete {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+
+/*<!-- Marital Status Page Index/Create/Edit/Delete -->*/
+
+
+.headline-maritalstatusindex {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.action-buttonmaritalstatus {
+  width: 260px;
+}
+.headline-maritalstatuscreate {
+  margin:0px;padding:0px;border:none;
+}
+.headline-maritalstatusedit {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+
+.Color-Red-asterisk span {
+  color:red!important;
+}
+
+/*<!-- Pensioner Type Page Index/Create/Edit/Delete -->*/
+
+.headline-pensionertypeindex {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.pensionertype-action {
+  width: 260px;
+}
+.headline-pensionertypecreate {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.button-pensionertypeloader {
+  display: none;
+}
+.headline-pensionertypeedit {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.button-pensionertypeeditloader {
+  display: none;
+}
+.headline-pensionertypedetails {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.headline-pensionertypedelete {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+
+
+/*<!-- Pensioner Type Page Index/Create/Edit/Delete -->*/
+.headline-masterstatusindex {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+
+.action-buttonname {
+  width: 40%;
+}
+.action-buttonstatus {
+  width: 30%;
+}
+.action-buttonaction {
+  width: 30%;
+}
+
+.headline-masterstatuscreate {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.headline-masterstatusedit {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.headline-masterstatusdetails {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.headline-masterstatusdelete {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+
+/*<!-- Master Bank Page Index/Create/Edit/Delete -->*/
+
+.headline-masterbankindex {
+  margin:0px;padding:0px;border:none;
+}
+.headline-masterbankcreate {
+  margin:0px;padding:0px;border:none;
+}
+.button-masterbankloader {
+  display: none;
+}
+.headline-masterbankedit {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.headline-masterbankdetails {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+
+/*<!-- Master Income Page Index/Create/Edit/Delete -->*/
+
+.headline-masterincomeindex {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.button-masterincome-action {
+  width: 200px;
+}
+.headline-masterincomecreate {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.button-masterincomeloader {
+  display: none;
+}
+.headline-masterincomeedit {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.headline-masterincomedetails {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+
+/*<!-- Region Page Index/Create/Edit/Delete -->*/
+
+
+
+.headline-regionindex {
+ margin:0px;padding:0px;border:none;
+}
+.button-regionaction {
+  width: 223px;
+}
+.headline-regioncreate {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+
+.button-regionloader {
+  display: none;
+}
+.headline-regionedit {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.button-regioneditloader {
+  display: none;
+}
+.headline-regiondetails {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.headline-regiondelete {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.headline-contributonindex {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.contributionphto {
+  width: 100px
+}
+.headline-contributionedit {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.contributiontable-edit {
+  width: 100%;
+  margin: 5px;
+}
+.contributionpf-edit {
+  width: 30%;
+}
+.contributionrate-edit {
+  width: 10%;
+}
+.contributiondate-edit {
+  width: 30%;
+}
+.contributioncreateon-edit {
+  width: 15%;
+}
+.contributionmodified-edit {
+  width: 15%;
+}
+
+.headline-contributionerr {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.headline-errtop {
+  margin-top: -30px;
+}
+.lebelerr {
+  margin-right: 5px;
+}
+.lebererrlast {
+  margin-right: 5px;
+}
+
+.healine-distructindex {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+}
+.distruct-action {
+  width: 223px;
+}
+ 
+.table .MailSettingstbl-thclass {
+  padding-right: 60px !important;
+}

@@ -1,0 +1,101 @@
+﻿@model App.Data.Entities.MasterEmployeeIncomes
+
+@{
+  ViewBag.Title = "AddIncomeDetails";
+  Layout = "~/Views/Shared/_LayoutPensioner.cshtml";
+}
+@section profilePensioner
+{
+  <div class="panel panel-default">
+    <div class="panel-heading clearfix">
+      <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+        Add Details:@string.Format("{0} ({1})", ViewBag.Name, ViewBag.PensionerID)
+        
+        @*<ul class="tool-bar">
+            
+          </ul>*@
+      </h4>
+    </div>
+    <div class="panel-body">
+      @using (Html.BeginForm("AddIncomeDetails", "MasterPensioner", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+      {
+        @Html.Hidden("PensionerID")
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary("", new { @class = "text-danger" })
+        <div class="row">
+          <div class="col-sm-5">
+            <div class="form-group">
+              @Html.LabelFor(model => model.Empl_Code, "Pensioner Id", new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.Empl_Code, new { @class = "form-control input-sm", @Value = ViewBag.PensionerID, @readonly = "readonly", placeholder = "Pensioner ID" })
+              </div>
+            </div>
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.inc_code, "Income Code *", new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.DropDownList("inc_code", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm" })
+
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.inc_rate, "Rate *", new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.inc_rate, new { @class = "form-control input-sm allownumericwithdecimal", placeholder = "Rate" })
+              </div>
+            </div>
+            @*<div class="form-group">
+                @Html.LabelFor(model => model.inc_number, new { @class = "col-sm-4 control-label" })
+                <div class="col-sm-8">
+                  @Html.TextBoxFor(m => m.inc_number, new { @class = "form-control input-sm", placeholder = "Number" })
+                </div>
+              </div>*@
+            <div class="form-group">
+              @Html.LabelFor(model => model.hi_inc_amt, "Amount *", new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.hi_inc_amt, new { @class = "form-control input-sm allownumericwithdecimal", placeholder = "Amount" })
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-sm-4 control-label"></label>
+              <div class="col-sm-8">
+                <button type="submit" class="btn btn-success"><i class="fa fa-save"> </i> Save</button>
+                <a href="/MasterPensioner/IncomeIndex/@ViewBag.CId" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+                @*@Html.ActionLink("Cancel", "IncomeIndex", "MasterPensioner", new { id = @ViewBag.CId }, new { @class = "btn btn-primary" })*@
+              </div>
+            </div>
+          </div>
+        </div>
+
+      }
+    </div>
+
+  </div>
+}
+@section scripts{
+  <script nonce="@ViewBag.StyleNonce">
+    $("#IncomeCode").on('change', function () {
+      if ($("#IncomeCode").val() != null) {
+        var iCode = $("#IncomeCode").val();
+        var value = $("#Empl_Code").val();
+        $.ajax({
+          url: "@Url.Action("IncomeDropDownAjax", "MasterPensioner")?Value=" + value + "&incomeCode" + iCode,
+          type: "Get"
+        }).done(function (result) {
+          debugger
+          if (result == "Error") {
+            toasterErrorMessage("This income Code Already Exist For this Pensioner");
+          }
+          else {
+            $("#inc_rate").val(result);
+
+          }
+        })
+      }
+      else {
+        $("#inc_rate").val("");
+      }
+    })
+  </script>
+}

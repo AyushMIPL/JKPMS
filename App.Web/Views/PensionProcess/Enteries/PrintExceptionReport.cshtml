@@ -1,0 +1,190 @@
+﻿@model App.Data.ViewModels.PensionProcessViewModel
+
+@{
+    ViewBag.Title = "PrintExceptionReport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var Group = @Html.Raw(Json.Encode(ViewBag.Group));
+}
+
+<style>
+    .btn.btn-success.disabled {
+        color: gray;
+        pointer-events: none;
+        opacity: .8;
+    }
+</style>
+<div class="panel panel-default">
+
+    <div class="panel-body">
+        @using (Html.BeginForm("PrintExceptionReport", "PensionProcess", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", onsubmit = "return generatePrintExceptionReport();" }))
+        {
+            @Html.HiddenFor(model => model.pybatchid)
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary("", new { @class = "text-danger" })
+            <div class="">
+                <div class="mb-4">
+                    <div class="col-sm-4 hidden">
+
+                        @Html.LabelFor(model => model.EmployeeCode, new { @class = "control-label mb-2" })
+                        @Html.TextBoxFor(m => m.EmployeeCode, new { @class = "form-control input-sm", placeholder = "Beneficiary Code" })
+
+                    </div>
+                    <div class="col-sm-12">
+                        <label>District</label>
+                        @Html.TextBoxFor(x => x.RegionNames, "", new { @class = "form-control", @autocomplete = "off", @placeholder = " Regions" })
+                    </div>
+
+                    <div class="col-sm-4" hidden>
+                        @Html.LabelFor(model => model.EmpType, new { @class = "control-label mb-2" })
+                        @Html.DropDownListFor(model => model.EmpType, ViewBag.EmployeeType as SelectList, new { @class = "form-control input-sm" })
+                    </div>
+
+                    <div class="col-sm-4" hidden>
+                        @Html.LabelFor(model => model.LPayDate, new { @class = "control-label mb-2" })
+                        <div class="input-group date">
+                            @Html.EditorFor(model => model.LPayDate, new { @placeholder = "Last Pay Date" })
+                            <span class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 hidden" hidden>
+                        @Html.LabelFor(model => model.FirstName, new { @class = "control-label mb-2" })
+                        @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control input-sm", placeholder = "First Name" })
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="col-sm-4" hidden>
+                        @Html.LabelFor(model => model.PayrollDate, new { @class = "control-label mb-2" })
+                        <div class="input-group date">
+                            @Html.EditorFor(model => model.PayrollDate, new { @placeholder = "PayRoleDate" })
+                            <span class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 hidden" hidden>
+                        @Html.LabelFor(model => model.LastName, new { @class = "control-label mb-2" })
+                        @Html.TextBoxFor(m => m.LastName, new { @class = "form-control input-sm", placeholder = "Last Name" })
+                    </div>
+                    <div class="col-sm-4" hidden>
+                        @Html.LabelFor(model => model.EOPDate, new { @class = "control-label mb-2" })
+                        <div class="input-group date">
+                            @Html.EditorFor(model => model.EOPDate, new { @placeholder = "End Of Period" })
+                            <span class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="col-sm-4">
+                        <div class="control-label mb-2 mt-3" for="EmpType"> &nbsp; </div>
+                        <button type="submit" id="Btn" class="btn btn-success height px-5 @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")"><i class="fa fa-print"></i> Print Exception Report<i id="spinner" class="fa fa-spinner fa-spin" style="display:none;"></i> </button>
+                    </div>
+                </div>
+            </div>
+            @*<div>
+                  <iframe id="RptIframe" width="100%" height="500" frameborder="0"></iframe>
+                </div>*@
+        }
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline" style="margin:0px;padding:0px;border:none;" id="PrintExceptionReportId">
+            Payroll Process - Print Exception Report
+            @*<ul class="tool-bar">
+
+                </ul>*@
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div class="row py-3">
+            <div class="col-sm-12 hidden" id="DivRptIframe">
+                <iframe id="RptIframe" width="100%" height="500" frameborder="0"></iframe>
+            </div>
+            <div class="col-sm-12 hidden" id="DivRecordFound">
+                <div class="alert alert-warning">
+                    <h4 class="mb-0"> There is no Record Found</h4>
+                </div>
+
+                @*<div class="alert alert-info">
+                        <h4 class="mb-0"> There is no Record Found</h4>
+                    </div>*@
+                @*<iframe id="reportData" style="border: 0px;height:700px;width:100%;"></iframe>*@
+            </div>
+        </div>
+    </div>
+
+</div>
+@section scripts{
+
+    <script src="~/Scripts/autocomplete.js"></script>
+    <link href="~/Content/endless/css/jquery-ui.css" rel="stylesheet" />
+    <script nonce="@ViewBag.StyleNonce">
+
+        //$("#PrintExceptionReportId").hide();
+  function batch() {
+    var data = new Array();
+    $('input[type="text"]').each(function () {
+      if ($(this).val() != "") {
+        var Values = $("label[for='" + $(this).attr('id') + "']").text() + "=" + $(this).val();
+        data.push(Values);
+      }
+    });
+
+    //var value = $("#ddlEmpTypes option:selected").val();
+    var ddl = "Pensioner Type=" + $("#ddlEmpTypes option:selected").val();
+    data.push(ddl);
+
+    $.ajax({
+      url: "@Url.Action("INSERTBatchProcessInfoAjax", "PensionProcessHeaders")?Data=" + data + "",
+      type: "GET",
+    })
+  }
+    // By Sujeet No action name "CheckProcessAdded" method found int the solution. So comment the code on class ".btn-success" click function
+  //$('.btn-success').click(function () {
+  //  $.ajax({
+  //    url: '/PensionProcess/CheckProcessAdded',
+  //    type: 'Get',
+  //    dataType: 'json'
+  //  }).done(function (result) {
+  //    if (result.length <= 0) {
+  //      toasterErrorMessage("No Active Batch for Payroll Process,Please Create a New Batch & Refresh"); return false;
+  //    }
+  //  });
+  //});
+
+        $(document).ready(function () {
+            debugger;
+      if ('@ViewBag.RptLoad' == 'RptPrintExceptionReportWages.rpt' || '@ViewBag.RptLoad' == 'RptPrintExceptionReport.rpt') {
+          //$("#PrintExceptionReportId").show();
+          $("#DivRptIframe").removeClass("hidden");
+      document.getElementById('RptIframe').src = "/ReportForms/ContributionByEmployer.aspx";
+      }
+      else {
+          $("#DivRecordFound").removeClass("hidden");
+      }
+        });
+
+ jQuery(document).ready(function ($) {
+      comboTree = $('#RegionNames').comboTree({
+        source: @Group,
+        isMultiple: true,
+        cascadeSelect: true,
+        collapse: false
+      });
+ });
+
+
+      function generatePrintExceptionReport() {
+        debugger
+        $('#spinner').show();
+        $('#Btn').prop('disabled', true);
+        return true;
+      }
+
+
+    </script>
+}

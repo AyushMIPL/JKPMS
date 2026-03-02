@@ -1,0 +1,128 @@
+﻿@model App.Data.Entities.MasterBanks
+@{
+    ViewBag.Title = "Create";
+}
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline headline-masterbankcreate" >
+            Add Details
+            @*<ul class="tool-bar">
+
+                </ul>*@
+        </h4>
+    </div>
+    <div class="panel-body">
+        @using (Html.BeginForm("Create", "MasterBank", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "IdMasterBank_Create" }))
+        {
+            @Html.AntiForgeryToken()
+            @*@Html.ValidationSummary("", new { @class = "text-danger" })*@
+            <div class="row">
+                <div class="col-sm-8">
+                  <div class="form-group">
+                    <label class="col-sm-4 control">
+                      @Html.DisplayNameFor(model => model.bank_code)
+                      <span class="text-danger">*</span>
+                    </label>
+                    @*@Html.LabelFor(model => model.bank_code, "Bank Code", htmlAttributes: new { @class = "control-label col-md-3" })*@
+                    <div class="col-md-5">
+                      @Html.EditorFor(m => m.bank_code, new { htmlAttributes = new { @class = "form-control" } })
+                      @Html.ValidationMessageFor(model => model.bank_code, "", new { @class = "text-danger" })
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-4 control">
+                      @Html.DisplayNameFor(model => model.bank_desc)
+                      <span class="text-danger">*</span>
+                    </label>
+                    @*@Html.LabelFor(model => model.bank_desc, "Bank Name", htmlAttributes: new { @class = "control-label col-md-3" })*@
+                    <div class="col-md-5">
+                      @Html.EditorFor(m => m.bank_desc, new { htmlAttributes = new { @class = "form-control" } })
+                      @Html.ValidationMessageFor(model => model.bank_desc, "", new { @class = "text-danger" })
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-4 control">
+                      @Html.DisplayNameFor(model => model.mag_media)
+                      <span class="text-danger">*</span>
+                    </label>
+                    @*@Html.LabelFor(model => model.mag_media, htmlAttributes: new { @class = "control-label col-md-3" })*@
+                    <div class="col-md-5">
+                      @Html.EditorFor(m => m.mag_media, new { htmlAttributes = new { @class = "form-control" } })
+                      @Html.ValidationMessageFor(model => model.mag_media, "", new { @class = "text-danger" })
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-4 control">
+                      @Html.DisplayNameFor(model => model.co_bank_acct_no)
+                      <span class="text-danger">*</span>
+                    </label>
+                    @*@Html.LabelFor(model => model.co_bank_acct_no, "Bank Account Number", htmlAttributes: new { @class = "control-label col-md-3" })*@
+                    <div class="col-md-5">
+                      @Html.EditorFor(m => m.co_bank_acct_no, new { htmlAttributes = new { @class = "form-control" } })
+                      @Html.ValidationMessageFor(model => model.co_bank_acct_no, "", new { @class = "text-danger" })
+                    </div>
+                  </div>
+
+                    @*<div class="form-group">
+                          @Html.LabelFor(model => model.rou, htmlAttributes: new { @class = "control-label col-md-3" })
+                          <div class="col-md-5">
+                            <div class="checkbox">
+                              @Html.EditorFor(model => model.IsActive, new { @class = "form-control input-sm" })
+                            </div>
+                          </div>
+                        </div>*@
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"></label>
+                        <div class="col-sm-5">
+                            <button type="submit" id="IdMasterBankCreate" class="btn btn-success"><i class="fa fa-save"> </i> Create </button>
+                            <button type="button" class="btn btn-success px-5 height button-masterbankloader"  title="Please Wait While We Process Your Request" id="btn_MasterBank_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                            <a href="/MasterBank/Index" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        }
+    </div>
+</div>
+@section scripts{
+    <script src="~/Scripts/Master.js"></script>
+    <script nonce="@ViewBag.StyleNonce">
+
+    $(document).ready(function () {
+      $('form').submit(function () {
+          $('#IdMasterBankCreate').hide();
+          $('#btn_MasterBank_loading').show();
+          var form = $("#IdMasterBank_Create");
+          if (!form.valid()) {
+              $('#IdMasterBankCreate').show();
+              $('#btn_MasterBank_loading').hide();
+              return false;
+          }
+      });
+        var error = '@TempData["error"]';
+        if (error && error.length > 0) {
+            $('#IdMasterBankCreate').show();
+            $('#btn_MasterBank_loading').hide();
+        }
+        $('#btn_MasterBank_loading').hide();
+    });
+    </script>
+
+
+
+    @*<script nonce="@ViewBag.StyleNonce">
+            $("#IdCreateTests").on('click', function () {
+                $("i.fa-spinner").show();
+                setTimeout(function () {
+                    $("i.fa-spinner").hide();
+                }, 1000);
+            });
+        </script>*@
+}
+

@@ -1,0 +1,131 @@
+﻿@model App.Data.Entities.MasterContributorJobDetails
+
+@{
+  ViewBag.Title = "Edit Job Details";
+  Layout = "~/Views/Shared/_LayoutProfile.cshtml";
+}
+
+@section profileContainer
+{
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+        Contributor Marriage Details : @string.Format("{0} ({1})", ViewBag.Name, ViewBag.PersonId)
+        
+      </h4>
+    </div>
+    @using (Html.BeginForm("EditJobDetails", "ContributorPersonalDetails", new { ID = Model.Id }, FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+    {
+      <div class="row">
+        <div class="panel-body">
+          <div class="col-sm-12">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.Id)
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.PersonID, htmlAttributes: new { @class = "control-label col-md-2" })
+              <div class="col-md-10">
+                @Html.TextBoxFor(m => m.PersonID, new { @class = "form-control", placeholder = "JKPS ID", @Value = ViewBag.PersonID, @readonly = "readonly" })
+                @Html.ValidationMessageFor(model => model.PersonID, "", new { @class = "text-danger" })
+              </div>
+            </div>
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.EmployerID, "EmployerID", htmlAttributes: new { @class = "control-label col-md-2" })
+              <div class="col-md-10">
+                @Html.DropDownList("EmployerID", null, htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.EmployerID, "", new { @class = "text-danger" })
+              </div>
+            </div>
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.EmployerType, "Employer Type", htmlAttributes: new { @class = "control-label col-lg-2" })
+              <div class="col-sm-10">
+                @Html.EditorFor(m => m.EmployerType, new { @class = "form-control select-sm txtEdit" })
+              </div>
+            </div>
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.DepartmentId, "DepartmentId", htmlAttributes: new { @class = "control-label col-md-2" })
+              <div class="col-md-10">
+                @Html.DropDownList("DepartmentId", null, htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.DepartmentId, "", new { @class = "text-danger" })
+              </div>
+            </div>
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.DesignationId, "DesignationId", htmlAttributes: new { @class = "control-label col-md-2" })
+              <div class="col-md-10">
+                @Html.DropDownList("DesignationId", null, htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.DesignationId, "", new { @class = "text-danger" })
+              </div>
+            </div>
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.JobTitleID, "Job Title", htmlAttributes: new { @class = "control-label col-lg-2" })
+              <div class="col-md-10">
+                @Html.DropDownList("JobTitleID", null, htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.JobTitleID, "", new { @class = "text-danger" })
+              </div>
+            </div>
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.GradeId, "Grade", htmlAttributes: new { @class = "control-label col-md-2" })
+              <div class="col-md-10">
+                @Html.DropDownList("GradeId", null, htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.GradeId, "", new { @class = "text-danger" })
+              </div>
+            </div>
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.HireDate, new { @class = "col-sm-2 control-label" })
+              <div class="col-sm-10">
+                <div class="input-group date">
+                  @Html.EditorFor(model => model.HireDate, new { @placeholder = "HireDate" })
+                  <span class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.PresentSalary, htmlAttributes: new { @class = "control-label col-md-2" })
+              <div class="col-md-10">
+                @Html.EditorFor(model => model.PresentSalary, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.PresentSalary, "", new { @class = "text-danger" })
+              </div>
+            </div>
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.JobDescription, htmlAttributes: new { @class = "control-label col-md-2" })
+              <div class="col-md-10">
+                @Html.EditorFor(model => model.JobDescription, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.JobDescription, "", new { @class = "text-danger" })
+              </div>
+            </div>
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.IsActive, htmlAttributes: new { @class = "control-label col-md-2" })
+              <div class="col-md-10">
+                <div class="checkbox">
+                  @Html.EditorFor(model => model.IsActive)
+                  @Html.ValidationMessageFor(model => model.IsActive, "", new { @class = "text-danger" })
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-success" />
+                <a href="/ContributorPersonalDetails/JobDetailsList/@ViewBag.PersonId" class="btn btn-primary">Cancel</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}

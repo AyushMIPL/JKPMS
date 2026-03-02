@@ -1,0 +1,170 @@
+﻿@model App.Data.Entities.MasterDedcodes
+
+@{
+  ViewBag.Title = "Create";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Add Details
+    </h4>
+  </div>
+  <div class="panel-body">
+    @using (Html.BeginForm("Edit", "MasterDeductionCode", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+      @Html.HiddenFor(model => model.ded_code_id)
+      <div class="row">
+        <div class="row">
+          <div class="col-sm-5">
+            <div class="form-group">
+              @Html.LabelFor(model => model.ded_code, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.ded_code, new { @class = "form-control input-sm", placeholder = "Deduction Code" })
+
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.ded_type, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.DropDownList("ded_type", null, "---Select---", new { @class = "form-control input-sm" })
+
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-5">
+            <div class="form-group">
+              @Html.LabelFor(model => model.description, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.description, new { @class = "form-control input-sm", placeholder = "Description" })
+
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.tax_jur, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.tax_jur, new { @class = "form-control input-sm", placeholder = "Tax Jurisdiction" })
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-10">
+            <div class="form-group">
+              <label class="col-sm-3 control-label">Defaults for manual entry:</label>
+
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5">
+            <div class="form-group">
+              @Html.LabelFor(model => model.ded_taxred, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.DropDownList("ded_taxred", null, "---Select---", new { @class = "form-control input-sm" })
+
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.dflt_rate, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.dflt_rate, new { @class = "form-control input-sm", placeholder = "Rate" })
+
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.dflt_apply, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.DropDownList("dflt_apply", null, "---Select---", new { @class = "form-control input-sm" })
+
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.dflt_lo_ded_amt, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.dflt_lo_ded_amt, new { @class = "form-control input-sm allownumericwithdecimal", placeholder = "Low Amount" })
+
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.dflt_acct, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.DropDownList("GLAccount", null, "---Select---", new { @class = "form-control input-sm" })
+
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-5">
+            <div class="form-group">
+              @Html.LabelFor(model => model.state_ein, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.state_ein, new { @class = "form-control input-sm", placeholder = "EIN Number" })
+
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.dflt_limit, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.dflt_limit, new { @class = "form-control input-sm", placeholder = "Annual Limit" })
+
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.dflt_pay_limit, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.dflt_pay_limit, new { @class = "form-control input-sm", placeholder = "Per payroll Limit" })
+
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.dflt_hi_ded_amt, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.dflt_hi_ded_amt, new { @class = "form-control input-sm allownumericwithdecimal", placeholder = "High Amount" })
+
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.Label("GL Account", new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.DropDownList("dflt_acct", null, "---Select---", new { @class = "form-control input-sm" })
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-5">
+          <div class="form-group">
+            <label class="col-sm-4 control-label"></label>
+            <div class="col-sm-8">
+              <button type="submit" class="btn btn-success"><i class="fa fa-save"> </i> Update</button>
+              <a href="/MasterDeductionCode/Index" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    }
+  </div>
+</div>
+@section scripts{
+  <script nonce="@ViewBag.StyleNonce">
+    $("#dflt_acct").on('change', function () {
+      var account = $("#dflt_acct").val();
+      var id = $("#ded_code_id").val();
+      $.ajax({
+        url: "@Url.Action("checkAccountExistAjax", "MasterDeductionCode")?id=" + id + "&account=" + account,
+        type: "GET",
+      })
+		.done(function (result) {
+		  if (result != 0) {
+		    toasterErrorMessage("This Account is Already Linked with another Deduction Code.");
+		    $("#dflt_acct").select2("val", "");
+		  }
+		})
+    })
+  </script>
+}
+

@@ -1,0 +1,350 @@
+﻿@model App.Data.Entities.MasterEmployeeIncomes
+@{
+  ViewBag.Title = "EditIncomeDetails";
+  Layout = "~/Views/Shared/_LayoutPensioner.cshtml";
+  var roleid = ViewBag.roleidlist;
+  var ReasonForChange = @Html.Raw(Model.ReasonForChange);
+  var ReasonForChangeString = ReasonForChange.ToString().Trim();
+}
+@{
+  bool showRegion = false;
+  if (!string.IsNullOrEmpty(ReasonForChangeString))
+  {
+    showRegion = true;
+  }
+}
+
+
+
+@section profilePensioner
+{
+  <div class="panel panel-default">
+    <div class="panel-heading clearfix">
+      <h4 class="headline Dash_contributorSummary">
+        Edit Details:@string.Format("{0} ({1})", ViewBag.Name, ViewBag.ApplicationReferenceNo)
+
+        @*<ul class="tool-bar">
+
+          </ul>*@
+      </h4>
+    </div>
+    <div class="panel-body">
+      @using (Html.BeginForm("EditIncomeDetails", "MasterPensioner", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "IdEditIncomeDetails" }))
+      {
+        @Html.Hidden("PensionerID")
+        @Html.HiddenFor(model => model.EmpIncomeID, new { @Value = ViewBag.Id })
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary("", new { @class = "text-danger" })
+
+        @Html.HiddenFor(model => model.EmployeeID)
+        @Html.HiddenFor(model => model.line_no)
+        @Html.HiddenFor(model => model.inc_number)
+        @Html.HiddenFor(model => model.inc_hours)
+        @Html.HiddenFor(model => model.acct_no)
+        @Html.HiddenFor(model => model.department)
+        @Html.HiddenFor(model => model.inc_qtd1)
+        @Html.HiddenFor(model => model.inc_qtd2)
+        @Html.HiddenFor(model => model.inc_qtd3)
+        @Html.HiddenFor(model => model.inc_qtd4)
+        @Html.HiddenFor(model => model.inc_ytd)
+        @Html.HiddenFor(model => model.lo_inc_amt)
+        @Html.HiddenFor(model => model.inc_code)
+
+
+
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-group hidden">
+              @Html.LabelFor(model => model.Empl_Code, "Pensioner ID", new { @class = "col-sm-4 control-label Color-Red-asterisk" })
+              <div class="col-sm-8 ">
+                @Html.TextBoxFor(m => m.Empl_Code, new { @class = "form-control input-sm disable-textbox", @Value = ViewBag.PensionerID, @readonly = "readonly", placeholder = "Pensioner ID" })
+              </div>
+            </div>
+
+            <div class="form-group hidden">
+              @Html.LabelFor(model => model.inc_code, "Application Reference No *", new { @class = "col-sm-4 control Color-Red-asterisk" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.Empl_Code, new { @class = "form-control input-sm disable-textbox", @Value = ViewBag.ApplicationReferenceNo, @readonly = "readonly", placeholder = "Application Reference No" })
+              </div>
+            </div>
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.inc_code, "Monthly Pension *", new { @class = "col-sm-4 control Color-Red-asterisk" })
+              <div class="col-sm-8 disabled">
+                @*@Html.DropDownList("inc_code", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm" })*@
+                @*@Html.DropDownList("inc_code", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm disable-textbox  ", @readonly = "readonly" })*@
+                @Html.DropDownListFor(model => model.inc_code, null, "---Select---", new { @class = "form-control input-sm", @disabled = "disabled" })
+                @*@Html.HiddenFor(model => model.inc_code)*@
+              </div>
+            </div>
+
+
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.inc_rate, "Rate *", new { @class = "col-sm-4 control Color-Red-asterisk" })
+              @*<div class="col-sm-8">
+                  @Html.TextBoxFor(m => m.inc_rate, new { @class = "form-control input-sm allownumericwithdecimal auto disable-textbox", placeholder = "Rate" })
+                </div>*@
+
+              <div class="col-sm-8">
+                @foreach (var item in ViewBag.permitionlist)
+                {
+                  if (item.FieldName.Trim() == "inc_rate")
+                  {
+                    @Html.TextBoxFor(m => m.inc_rate, new { @class = "form-control input-sm allownumericwithdecimal auto disable-textbox" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Rate" })
+                  }
+                }
+                <p id="inc_rateArr" class="red"></p>
+              </div>
+
+
+
+            </div>
+            @*<div class="form-group">
+                @Html.LabelFor(model => model.inc_number, new { @class = "col-sm-4 control-label" })
+                <div class="col-sm-8">
+                  @Html.TextBoxFor(m => m.inc_number, new { @class = "form-control input-sm", placeholder = "Number" })
+                </div>
+              </div>*@
+            <div class="form-group hidden">
+              @Html.LabelFor(model => model.hi_inc_amt, "Amount *", new { @class = "col-sm-4 control Color-Red-asterisk" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.hi_inc_amt, new { @class = "form-control input-sm allownumericwithdecimal auto disable-textbox", placeholder = "Amount" })
+              </div>
+            </div>
+            @*Reason for Remarks*@
+            <div class="form-group ">
+              @Html.LabelFor(model => model.ReasonForChange, "Remark *", new { @class = "col-sm-4 control Color-Red-asterisk " })
+              <div class="col-sm-8">
+                <div id="ReasonForChangeDiv" class="row hidden">
+                  <label>@ReasonForChange</label>
+                </div>
+              </div>
+              @Html.LabelFor(model => model.ReasonForChange, " ", new { @class = "col-sm-4 control  Color-Red-asterisk" })
+              <div class="col-sm-8 Editmargin-top">
+                @Html.TextAreaFor(m => m.ReasonForChange, new { @class = "form-control input-sm disable-textbox spaceNotAllowed MPSReasRN", placeholder = "Enter your Remark" })
+                <p id="remarksErr" class="red"></p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-4 control-label"></label>
+              <div class="col-sm-8">
+                <button type="button" class="btn btn-success px-5 height display_none" title="Please Wait While We Process Your Request" id="btn_IncomeBank_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                @*<button type="submit" class="btn btn-success" id="SaveDetails"><i class="fa fa-save"> </i> Update</button>*@
+
+                <button type="submit" id="SaveDetails" class="btn btn-success @(ViewBag.AdminOrSupperAminPerMition == true ? "" : "disabled") @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")"><i class="fa fa-save"> </i> Update</button>
+
+                <a href="/MasterPensioner/IncomeIndex/@ViewBag.CId" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+                @*<input type="submit" class="btn btn-success" id="SaveDetails" value="Save" />
+                  @Html.ActionLink("Cancel", "IncomeIndex", "MasterPensioner", new { id = @ViewBag.CId }, new { @class = "btn btn-primary" })*@
+              </div>
+            </div>
+          </div>
+        </div>
+
+      }
+    </div>
+  </div>
+
+
+
+  @*<div class="panel panel-default">
+      <div class="panel-heading clearfix">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="form-group">
+              <div class="col-sm-6">
+                <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+                  Audit Log - Income Details:
+                </h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="table-responsive">
+          <table class="table" id="reportDataIncomeDetails">
+            <thead>
+              <tr>
+                <th>Created By</th>
+                <th>Created On</th>
+                <th>Modified By</th>
+                <th>Modified On</th>
+                <th>Event Type</th>
+                <th>Table Name</th>
+                <th>Column Name</th>
+                <th>Old Value</th>
+                <th>New Value</th>
+                <th>Url</th>
+                <th>Controller</th>
+                <th>Action</th>
+                <th>Area</th>
+                <th>IP Address</th>
+                <th>Record Id</th>
+                <th>Old SystemId</th>
+                <th>Message</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>*@
+}
+
+<input type="hidden" id="txtId" value="" />
+
+@section scripts{
+  <script nonce="@ViewBag.StyleNonce">
+    //$(document).ready(function () {
+    //  debugger
+    //  FunctionUserLog();
+    //});
+      $('#SaveDetails').on('click', function (e) {
+        var ReasonForChange = $('#ReasonForChange').val();
+        var inc_rate = $("#inc_rate").val();
+        if (inc_rate === null || inc_rate.trim() === '') {
+          e.preventDefault();
+          $("#inc_rateArr").text("Rate is Required..");
+        }
+        else {
+          $("#inc_rateArr").text("");
+        }
+        if (ReasonForChange === null || ReasonForChange.trim() === '') {
+          e.preventDefault();
+          $("#remarksErr").text("Remarks is Required..");
+        }
+        else {
+          $("#remarksErr").text("");
+        }
+      });
+
+    $(function () {
+      $(".auto").autoNumeric({ aSep: ',', aDec: '.' });
+    })
+
+    $("#SaveDetails").click(function () {
+      $('.auto').each(function (i) {
+        var self = $(this);
+        var v = self.autoNumeric('get');
+        self.autoNumeric('destroy');
+        self.val(v);
+      });
+    })
+
+
+    $("#IncomeCode").on('change', function () {
+      if ($("#IncomeCode").val() != null) {
+        var iCode = $("#IncomeCode").val();
+        var value = $("#Empl_Code").val();
+        $.ajax({
+          url: "@Url.Action("IncomeDropDownAjax", "MasterPensioner")?Value=" + value + "&incomeCode" + iCode,
+          type: "Get"
+        }).done(function (result) {
+          debugger
+          if (result == "Error") {
+            toasterErrorMessage("This income Code Already Exist For this Pensioner");
+
+          }
+          else {
+            $("#inc_rate").val(result);
+          }
+        })
+      }
+      else {
+        $("#inc_rate").val("");
+      }
+    })
+
+    ////////
+
+
+    function ClosePopup() {
+      location.reload();
+      $("#exampleModal").popup("hide");
+    }
+
+
+    ///
+
+        $(document).ready(function () {
+
+      //*****Dynamic Code Role Base *****//
+          //if (@ViewBag.EditPermission == "True") {
+             //$(".disable-textbox").prop("readonly", false);
+              //$(".disable-dropdown").prop("disabled", false);
+          //}
+          //else if (@ViewBag.ViewPermission == "True") {
+              //$(".disable-textbox").prop("readonly", true);
+              //$(".disable-dropdown").prop("disabled", true);
+          //}
+
+          //***** Static Code Role Base*****//
+
+      //if (@roleid == 1 || @roleid == 2 || @roleid == 4  || @roleid == 6)
+      //{
+        //$(".disable-textbox").prop("readonly", false);
+        //$(".disable-dropdown").prop("disabled", false);
+      //}
+      //else {
+       //$(".disable-textbox").prop("readonly", true);
+        //$(".disable-dropdown").prop("disabled", true);
+      //}
+
+        var error = '@TempData["error"]';
+        if (error && error.length > 0) {
+            $('#SaveDetails').show();
+            $('#btn_IncomeBank_loading').hide();
+        }
+        $('#btn_IncomeBank_loading').hide();
+          $("#ReasonForChange").val('');
+
+          debugger
+          if ('@showRegion' == 'False') {
+          $("#ReasonForChangeDiv").addClass("hidden");
+        } else {
+          $("#ReasonForChangeDiv").removeClass("hidden");
+        }
+    });
+
+
+    ////// Added Log //////////
+
+
+
+    @*function FunctionUserLog() {
+      debugger
+      var Username = "@email";
+      var sName = $('#reportDataIncomeDetails').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "bAutoWidth": true,
+        "sAjaxSource": "@Url.Action("MasterPensionerHistoryAjax", "MasterPensioner")?Email=" + Username + "",//",
+        "aoColumns": [
+
+        { "sName": "CreatedBy" },
+        { "sName": "CreatedOn" },
+        { "sName": "ModifiedBy" },
+        { "sName": "ModifiedOn" },
+        { "sName": "EventType" },
+        { "sName": "TableName" },
+        { "sName": "ColumnName" },
+        { "sName": "OldValue" },
+        { "sName": "NewValue" },
+        { "sName": "Url" },
+        { "sName": "Controller" },
+        { "sName": "Action" },
+        { "sName": "Area" },
+        { "sName": "IPAddress" },
+        { "sName": "RecordId" },
+        { "sName": "OldSystemId" },
+        { "sName": "Message" }
+
+        ]
+      });
+    }*@
+  </script>
+}

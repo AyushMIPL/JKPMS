@@ -1,0 +1,432 @@
+﻿@model App.Data.ViewModels.PensionProcessViewModel
+@using App.Web.Helper
+@{
+  ViewBag.Title = "Index";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+  var Group = @Html.Raw(Json.Encode(ViewBag.Group));
+}
+
+@*<style>
+      .select2-container--default .select2-selection--multiple {
+          background-color: transparent;
+          border: 0px solid #aaa;
+          border-radius: 4px;
+          cursor: text;
+      }
+
+      .btn-success.disabled {
+          color: gray;
+          pointer-events: none;
+          opacity: .8;
+      }
+  </style>*@
+
+
+<div class="panel panel-default">
+
+  <div class="panel-body">
+    @using (Html.BeginForm("CancelBatchProcess1", "PensionProcess", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "IdCancelBatchProcess", onsubmit = "return GenerateBatchProcess1();" }))
+    {
+      @Html.HiddenFor(model => model.pybatchid, new { @Value = Model.pybatchid })
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+      <div class="row border">
+        <div class="row">
+          <div class="col-sm-12">
+            <label>District</label>
+            @Html.TextBoxFor(x => x.RegionNames, "", new { @class = "form-control", @autocomplete = "off", @placeholder = "Regions" })
+          </div>
+          <div class="col-sm-4">
+            @Html.LabelFor(model => model.Title, "Scheme Type", new { @class = "control" })
+            @*@Html.DropDownListFor(model => model.EmployeeCode, null, htmlAttributes: new { @class = "form-control" })*@
+            @Html.DropDownListFor(model => model.EmployerId, ViewBag.EmployeeType as SelectList, new { @class = "form-control input-sm" })
+
+          </div>
+          <div class="col-sm-4 select_drop">
+
+            @Html.LabelFor(model => model.Title, "Beneficiary Name", new { @class = "control" })
+            @*@Html.DropDownListFor(model => model.EmployeeCode, null, htmlAttributes: new { @class = "form-control" })*@
+            @*@Html.DropDownListFor(model => model.EmployeeCode, ViewBag.EmployeeCode as SelectList, new { @class = "form-control input-sm" })*@
+            <input type="hidden" name="EmployeeCode" id="EmployeeCode_id" /> 
+            @Html.TextBoxFor(x => x.EmployeeCode, "", new { @class = "form-control", @autocomplete = "off", @placeholder = "Search Beneficiary Name" })
+
+          </div>
+          <div class="col-sm-4  mt-5">
+            <button type="button" class="btn btn-success px-5 height display-none" title="Please Wait While We Process Your Request" id="btn_CancelBatchProcess_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+            <button type="submit" id="Btn" class="btn btn-success cancel-payroll-btn @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")"><i class="fa fa-times fa-lg"></i> Cancel Payroll</button>
+            @*<input type="submit" id="Btn" class="btn btn-success" value="Cancel Payroll" />*@
+
+          </div>
+        </div>
+        @*<div class="row">
+              <div class="col-sm-4">
+                  <div class="form-group">
+                      @Html.LabelFor(model => model.Title, "Payroll Process", new { @class = "col-sm-4 control-label" })
+                      <div class="col-sm-7">
+                          <input type="submit" id="Btn" class="btn btn-success" value="Cancel Batch Process" />
+                      </div>
+                  </div>
+              </div>
+          </div>*@
+      </div>
+      <br />
+      <div id="processDetail" class="row border">
+        <div class="px-4">
+          <ul class="list-group">
+            <li class="list-group-item clearfix">
+              <div class="pull-left m-left-sm">
+                @if (Model.pybatchid > 0)
+                {
+                  <span><b class="font-weight-bolder">Batch Id:- </b></span>@Html.DisplayFor(model => model.pybatchid, new { @class = "control-label" })<br>
+                }
+                else
+                {
+                  <span><b class="font-weight-bolder">Batch Id:- </b></span>
+                }
+              </div>
+              <div class="pull-right">
+                <span><b class="font-weight-bolder">Process Started On:-</b></span>@Html.FormatDate(Model.processstartedon)<br>
+              </div>
+            </li>
+
+            <li class="list-group-item clearfix">
+              <div class="pull-left m-left-sm">
+                <span><b class="font-weight-bolder">Start By:-</b></span>@Html.DisplayFor(model => model.insertbyName, new { @class = "control-label" })
+              </div>
+            </li>
+            <li class="list-group-item clearfix">
+              <div class="pull-left m-left-sm">
+                <span><b class="font-weight-bolder">Status:- </b></span>
+                @if (Model != null)
+                {
+                  @Html.FormatProcess(Model.status)<br>
+                }
+              </div>
+            </li>
+
+          </ul>
+
+        </div>
+
+      </div>
+      @*<div id="processDetail" class="row border">
+          <div class="panel panel-default">
+            <ul class="list-group">
+              <li class="list-group-item clearfix">
+                <div class="pull-left m-left-sm">
+                  <span>Batch Id:-</span>@Html.DisplayFor(model => model.pybatchid, new { @class = "control-label" })<br>
+                </div>
+                <div class="pull-right">
+                  <span>Process Started On:-</span>@Html.DisplayFor(model => model.processstartedon, new { @class = "control-label" })<br>
+                </div>
+              </li>
+
+              <li class="list-group-item clearfix">
+                <div class="pull-left m-left-sm">
+                  <span>Start By:-</span>@Html.DisplayFor(model => model.processstartedon, new { @class = "control-label" })
+                </div>
+              </li>
+              <li class="list-group-item clearfix">
+                <div class="pull-left m-left-sm">
+                  <span>Status:-</span>@Html.DisplayFor(model => model.status, new { @class = "control-label" })<br>
+                </div>
+              </li>
+
+            </ul>
+          </div>
+        </div>*@
+
+    }
+  </div>
+</div>
+
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline headlineMonthlyPensionSummary">
+      Payroll Process - Cancel Individual Payroll
+      @*<ul class="tool-bar">
+
+        </ul>*@
+    </h4>
+  </div>
+  <div class="panel-body">
+    <table id="tbl" class="table display-block">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Process</th>
+          <th>Start On</th>
+          <th>End On</th>
+          <th>Searched</th>
+          <th>Processed</th>
+          <th>Error</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <table id="tblDGVCheck" class="table display-none">
+      <thead>
+        <tr>
+          <th>Doc No.</th>
+          <th>Cheque No.</th>
+          <th>Pay Date</th>
+          <th>Employee</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+@section scripts{
+  <script nonce="@ViewBag.StyleNonce">
+    /*EmployerIdchange();*/
+    function EmployerIdchange() {     
+       var seletedType = $("#EmployerId option:selected").val();
+                $.ajax({
+                  url: "@Url.Action("GetseletedTypeAjax", "ContributorPersonalDetails")?seletedType=" + seletedType,
+                  success: function (res) {
+                    var data = $("#EmployeeCode");
+                    data.empty();
+                    data.append($("<option></option>").text("---Select---"));
+                    $.each(res, function (index, item) {
+                      data.append($("<option></option>").attr("value", item.Key).text(item.Value));
+                    });
+                  },
+                  error: function (error) {
+                    // Handle any errors here
+                  }
+         });
+    }
+
+    $("#EmployerId").on('change', function () {
+      $("#EmployeeCode").val("");
+      $("#EmployeeCode_id").val("");
+    });
+
+     @*$("#EmployerId").on('change', function () {
+       $("#EmployeeId").val('');
+      /* $("#select2-EmployeeCode-container").text("---Select---");*/
+       $("#select2-EmployeeCode-container").text("");
+           var seletedType = $("#EmployerId option:selected").val();
+                $.ajax({
+                  url: "@Url.Action("GetseletedTypeAjax", "ContributorPersonalDetails")?seletedType=" + seletedType,
+                  success: function (res) {
+                    var data = $("#EmployeeCode");
+                    data.empty();
+                    data.append($("<option></option>").text("---Select---"));
+                    $.each(res, function (index, item) {
+                      data.append($("<option></option>").attr("value", item.Key).text(item.Value));
+                    });
+                  },
+                  error: function (error) {
+                    // Handle any errors here
+                  }
+                });
+      });*@
+    $(function () {
+      //$("#EmployeeCode").select2({
+      //  theme:'classic'
+      //});
+
+      if ($("#pybatchid").val() != 0) {
+        debugger
+        //$('input[type="text"]').each(function () {
+        //  $(this).attr("disabled", true);
+        //});
+        var pybatchid = $("#pybatchid").val();
+        //$("#Btn").val("Batch:" + pybatchid + " is Active for Pension Process")
+        $.ajax({
+          url: "@Url.Action("DisplayAjax", "PensionProcess")?Pybatchid=" + pybatchid,
+          type: "GET",
+        }).done(function (result) {
+          var trHTML = '';
+          $('#tbl> tbody > tr').empty();
+          $.each(result, function (index, item) {
+            debugger
+            trHTML += '<tr><td>' + item.pybatchid + '</td><td>' + item.processname + '</td><td>' + item.processstartedon + '</td><td>' + item.processendedon + '</td><td>' + item.recordssearched + '</td><td>' + item.recordsprocessed + '</td><td>' + item.errormessage + '</td></tr>';
+          })
+          $('#tbl').append(trHTML);
+          debugger;
+        });
+
+        $.ajax({
+          url: "@Url.Action("DGVCheckAjax", "PensionProcess")?Pybatchid=" + pybatchid,
+          type: "GET",
+        }).done(function (result) {
+          var trHTML = '';
+          $('#tblDGVCheck> tbody > tr').empty();
+          $.each(result, function (index, item) {
+            debugger
+            trHTML += '<tr><td>' + item.DocNo + '</td><td>' + item.CheckNo + '</td><td>' + item.PayDate + '</td><td>' + item.Employee + '</td><td>' + item.Amount + '</td></tr>';
+          })
+          $('#tblDGVCheck').append(trHTML);
+          debugger;
+        });
+
+      }
+      else {
+        $('#Btn').attr('disabled', 'disabled');
+        $("#Btn").removeClass("btn btn-success").addClass("btn btn-primary")
+      }
+    })
+
+    $(document).ready(function () {
+      $("#CancelBatchProcess1").validate({
+        rules: {
+          EmployeeCode: {
+            required: true
+          }
+        },
+        messages: {
+          EmployeeCode: {
+            required: "<br/> Please select any pensioner."
+          }
+        }
+      });
+    });
+
+      $('form').submit(function () {
+        //if ($('#EmployeeCode').val() == null)
+        //{
+        //  return false;
+        //}
+        debugger
+        var employerId = $("#EmployerId").val();
+        if (employerId == null || employerId == "" || employerId == undefined) {
+          toasterErrorMessage("Please select Scheme type ");
+          return;
+        }
+
+        var employeeCode = $("#EmployeeCode_id").val();
+        if (employeeCode == null || employeeCode == "" || employeeCode == undefined || employeeCode == '---Select---' || employeeCode == "---Select---") {
+        toasterErrorMessage("Please select Beneficiary Name ");
+        return;
+      }
+        var obj = [$('#pybatchid').val(), $('#EmployerId').val() + "", $('#EmployeeCode_id').val() + "", $('#RegionNames').val() + ""];
+
+        debugger;
+        //var obj = {
+      //    pybatchid: $('#pybatchid').val(),
+      //    EmployeeCode: $('#EmployeeCode').val()
+      //};
+      $.ajax({
+        type: "POST",
+        url: '@Url.Action("CancelBatchProcess1Ajax", "PensionProcess")',
+        dataType: "json",
+        data: JSON.stringify(obj),
+        contentType: "application/json; charset=utf-8",
+
+      }).done(function (result) {
+        //alert(item.pybatchid);
+        //var trHTML = '';
+        //$('#tbl> tbody > tr').empty();
+        //$.each(result, function (index, item) {
+        //  debugger
+        //  trHTML += '<tr><td>' + item.pybatchid + '</td><td>' + item.processname + '</td><td>' + item.processstartedon + '</td><td>' + item.processendedon + '</td><td>' + item.recordssearched + '</td><td>' + item.recordsprocessed + '</td><td>' + item.errormessage + '</td></tr>';
+        //})
+        //$('#tbl').append(trHTML);
+        //debugger;
+      })
+
+    });
+    jQuery(document).ready(function ($) {
+      const textBox = document.getElementById("RegionNames");
+      textBox.removeAttribute("disabled");
+      comboTree = $('#RegionNames').comboTree({
+        source: @Group,
+        isMultiple: true,
+        cascadeSelect: true,
+        collapse: false
+      });
+    });
+
+    $(document).ready(function () {
+      $('form').submit(function () {
+        debugger
+        var employerId = $("#EmployerId").val();
+        if (employerId == null || employerId == "" || employerId == undefined) {
+          toasterErrorMessage("Please select Scheme type ");
+          return;
+        }
+
+        var employeeCode = $("#EmployeeCode_id").val();
+        if (employeeCode == null || employeeCode == "" || employeeCode == undefined || employeeCode == '---Select---' || employeeCode == "---Select---") {
+          toasterErrorMessage("Please select Beneficiary Name ");
+          return;
+        }
+          $('#Btn').hide();
+          $('#btn_CancelBatchProcess_loading').show();
+          var form = $("#IdCancelBatchProcess");
+          if (!form.valid()) {
+              $('#Btn').show();
+              $('#btn_CancelBatchProcess_loading').hide();
+              return false;
+          }
+      });
+        var error = '@TempData["error"]';
+        if (error && error.length > 0) {
+            $('#Btn').show();
+            $('#btn_CancelBatchProcess_loading').hide();
+        }
+        $('#btn_CancelBatchProcess_loading').hide();
+    });
+
+
+      //function GenerateBatchProcess1() {
+      //  debugger
+      //  $('#spinner').show();
+
+      //  $('#Btn').prop('disabled', true);
+      //  return true;
+      //}
+
+
+
+  $("#EmployeeCode").autocomplete({
+    source: function (request, response) {
+      debugger;
+      var type = $("#EmployerId option:selected").val();
+      if (!type) {
+        toasterErrorMessage("Please select the Scheme Type first");
+        return
+      }
+       // $("#spinner2").show();
+        $.ajax({
+          url: `@Url.Action("GetseletedTypeAjax", "ContributorPersonalDetails")?term=${request.term}&seletedType=${type}`,
+            type: "GET",
+            success: function (data) {
+              // $("#spinner2").hide();
+              debugger
+              if (data.length == 0) {
+                toasterErrorMessage("Beneficiary name is not valid");
+                return false
+              }
+              const dataArray = Object.values(data);
+              response($.map(dataArray, function (item) {
+                return { label: item.Value, id: item.Key };
+              }));
+            },
+            error: function (xhr, status, error) {
+                $("#spinner2").hide();
+                console.error("Error fetching data:", error);
+            }
+        });
+    },
+     select: function (event, ui) {       
+       //console.log("Selected item:", ui.item);
+      $("#EmployeeCode_id").val(ui.item.id);
+       $("#EmployeeCode").val(ui.item.label);
+      return false;
+    }
+
+});
+
+  </script>
+}
+
+
+
+

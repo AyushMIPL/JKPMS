@@ -1,0 +1,184 @@
+﻿@model IEnumerable<App.Data.Entities.MasterTehsil>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<style>
+    a.disabled {
+        color: gray;
+        pointer-events: none;
+        opacity: .8;
+    }
+
+    table.dataTable thead th, table.dataTable tfoot th, table.dataTable tbody td {
+        text-align: left !important;
+    }
+</style>
+
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline headlineMonthlyPensionSummary">
+            Tehsil
+
+            <ul class="tool-bar">
+                <li>
+                    <a href="/Tehsil/Create" class="@(ViewBag.AddPermission == true ? "" : "disabled")"
+                       data-placement="bottom"
+                       title="Add details"
+                       data-original-title="Add Details">
+                        <i class="fa fa-plus"></i>
+                    </a>
+                </li>
+
+            </ul>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <table class="table dataTable" id="tbl">
+            <thead>
+                <tr>
+
+                    <th>District</th>
+                    <th>Tehsil</th>
+                    <th>Status</th>
+                    <th class="tblTehsilIndex"></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+@section Scripts {
+
+    <script nonce="@ViewBag.StyleNonce">
+    $(function () {
+      doBindData();
+    });
+
+
+      var TehsilTableId = [];
+
+    function doBindData() {
+      var oTable = $('#tbl').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "bAutoWidth": false,
+        "sAjaxSource": "/Tehsil/AjaxHandler",
+
+
+        "fnDrawCallback": function (setting) {
+          debugger;
+
+          TehsilTableId.forEach(function (item, index) {
+            debugger
+            if (document.getElementById("EditTehsilBtn_" + item) != null && document.getElementById("EditTehsilBtn_" + item) != undefined) {
+              document.getElementById("EditTehsilBtn_" + item).addEventListener("click", function () {
+                EditTehsil(item);
+              });
+            }
+            if (document.getElementById("DetailsTehsilBtn_" + item) != null && document.getElementById("DetailsTehsilBtn_" + item) != undefined) {
+              document.getElementById("DetailsTehsilBtn_" + item).addEventListener("click", function () {
+                DetailsTehsil(item);
+              });
+            }
+            if (document.getElementById("DeleteTehsilBtn_" + item) != null && document.getElementById("DeleteTehsilBtn_" + item) != undefined) {
+              document.getElementById("DeleteTehsilBtn_" + item).addEventListener("click", function () {
+                del(item);
+              });
+            }
+
+          });
+
+        },
+
+        "aoColumns": [
+
+						{ "sName": "State" },
+            { "sName": "Tehsil" },
+						{
+						  "sName": "ActiveStatus",
+						  "bSearchable": false,
+						  "bSortable": false,
+						  "fnRender": function (oObj) {
+						    if (oObj.aData[2] == "False")
+						      return '<span class="badge badge-danger">inactive</span>';
+						    else
+						      return '<span class="badge badge-success">active</span>';
+						  }
+						},
+						{
+						  "sName": "ID",
+						  "bSearchable": false,
+						  "bSortable": false,
+              "fnRender": function (oObj) {
+                var EditPermission = ("@ViewBag.EditPermission").toLowerCase();
+                var ViewPermission = ("@ViewBag.ViewPermission").toLowerCase();
+                var DeletePermission = ("@ViewBag.DeletePermission").toLowerCase();
+
+                //var strString = '<button onclick="EditTehsil(\'' + oObj.aData[3] + '\');" class="btn btn-info btn-xs ' + (EditPermission == 'false' ? 'disabled' : '') + '" title="Edit"><i class="fa fa-pencil"></i> Edit</button>';
+                //strString += '&nbsp;<button onclick="DetailsTehsil(\'' + oObj.aData[3] + '\');" class="btn btn-xs btn-primary  ' + (ViewPermission == 'false' ? 'disabled' : '') + '" title="Detail"><i class="fa fa-list"></i> Detail</button>';
+                //  /*var strString = '<button href="/Tehsil/Edit/' + oObj.aData[3] + '\" class="btn btn-info btn-xs ' + (EditPermission == "" ? "" : "") + '" title="Edit"><i class="fa fa-pencil"></i> Edit</button>';*/
+                //  /*strString += '&nbsp;<button href="/Tehsil/Details/' + oObj.aData[3] + '\" class="btn btn-xs btn-primary " title="Detail"><i class="fa fa-list"></i> Details</button>';*/
+                ///* strString += '&nbsp;<a href="javascript:;"  onclick="javascript:del(' + oObj.aData[3] + ');" class="btn btn-xs btn-danger" title="Delete"><i class="fa fa-trash-o fa-lg"></i> Delete</a>';*/
+                //  strString += '&nbsp;<button href="javascript:;" onclick="javascript:del(\'' + oObj.aData[3] + '\');" class="btn btn-xs btn-danger ' + (DeletePermission == "false" ? "disabled" : "") + '" title="Delete"><i class="fa fa-trash-o fa-lg"></i> Delete</button>';
+
+
+                var strString = '<button id="EditTehsilBtn_' + oObj.aData[3] + '" onclick="EditTehsil(\'' + oObj.aData[3] + '\');" class="btn btn-info btn-xs ' + (EditPermission == 'false' ? 'disabled' : '') + '" title="Edit"><i class="fa fa-pencil"></i> Edit</button>';
+                strString += '&nbsp;<button id="DetailsTehsilBtn_' + oObj.aData[3] + '" onclick="DetailsTehsil(\'' + oObj.aData[3] + '\');" class="btn btn-xs btn-primary  ' + (ViewPermission == 'false' ? 'disabled' : '') + '" title="Detail"><i class="fa fa-list"></i> Detail</button>';
+                strString += '&nbsp;<button id="DeleteTehsilBtn_' + oObj.aData[3] + '" href="javascript:;" onclick="javascript:del(\'' + oObj.aData[3] + '\');" class="btn btn-xs btn-danger ' + (DeletePermission == "false" ? "disabled" : "") + '" title="Delete"><i class="fa fa-trash-o fa-lg"></i> Delete</button>';
+
+
+                TehsilTableId.push(oObj.aData[3]);
+						    return strString;
+						  }
+						}
+        ]
+      });
+    }
+
+    function del(ctrlId) {
+      $("#hdDocumentId").val(ctrlId);
+      $('#confirmDelete').popup("show");
+      }
+
+      const Confirm_Delete_ClassBtn = document.querySelectorAll('.Confirm_Delete_Class');
+      debugger
+      Confirm_Delete_ClassBtn.forEach(button => {
+        button.addEventListener('click', onDeleteConfirm);
+      });
+    function onDeleteConfirm() {
+      debugger
+      var id = $("#hdDocumentId").val();
+      var name = "TehsilId";
+      $.ajax({
+        url: "@Url.Action("RemoveAjax", "Tehsil")?Id=" + id + "&name=" + name,
+        type: "GET",
+      })
+		.done(function (result) {
+      var actionRes = result;
+      debugger
+		  if (actionRes == "0") {
+		    toasterErrorMessage("There is some error, please try again.");
+		    return actionRes;
+		  }
+		  else if (actionRes == "1") {
+		    toasterSuccessMessage("Status changed sucessfully.");
+		    $('#confirmDelete').popup("hide");
+		    doBindData();
+		  } else {
+        toasterSuccessMessage("Record Deleted successfully.");
+        $('#confirmDelete').popup("hide");
+        doBindData();
+		  }
+		});
+    }
+    function EditTehsil(id) {
+     window.location.href = "@Url.Action("Edit", "Tehsil")?Id=" + id ;
+}   function DetailsTehsil(id) {
+     window.location.href = "@Url.Action("Details", "Tehsil")?Id=" + id ;
+}
+    </script>
+}

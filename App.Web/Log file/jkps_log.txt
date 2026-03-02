@@ -1,0 +1,8 @@
+Model state valid
+valid captcha
+passwod decoded
+ratelimit allowed
+user valid
+user active
+set cookies
+Redirected to ChooseFinancialYear

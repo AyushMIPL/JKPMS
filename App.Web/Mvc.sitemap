@@ -1,0 +1,226 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<mvcSiteMap xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns="http://mvcsitemap.codeplex.com/schemas/MvcSiteMap-File-4.0"
+            xsi:schemaLocation="http://mvcsitemap.codeplex.com/schemas/MvcSiteMap-File-4.0 MvcSiteMapSchema.xsd">
+  <mvcSiteMapNode title="Login" controller="Account" action="Login" preservedRouteParameters="id">
+    <mvcSiteMapNode title="Dashboard" controller="Dashboard" action="Index">
+      <mvcSiteMapNode title="Employers" controller="Employers" action="Index" >
+        <mvcSiteMapNode title="Add Employers" controller="Employers" action="Create" />
+        <mvcSiteMapNode title="Edit Employers" controller="Employers" action="Edit" preservedRouteParameters="id" />
+      </mvcSiteMapNode>
+      <mvcSiteMapNode title="Contributor" controller="ContributorPersonalDetails" action="Index" >
+        <mvcSiteMapNode title="Add Contributor" controller="ContributorPersonalDetails" action="AddPersonalDetails" />
+        <mvcSiteMapNode title="Edit Contributor" controller="ContributorPersonalDetails" action="Edit" preservedRouteParameters="id">
+          <mvcSiteMapNode title="Marriage Details" controller="ContributorPersonalDetails" action="MarriageDetailsIndex" preservedRouteParameters="id" >
+            <mvcSiteMapNode title="Add Marriage Details" controller="ContributorPersonalDetails" action="AddMarriageDetails" preservedRouteParameters="id"/>
+            <mvcSiteMapNode title="Edit Marriage Details" controller="ContributorPersonalDetails" action="EditMarriageDetails" preservedRouteParameters="id"/>
+          </mvcSiteMapNode>
+          <mvcSiteMapNode title="Dependant Details" controller="ContributorPersonalDetails" action="DependantDetailsIndex" preservedRouteParameters="id">
+            <mvcSiteMapNode title="Add Dependant Details" controller="ContributorPersonalDetails" action="AddDependantDetails" preservedRouteParameters="id" />
+            <mvcSiteMapNode title="Edit Dependant Details" controller="ContributorPersonalDetails" action="EditDependantDetails" preservedRouteParameters="id" />
+          </mvcSiteMapNode>
+          <mvcSiteMapNode title="Add Job Details" controller="ContributorPersonalDetails" action="AddJobDetails" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Add Comment" controller="ContributorPersonalDetails" action="AddComment" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Salary History" controller="ContributorPersonalDetails" action="SalaryHistoryIndex" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+      </mvcSiteMapNode>
+      <mvcSiteMapNode title="Monthly Receiving" clickable="false">
+        <mvcSiteMapNode title="Contributon Details" controller="ContributorPersonalDetails" action="ContributonDetailsList" >
+          <mvcSiteMapNode title="Add Contribution Details" controller="ContributorPersonalDetails" action="AddContributionDetails" />
+          <mvcSiteMapNode title="Edit Contributor Uploaded Details" controller="ContributorPersonalDetails" action="EditContributorUploadedDetails" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Finalized Details" controller="ContributorPersonalDetails" action="FinalizedDetails" />
+        <mvcSiteMapNode title="Excel Sheet Upload" controller="ContributorPersonalDetails" action="ContributionExcelUpload" />
+        <mvcSiteMapNode title="Modify Finalized Details" controller="ContributorPersonalDetails" action="ModifyFinalizedDetails" >
+          <mvcSiteMapNode title="Edit Contributor Finalized Details" controller="ContributorPersonalDetails" action="EditContributorFinalizedDetails" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+      </mvcSiteMapNode>
+      <mvcSiteMapNode title="Payment and Refund" clickable="false">
+        <mvcSiteMapNode title="Refund Application List" controller="PaymentAndRefund" action="Index" >
+          <mvcSiteMapNode title="Refund Application Form" controller="PaymentAndRefund" action="AddRefundApplicationForm" />
+          <mvcSiteMapNode title="Refund Details" controller="PaymentAndRefund" action="RefundDetails" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Refund Application Approval" controller="PaymentAndRefund" action="RefundApplicationApprovalIndex">
+          <mvcSiteMapNode title="Refund Application Approval Details" controller="PaymentAndRefund" action="RefundApplicationApprovalDetails" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Rejected Application" controller="PaymentAndRefund" action="RefundRejectedDetails" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Estimated Pension/Refund Details" controller="PaymentAndRefund" action="PrintApplication" />
+
+      </mvcSiteMapNode>
+      <mvcSiteMapNode title="Payment Process" clickable="false">
+        <mvcSiteMapNode title="Pension Applications" controller="PensionApplications" action="Index" >
+          <mvcSiteMapNode title="Details" controller="PensionApplications" action="Details" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Create" controller="PensionApplications" action="Create" />
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Pension Application Approval" controller="MasterPensioner" action="PensionApplicationApprovalIndex" >
+          <mvcSiteMapNode title="Pension Application Approval Details" controller="MasterPensioner" action="PensionApplicationApprovalDetails" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Rejected Application" controller="PensionApplications" action="pensionRejectedDetails" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Beneficiary Details" controller="MasterPensioner" action="Index" >
+          <mvcSiteMapNode title="Edit" controller="MasterPensioner" action="Edit" preservedRouteParameters="id">
+            <mvcSiteMapNode title="Income" controller="MasterPensioner" action="IncomeIndex" preservedRouteParameters="id">
+              <mvcSiteMapNode title="Add Income Details" controller="MasterPensioner" action="AddIncomeDetails" preservedRouteParameters="id"/>
+              <mvcSiteMapNode title="Edit Income Details" controller="MasterPensioner" action="EditIncomeDetails" preservedRouteParameters="id"/>
+            </mvcSiteMapNode>
+            <mvcSiteMapNode title="Deduction" controller="MasterPensioner" action="DeductionIndex" preservedRouteParameters="id">
+              <mvcSiteMapNode title="Add Deduction Details" controller="MasterPensioner" action="AddDeductionDetails" preservedRouteParameters="id"/>
+              <mvcSiteMapNode title="Edit Deduction Details" controller="MasterPensioner" action="EditDeductionDetails" preservedRouteParameters="id"/>
+            </mvcSiteMapNode>
+            <mvcSiteMapNode title="Bank Details" controller="MasterPensioner" action="BankDetailsIndex" preservedRouteParameters="id">
+              <mvcSiteMapNode title="Add Bank Details" controller="MasterPensioner" action="AddBankDetails" preservedRouteParameters="id"/>
+              <mvcSiteMapNode title="Edit Bank Details" controller="MasterPensioner" action="EditBankDetails" preservedRouteParameters="id"/>
+            </mvcSiteMapNode>
+          </mvcSiteMapNode>
+          <mvcSiteMapNode title="Active Contributor" controller="MasterPensioner" action="ActiveContributorIndex">
+            <mvcSiteMapNode title="Move to Pensioner" controller="MasterPensioner" action="MoveToPensionerEdit"/>
+          </mvcSiteMapNode>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Create New Process" controller="PensionProcessHeaders" action="Index" />
+        <mvcSiteMapNode title="Autogenerate Pensions" controller="PensionProcess" action="GeneratePensionProcess" />
+        <mvcSiteMapNode title="Print Exception Reports" controller="PensionProcess" action="PrintExceptionReport" />
+        <mvcSiteMapNode title="Generate Details for Payslip" controller="PensionProcess" action="GeneratePaySlipDetails" />
+        <mvcSiteMapNode title="Direct Deposit Entries" controller="PensionProcess" action="DirectDepositEntries" />
+        <mvcSiteMapNode title="Print Cheques" controller="PensionProcess" action="PrintCheques" />
+        <mvcSiteMapNode title="Print Payslip" controller="PensionProcess" action="PrintPayslip" />
+        <mvcSiteMapNode title="Post Pension Payroll" controller="PensionProcess" action="UpdatePostedStatus" />
+        <mvcSiteMapNode title="Print Bank Listing" controller="PensionProcess" action="PrintBankListing" />
+        <mvcSiteMapNode title="Generate Bank Media" controller="PensionProcess" action="GenerateBankMedia" />
+        <mvcSiteMapNode title="Close Batch Process" controller="PensionProcess" action="CloseBatchProcess" />
+        <mvcSiteMapNode title="Cancel Batch Process" controller="PensionProcess" action="CancelBatchProcess" />
+        <mvcSiteMapNode title="Cancel Individual Payroll" controller="PensionProcess" action="CancelBatchProcess1" />
+      </mvcSiteMapNode>
+
+      <mvcSiteMapNode title="General Reports" clickable="false">
+        <mvcSiteMapNode title="New Contributors by Month" controller="Reports" action="NewContributor" />
+        <mvcSiteMapNode title="Employer Contributions" controller="Reports" action="EmployerContribution" />
+        <mvcSiteMapNode title="Contribution by Contributors" controller="Reports" action="ContributionByContributor" />
+        <mvcSiteMapNode title="Monthly Pension Summary" controller="Reports" action="MonthlyPensionSummary" />
+        <mvcSiteMapNode title="Yearly Pension Summary" controller="Reports" action="YearlyPensionSummary" />
+        <mvcSiteMapNode title="Direct Deposits to Bank" controller="Reports" action="DirectDepositsToBank" />
+        <mvcSiteMapNode title="Total Pension Payments" controller="Reports" action="TotalPensionPayments" />
+        <mvcSiteMapNode title="Retirements Approved" controller="Reports" action="RetirementsApproved" />
+        <mvcSiteMapNode title="Granted Refunds" controller="Reports" action="ListofGrantedRefunds" />
+        <mvcSiteMapNode title="Retirement Details" controller="Reports" action="RetirementDetails" />
+        <mvcSiteMapNode title="Annual Contribution Statement" controller="Reports" action="AnnualContributionStatement" />
+        <mvcSiteMapNode title="Monthly Deductions" controller="Reports" action="MonthlyDeductions" />
+      </mvcSiteMapNode>
+
+      <mvcSiteMapNode title="Financial Reports" clickable="false">
+        <mvcSiteMapNode title="Pension Payments" controller="Reports" action="PensionPayments" />
+        <mvcSiteMapNode title="Gratuity Payments" controller="Reports" action="GratuityPayments" />
+        <mvcSiteMapNode title="Refund Details" controller="Reports" action="RefundDetails" />
+        <mvcSiteMapNode title="Contributions" controller="Reports" action="ContributionsDetails" />
+      </mvcSiteMapNode>
+
+      <mvcSiteMapNode title="Master" clickable="false">
+        <mvcSiteMapNode title="State" controller="State" action="Index" >
+          <mvcSiteMapNode title="Add State" controller="State" action="Create" />
+          <mvcSiteMapNode title="Edit State" controller="State" action="Edit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="State Details" controller="State" action="Details" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Country" controller="Country" action="Index" >
+          <mvcSiteMapNode title="Add Country" controller="Country" action="Create" />
+          <mvcSiteMapNode title="Edit Country" controller="Country" action="Edit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Country Details" controller="Country" action="Details" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="City" controller="City" action="Index" >
+          <mvcSiteMapNode title="Add City" controller="City" action="Create" />
+          <mvcSiteMapNode title="Edit City" controller="City" action="Edit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Country City" controller="City" action="Details" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Designation" controller="Designation" action="Index" >
+          <mvcSiteMapNode title="Add Designation" controller="Designation" action="Create" />
+          <mvcSiteMapNode title="Edit Designation" controller="Designation" action="Edit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Designation Details" controller="Designation" action="Details" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Department" controller="Department" action="Index" >
+          <mvcSiteMapNode title="Add Department" controller="Department" action="Create" />
+          <mvcSiteMapNode title="Edit Department" controller="Department" action="Edit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Department Details" controller="Department" action="Details" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Grade" controller="Grade" action="Index" >
+          <mvcSiteMapNode title="Add Grade" controller="Grade" action="Create" />
+          <mvcSiteMapNode title="Edit Grade" controller="Grade" action="Edit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Grade Details" controller="Grade" action="Details" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Marital Status" controller="MaritalStatus" action="Index" >
+          <mvcSiteMapNode title="Add Marital Status" controller="MaritalStatus" action="Create" />
+          <mvcSiteMapNode title="Edit Marital Status" controller="MaritalStatus" action="Edit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Marital Status Details" controller="MaritalStatus" action="Details" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Nationality" controller="Nationality" action="Index" >
+          <mvcSiteMapNode title="Add Nationality" controller="Nationality" action="Create" />
+          <mvcSiteMapNode title="Edit Nationality" controller="Nationality" action="Edit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Nationality Details" controller="Nationality" action="Details" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Pensioner Type" controller="PensionerType" action="Index" >
+          <mvcSiteMapNode title="Add Pensioner Type" controller="PensionerType" action="Create" />
+          <mvcSiteMapNode title="Edit Pensioner Type" controller="PensionerType" action="Edit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Pensioner Type Details" controller="PensionerType" action="Details" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="PFRate" controller="PFRate" action="Index" >
+          <mvcSiteMapNode title="Add PFRate" controller="PFRate" action="Create" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Edit PFRate" controller="PFRate" action="Edit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="PFRate Details" controller="PFRate" action="Details" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Prefix" controller="Prefix" action="Index" >
+          <mvcSiteMapNode title="Add Prefix" controller="Prefix" action="Create" />
+          <mvcSiteMapNode title="Edit Prefix" controller="Prefix" action="Edit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Prefix Details" controller="Prefix" action="Details" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Suffix" controller="Suffix" action="Index" >
+          <mvcSiteMapNode title="Add Suffix" controller="Suffix" action="Create" />
+          <mvcSiteMapNode title="Edit Suffix" controller="Suffix" action="Edit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Suffix Details" controller="Suffix" action="Details" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Relationship Type" controller="RelationshipType" action="Index" >
+          <mvcSiteMapNode title="Add Relationship Type" controller="RelationshipType" action="Create" />
+          <mvcSiteMapNode title="Edit Relationship Type" controller="RelationshipType" action="Edit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Relationship Type Details" controller="RelationshipType" action="Details" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Job Titles" controller="MasterJobTitles" action="Index" >
+          <mvcSiteMapNode title="Add Job Title" controller="MasterJobTitles" action="Create" />
+          <mvcSiteMapNode title="Edit Job Title" controller="MasterJobTitles" action="Edit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Job Title Details" controller="MasterJobTitles" action="Details" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Employer Types" controller="MasterEmployerTypes" action="Index" >
+          <mvcSiteMapNode title="Add Employer Types" controller="MasterEmployerTypes" action="Create" />
+          <mvcSiteMapNode title="Edit Employer Types" controller="MasterEmployerTypes" action="Edit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Employer Types Details" controller="MasterEmployerTypes" action="Details" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Bank" controller="MasterBank" action="Index" >
+          <mvcSiteMapNode title="Add Bank" controller="MasterBank" action="Create" />
+          <mvcSiteMapNode title="Edit Bank" controller="MasterBank" action="Edit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Bank Details" controller="MasterBank" action="Details" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Discount Rates" controller="MasterDiscountForGratuityMain" action="Index" >
+          <mvcSiteMapNode title="Add Discount Rate" controller="MasterDiscountForGratuityMain" action="Create" />
+          <mvcSiteMapNode title="Edit Discount Rate" controller="MasterDiscountForGratuityMain" action="Edit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="Discount Rate Details" controller="MasterDiscountForGratuityMain" action="Details" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Interest Rates" controller="MasterInterestRates" action="Index" >
+          <mvcSiteMapNode title="Edit Interest Rates" controller="MasterInterestRates" action="Edit" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+
+        <mvcSiteMapNode title="Separator" clickable="false" />
+        <mvcSiteMapNode title="Sign Off" controller="Home" action="SignOff" />
+      </mvcSiteMapNode>
+      <mvcSiteMapNode title="Security" clickable="false">
+        <mvcSiteMapNode title="User Profile" controller="Account" action="UserProfiles" >
+          <mvcSiteMapNode title="Add User" controller="Account" action="AddUser" />
+          <mvcSiteMapNode title="UserEdit" controller="Account" action="UserEdit" preservedRouteParameters="id"/>
+          <mvcSiteMapNode title="User Details" controller="Account" action="UserDetails" preservedRouteParameters="id"/>
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Reset Password" controller="Account" action="ResetPassword" >
+          <mvcSiteMapNode title="Send Password on Email" controller="Account" action="ResEditUserPassword" preservedRouteParameters="id"/>
+
+        </mvcSiteMapNode>
+        <mvcSiteMapNode title="Add Module" controller="Account" action="AddModule" />
+        <mvcSiteMapNode title="Edit Module" controller="Account" action="EditModule" preservedRouteParameters="id"/>
+        <mvcSiteMapNode title="Change User Password" controller="Account" action="ChangeUserPassword" preservedRouteParameters="id"/>
+
+      </mvcSiteMapNode>
+
+    </mvcSiteMapNode>
+  </mvcSiteMapNode>
+</mvcSiteMap>

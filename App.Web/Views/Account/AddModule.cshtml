@@ -1,0 +1,227 @@
+﻿@*@model App.Data.ViewModels.SessionViewModel*@
+@model List<App.Data.ViewModels.SecModuleVM>
+@{
+  List<string> moduleIdList = new List<string>();
+  List<string> subModuleIdList = new List<string>();
+}
+
+<style>
+  table.dataTable thead th, table.dataTable tfoot th, table.dataTable tbody td {
+    text-align: left !important;
+  }
+</style>
+
+<div class="panel panel-default">
+  @*<div class="panel-heading clearfix">
+        <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+            Add Module
+            <ul class="tool-bar">
+                <li><a href="javascript:Module();" data-toggle="tooltip" data-placement="bottom" title="Add Module" data-original-title="Add Module"><i class="fa fa-plus"></i></a></li>
+            </ul>
+        </h4>
+    </div>*@
+  <div class="panel-body Sc_display" id="AddModule">
+    @using (Html.BeginForm("AddModule", "Account", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+      @*@Html.HiddenFor(model => model.Id)*@
+      <div class="row">
+        <div class="col-sm-5">
+          <div class="form-group">
+            @Html.Label("ModuleName", "Module Name", new { @class = "col-sm-4 control-label" })
+            <div class="col-sm-8">
+              @Html.TextBox("ModuleName", "", new { @class = "form-control input-sm", placeholder = "Module Name", required = "required" })
+
+            </div>
+          </div>
+          <div class="form-group">
+            @Html.Label("ControllerName", "Controller Name", new { @class = "col-sm-4 control-label" })
+            <div class="col-sm-8">
+              @Html.DropDownList("ControllerName", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm", required = "required" })
+            </div>
+          </div>
+          <div class="form-group">
+            @Html.Label("ActionName", "Action Name", new { @class = "col-sm-4 control-label" })
+            <div class="col-sm-8">
+              @Html.DropDownList("ActionName", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm", required = "required" })
+            </div>
+          </div>
+          <div class="form-group">
+            @Html.Label("ParentId", "Select Parent Module", new { @class = "col-sm-4 control-label" })
+            <div class="col-sm-8">
+              @Html.DropDownList("ParentId", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm", required = "required" })
+            </div>
+          </div>
+          <div class="form-group">
+            @Html.Label("ModuleClass", "Select Icon Class", new { @class = "col-sm-4 control-label" })
+            @*<div class="col-sm-8">*@
+            @*@Html.DropDownList("ModuleClass", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm", required = "required" })*@
+            <div class="col-sm-8 combobox">
+              @Html.TextBox("ModuleClass", "", new { @class = "form-control input-sm txtbox", placeholder = "Module Class", required = "required" })
+              @*@Html.TextBox("ModuleClass", new { @class = "form-control input-sm txtbox", placeholder = "Module Class", required = "required" })*@
+              <ul id="tempList" class="dropdown tmpDDOption AddModule"></ul>
+              @*</div>*@
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-4 control-label"></label>
+            <div class="col-sm-8">
+              <button type="submit" class="btn btn-success"><i class="fa fa-save"> </i> Create</button>
+              <button type="button" id="addModuleBackToList_Btn" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</button>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    }
+  </div>
+  <div class="panel-body">
+    <table class="table dataTable" id="tbl">
+      <thead>
+        <tr>
+          <th>Modules</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (Model.Count > 0)
+        {
+          foreach (var item in Model.Where(x => x.ParentId == 0))
+          {
+            moduleIdList.Add(item.Id);
+
+            <tr class="modulenameuse">
+              <td>@item.ModuleName</td>
+              <td>
+                @*<button onclick="EditModule(\''+@item.Id+'\');" class="btn btn-info btn-xs @(ViewBag.EditPermission == true ? "" : "disabled")" title="Edit"><i class="fa fa-pencil"> Edit</i></button>*@
+
+                <button id="@item.Id" class="btn btn-info btn-xs @(ViewBag.EditPermission == true ? "" : "disabled")" title="Edit">
+                  <i class="fa fa-pencil"> Edit</i>
+                </button>
+              </td>
+            </tr>
+            //foreach (var subitem in Model.Where(x => x.ParentId != 0))
+            foreach (var subitem in Model.Where(x => x.ParentIdString == item.Id))
+            {
+              <tr>
+                <td>@subitem.ModuleName</td>
+                <td><button id="@subitem.Id" class="btn btn-info btn-xs @(ViewBag.EditPermission == true ? "" : "disabled")" title="Edit"><i class="fa fa-pencil"></i> Edit</button></td>
+              </tr>
+
+              moduleIdList.Add(subitem.Id);
+            }
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+@section scripts{
+  <script nonce="@ViewBag.StyleNonce">
+        debugger
+
+
+    $(document).ready(function () {
+      debugger
+          var moduleIdList = @Html.Raw(Json.Encode(moduleIdList));
+
+          moduleIdList.forEach(function (item, index) {
+              document.getElementById(item).addEventListener("click", function () {
+                  EditModule(item);
+              });
+          });
+
+          document.getElementById("addModuleBackToList_Btn").addEventListener("click", hidemodule);
+    });
+
+    $(function () {
+      loadDropDown();
+    })
+    $('.combobox').on('click', '.txtbox', function () {
+      if ($("#tempList").is(":visible"))
+        $("#tempList").hide();
+      else
+        $("#tempList").show();
+    });
+
+    ///  **** Code With Himanshu Rajput ****
+
+    function EditModule(id) {
+      debugger
+          //alert('Hello user')
+     window.location.href = "@Url.Action("EditModule", "Account")?Id=" + id ;
+}
+
+
+
+
+
+    $('.tmpDDOption').on('click', 'li', function () {
+      var $selectedLi = $(this),
+        $options = $selectedLi.parent(),
+        $combobox = $options.siblings('.combobox'),
+        $txtbox = $combobox.children('.txtbox');
+      $("#ModuleClass").val($selectedLi.text().trim());
+      $options.hide();
+    });
+
+
+    function loadDropDown() {
+      $.ajax({
+        url: '/Account/ModuleClassAjax',
+        type: "GET",
+      })
+        .done(function (result) {
+          debugger
+          var items = [];
+          $.each(result, function (i, names) {
+            items.push('<li><span class="' + names + '"></span>   ' + names + ' </li>');
+          });
+          $('#tempList').append(items.join(''));
+        })
+    }
+    //$(function () {
+    //  doBindData();
+    //});
+    //function doBindData() {
+    //  var oTable = $('#tbl').dataTable({
+    //    "bJQueryUI": true,
+    //    "sPaginationType": "full_numbers",
+    //    "bServerSide": true,
+    //    "bDestroy": true,
+    //    "sAjaxSource": "/Account/ModuleAjaxHandler",
+    //    "aoColumns": [
+
+    //					{ "sName": "Modules" }
+    //    ]
+    //  });
+    //}
+
+    $("#ControllerName").on('change', function () {
+      if ($("#ControllerName").val() != "") {
+        debugger
+        var controllerName = $("#ControllerName").val();
+        $.ajax({
+          url: "FindAction/Account/?ControllerName=" + controllerName,
+          type: "Get",
+        }).done(function (result) {
+          $("#ActionName").empty();
+          $('#ActionName').append($('<option/>').attr("value", "").text("---Select---"));
+          $.each(result, function (i, actionName) {
+            debugger
+            $('#ActionName').append($('<option/>').attr("value", actionName).text(actionName));
+          });
+        })
+      }
+    })
+    function Module() {
+      $("#AddModule").show();
+    }
+    function hidemodule() {
+      $("#AddModule").hide();
+    }
+  </script>
+}

@@ -1,0 +1,587 @@
+﻿@model App.Data.ViewModels.WidgetsViewModel
+@{
+  ViewBag.Title = "Dashboard Widgets";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+  .dataTables_filter {
+    float: right;
+    text-align: right;
+    width: auto;
+  }
+</style>
+
+<div class="card-header panel panel-default">
+  <div class="row">
+    <div class="panel-heading clearfix">
+      <div class="col-md-12"> <p><i class="fa fa-user-plus"></i> Widgets</p></div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="form-group">
+    <label class="col-sm-4 control">Role: <span class="text-danger">*</span></label>
+    <div class="col-sm-4">
+      @Html.DropDownList("Role", null, "---Select---", new { @class = "form-control select-sm" })
+    </div>
+    <div class="col-sm-4">
+    </div>
+  </div>
+  </div>
+
+  <div class="padding-sm">
+    <div class="row home5 mb-4">
+      <div>
+        <div class="col-lg-3 px-2">
+          <section data-stellar-background-ratio="0.3" class="counter_feature px-3">
+            <div class="container">
+              <div class="row text-center">
+                <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+                  <div class="single-project">
+                    <i class="fa fa-wheelchair"></i>
+                    <h2 class="counter-num">PCP</h2>
+                    <a class="text-white"></a><a class="text-white PMTransander_Class" href="#"><h4>0</h4></a>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                  <div class="single-project">
+                    <i class="fa fa-user"></i>
+                    <h2 class="counter-num">Old  Age</h2>
+                    <a class="text-white"></a><a class="text-white PMTransander_Class" href="#"><h4>0</h4></a>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+                  <div class="single-project">
+                    <i class="fa fa-female"></i>
+                    <h2 class="counter-num">Widow</h2>
+                    <a class="text-white"></a><a class="text-white PMTransander_Class" href="#"><h4>0</h4></a>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+                  <div class="single-project">
+                    <i class="fa fa-venus"></i>
+                    <h2 class="counter-num">TransG</h2>
+                    <a class="text-white"></a><a class="text-white PMTransander_Class" href="#"><h4>0</h4></a>
+                  </div>
+                </div>
+              </div>
+              <div class="row text-center mt-3">
+                <div class="col-sm-12 col-xs-12 wow fadeInUp">
+                  <div class="video_btn pt-1 pb-0">
+                    <div class="row">
+
+                      <!--                          <h3 class="bg-circle mt_4 bg-white"><a class="text-white" href="#">0</a></h3>
+                      </div>-->
+                      <div class="col-md-12 p-0 col-xs-12">
+
+                        <div class="video_btn">
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Registered Beneficiary Male">M</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">0</a></h3>
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Registered Beneficiary Female">F</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">0</a></h3>
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Registered Beneficiary Transgender">T</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">0</a></h3>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row mb-3 Dashboard_TotalRegistered">
+                    <div class="col-md-9 text-left px-2">
+                      <label class="font-12 text-left text-white pt-1">Total Registered Beneficiary |</label>
+                      <a class="text-white PMTransander_Class" href="#">0</a>
+                    </div>
+                    <div class="col-md-3 text-left px-2">
+                      @if (@Model.Total_Registered)
+                      {
+                        <span @*onclick="changeStatus(1);"*@ id="Total_Registered_id"  class="btn btn-xs btn-success pull-right greeen"><i class="fa fa-check"></i></span>
+                      }
+                      else
+                      {
+                        <span @*onclick="changeStatus(1);"*@ id="Total_Registered_id" class="btn btn-xs btn-danger pull-right"><i class="fa fa-remove"></i></span>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+      <div>
+        <div class="col-lg-3 px-2">
+          <section data-stellar-background-ratio="0.3" class="counter_feature px-3">
+            <div class="container">
+              <div class="row text-center">
+                <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+                  <div class="single-project">
+                    <i class="fa fa-wheelchair"></i>
+                    <h2 class="counter-num">PCP</h2>
+                    <a class="text-white"></a><a class="text-white PMTransander_Class" href="#"><h4>0 </h4></a>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                  <div class="single-project">
+                    <i class="fa fa-user"></i>
+                    <h2 class="counter-num">Old  Age</h2>
+                    <a class="text-white"></a><a class="text-white PMTransander_Class" href="#"><h4>0</h4></a>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+                  <div class="single-project">
+                    <i class="fa fa-female"></i>
+                    <h2 class="counter-num">Widow</h2>
+                    <a class="text-white"></a><a class="text-white PMTransander_Class" href="#"><h4>0</h4></a>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+                  <div class="single-project">
+                    <i class="fa fa-venus"></i>
+                    <h2 class="counter-num">TransG</h2>
+                    <a class="text-white"></a><a class="text-white PMTransander_Class" href="#"><h4>0</h4></a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row text-center mt-3">
+                <div class="col-sm-12 col-xs-12 wow fadeInUp">
+                  <div class="video_btn pt-1 pb-0" >
+                    <div class="row">
+                    
+                      <div class="col-md-12 p-0 col-xs-12">
+
+                        <div class="video_btn pb-3">
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Approved Beneficiary Male">M</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">0</a></h3>
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Approved Beneficiary Female">F</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">0</a></h3>
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Approved Beneficiary Transgender">T</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">0</a></h3>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3 Dashboard_TotalRegistered">
+                      <div class="col-md-9 text-left pl-3">
+                        <label class="font-12 text-left text-white pt-1">
+                          Total Approved Beneficiary |
+                        </label>
+                        <a class="text-white PMTransander_Class" href="#">0</a>
+                      </div>
+                      <div class="col-md-3 text-left px-2">
+                        @if (@Model.Total_Approved)
+                        {
+                          <span @*onclick="changeStatus(2);"*@ id="Total_Approved" class="btn btn-xs btn-success pull-right greeen"><i class="fa fa-check"></i></span>
+                        }
+                        else
+                        {
+                          <span @*onclick="changeStatus(2);"*@ id="Total_Approved" class="btn btn-xs btn-danger pull-right"><i class="fa fa-remove"></i></span>
+                        }
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+      <div>
+        <div class="col-lg-3 px-2">
+          <section data-stellar-background-ratio="0.3" class="counter_feature px-3">
+            <div class="container">
+              <div class="row text-center">
+                <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+                  <div class="single-project">
+                    <i class="fa fa-wheelchair"></i>
+                    <h2 class="counter-num">PCP</h2>
+                    <a class="text-white"></a><a class="text-white PMTransander_Class" href="#"><h4>0</h4></a>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                  <div class="single-project">
+                    <i class="fa fa-user"></i>
+                    <h2 class="counter-num">Old  Age</h2>
+                    <a class="text-white"></a><a class="text-white PMTransander_Class" href="#"><h4>0</h4></a>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+                  <div class="single-project">
+                    <i class="fa fa-female"></i>
+                    <h2 class="counter-num">Widow</h2>
+                    <a class="text-white"></a><a class="text-white PMTransander_Class" href="#"><h4>0</h4></a>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+                  <div class="single-project">
+                    <i class="fa fa-venus"></i>
+                    <h2 class="counter-num">TransG</h2>
+                    <a class="text-white"></a><a class="text-white PMTransander_Class" href="#"><h4>0</h4></a>
+
+                  </div>
+                </div>
+              </div>
+              <div class="row text-center">
+                <div class="col-sm-12 col-xs-12 wow fadeInUp">
+                  <div class="video_btn pt-1 pb-0">
+                    <div class="row text-center">
+                      <div class="col-sm-12 col-xs-12 wow fadeInUp">
+                        <div class="video_btn pt-1 pb-0" >
+                          <div class="row mt-3">
+                            <div class="col-md-12 p-0 col-xs-12">
+
+                              <div class="video_btn">
+                                <div class="col-md-4 col-xs-4 px-1">
+                                  <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Unapproved Beneficiary Male">M</label>
+                                  <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">0</a></h3>
+                                </div>
+                                <div class="col-md-4 col-xs-4 px-1">
+                                  <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Unapproved Beneficiary Female">F</label>
+                                  <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">0</a></h3>
+                                </div>
+                                <div class="col-md-4 col-xs-4 px-1">
+                                  <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Total Unapproved Beneficiary Transgender">T</label>
+                                  <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">0</a></h3>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mb-3 Dashboard_TotalRegistered">
+                      <div class="col-md-9 text-left pl-3">
+                        <label class="font-12 text-left text-white pt-1">Total Unapproved Beneficiary |</label>
+
+                        <a class="text-white PMTransander_Class" href="#">0</a>
+                      </div>
+                      <div class="col-md-3 text-left px-2">
+                        @if (@Model.Total_Unapproved)
+                        {
+                          <span @*onclick="changeStatus(3);"*@ id="Total_Unapproved" class="btn btn-xs btn-success pull-right greeen"><i class="fa fa-check"></i></span>
+                        }
+                        else
+                        {
+                          <span @*onclick="changeStatus(3);"*@ id="Total_Unapproved" class="btn btn-xs btn-danger pull-right"><i class="fa fa-remove"></i></span>
+                        }
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+      <div>
+        <div class="col-lg-3 px-2">
+          <section data-stellar-background-ratio="0.3" class="counter_feature px-3">
+            <div class="container">
+              <div class="row text-center">
+                <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+                  <div class="single-project">
+                    <i class="fa fa-wheelchair"></i>
+                    <h2 class="counter-num">PCP</h2>
+                    <a class="text-white PMTransander_Class" href="#"><h4>0</h4></a>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                  <div class="single-project">
+                    <i class="fa fa-user"></i>
+                    <h2 class="counter-num">Old  Age</h2>
+                    <a class="text-white PMTransander_Class" href="#"><h4>0</h4></a>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+                  <div class="single-project">
+                    <i class="fa fa-female"></i>
+                    <h2 class="counter-num">Widow</h2>
+                    <a class="text-white PMTransander_Class" href="#"><h4>0</h4></a>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-3 col-xs-3 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+                  <div class="single-project">
+                    <i class="fa fa-venus"></i>
+                    <h2 class="counter-num">TransG</h2>
+                    <a class="text-white PMTransander_Class" href="#"><h4>0</h4></a>
+                  </div>
+                </div>
+              </div>
+              <div class="row text-center">
+                <div class="col-sm-12 col-xs-12 wow fadeInUp">
+                  <div class="video_btn pt-1 pb-0">
+                    <div class="row mt-3">                   
+                      <div class="col-md-12 p-0 col-xs-12">
+                        <div class="video_btn">
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Beneficiary Paid Last Month Male">M</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">0</a></h3>
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Beneficiary Paid Last Month Female">F</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">0</a></h3>
+                          </div>
+                          <div class="col-md-4 col-xs-4 px-1">
+                            <label class="circle_blue custom-tooltip" data-toggle="tooltip" title="Beneficiary Paid Last Month Transgender">T</label>
+                            <h3 class="bg-circle"><a class="text-white PMTransander_Class" href="#">0</a></h3>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mb-3 Dashboard_TotalRegistered">
+                      <div class="col-md-9 text-left pl-3">
+                        <label class="font-12 text-left text-white pt-1">
+                          Beneficiary Paid Last Month |
+                        </label>
+                        <a class="text-white PMTransander_Class" href="#">0</a>
+                      </div>
+                      <div class="col-md-3 text-left px-2">
+                        @if (@Model.Beneficiary_Paid)
+                        {
+                          <span @*onclick="changeStatus(4);"*@ id="Beneficiary_Paid" class="btn btn-xs btn-success pull-right greeen"><i class="fa fa-check"></i></span>
+                        }
+                        else
+                        {
+                          <span @*onclick="changeStatus(4);"*@ id="Beneficiary_Paid" class="btn btn-xs btn-danger pull-right"><i class="fa fa-remove"></i></span>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12" id="employerGraph">
+        <div class="panel panel-default" id="dicttbl">
+          <div class="panel-heading clearfix">
+            <div class="col-md-11"><h4>Registered Beneficiary District Wise Details</h4></div>
+            <div class="col-md-1">
+              @if (@Model.RegisteredBeneficiary_DistrictWise)
+              {
+                <span @*onclick="changeStatus(5);"*@ id="RegisteredBeneficiary_DistrictWise" class="btn btn-xs btn-success pull-right greeen"><i class="fa fa-check"></i></span>
+              }
+              else
+              {
+                <span @*onclick="changeStatus(5);"*@ id="RegisteredBeneficiary_DistrictWise" class="btn btn-xs btn-danger pull-right"><i class="fa fa-remove"></i></span>
+              }
+            </div>
+
+
+          </div>
+          <div class="_dash_padding">
+            <div class="scroller">
+              @if (@ViewBag.RegionNames == "JAMMU REGION")
+              {
+              <table class="tbl " id="tblJAMMUCounts"><table class="tbl"><thead class="thr"><tr><th colspan="3">DODA</th><th colspan="3">JAMMU</th><th colspan="3">KATHUA</th><th colspan="3">KISHTWAR</th><th colspan="3">POONCH</th><th colspan="3">RAJOURI</th><th colspan="3">RAMBAN</th><th colspan="3">REASI</th><th colspan="3">SAMBA</th><th colspan="3">UDHAMPUR</th></tr></thead><tbody class="tbr"><tr><td>F</td><td>M</td><td>T</td><td>F</td><td>M</td><td>T</td><td>F</td><td>M</td><td>T</td><td>F</td><td>M</td><td>T</td><td>F</td><td>M</td><td>T</td><td>F</td><td>M</td><td>T</td><td>F</td><td>M</td><td>T</td><td>F</td><td>M</td><td>T</td><td>F</td><td>M</td><td>T</td><td>F</td><td>M</td><td>T</td></tr><tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody></table></table>
+              }
+              else
+              {
+              <table class="tbl " id="tblJAMMUCounts"><table class="tbl"><thead class="thr"><tr><th colspan="3">ANANTNAG</th><th colspan="3">BANDIPORA</th><th colspan="3">BARAMULLA</th><th colspan="3">BUDGAM</th><th colspan="3">GANDERBAL</th><th colspan="3">KULGAM</th><th colspan="3">KUPWARA</th><th colspan="3">PULWAMA</th></tr></thead><tbody class="tbr"><tr><td>F</td><td>M</td><td>T</td><td>F</td><td>M</td><td>T</td><td>F</td><td>M</td><td>T</td><td>F</td><td>M</td><td>T</td><td>F</td><td>M</td><td>T</td><td>F</td><td>M</td><td>T</td><td>F</td><td>M</td><td>T</td><td>F</td><td>M</td><td>T</td></tr><tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody></table></table>
+              }
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="loader display_none" id="loader" ></div>
+        <div class="panel panel-default" id="contributorSummaryStatistics">
+          <div class="panel-heading clearfix">
+            <div class="headline  Dash_contributorSummary">
+              <button type="button" class="btn btn-info dash_button" data-dismiss="modal" aria-hidden="true">Graph</button>
+
+              <div class="row">
+                <div class="col-md-4"><h4>Beneficiaries Payment Summary</h4></div>
+                <div class="col-md-7"></div>
+                <div class="col-md-1 dash_button_right">
+                  @if (@Model.Beneficiaries_PaymentSummary)
+                  {
+                    <span @*onclick="changeStatus(6);"*@ id="Beneficiaries_PaymentSummary"class="btn btn-xs btn-success pull-right greeen"><i class="fa fa-check"></i></span>
+                  }
+                  else
+                  {
+                    <span @*onclick="changeStatus(6);"*@ id="Beneficiaries_PaymentSummary" class="btn btn-xs btn-danger pull-right"><i class="fa fa-remove"></i></span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="DashDiv_padding">
+            <div id="tblPaymentCounts_wrapper" class="dataTables_wrapper">
+              <div id="tblPaymentCounts_filter" class="dataTables_filter"><label>Search:<input type="search" class="" placeholder="" aria-controls="tblPaymentCounts"></label></div><table id="tblPaymentCounts" class="dataTable" aria-describedby="tblPaymentCounts_info">
+                <thead>
+                  <tr><th class="text-center sorting" tabindex="0" aria-controls="tblPaymentCounts" rowspan="1" colspan="1" aria-label="District: activate to sort column ascending">District</th><th class="text-center sorting_disabled" rowspan="1" colspan="1" aria-label="Success">Success</th><th class="text-center sorting_disabled" rowspan="1" colspan="1" aria-label="Failed">Failed</th><th class="text-center sorting_disabled" rowspan="1" colspan="1" aria-label="Status Not Updated">Status Not Updated</th><th class="text-center sorting_disabled" rowspan="1" colspan="1" aria-label="Total(Success, Failed,  Status Not Updated)"><span>Total</span><br><span>(Success, Failed, <br> Status Not Updated)</span></th><th class="text-center sorting" tabindex="0" aria-controls="tblPaymentCounts" rowspan="1" colspan="1" aria-label="Month Amount&amp;nbsp;: activate to sort column ascending"><span>Month Amount&nbsp;</span><br><span id="LastPayMonthInYear" class="MonthAmount"></span></th><th class="text-center sorting" tabindex="0" aria-controls="tblPaymentCounts" rowspan="1" colspan="1" aria-label="Year Amount&amp;nbsp;: activate to sort column ascending"><span>Year Amount&nbsp;</span><br><span id="PayMonthInYear" class="MonthAmount"></span></th></tr>
+                </thead>
+                <tbody>
+                  <tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">No data available in table</td></tr>
+                </tbody>
+                <tfoot>
+                  <tr><th rowspan="1" colspan="1">Grand Total:</th><th rowspan="1" colspan="1"><span id="totalValueOfSuccess">0</span></th><th rowspan="1" colspan="1"><span id="totalValueOfFailed">0</span></th><th rowspan="1" colspan="1"><span id="totalValueOfStatusNotUpdated">0</span></th><th rowspan="1" colspan="1"><span id="totalValueOfBeneficiaries" class="tableTdTextCenter">0</span></th><th rowspan="1" colspan="1"><span id="totalValueOfMonthAmount">0.00</span></th><th rowspan="1" colspan="1"><span id="totalValueOfYearAmount">0.00</span></th></tr>
+                </tfoot>
+              </table><div class="dataTables_info" id="tblPaymentCounts_info" role="status" aria-live="polite">Showing 0 to 0 of 0 entries</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel panel-default dash_displaynone" id="contributorGraph">
+          <div class="panel-heading clearfix">
+            <h4 class="headline s">
+              <button type="button"  class="btn btn-info dash_button" data-dismiss="modal" aria-hidden="true">Statistics</button>
+              Contribution Summary
+            </h4>
+            <ul class="Dash_ul_tage">
+              <li class="Dash_li_tage"><span class="fa fa-square"></span> Employer Contribution</li>
+              <li class="Dash_li_tage_li"><span class="fa fa-square"></span> Employee’s Contribution</li>
+            </ul>
+          </div>
+          <canvas id="contributorSummary" class="Canvass_Summary"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="row dash_displaynone">
+      <div class="col-lg-12" id="divDependant">
+        <a name="Dependant"></a>
+
+        <div class="panel panel-default">
+          <div class="panel-heading clearfix">
+            <h4 class="headline">
+              Dependant
+            </h4>
+          </div>
+          <div class="panel-body">
+            <div id="tblDependant_wrapper" class="dataTables_wrapper no-footer">
+              <div class="dataTables_length" id="tblDependant_length"><label>Show <select name="tblDependant_length" aria-controls="tblDependant" class=""><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select> entries</label></div><div id="tblDependant_filter" class="dataTables_filter"><label>Search:<input type="search" class="" placeholder="" aria-controls="tblDependant"></label></div><table class="table dataTable no-footer" id="tblDependant" aria-describedby="tblDependant_info">
+                <thead>
+                  <tr><th class="sorting sorting_asc" tabindex="0" aria-controls="tblDependant" rowspan="1" colspan="1" aria-label="Name: activate to sort column ascending">Name</th><th class="sorting" tabindex="0" aria-controls="tblDependant" rowspan="1" colspan="1" aria-label="Relationship: activate to sort column ascending">Relationship</th><th class="sorting_disabled" rowspan="1" colspan="1" aria-label="Gender">Gender</th><th class="sorting" tabindex="0" aria-controls="tblDependant" rowspan="1" colspan="1" aria-label="D.O.B.: activate to sort column ascending">D.O.B.</th><th class="sorting" tabindex="0" aria-controls="tblDependant" rowspan="1" colspan="1" aria-label="Termination Date(Expected): activate to sort column ascending">Termination Date<br>(Expected)</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="odd"><td valign="top" colspan="5" class="dataTables_empty">No data available in table</td></tr>
+                </tbody>
+              </table><div class="dataTables_info" id="tblDependant_info" role="status" aria-live="polite">Showing 0 to 0 of 0 entries</div><div class="dataTables_paginate paging_full_numbers" id="tblDependant_paginate"><a class="paginate_button first disabled" aria-controls="tblDependant" aria-disabled="true" role="link" data-dt-idx="first" tabindex="-1" id="tblDependant_first">First</a><a class="paginate_button previous disabled" aria-controls="tblDependant" aria-disabled="true" role="link" data-dt-idx="previous" tabindex="-1" id="tblDependant_previous">Previous</a><span></span><a class="paginate_button next disabled" aria-controls="tblDependant" aria-disabled="true" role="link" data-dt-idx="next" tabindex="-1" id="tblDependant_next">Next</a><a class="paginate_button last disabled" aria-controls="tblDependant" aria-disabled="true" role="link" data-dt-idx="last" tabindex="-1" id="tblDependant_last">Last</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row dash_displaynone">
+      <div class="col-lg-12" id="divSurvivor">
+        <a name="Survivor"></a>
+        <div class="panel panel-default">
+          <div class="panel-heading clearfix">
+            <h4 class="headline" >
+              Survivor Details
+            </h4>
+          </div>
+          <div class="panel-body">
+            <div id="survivor_wrapper" class="dataTables_wrapper no-footer">
+              <div class="dataTables_length" id="survivor_length"><label>Show <select name="survivor_length" aria-controls="survivor" class=""><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select> entries</label></div><div id="survivor_filter" class="dataTables_filter"><label>Search:<input type="search" class="" placeholder="" aria-controls="survivor"></label></div><table class="table dataTable no-footer" id="survivor" aria-describedby="survivor_info">
+                <thead>
+                  <tr><th class="sorting sorting_asc" tabindex="0" aria-controls="survivor" rowspan="1" colspan="1" aria-label="Name: activate to sort column ascending">Name</th><th class="sorting" tabindex="0" aria-controls="survivor" rowspan="1" colspan="1" aria-label="Relationship: activate to sort column ascending">Relationship</th><th class="sorting_disabled" rowspan="1" colspan="1" aria-label="Gender">Gender</th><th class="sorting" tabindex="0" aria-controls="survivor" rowspan="1" colspan="1" aria-label="D.O.B.: activate to sort column ascending">D.O.B.</th><th class="sorting" tabindex="0" aria-controls="survivor" rowspan="1" colspan="1" aria-label="Termination Date(Expected): activate to sort column ascending">Termination Date<br>(Expected)</th></tr>
+                </thead>
+                <tbody><tr class="odd"><td valign="top" colspan="5" class="dataTables_empty">No data available in table</td></tr></tbody>
+
+              </table><div class="dataTables_info" id="survivor_info" role="status" aria-live="polite">Showing 0 to 0 of 0 entries</div><div class="dataTables_paginate paging_full_numbers" id="survivor_paginate"><a class="paginate_button first disabled" aria-controls="survivor" aria-disabled="true" role="link" data-dt-idx="first" tabindex="-1" id="survivor_first">First</a><a class="paginate_button previous disabled" aria-controls="survivor" aria-disabled="true" role="link" data-dt-idx="previous" tabindex="-1" id="survivor_previous">Previous</a><span></span><a class="paginate_button next disabled" aria-controls="survivor" aria-disabled="true" role="link" data-dt-idx="next" tabindex="-1" id="survivor_next">Next</a><a class="paginate_button last disabled" aria-controls="survivor" aria-disabled="true" role="link" data-dt-idx="last" tabindex="-1" id="survivor_last">Last</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  @section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/jqueryval")
+    <script nonce="@ViewBag.StyleNonce">
+      debugger
+
+      $("#Role").on("change", function () {
+        getWidgetsDetails();
+      });
+
+      document.getElementById("Total_Registered_id").addEventListener("click", function () {
+        changeStatus("1")
+      })
+
+      document.getElementById("Total_Approved").addEventListener("click", function () {
+        debugger;
+        changeStatus("2")
+      })
+      document.getElementById("Total_Unapproved").addEventListener("click", function () {
+        debugger;
+        changeStatus("3")
+      })
+      document.getElementById("Beneficiary_Paid").addEventListener("click", function () {
+         changeStatus("4")
+      })
+      document.getElementById("RegisteredBeneficiary_DistrictWise").addEventListener("click", function () {
+          changeStatus("5")
+      })
+      document.getElementById("Beneficiaries_PaymentSummary").addEventListener("click", function () {
+        changeStatus("6")
+      })
+      function getWidgetsDetails() {
+        Roleid = document.getElementById("Role").value;
+        window.location.href = `/Account/Widgets?Role_id=${Roleid}`;
+      } 
+      function changeStatus(id) {
+        var Roleid = document.getElementById("Role").value;
+        if (!Roleid || Roleid <= 0) {
+          toasterErrorMessage("Please select a valid Role!");
+          return; 
+        }
+        if (id > 0) {
+          $.post('/Account/ChangeStatus',
+            $.param({ id: id, Roleid: Roleid }, true),
+            function (data) {
+              debugger              
+              if (data.success === true) {
+                if (data.isDisplay === true) {
+                  toasterSuccessMessage("Activated successfully");
+                }
+                else {
+                  toasterSuccessMessage("Deactivated successfully");
+                }
+                getWidgetsDetails();
+              }
+              else {
+                toasterErrorMessage(data.message);
+              }
+            }
+          ).fail(function () {
+            toasterErrorMessage("An error occurred while changing the status.");
+          });
+        } else {
+          toasterErrorMessage("Invalid ID provided!");
+        }
+      }
+
+    </script>
+  }
+
+
+
+
+
+
+
+
+

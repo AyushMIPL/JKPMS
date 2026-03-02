@@ -1,0 +1,140 @@
+﻿@model App.Data.ViewModels.MonthlyDeductionModel
+@{
+  ViewBag.Title = "MonthlyDeductions";
+}
+<div class="panel panel-default">
+
+  <div class="panel-body">
+    @*@using (Html.BeginForm("MonthlyDeductions", "Reports", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+      {*@
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary("", new { @class = "text-danger" })
+    <div class="">
+      <div class="row">
+        <div class="col-sm-3">
+          @Html.LabelFor(model => model.EmpType, new { @class = "control-label" })
+
+          @Html.DropDownListFor(model => model.EmpType, ViewBag.EmployeeType as SelectList, new { @class = "form-control input-sm" })
+
+        </div>
+        @*<div class="col-sm-2">
+        @Html.LabelFor(model => model.Months, new { @class = "col-sm-3 control-label" })
+        <div class="col-sm-8">
+          @Html.DropDownListFor(model => model.Months, ViewBag.MonthList as SelectList, new { @class = "form-control input-sm" })
+        </div>
+    </div>
+    <div class="col-sm-2">
+        <div class="col-sm-7">
+          @Html.DropDownListFor(model => model.Years, ViewBag.YearList as SelectList, new { @class = "form-control input-sm" })
+        </div>
+    </div>*@
+
+
+
+      <div class="col-sm-3">
+        <div class="control-label mb-2 mt-3" for="Name"> &nbsp; </div>
+        <div class="input-group date" id="validateFrom">
+          @Html.TextBox("SelectFrom ", "", new { @class = "form-control", @placeholder = "Select Start Date", @id = "From" })
+          <span class="input-group-addon">
+            <i class="fa fa-calendar"></i>
+          </span>
+        </div>
+      </div>
+        <div class="col-sm-3">
+          <div class="control-label mb-2 mt-3" for="Name"> &nbsp; </div>
+          <div class="input-group date" id="validateTo">
+            @Html.TextBox("SelectTo ", "", new { @class = "form-control", @placeholder = "Select End Date", @id = "to" })
+            <span class="input-group-addon">
+              <i class="fa fa-calendar"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="col-sm-3">
+          @Html.LabelFor(model => model.DeductionType, new { @class = "control-label" })
+
+          @Html.DropDownListFor(model => model.DeductionType, ViewBag.Ductions as SelectList, new { @class = "form-control input-sm" })
+        </div>
+
+        <div class="col-sm-12 text-right">
+         
+            <div class="control-label mb-2 mt-3" for="Name"> &nbsp; </div>
+            <button type="submit" id="Btn" class="btn btn-success height px-5" onclick="javascript:return ShowReport()"><i class="fa fa-search"></i> Search</button>
+          
+        </div>
+      </div>
+      @*<div>
+            <iframe id="reportData" width="100%" height="600" frameborder="0"></iframe>
+        </div>*@
+      @*}*@
+    </div>
+  </div>
+</div>
+
+
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Monthly Deduction Details
+
+      @*<ul class="tool-bar">
+
+        </ul>*@
+    </h4>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      @*<div class="col-sm-2">
+        </div>*@
+      <div class="col-sm-12">
+        <div class="alert alert-warning">
+          <h4 class="mb-0"> There is no Record Found</h4>
+        </div>
+        @*<iframe id="reportData" style="border: 0px;height:700px;width:100%;"></iframe>*@
+      </div>
+    </div>
+  </div>
+
+</div>
+
+@section Scripts {
+  <script nonce="@ViewBag.StyleNonce">
+    $(function () {
+      //ShowReport();
+    })
+
+    function ShowReport() {
+      debugger;
+      var EmpType = $("#EmpType").val();
+      //var Months = $("#Months").val();
+        //var Years = $("#Years").val();
+      var Date1 = $("#From").val();
+      var Date2 = $("#to").val();
+      if (Date1 == "" && Date2 == "") {
+          var date = new Date();
+          var LastDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+          Date1 = (LastDate.getMonth() + 1) + "/" + 01 + "/" + (LastDate.getFullYear());
+          Date2 = (LastDate.getMonth() + 1) + "/" + LastDate.getDate() + "/" + (LastDate.getFullYear());
+      //    $("#From").val(Date1);
+      //    $("#to").val(Date2);
+      }
+      var DeductionType = $("#DeductionType").val();
+      $.ajax({
+          url: "@Url.Action("MonthlyDeductionsAjax", "Reports")?EmpType=" + EmpType + "&datefrom=" + Date1 + "&dateto=" + Date2 + "&DeductionType=" + DeductionType,
+        type: "GET",
+      }).done(function (result) {
+        var actionRes = result;
+        if (actionRes == "1") {
+          $('#reportData').attr('src', '/ReportForms/ContributionByEmployer.aspx');
+          return false;
+        }
+        else {
+          toasterInfoMessage("Result not found on this search criteria.");
+          return false;
+        }
+      });
+    }
+
+  </script>
+}

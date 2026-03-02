@@ -1,0 +1,716 @@
+﻿@model IEnumerable<JKPS.COMMON.DVOMasterEmployee>
+@using App.Web.Helper
+@{
+  ViewBag.Title = "FindbeneficiaryDetails";
+  var Group = @Html.Raw(Json.Encode(ViewBag.Group));
+}
+
+<link href="~/Content/endless/LatestJS/jquery.dataTables.min.css" rel="stylesheet" />
+
+
+<div class="panel panel-default">
+  <div class="panel-body">    
+    <div class="row py-4">
+      <div class="col-sm-4 hidden">
+        <div class="form-group">
+          <label>District</label>
+          @Html.TextBox("RegionNames", "", new { @class = "form-control", @autocomplete = "off", @placeholder = " Regions" })
+        </div>
+      </div>
+
+
+      <div class="col-sm-4">
+
+        <label>Search Type</label>
+        <div class="form-group h_select">
+          @Html.DropDownList("SearchType", new SelectList(new[]
+          {
+            new SelectListItem{Value="0",Text=" -Select-- "},
+            new SelectListItem{Value="1",Text="Account No"},
+            new SelectListItem{Value="2",Text="Reference No"},
+          }, "Value", "Text"), new { @class = "form-control", @autocomplete = "off", @placeholder = "Select Search Type" })
+        </div>       
+      </div>
+
+      <div class="col-sm-4 hidden" id="AccountNoDivd">
+        <div class="form-group h_select">
+          <label>Account No.</label>
+          <input type="text" id="bank_acct_no" class="form-control" placeholder="Search for Account No." />
+          <i class="fa fa-search Searchicancenter" aria-hidden="true"></i>
+        </div>
+      </div>
+
+      @*------Account Status----*@
+
+      <div class="col-sm-4 hidden" id="ReferenceNoDivId">
+        <div class="form-group h_select">
+          <label>Reference No.</label>
+          <input type="text" id="APPLICATION_REFERENCE_NO" class="form-control" placeholder="Search for Reference No." />
+          <i class="fa fa-search Searchicancenter" aria-hidden="true"></i>
+        </div>
+      </div>
+
+      <div class="col-sm-2">
+        <div class="form-group">
+          <button type="button" class="btn btn-success px-5 height MPbtnProcessing " title="Please Wait While We Process Your Request" id="btn_Beneficiary_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+          <button class="btn btn-success height mr-2 px-5 MPbtnSearch" id="Btn" type="button">
+            <i class="fa fa-search fa-lg"></i> Search
+          </button>
+        </div>
+      </div>
+
+
+    </div>     
+  </div>
+</div>
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline Mpheadline">
+      Beneficiary
+      <button type="button" class="btn btn-success px-5 height display_none MpDownloadExcel" title="Please Wait While We Process Your Request" id="btn_downloadExcel_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+      <button class="btn btn-success MpDownloadExcel" id="IddownloadExcel">Download Excel</button>
+
+    </h4>
+  </div>
+  <div class="loader display_none" id="loader"></div>
+  <div class="panel-body">
+    <div class="table-responsive MpTable">
+      <table id="example" class="display nowrap" cellspacing="0" width="100%">
+        @*<table class="table" id="example">*@
+        <thead>
+          <tr>
+            <th>Application Reference No</th>
+            <th>Name</th>
+            <th>Gender</th>
+            <th>Age</th>
+            <th>Address</th>
+            <th>Phone</th>
+            <th>Mailid</th>
+            <th>Account No</th>
+            <th>IFSC Code</th>
+            <th>Bank Name</th>
+            <th>Last Verified</th>
+            <th>Account Status</th>
+            <th>Hold Payment</th>
+            <th>Remarks/Reason</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="custom-popup confirmClass px-0 pt-0 MPPop" data-keyboard="false" data-backdrop="static" id="PopUpShowLargeMessage">
+    <h3 class="m-top-none py-3 text-white MPHeaderText" id="MHeader"></h3>
+
+    <div class="padding-md">
+      <!-- Update Payment Section -->
+      <!-- Header Section -->
+      <div class="MPMassageText">
+        <label id="MessageText"></label>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="custom-popup confirmClass px-0 pt-0  MPPop" data-keyboard="false" data-backdrop="static" id="PopUpMessage">
+  <h3 class="m-top-none py-3 text-white MPHeaderText" id="MHeaderr"></h3>
+
+  <div class="padding-md">
+    <!-- Update Payment Section -->
+    <!-- Header Section -->
+    <div class="MPMassageText">
+      @*<label id="MessageText"></label>*@
+      <div class="row  mb-3">
+        <div class="col-md-5">
+          <div class="border-bottom2" data-mdb-toggle="tooltip">
+            Application Reference No :
+
+          </div>
+        </div>
+        <div class="col-md-7">
+          <div class="border-dotted" id="ApplicationReferenceNo">
+          </div>
+        </div>
+      </div>
+
+      <div class="row  mb-3">
+        <div class="col-md-5">
+          <div class="border-bottom2" data-mdb-toggle="tooltip">
+            Name :
+
+          </div>
+        </div>
+        <div class="col-md-7">
+          <div class="border-dotted" id="Name">
+
+          </div>
+        </div>
+      </div>
+      <div class="row  mb-3">
+        <div class="col-md-5">
+          <div class="border-bottom2" data-mdb-toggle="tooltip">
+            Scheme  :
+
+          </div>
+        </div>
+        <div class="col-md-7">
+          <div class="border-dotted" id="Scheme">
+
+          </div>
+        </div>
+      </div>
+      <div class="row  mb-3">
+        <div class="col-md-5">
+          <div class="border-bottom2" data-mdb-toggle="tooltip">
+            Bank Account No  :
+
+          </div>
+        </div>
+        <div class="col-md-7">
+          <div class="border-dotted" id="BankAccountNo">
+
+          </div>
+        </div>
+      </div>
+      <div class="row  mb-3">
+        <div class="col-md-5">
+          <div class="border-bottom2" data-mdb-toggle="tooltip">
+            IFSC Code  :
+
+          </div>
+        </div>
+        <div class="col-md-7">
+          <div class="border-dotted" id="IFSCCode">
+
+          </div>
+        </div>
+      </div>
+      <div class="row  mb-3">
+        <div class="col-md-5">
+          <div class="border-bottom2" data-mdb-toggle="tooltip">
+            Account Status  :
+
+          </div>
+        </div>
+        <div class="col-md-7">
+          <div class="border-dotted" id="AccountStatuss">
+
+          </div>
+        </div>
+      </div>
+      <div class="row  mb-3">
+        <div class="col-md-5">
+          <div class="border-bottom2" data-mdb-toggle="tooltip">
+            CBS Name  :
+
+          </div>
+        </div>
+        <div class="col-md-7">
+          <div class="border-dotted" id="CBS_Name">
+
+          </div>
+        </div>
+      </div>
+
+      <div class="row  mb-3">
+        <div class="col-md-5">
+          <div class="border-bottom2" data-mdb-toggle="tooltip">
+            Hold Payment  :
+
+          </div>
+        </div>
+        <div class="col-md-7">
+          <div class="border-dotted" id="Holdpayment">
+
+          </div>
+        </div>
+      </div>     
+    </div>
+  </div>
+</div>
+@section Scripts {
+  <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+  <script src="~/Content/endless/LatestJS/jquery.dataTables.min.js"></script>
+
+
+  <script nonce="@ViewBag.StyleNonce">
+
+        document.getElementById("Btn").addEventListener("click", dobind);
+        document.getElementById("IddownloadExcel").addEventListener("click", downloadExcel);        
+    
+
+    jQuery(document).ready(function ($) {
+      comboTree = $('#RegionNames').comboTree({
+        source: @Group,
+        isMultiple: true,
+        cascadeSelect: true,
+        collapse: false
+      });
+      /*$("#AccountStatus").val("ACTIVE");*/
+      /*dobind();*/ GetAccountNo(); GetReferenceNo();
+     
+
+      $('.select2-dropdown').select2();
+    });
+
+    $("#SearchType").on("change", function () {
+      var selectedValue = $(this).val();
+      if (selectedValue == "0") {
+        $("#AccountNoDivd").addClass("hidden");
+        $("#ReferenceNoDivId").addClass("hidden");
+      }
+      else if (selectedValue=="1") {
+        $("#ReferenceNoDivId").addClass("hidden");
+        $("#AccountNoDivd").removeClass("hidden");
+      }
+      else if (selectedValue=="2") {
+        $("#ReferenceNoDivId").removeClass("hidden");
+        $("#AccountNoDivd").addClass("hidden");
+      }
+    });
+
+
+      function GetReferenceNo() {
+        $("#APPLICATION_REFERENCE_NO").autocomplete({
+          source: function (request, response) {
+            $.ajax({
+              url: '/MasterPensioner/GetReferenceNoAjax/?ReferenceNo=' + request.term,
+              method: "GET",
+              data: { term: request.term },
+              success: function (data) {
+                debugger
+                if (data.length === 0) {
+                  toastr.error("Please input a valid Reference No.");
+                } else {
+                  response($.map(data, function (item) {
+
+                    return { label: item.Text, value: item.Value };
+                  }));
+                }
+              }
+            });
+          },
+        });
+      }
+
+
+    function GetAccountNo() {
+      $("#bank_acct_no").autocomplete({
+          source: function (request, response) {
+            $.ajax({
+              url: '/MasterPensioner/GetAccountNoAjax/?accountno=' + request.term,
+              method: "GET",
+              data: { term: request.term },
+              success: function (data) {
+                debugger
+                if (data.length === 0) {
+                  toastr.error("Please input a valid Account No.");
+                } else {
+                  response($.map(data, function (item) {
+                    return { label: item.Text, value: item.Value };
+                  }));
+                }
+              }
+            });
+          },
+        });
+      }
+
+
+          let i = 0;
+          var OpenMessagePopupArr = [];
+          var OpenMessagePopupApplicationNoArr = [];
+          var showHoldPaymentPopupArr = [];
+          function dobind() {
+            var searchtype = $("#SearchType").val();
+            if (searchtype === "0") {
+              toastr.error("Please select a valid search type");
+              return; 
+            }           
+            var isAccountDivVisible = !$("#AccountNoDivd").hasClass("hidden");
+            var isReferenceDivVisible = !$("#ReferenceNoDivId").hasClass("hidden");
+
+            if (isAccountDivVisible) {
+              var bankAcctNo = $("#bank_acct_no").val();
+              if (bankAcctNo.trim() === "") {
+                toastr.error("Please input a valid Account No.");
+                return;
+              }
+            }
+
+            if (isReferenceDivVisible) {
+              var applicationReferenceNo = $("#APPLICATION_REFERENCE_NO").val();
+              if (applicationReferenceNo.trim() === "") {
+                toastr.error("Please input a valid Reference No.");
+                return;
+              }
+            }
+            document.getElementById("loader").style.display = "block";
+            $('#example').dataTable({
+              "bJQueryUI": true,
+              "sPaginationType": "full_numbers",
+              "bServerSide": true,
+              "bDestroy": true,
+              //"bProcessing": true,
+              "sAjaxSource": "/MasterPensioner/BeneficiaryAjaxHandler?Tehsil=" +"" + "&BeneficiariesType=" + "" + "&Gender=" + ""+ "&RegionNames=" + $("#RegionNames").val() + "&AccountStatus=" +"" + "&bank_acct_no=" + $("#bank_acct_no").val() + "&APPLICATION_REFERENCE_NO=" + $("#APPLICATION_REFERENCE_NO").val(),
+              "fnDrawCallback": function (setting) {
+                document.getElementById("loader").style.display = "none";
+                document.querySelectorAll('.clearLocatMenuStorage_class').forEach(element => {
+                  element.addEventListener('click', clearLocatMenuStorage);
+                });
+               OpenMessagePopupArr.forEach(function (item, index) {
+
+                  var items = item.split('~')[0];
+                  var heading = items.split('_')[0];
+                  var message = items.split('_')[1];
+                  var element = document.getElementById(item);
+                  if (element) {
+                    element.addEventListener("click", function () {
+                      OpenMessagePopup(heading, message);
+                    });
+                  }
+                });
+                OpenMessagePopupApplicationNoArr.forEach(function (item) {
+                  var parts = item.split('_');
+                  var heading = parts[0];
+                  var applicationReferenceNo = parts[1];
+                  var name = parts[2];
+                  var scheme = parts[3];
+                  var bankAccountNo = parts[4];
+                  var ifscCode = parts[5];
+                  var accountStatus = parts[6];
+                  var cbsName = parts[7];
+                  var holdPayment = parts[8];
+                  var element2 = document.getElementById(item);
+                  if (element2) {
+                    element2.addEventListener("click", function () {
+                      OpenMessagePopupApplicationNo(heading, applicationReferenceNo, name, scheme, bankAccountNo, ifscCode, accountStatus, cbsName, holdPayment);
+                    });
+                  }
+                });               
+                debugger
+                GroupDataTable(this.api(), 10, 15);
+              },
+              "aoColumns": [
+                /* { "sname": "ApplicationReferenceNo" },*/
+
+                {
+                  "sname": "ApplicationReferenceNo",
+                  "bsearchable": false,
+                  "bsortable": false,
+                  "render": function (data, type, row) {
+                    var id = `Details_${row[0]}_${row[1]} ${row[13]}_${row[11]}_${row[7]}_${row[8]}_${row[15]}_${row[20]}_${row[17]}`;
+                    OpenMessagePopupApplicationNoArr.push(id);
+                    return ('<span href="#" class="MPCursor" id="' + id + '" >' + data + '...</span>');
+                  }
+                },
+
+                {
+                  "sname": "FirstName",
+                  "bsearchable": false,
+                  "bsortable": false,
+                  "render": function (data, type, row) {
+                    return `${row[1]+" "+row[13]}`;
+                  }
+                },
+                { "sname": "Gender" },
+                { "sname": "AgeInYears" }, {
+                  "sname": "Address1",
+                  "bsearchable": false,
+                  "bsortable": false,
+                  "render": function (data, type, row) {
+                    if (row[4].length > 10) {
+                      // Get the first 10 characters
+                      i = i + 1;
+                      var firstTenCharacters = row[4].substring(0, 10);
+                      var id = "Address" + "_" + row[4] + "~" + i;
+                      OpenMessagePopupArr.push(id);
+                      return ('<span href="#" class="MPCursor" id="' + id + '" >' + firstTenCharacters + '...</span>');
+                    } else {
+                      return (row[16]);
+                    }
+                  }
+                },
+                { "sname": "Phone" },
+                { "sname": "mailid" },
+                { "sname": "BankAcctNo" },
+                { "sname": "IFSCCode" },
+                {
+                  "sname": "BankName",
+                  "bsearchable": false,
+                  "bsortable": false,
+                  "render": function (data, type, row) {
+                    if (row[9].length > 10) {
+                      // Get the first 10 characters
+                      i = i + 1;
+                      var firstTenCharacters = row[9].substring(0, 10);
+                      var id = "Bank Name" + "_" + row[9]+"~"+i;
+                      OpenMessagePopupArr.push(id);
+                      return ('<span href="#" class="MPCursor" id="' + id + '" >' + firstTenCharacters + '...</span>');
+                    } else {
+                      return (row[9]);
+                    }
+                  }
+                },
+                { "sname": "LastVerified" },
+                {
+                  "sname": "ACCOUNT_STATUS",
+                  "bsearchable": false,
+                  "bsortable": false,
+                  "render": function (data, type, row) {
+                    ;
+                    var AccountStatus = row[15];
+                    if (AccountStatus === "Validate") {
+                      return '<img src="../Images/check-mark.png" class="MPStatus" alt="Payment Success" data-toggle="tooltip" data-placement="top" title="Validate"/>';
+                    } else if (AccountStatus === "Not Validate") {
+                      return '<img src="../Images/alert.png" class="MPStatus" alt="Payment Success" data-toggle="tooltip" data-placement="top" title="Not Validate"/>';
+                    }
+                  }
+                },
+                {
+                  "sName": "HoldPayment",
+                  "render": function (data, type, row) {
+                    var status = row[17];
+                    var statusClass = 'unknown';
+                    var statusIcon = '<i class="fa fa-question-circle"></i>';
+                    var statusTooltip = 'Unknown Status';
+                    if (status === "N") {
+                      statusClass = 'badge badge-success';
+                      statusIcon = '<i class="fa fa-check-circle text-success"></i>';
+                      statusTooltip = 'No';
+                    } else if (status === "Y") {
+                      statusClass = 'badge badge-danger';
+                      statusIcon = '<i class="fa fa-times-circle text-success"></i>';
+                      statusTooltip = 'Yes';
+                    }
+                    return '<span class="' + statusClass + '" title="' + statusTooltip + '">' + statusIcon + ' ' + statusTooltip + '</span>';
+                  }
+                },
+                {
+                  "sname": "ReasonForChange",
+                  "bsearchable": false,
+                  "bsortable": false,
+                  "render": function (data, type, row) {
+                    if (row[16].length > 10) {
+                      // Get the first 10 characters
+                      var firstTenCharacters = row[16].substring(2, 10);
+                      var RemarkHeading = "Remark";
+                      var AccountStatus = row[15];
+                      if (AccountStatus === "Not Validate") {
+                        RemarkHeading = "Remarks";
+                      }
+                      i = i + 1;
+                      /*var id = RemarkHeading + "_" + row[16].replace(/\s/g, '') + "~" + i;*/
+                      var id = RemarkHeading + "_" + row[16].replace(/\s\s+/g, ' ') + "~" + i;
+                      OpenMessagePopupArr.push(id);
+                      return ('<span href="#" class="MPCursor" id="' + id + '" >' + firstTenCharacters + '...</span>');
+                    } else {
+                      return (row[16]);
+                    }
+                  }
+                },
+                {
+                  "sname": "EmplCode",
+                  "bsearchable": false,
+                  "bsortable": false,
+                  "render": function (data, type, row) {
+                    ;
+                    var id = row[18]+"~"+row[17];
+                    showHoldPaymentPopupArr.push(id);
+                    var detailsLink = '/MasterPensioner/Edit/' + row[18];
+                    var detailsButton = '<a href="' + detailsLink + '" class="dropdown-item clearLocatMenuStorage_class" title="Detail"><i class="fa fa-list"></i> Details</a>';                    
+                    //var resumeButton = '<a href="#" class="dropdown-item" id="ResumeButtonID" onclick="showResumePaymentPopup(\'' + detailsLink + '\')"><i class="fa fa-play"></i> Activate Payment</a>';                   
+                    return '<div class="dropdown">' +
+                      '<button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                      '<i class="fa fa-caret-down"></i>  Actions' +
+                      '</button>' +
+                      '<div class="dropdown-menu">' +
+                      '<div class="dropdown-item">' + detailsButton + '</div>' +                      
+                      '</div>';
+                  }
+                }
+              ],
+              "columnDefs": [
+                {
+                  "targets": [10],
+                  "visible": false
+                }
+              ],
+            })
+           
+            $('[data-toggle="tooltip"]').tooltip();
+          }
+
+
+     
+        function OpenMessagePopupApplicationNo(heading, ApplicationReferenceNo, Name, Scheme, BankAccountNo, IFSCCode, AccountStatus, CBS_Name, holdpayment,) {
+        ;
+          $("#MHeaderr").html(heading + '<button class="MPSClose close" margin-right: 10px;" type="button" class="close" title="Close" aria-label="Close" id="ClosePopupWindo"><span aria-hidden="true">&times;</span>');
+        /*$("#MessageText").html(message);*/
+        $("#ApplicationReferenceNo").html(ApplicationReferenceNo);
+        $("#Name").html(Name);
+        $("#Scheme").html(Scheme);
+        $("#BankAccountNo").html(BankAccountNo);
+        $("#IFSCCode").html(IFSCCode);
+        $("#AccountStatuss").html(AccountStatus);
+            $("#CBS_Name").html(CBS_Name);
+            holdpayment = holdpayment.trim() == "Y" ? "Yes" : "No";
+            $("#Holdpayment").html(holdpayment);
+            //$("#CBS_Branch").html(CBS_Branch);
+          $("#PopUpMessage").popup('show');
+          document.getElementById("ClosePopupWindo").addEventListener("click", ClosePopupWindow);
+          }
+      function OpenMessagePopup(heading, message) {
+        ;
+          $("#MHeader").html(heading + '<button  class="MPSClose close" type="button" class="close" title="Close" aria-label="Close" id="ClosePopupWindow"><span aria-hidden="true">&times;</span>');
+        $("#MessageText").html(message);
+          $("#PopUpShowLargeMessage").popup('show');
+          document.getElementById("ClosePopupWindow").addEventListener("click", ClosePopupWindow);
+
+      }
+      function ClosePopupWindow() {
+        $("#PopUpShowLargeMessage").popup("hide");
+        $("#PopUpMessage").popup('hide');
+      }
+
+      function clearLocatMenuStorage() {
+        localStorage.setItem('activeIndex', "0");
+      }
+
+      function downloadExcel(evt) {
+          var searchtype = $("#SearchType").val();
+          if (searchtype === "0") {
+            toastr.error("Please select a valid search type");
+            return;
+          }
+        var isAccountDivVisible = !$("#AccountNoDivd").hasClass("hidden");
+        var isReferenceDivVisible = !$("#ReferenceNoDivId").hasClass("hidden");
+        if (isAccountDivVisible) {
+          var bankAcctNo = $("#bank_acct_no").val();
+          if (bankAcctNo.trim() === "") {
+            toastr.error("Please input a valid Account No.");
+            return;
+          }
+        }
+
+        if (isReferenceDivVisible) {
+          var applicationReferenceNo = $("#APPLICATION_REFERENCE_NO").val();
+          if (applicationReferenceNo.trim() === "") {
+            toastr.error("Please input a valid Reference No.");
+            return;
+          }
+        }
+
+          try {
+              $(evt.target).find("i.fa-spinner").show();
+              $('#btn_downloadExcel_loading').show();
+              $('#IddownloadExcel').hide();
+
+              // Create XMLHttpRequest object
+                var xhr = new XMLHttpRequest();
+
+                // Configure it: POST-request for the URL
+                xhr.open('POST', '@Url.Action("BeneficiaryAjaxHandler", "MasterPensioner")', true);
+                xhr.responseType = 'arraybuffer'; // Expect binary data
+
+                // Set up event handlers
+              xhr.onload = function () {
+
+                  if (xhr.status === 200) {
+
+                        // Success: Convert arraybuffer to blob and initiate download
+                        var blob = new Blob([xhr.response], { type: 'application/octet-stream' });
+                        var url = window.URL.createObjectURL(blob);
+                        var a = document.createElement('a');
+                        a.href = url;
+                    a.download = 'Beneficiary.xlsx'; // Default filename
+
+                        // Check Content-Disposition header for filename if available
+                        var disposition = xhr.getResponseHeader('Content-Disposition');
+                        if (disposition) {
+                            var matches = /filename="([^"]*)"/.exec(disposition);
+                            if (matches != null && matches[1]) {
+                                a.download = matches[1];
+                            }
+                        }
+
+                        // Append the anchor to the document body and trigger the download
+                        document.body.appendChild(a);
+                        a.click();
+
+                        // Clean up
+                        window.URL.revokeObjectURL(url);
+                      document.body.removeChild(a);
+
+                      $('#btn_downloadExcel_loading').hide();
+                      $('#IddownloadExcel').show();
+                    } else {
+                        // Handle HTTP errors
+                      console.error('Error downloading file:', xhr.statusText);
+                      $('#btn_downloadExcel_loading').hide();
+                      $('#IddownloadExcel').show();
+                    }
+                };
+
+              xhr.onerror = function () {
+
+                    // Handle network errors
+                  console.error('Network error.');
+                  $('#btn_downloadExcel_loading').hide();
+                  $('#IddownloadExcel').show();
+                };
+
+                // Prepare form data and send
+                var formData = new FormData();
+                formData.append('Tehsil', "");
+                formData.append('BeneficiariesType', "");
+                formData.append('Gender',"");
+                formData.append('RegionNames', $('#RegionNames').val());
+                formData.append('AccountStatus',"");
+                formData.append('bank_acct_no', $('#bank_acct_no').val());
+                formData.append('APPLICATION_REFERENCE_NO', $('#APPLICATION_REFERENCE_NO').val());
+                formData.append('isDownload', true);
+
+                // Send the request with form data
+                xhr.send(formData);
+
+
+
+                 } catch (e) {
+                 }
+    }
+    
+      function AddMasterEmployeeExcelDatabase() {
+      if ($("#formattedName").val() == "" || $("#formattedName").val() == null || $("#formattedName").val() == undefined || $("#formattedName").val() == "undefined") {
+        toasterWarningMessage("First upload the file then save.");
+        return false;
+      }
+      // Create FormData object
+      var fileData = new FormData();
+      // Adding one more key to FormData object
+      fileData.append('formattedName', $("#formattedName").val());
+      $.ajax({
+        type: "POST",
+        url: "@Url.Action("AddMasterEmployeeExcelDatabase", "MasterPensioner")",
+        contentType: false, // Not to set any content header
+        processData: false, // Not to process data
+        data: fileData,
+        success: function (data) {
+          if (data == "1") {
+            toasterSuccessMessage("Save Successfully.");
+            location.reload();
+          } else {
+            toastr.error("Opps! Something went wrong. Please try again.");
+
+          }
+        }
+      });
+    }
+
+   
+
+  </script>
+}

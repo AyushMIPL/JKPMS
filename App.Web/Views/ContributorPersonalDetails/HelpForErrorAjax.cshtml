@@ -1,0 +1,51 @@
+﻿
+@{
+  
+  Layout = null;
+}
+
+<html>
+<head>
+  <h2 style="text-align:center;">
+    <u>
+      GUIDELINES
+    </u>
+  </h2>
+</head>
+<body>
+  To upload Excel sheet and save the data successfully, kindly follow the following guidelines:
+  <br>
+  
+  <h4><u>File Name Format:</u></h4>
+  <br>
+
+  1. Name of the excel sheet should be as- <b>“EmployerName_Month_Year”</b>. Employer Name must be matched with our database name.<br>
+  2. The Employer must be present in Employers list. <br>
+  3. Month name should not be in abbreviation form and not be in number format. It should be (January, February etc). <br>
+  4. System does not allow uploading sheet for future month/year. So the Month and Year should not be greater than current Month and Year. <br>
+  5. System will not allow employee’s contributor prior to their joining data. So the Month and Year must be greater than Joining Date of contributors. <br>
+
+  <h4><u>File Format:</u></h4>
+  <br>
+
+  1. The content of sheet should start from Row Index 1 and Column Index 1 and shall be continuous, which means there shall be no blank row and column in the beginning as well as anywhere in between. <br>
+  2. Data should be of the Contributors which are under respective Employer only. <br>
+  3. Data should be defined in 6 columns with following titles: <br>
+  i. PersonID (PersonID is the JKPS ID of contributor) <br>
+  ii. ContributorName <br>
+  iii. Source <br>
+  iv. SalaryAmount <br>
+  v. ContributorContribution <br>
+  vi. EmployerContribution <br>
+  4. Contributor Name must contain First name and Last name of contributor. <br>
+  5. SalaryAmount, ContributorContribution and EmployerContribution shall be in decimal form. <br>
+  6. SalaryAmount shall be monthly salary of contributors. <br>
+  7. SalaryAmount, ContributorContribution and EmployerContribution should match with System Salary, System Employee’s Contribution and System Employer Contribution respectively. <br>
+  8. If SalaryAmount doesn’t match with System salary then ContributorContribution and EmployerContribution shall be according to the PF Rate defined by Contributor and Employer respectively. <br>
+  9. Please Add job details of every contributor before Uploading Sheet.
+  <br />
+  <b style="text-align:center">Excel Sheet Format Should Be</b>
+  <img style="text-align:center" src="~/Images/excelsheetformat.JPG" />
+
+</body>
+</html>

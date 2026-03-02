@@ -1,0 +1,1426 @@
+﻿@{
+  ViewBag.Title = "PaymentHistory";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+  ViewBag.Title = "MonthlyPensionSummary";
+  int FinancialYear = DateTime.Now.Year;
+  if (Session["FinancialYear"] != null)
+  {
+    FinancialYear = Convert.ToInt32(Session["FinancialYear"]);
+  }
+}
+
+<style>
+  label[id*="-error"] {
+    color: red;
+  }
+
+  .dropdown-menu {
+    right: 0 !important;
+    left: auto;
+  }
+
+  .select2-container--default .select2-results__option[aria-disabled=true] {
+    color: #999;
+    background-color: #edeaea;
+  }
+
+  select.input-sm {
+    height: 30px;
+    line-height: 30px;
+    border: 1px solid #aaa;
+    font-size: 16px !important;
+    border-radius: 20px !important;
+    -moz-border-radius: 20px !important;
+    -webkit-border-radius: 20px !important;
+    margin: 0;
+    padding: 6px 10px;
+    box-shadow: inset 3px 3px 6px #BFC3CF, inset -3px -3px 6px #ffffff;
+    background-color: transparent !important;
+    box-shadow: inset 3px 3px 6px #BFC3CF, inset -3px -3px 6px #ffffff;
+    cursor: default;
+    display: -ms-flexbox;
+    -ms-flex-wrap: wrap;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    -webkit-transition: all 100ms;
+    transition: all 100ms;
+    border: none !important;
+    height: 40px !important;
+    color: #aeadad !important;
+  }
+
+  label#Equality-error, label#District-error, label#Criteria-error, label#Gender-error, label#CriteriaValue-error {
+    position: absolute;
+    bottom: -34px;
+    left: 18px;
+  }
+
+  label[id*="-error"] {
+    color: red;
+    position: absolute;
+    display: block;
+    bottom: -33px;
+  }
+</style>
+<div class="panel panel-default">
+  @using (Html.BeginForm("", "", FormMethod.Post, new { @id = "Form" }))
+  {
+    <div class="panel-body">
+      <div class="row pb-4 AppendDiv">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <div class="row">
+              <div class="col-sm-3 mb-3">
+                <label>Criteria</label>
+                @Html.DropDownList("Criteria", null, "---Select---", new { @class = "form-control select-sm", @autocomplete = "off", required = "required" })
+
+              </div>
+              <div class="col-sm-3 mb-3">
+                <label>Equality</label>
+
+                @Html.DropDownList("Equality", null, "---Select---", new { @class = "form-control", @autocomplete = "off", required = "required" })
+
+              </div>
+              <div class="col-sm-3 mb-3">
+                <label>Value</label>
+
+                @Html.TextBox("CriteriaValue", "", new { @class = "form-control", @placeholder = "Enter Criteria Value", @id = "CriteriaValue", required = "required" })
+                <div class="genderdiv display-none">
+                  @Html.DropDownList("Gender", new List<SelectListItem> {
+                    new SelectListItem { Text = "---Select---", Value = "" },
+                    new SelectListItem { Text = "Male", Value = "M" },
+                    new SelectListItem { Text = "Female", Value = "F" },
+                    new SelectListItem { Text = "Transgender", Value = "T" }
+                  }, new { @class = "form-control select-sm width-100", @placeholder = "Select Gender", required = "required" })
+                </div>
+                <div class="DistrictDiv display-none">
+                  @Html.DropDownList("District", null, "---Select---", new { @class = "form-control select-sm width-100", required = "required" })
+                </div>
+                <div class="input-group date display-none">
+                  @Html.TextBox("CriteriaDateValue", "", new { @class = "form-control", @placeholder = "Enter Date", @id = "CriteriaDateValue", required = "required" })
+                  <span class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                  </span>
+                </div>
+              </div>
+              <div class="col-sm-3 mb-3">
+                <label>Logic Operator</label>
+                @Html.DropDownList("Operator", new List<SelectListItem> {
+                  new SelectListItem { Text = "Select", Value = "" },
+                  new SelectListItem { Text = "And", Value = "And" },
+                  new SelectListItem { Text = "Or", Value = "Or" },
+                  //new SelectListItem { Text = "Not", Value = "Not" }
+                }, new { @class = "form-control select-sm", @placeholder = "select Operator" })
+              </div>
+            </div>
+            @*<div class="row">
+                  <div class="col-sm-3 mt-5 mb-3">
+                      <label>Age</label>
+                      @Html.TextBox("AgeInYears", "", new { @class = "form-control", placeholder = "Age (In Years)", min = "0", type = "number", step = "1", @id = "AgeInYears" })
+                  </div>
+              </div>*@
+
+          </div>
+        </div>
+      </div>
+      <div class="row pb-4">
+        <div class="col-sm-12">
+          <div class="col-sm-3 text-align-left">
+            <button type="button" class="btn btn-success px-5 height display-none" title="Please Wait While We Process Your Request" id="btn_paymentHistory_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+            <button type="button" class="btn btn-success height px-5" id="SearchQuery"><i class="fa fa-search fa-1x"></i> Search Query</button>
+          </div>
+          <div class="col-sm-3"></div>
+          <div class="col-sm-3"></div>
+          <div class="col-sm-3 text-align-right">
+            @*<button type="button" class="btn btn-success height px-5" id="AddMore"><i class="fa fa-plus fa-1x"></i>Add More</button>*@
+            <button type="button" class="btn btn-success height px-5" id="AddMore" disabled><i class="fa fa-plus fa-1x"></i>Add More</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+
+
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline headlineMonthlyPensionSummary">
+      Payment History
+      <ul class="tool-bar">
+        <li class="dropdown">
+          <a class="dropdown-toggle DownloadDropdown" data-toggle="dropdown" href="#">
+            <span><i class="fa fa-ellipsis-v fa-2x"></i></span>
+          </a>
+          <ul class="dropdown-menu" id="DownloadOptions">
+            @*<li>
+                  <a tabindex="-1" id="ExcelDownload" onclick="PaymentHistoryExcelDownload()"><i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel</a>
+              </li>
+              <li>
+                  <a tabindex="-1" id="PdfDownload" onclick="PaymentHistoryPdfDownload()"><i class="fa fa-file-pdf-o" aria-hidden="true"></i> Pdf</a>
+              </li>*@
+            <li>
+              <a tabindex="-1" id="CrystalReportDownloads" @*onclick="CrystalReportDownload()"*@><i class="fa fa-file" aria-hidden="true"></i> Report</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </h4>
+  </div>
+  <div class="panel-body" id="CrystalReport">
+    <div class="row py-3">
+      <div class="col-sm-12">
+        <div class="alert alert-warning display-none">
+          <h4 class="mb-0"> There is no Record Found</h4>
+        </div>
+        <iframe id="reportData" class="reportDataAction1MonthlyPensionSummary"></iframe>
+      </div>
+    </div>
+  </div>
+  @*List For Payment History*@
+
+  <div class="panel-body" id="PayHistoryList">
+    @*<table id="reportData" class="display nowrap" cellspacing="0" width="100%">*@
+    <div class="table-responsive">
+      <table class="table dataTable display-none" id="tblPaymentHistory">
+        <thead>
+          <tr>
+            <th data-searchable="true">District</th>
+            <th data-searchable="true">Application Reference Number</th>
+            <th data-searchable="true">Applicant Name</th>
+            <th data-searchable="true">Account No</th>
+            <th data-searchable="true">Bank Name</th>
+            <th data-searchable="true">IFSC Code</th>
+            <th data-searchable="true">Gender</th>
+            <th data-searchable="true">Age</th>
+            <th data-searchable="true">Scheme</th>
+            <th data-searchable="true">Amount</th>
+            <th data-searchable="true">Pension Generated On</th>
+            <th data-searchable="true">Status</th>
+            <th data-searchable="true">Reason</th>
+            <th data-searchable="true">Transaction Reference No</th>
+            <th class="hidden">Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+@*//This is model popupo*@
+
+<div class="custom-popup confirmClass PopUpPaymentStatusPaymentHistoty" id="PopUpPaymentStatus">
+  <div class="padding-md">
+
+    <!-- Update Payment Section -->
+    <h3 class="m-top-none py-3 text-white updatepaymenthistoryPaymentHistoty">Update Payment History Details.</h3>
+    <!-- Header Section -->
+    <div class="row">
+      <div class="col-sm-6">
+        <label for="APPLICATION_REFERENCE_NO">Application Reference No:</label>
+        <div class="form-group">
+          <input type="text" id="APPLICATION_REFERENCE_NO" class="form-control" placeholder="Enter Your Application Reference No." disabled />
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <label for="Name">Name:</label>
+        <div class="form-group">
+          <input type="text" id="Name" class="form-control enterYourNamePaymentHistoty" placeholder="Enter Your Name" disabled />
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Payment Status -->
+    <div class="row">
+      <div class="col-sm-6">
+        <label for="paymentStatus">Payment Status:</label>
+        <div class="form-group">
+          <select class="form-control paymentStatusPaymentHistoty" id="paymentStatus">
+            <option value="0">--select--</option>
+            <option value="FAIL">Fail</option>
+            <option value="OK">Ok</option>
+          </select>
+          <div id="error-paymentStatus" class="error-message error-message-PaymentHistoty"></div>
+
+        </div>
+      </div>
+
+      <div class="col-sm-6">
+        <label>Date</label>
+        <div>
+          <input type="date" id="TransactionDate" class="form-control" placeholder="select date">
+        </div>
+        <!--<div class="input-group date" id="validateFrom">-->
+        @*@Html.TextBox("TransactionDate", "", new { @class = "form-control", @placeholder = "Select Start Date", @id = "TransactionDate" })*@
+        <!--<input type="datetime" id="SpareDispatachDate" class="form-control" placeholder="select date">
+          <span class="input-group-addon">
+            <i class="fa fa-calendar"></i>
+          </span>
+        </div>-->
+      </div>
+
+      @*<div class="col-sm-6">
+          <label for="Date">Date:</label>
+          <div class="form-group">
+            <input type="text" id="TransactionDate" class="form-control" placeholder="Search for TransactionDate No." />
+          </div>
+        </div>*@
+    </div>
+    <div class="row">
+      <div class="col-sm-6">
+        <label for="TransactionNo">Transaction No</label>
+        <div class="form-group">
+          <input type="text" id="TransactionNo" class="form-control" placeholder="Enter Your Transaction No" />
+          <div id="error-TransactionNo" class="error-message-PaymentHistoty"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Date -->
+    <!-- Remark -->
+    <div class="row">
+      <div class="col-sm-12">
+        <label for="RemarksId">Remark:</label>
+        <div class="form-group">
+          <textarea type="text" id="RemarksId" class="form-control" placeholder="Enter Your Remark"></textarea>
+          <div id="error-RemarksId" class="error-message-PaymentHistoty"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Buttons (Update and Cancel) -->
+    <div class="text-center">
+      <button type="button" class="btn btn-success px-5 height btn_PaymentStatus_loading_PaymentHistoty" title="Please Wait While We Process Your Request" id="btn_PaymentStatus_loading">
+        <i class="fa fa-spinner fa-spin"></i> Processing
+      </button>
+      <a class="btn btn-success m-right-sm " id="IdPaymentStatus" onclick="onclickPaymentStatus()">Update</a>
+      <a class="btn btn-danger" onclick="oncancelPayment()">Cancel</a>
+
+      @*@(ViewBag.EditPermission == true ? "" : "disabled")"*@
+    </div>
+  </div>
+  <script nonce="@ViewBag.StyleNonce">
+    var currentDate = new Date().toISOString().split('T')[0];
+    document.getElementById('TransactionDate').min = currentDate;
+  </script>
+</div>
+
+<input type="text" id="PaymentStatusEmplcode" hidden />
+<input type="text" id="PaymentStatusAccountNo" hidden />
+<input type="text" id="PayDocNo" hidden />
+
+@section Scripts {
+  <script src="~/Content/endless/LatestJS/pdfmake.min.js"></script>
+  <script src="~/Content/endless/LatestJS/html2canvas.min.js"></script>
+  <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+  <script src="~/Content/endless/LatestJS/jquery.dataTables.min.js"></script>
+  <script nonce="@ViewBag.StyleNonce">
+    let cristalreportDisplay;
+      document.getElementById("SearchQuery").addEventListener("click", function () {
+        ShowReport(this, false);
+      });
+
+
+    var financialYear = '@FinancialYear';
+    if (financialYear == '' || financialYear == null || financialYear == undefined) {
+        financialYear = new Date().getFullYear();
+    }
+    var startDate = new Date(parseInt(financialYear),3,1);
+    var endDate = new Date(parseInt(financialYear) + 1, 2, 31);
+    $('.input-group.date').datepicker("destroy");
+    $('.input-group.date').datepicker({
+      format: 'dd/mm/yyyy',
+      autoclose: true,
+      todayHighlight: true,
+      startDate: startDate,
+      endDate: endDate,
+    });
+
+
+        jQuery(document).ready(function ($) {
+            debugger
+            BindDropDown($("#Criteria"));
+
+            $("#Criteria").on("change", function () {
+                BindDropDown(this);
+            });
+
+            $("#Equality").on("change", function () {
+                ChangeInputField(this);
+            });
+
+            $("#Operator").on("change", function () {
+                enableAddMorebutton();
+            });
+
+            ShowReport("", true);
+        });
+
+    var ExcelNPdf = "";
+    $(function () {
+      $(".alert-warning").hide();
+      $.ajax({
+        url: "@Url.Action("GetQueryCriteriaAjax", "Reports")",
+        success: function (res) {
+          var DropDown = $("#Criteria");
+          DropDown.empty();
+          DropDown.append($("<option value='' selected>---Select---</option>"));
+          JSON.parse(res).forEach((data, index) => {
+              DropDown.append($("<option disabled class='font-weight-bold'></option>").text(data.Item1));
+            data.Item2.forEach((obj) => {
+              DropDown.append($("<option></option>").attr("value", obj.Item2).text(obj.Item1));
+            });
+          });
+        },
+        error: function (error) {
+          // Handle any errors here
+        }
+      });
+      var Counter = 1;
+      $("#AddMore").on("click", function (el, ind) {
+        debugger;
+          //var HtmlString = '<div class="col-sm-1"><a href="#" class="btn btn-primary" id="removeDiv_' + Counter + '" onclick="removeDiv(this)"><i class="fa fa-trash"></i></a></div>';
+          var HtmlString = '<div class="col-sm-1"><a href="#" class="btn btn-primary" id="removeDiv_' + Counter + '"><i class="fa fa-trash"></i></a></div>';
+        var Original = $(el.target).parents("div.row").parents("div").find("div.AppendDiv");
+        if (Original.find("select[name*='Operator']").is("[required]"))
+          Original.find("select[name*='Operator']").removeAttr("required");
+        var ClonedDiv = Original.clone();
+        Original.find("select[name*='Operator']").attr("required", "required");
+        var AllDiv = $(el.target).parents("div.panel-body").children("div.row");
+        if ((AllDiv.length - 1) >= 2)
+          $(AllDiv[AllDiv.length - 2]).find("select[name*='Operator']").attr("required", "required");
+        ClonedDiv.removeClass("AppendDiv");
+        ClonedDiv.find("select,input").each(function (ind, obj) {
+          $(obj).parents("div").find("label").remove();
+          var NewId = $(obj).attr("id") + "_" + Counter;
+          var NewName = $(obj).attr("name") + "_" + Counter;
+          $(obj).attr("id", NewId);
+          $(obj).attr("name", NewName);
+          if (NewId.includes("CriteriaDateValue")) {
+            $(obj).datepicker({
+              format: 'dd/mm/yyyy',
+              autoclose: true,
+              todayHighlight: true,
+              startDate: startDate,
+              endDate: endDate,
+            });
+            $(obj).val("");
+          }
+          else if (NewId.includes("CriteriaValue")) {
+            $(obj).val("");
+            }
+        });
+        var LastDiv = $(ClonedDiv.find("div.col-sm-3")[3]);
+        LastDiv.attr("class", "col-sm-2");
+        LastDiv.after(HtmlString);
+        var AppendDiv = $(el.target).parents("div.row").prev("div");
+          $(AppendDiv).after(ClonedDiv);
+
+          // bind click event to removeDiv button
+          $("#removeDiv_" + Counter).on("click", function () {
+            removeDiv(this);
+          });
+
+        $(ClonedDiv).find("select").each(function (ind, el) {
+          $(el).removeClass("select2-hidden-accessible");
+          $(el).next("span.select2-container--default").remove();
+            $(el).select2();
+
+            // bind onchange events
+            if (el.id.includes("Criteria_")) {
+                debugger
+                $("#" + el.id).on("change", function () {
+                    BindDropDown(this);
+                });
+            }
+
+            if (el.id.includes("Equality_")) {
+                debugger
+                $("#" + el.id).on("change", function () {
+                    ChangeInputField(this);
+                });
+            }
+
+            if (el.id.includes("Operator_")) {
+                debugger
+                $("#" + el.id).on("change", function () {
+                    enableAddMorebutton(this);
+                });
+            }
+        });
+          Counter++;
+          $("#AddMore").prop("disabled", true);
+      });
+    });
+
+        function enableAddMorebutton() {
+            debugger
+            var dropdown = $("#Operator").val();
+
+            if (dropdown != "") {
+                $("#AddMore").prop("disabled", false);
+            } else {
+                $("#AddMore").prop("disabled", true);
+            }
+
+        }
+
+      function removeDiv(el, ind) {
+        debugger;
+      if ($(el).parents("div.row").is(':nth-last-child(2)')) {
+        $(el).parents("div.row").prev("div").find("select[name*='Operator']").removeAttr("required");
+        $(el).parents("div.row").prev("div").find("label[id*='-error']").remove();
+      }
+        $(el).parents("div.row").remove();
+        //$("#AddMore").prop("disabled", true);
+      if ($(el).parents("div.row").is(':nth-last-child(2)')) {
+        var dropdown = $(el).parents("div.row").prev("div").find("select[name*='Operator']").val();
+
+        if (dropdown != null && dropdown != undefined && dropdown != "") {
+          $("#AddMore").prop("disabled", false);
+        } else {
+          $("#AddMore").prop("disabled", true);
+        }
+      }
+
+
+      if (dropdown == "And" || dropdown == "Or" || dropdown == "Not") {
+        $("#AddMore").prop("disabled", true);
+      }
+      else {
+        $("#AddMore").prop("disabled", false);
+      }
+    }
+      function ShowReport(element,ispageLoad) {
+
+        debugger
+        if (ispageLoad == true) {
+          debugger
+          var oTable = $('#tblPaymentHistory').dataTable({
+            "bJQueryUI": true,
+            "sPaginationType": "full_numbers",
+            "bServerSide": true,
+            "bDestroy": true,
+            "bAutoWidth": false,
+            "iDisplayLength": 50,  // Set the page size to 10 records per page
+            "sAjaxSource": "/Reports/PaymentHistoryAjax",
+            "fnDrawCallback": function (oSettings) {
+              debugger
+              cristalreportDisplay = oSettings.aoData.length;
+              var api = this.api();
+              var rows = api.rows({ page: 'current' }).nodes();
+              var last = null;
+            },
+            "columnDefs": [
+              {
+                "targets": [14], // Index of the column to hide
+                "visible": false // Set visibility to false
+              }
+            ],
+            "aoColumns": [
+
+              { "sName": "District" },
+              { "sName": "ApplicationReferenceNo" },
+              { "sName": "ApplicantName" },
+              { "sName": "AccountNo" },
+              { "sName": "BankName" },
+              { "sName": "IFSC_Code" },
+              { "sName": "Gender" },
+              { "sName": "Age_InYears" },
+              { "sName": "SchemeType" },
+              { "sName": "Amount" },
+              {
+                "sName": "PaidOn",
+                "bSearchable": false,
+                "bSortable": false,
+                "fnRender": function (oObj) {
+
+                  var strString = (oObj.aData[10].split(" ")[0]).split("-").reverse().join("-");
+
+                  return strString;
+                }
+              },
+              { "sName": "Status" },
+              { "sName": "Reason" },
+              { "sName": "TransactionRefrenceNo" },
+              {
+                "sName": "Action",
+                "bSearchable": false,
+                "bSortable": false,
+                "fnRender": function (oObj) {
+
+                  var strString = "<td class='hidden'><button class='btn btn-success dropdown-toggle' type='button' onclick='showPaymentStatusPopup(" + oObj.aData[14] + "," + oObj.aData[15] + ")'>Edit</button></td>";
+
+                  return strString;
+                }
+              }
+            ]
+          });
+          //.rowGrouping({
+          //        bExpandableGrouping: true,
+          //        iGroupingColumnIndex: 0,
+          //      bHideGroupingColumn: true,
+          //      asExpandedGroups: null // Avoid unnecessary redraw triggers
+          //    });
+
+              $("#tblPaymentHistory").hide();
+          }
+          else {
+              if ($("#Form").valid()) {
+                  $("i.fa-spinner").show();
+                  var WhereClause = "";
+                  if (ShowReport != null && ShowReport != "" && ShowReport != undefined) {
+                      var DataDiv = $(element).parents("div.panel-body").children("div.row");
+                      var DivCount = $(element).parents("div.panel-body").children("div.row").length - 1;
+                      for (i = 0; i < DivCount; i++) {
+                          var DataType = $(DataDiv[i]).find("select[name^=Criteria] option:selected").val();
+                          var Criteria = DataType.split("|")[1].toLowerCase().trim();
+                          if (DataType.toLowerCase().trim().includes("masteremployee"))
+                              Criteria = "me." + Criteria;
+                          else if (DataType.toLowerCase().trim().includes("masterempbankdetails"))
+                              Criteria = "eb." + Criteria;
+                          else if (DataType.toLowerCase().trim().includes("process_directdeposit_details"))
+                              Criteria = "pe." + Criteria;
+                          else if (DataType.toLowerCase().trim().includes("masteremptype"))
+                              Criteria = "et." + Criteria;
+                          var Equality = $(DataDiv[i]).find("select[name^=Equality] option:selected").val();
+                          var Operator = $(DataDiv[i]).find("select[name^=Operator] option:selected").val();
+                          var CriteriaValue = "";
+                          var AssignmentOperator = ['=', '>', '<', "<=", ">=", "NOT"];
+                          if (AssignmentOperator.includes(Equality)) {
+                              switch (DataType.split("_")[0].toLowerCase().trim()) {
+                                  case "string":
+                                      if (Criteria.includes("gender"))
+                                          CriteriaValue = $(DataDiv[i]).find("select[name^='Gender']").val();
+                                      else if (Criteria.includes("district"))
+                                          CriteriaValue = $(DataDiv[i]).find("select[name^='District']").val();
+                                      else if (Criteria.includes("Age_InYears"))
+                                          CriteriaValue = $(DataDiv[i]).find("select[name^='Age_InYears']").val();
+                                      else
+                                          CriteriaValue = $(DataDiv[i]).find("input[name^='CriteriaValue']").val();
+                                      break;
+                                  case "datetime":
+                                  CriteriaValue = $(DataDiv[i]).find("input[name^='CriteriaDateValue']").val();
+                                  CriteriaValue = convertDateFormatToYYYY_mm_dd(CriteriaValue);
+                                      break;
+                                  case "bit":
+                                      CriteriaValue = $(DataDiv[i]).find("input[name^='CriteriaValue']").val();
+                                      break;
+                                  default:
+                                      CriteriaValue = $(DataDiv[i]).find("input[name^='CriteriaValue']").val();
+                                      break;
+                              }
+                          } else {
+                              CriteriaValue = $(DataDiv[i]).find("input[name^='CriteriaValue']").val();
+                        }
+                        if (CriteriaValue != "" && CriteriaValue != null && CriteriaValue != undefined) {
+                          CriteriaValue = CriteriaValue.trim();
+                        }
+
+
+                          switch (Equality) {
+                              case "Like":
+                                  CriteriaValue = '%' + CriteriaValue + '%';
+                                  break;
+                              case "Starts With":
+                                  Equality = "Like";
+                                  CriteriaValue = CriteriaValue + '%';
+                                  break;
+                              case "Ends With":
+                                  Equality = "Like";
+                                  CriteriaValue = '%' + CriteriaValue;
+                                  break;
+                              case "NOT":
+                                  Equality = "!=";
+                                  break;
+                          }
+                          WhereClause += ` ${Criteria} ${Equality} '${CriteriaValue}' ${i < DivCount - 1 ? Operator : ''}`;
+                          ExcelNPdf = WhereClause;
+                      }
+                  }
+                  $("#btn_paymentHistory_loading").show();
+                  $("#SearchQuery").hide();
+
+                  // Jquery datatable call
+                var oTable = $('#tblPaymentHistory').dataTable({
+                  "bJQueryUI": true,
+                  "sPaginationType": "full_numbers",
+                  "bServerSide": true,
+                  "bDestroy": true,
+                  "bAutoWidth": false,
+                  "iDisplayLength": 50,  // Set the page size to 10 records per page
+                  "fnDrawCallback": function (oSettings) {
+                    cristalreportDisplay = oSettings.aoData.length;
+                    // Total number of records across all pages
+                    var totalRecords = oSettings.fnRecordsTotal();
+                    if (totalRecords > 0) {
+                      $("#reportData").show();
+                      $(".alert-warning").hide();
+                      $('#reportData').attr('src', '/ReportForms/ContributionByEmployer.aspx');
+                    }
+                    else {
+                      $("#reportData").hide();
+                      $(".alert-warning").show();
+                      toasterInfoMessage("Result not found on this search criteria.");
+                    }
+
+                    $("i.fa-spinner").hide();
+                    $("#SearchQuery").show();
+                    $("#btn_paymentHistory_loading").hide();
+
+                    debugger
+                    GroupDataTable(this.api(),0,13);
+                  },
+                  "sAjaxSource": "/Reports/PaymentHistoryAjax?WhereClause=" + encodeURIComponent(WhereClause),
+                  "columnDefs": [
+                    {
+                      "targets": [14], // Index of the column to hide
+                      "visible": false // Set visibility to false
+                    },
+                    {
+                      "targets": [0], // Index of the column to hide
+                      "visible": false // Set visibility to false
+                    }
+                  ],
+                  "aoColumns": [
+
+                    { "sName": "District" },
+                    { "sName": "ApplicationReferenceNo" },
+                    { "sName": "ApplicantName" },
+                    { "sName": "AccountNo" },
+                    { "sName": "BankName" },
+                    { "sName": "IFSC_Code" },
+                    { "sName": "Gender" },
+                    { "sName": "Age_InYears" },
+                    { "sName": "SchemeType" },
+                    { "sName": "Amount" },
+                    {
+                      "sName": "PaidOn",
+                      "bSearchable": false,
+                      "bSortable": false,
+                      "render": function (data, type, row, meta) {
+
+                        var strString = (row[10].split(" ")[0]).split("-").reverse().join("-");
+
+                        return strString;
+                      }
+                    },
+                    { "sName": "Status" },
+                    { "sName": "Reason" },
+                    { "sName": "TransactionRefrenceNo" },
+                    {
+                      "sName": "Action",
+                      "bSearchable": false,
+                      "bSortable": false,
+                      "render": function (data, type, row, meta) {
+
+                        var strString = "<td class='hidden'><button class='btn btn-success dropdown-toggle' type='button' onclick='showPaymentStatusPopup(" + row[14] + "," + row[15] + ")'>Edit</button></td>";
+
+                        return strString;
+                      }
+                    }
+                  ]
+                });
+                //.rowGrouping({
+                //      bExpandableGrouping: true,
+                //      iGroupingColumnIndex: 0,
+                //      bHideGroupingColumn: true
+                //  });
+
+                  $("#tblPaymentHistory").show();
+                  $('#CrystalReport').hide();
+        @*$.ajax({
+          url: "@Url.Action("PaymentHistoryAjax", "Reports")?WhereClause=" + encodeURIComponent(WhereClause) ,
+            success: function (result) {
+                ;
+              $("i.fa-spinner").show();
+            if (result.length >= 0)
+            {
+              var newRow = "";
+              if ($.fn.dataTable.fnIsDataTable(document.getElementById("tblPaymentHistory")))
+                $('#tblPaymentHistory').DataTable().fnDestroy();
+              $("#tblPaymentHistory tbody").empty();
+              for (var i = 0; i < result.length; i++) {
+                var rowData = result[i];
+                newRow += "<tr>" +
+                  "<td>" + rowData.District + "</td>" +
+                  "<td>" + rowData.ApplicationReferenceNo + "</td>" +
+                  "<td>" + rowData.ApplicantName + "</td>" +
+                  "<td>" + rowData.AccountNo + "</td>" +
+                  "<td>" + rowData.BankName + "</td>" +
+                  "<td>" + rowData.IFSC_Code + "</td>" +
+                  "<td>" + rowData.Gender + "</td>" +
+                  "<td>" + rowData.Age_InYears + "</td>" +
+                  "<td>" + rowData.SchemeType + "</td>" +
+                  "<td>" + rowData.Amount + "</td>" +
+                  "<td>" + (rowData.PaidOn.split(" ")[0]).split("-").reverse().join("-") + "</td>" +
+                  "<td>" + rowData.Status + "</td>" +
+                  "<td>" + rowData.Reason + "</td>" +
+                    "<td class='hidden'><button class='btn btn-success dropdown-toggle' type='button' onclick='showPaymentStatusPopup(" + rowData.EmplCode + "," + rowData.PayDocNo + ")'>Edit</button></td>" +
+                    "<td>" + rowData.TransactionRefrenceNo + "</td>" +
+                  "</tr>";
+              }
+              $("#tblPaymentHistory tbody").append(newRow);
+              $('#tblPaymentHistory').dataTable({
+                "paging": false,
+                "searching": false,
+                "ordering": false
+              }).rowGrouping({
+                  bExpandableGrouping: true,
+                  iGroupingColumnIndex: 0,
+                  bHideGroupingColumn: true
+              });
+              $("#tblPaymentHistory").show();
+              $('#CrystalReport').hide();
+              var actionRes = result;
+              if (actionRes.length >= 1) {
+                $("#reportData").show();
+                $(".alert-warning").hide();
+                $('#reportData').attr('src', '/ReportForms/ContributionByEmployer.aspx');
+                return false;
+              }
+              else {
+                $("#reportData").hide();
+                $(".alert-warning").show();
+                toasterInfoMessage("Result not found on this search criteria.");
+                return false;
+              }
+            }
+            else
+            {
+
+            }
+          },
+          complete: function () {
+              $("i.fa-spinner").hide();
+              $("#SearchQuery").show();
+              $("#btn_paymentHistory_loading").hide();
+          },
+          error: function (error) {
+            // Handle any errors here
+          }
+        });*@
+              }
+          }
+      }
+
+      function convertDateFormatToYYYY_mm_dd(dateString) {
+        // Split the input date string by '/'
+        const parts = dateString.split('/');
+
+        // Ensure the input date is valid
+        if (parts.length !== 3) {
+          console.error("Invalid date format");
+          return null;
+        }
+
+        // Rearrange the date parts to form yyyy-mm-dd
+        const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+
+        return formattedDate;
+      }
+
+    ///This is for the the Excel Download
+    function PaymentHistoryExcelDownload() {
+      let table = $('#tblPaymentHistory');
+      TableToExcel.convert(table[0], {
+          name: `PaymentHistory.xlsx`,
+        sheet: {
+            name: 'PaymentHistory'
+        }
+      });
+      }
+      document.getElementById("CrystalReportDownloads").addEventListener("click", function () {
+        CrystalReportDownload();
+      });
+    function CrystalReportDownload() {
+      debugger
+      if (cristalreportDisplay > 0) {
+        if ($.fn.dataTable.fnIsDataTable(document.getElementById("tblPaymentHistory")))
+          $("#tblPaymentHistory").parents("div#tblPaymentHistory_wrapper").first().hide()
+        else
+          $('#tblPaymentHistory').hide();
+        $('#CrystalReport').show();
+        var iframe = document.getElementById('reportData');
+
+        iframe.src = iframe.src; // Reload the iframe
+      }
+    }
+    ///This is for the the Pdf Download
+    function PaymentHistoryPdfDownload() {
+
+      html2canvas($('#tblPaymentHistory')[0], {
+        onrendered: function (canvas) {
+          var data = canvas.toDataURL();
+          var docDefinition = {
+            content: [{
+              image: data,
+              width: 500
+            }]
+          };
+          pdfMake.createPdf(docDefinition).download("Payment-details.pdf");
+        }
+      });
+    }
+        function BindDropDown(element) {
+            debugger
+      var Crit = $(element).val();
+      var Criteria = $(element).find(":selected").text();
+        var data = $(element).parents("div.form-group").find("select[name^='Equality']");
+      data.empty();
+      var Equality = [];
+      if (Crit != null && Crit != undefined && Crit != "") {
+        var Datatype = Crit.split("_")[0];
+        switch (Datatype.toLowerCase().trim()) {
+          case "string":
+            Equality = ['=', 'Like', 'Starts With', 'Ends With', 'NOT'];
+            switch (Criteria.toLowerCase().trim()) {
+              case "gender":
+                $(element).parents("div.form-group").find("div.genderdiv").find("select[name^='Gender']").select2("val", "");
+                    //$(element).parents("div.form-group").find("div.genderdiv").attr("class", "width-100");
+                    $(element).parents("div.form-group").find("div.genderdiv").each(function () {
+                        if ($(this).attr("class")) {
+                            $(this).addClass("width-100");
+                            $(this).removeClass("display-none");
+                        } else {
+                            $(this).attr("class", "width-100");
+                        }
+                    });
+                    //$(element).parents("div.form-group").find("div.DistrictDiv").attr("class", "display-none");
+                    $(element).parents("div.form-group").find("div.DistrictDiv").each(function () {
+                        if ($(this).attr("class")) {
+                            $(this).addClass("display-none");
+                        } else {
+                            $(this).attr("class", "display-none");
+                        }
+                    });
+                $(element).parents("div.form-group").find("input[name^='CriteriaValue']").hide();
+                    //$(element).parents("div.form-group").find("div.input-group").hide();
+                    $(element).parents("div.form-group").find("div.input-group").each(function () {
+                        if ($(this).attr("class")) {
+                            $(this).addClass("display-none");
+                            $(this).removeClass("display-table-important");
+                        } else {
+                            $(this).attr("class", "display-none");
+                        }
+                    });
+                    break;
+              case "district":
+                    //$(element).parents("div.form-group").find("div.DistrictDiv").attr("class", "width-100");
+                    $(element).parents("div.form-group").find("div.DistrictDiv").each(function () {
+                        if ($(this).attr("class")) {
+                            $(this).removeClass("display-none");
+                            $(this).addClass("width-100");
+                        } else {
+                            $(this).attr("class", "width-100");
+                        }
+                    });
+                    //$(element).parents("div.form-group").find("div.genderdiv").attr("class", "display-none");
+                    $(element).parents("div.form-group").find("div.genderdiv").each(function () {
+                        if ($(this).attr("class")) {
+                            $(this).addClass("display-none");
+                        } else {
+                            $(this).attr("class", "display-none");
+                        }
+                    });
+                  $(element).parents("div.form-group").find("input[name^='CriteriaValue']").hide();
+                    //$(element).parents("div.form-group").find("div.input-group").hide();
+                    $(element).parents("div.form-group").find("div.input-group").each(function () {
+                        if ($(this).attr("class")) {
+                            $(this).addClass("display-none");
+                            $(this).removeClass("display-table-important");
+                        } else {
+                            $(this).attr("class", "display-none");
+                        }
+                    });
+                    break;
+                case "Age_InYears":
+                    //$(element).parents("div.form-group").find("div.DistrictDiv").attr("class", "width-100");
+                    $(element).parents("div.form-group").find("div.DistrictDiv").each(function () {
+                        if ($(this).attr("class")) {
+                            $(this).removeClass("display-none");
+                            $(this).addClass("width-100");
+                        } else {
+                            $(this).attr("class", "width-100");
+                        }
+                    });
+                    //$(element).parents("div.form-group").find("div.genderdiv").attr("class", "display-none");
+                    $(element).parents("div.form-group").find("div.genderdiv").each(function () {
+                        if ($(this).attr("class")) {
+                            $(this).addClass("display-none");
+                        } else {
+                            $(this).attr("class", "display-none");
+                        }
+                    });
+                    $(element).parents("div.form-group").find("input[name^='CriteriaValue']").hide();
+                    //$(element).parents("div.form-group").find("div.input-group").hide();
+                    $(element).parents("div.form-group").find("div.input-group").each(function () {
+                        if ($(this).attr("class")) {
+                            $(this).addClass("display-none");
+                            $(this).removeClass("display-table-important");
+                        } else {
+                            $(this).attr("class", "display-none");
+                        }
+                    });
+                    break;
+              default:
+                    //$(element).parents("div.form-group").find("div.genderdiv").attr("class", "display-none");
+                    $(element).parents("div.form-group").find("div.genderdiv").each(function () {
+                        if ($(this).attr("class")) {
+                            $(this).addClass("display-none");
+                        } else {
+                            $(this).attr("class", "display-none");
+                        }
+                    });
+                    //$(element).parents("div.form-group").find("div.DistrictDiv").attr("class", "display-none");
+                    $(element).parents("div.form-group").find("div.DistrictDiv").each(function () {
+                        if ($(this).attr("class")) {
+                            $(this).addClass("display-none");
+                        } else {
+                            $(this).attr("class", "display-none");
+                        }
+                    });
+                $(element).parents("div.form-group").find("input[name^='CriteriaValue']").val("");
+                $(element).parents("div.form-group").find("input[name^='CriteriaValue']").show();
+                    //$(element).parents("div.form-group").find("div.input-group").hide();
+                    $(element).parents("div.form-group").find("div.input-group").each(function () {
+                        if ($(this).attr("class")) {
+                            $(this).addClass("display-none");
+                            $(this).removeClass("display-table-important");
+                        } else {
+                            $(this).attr("class", "display-none");
+                        }
+                    });
+                break;
+            }
+            break;
+          case "datetime":
+            Equality = ['=', '>', '<', "<=", ">=", "NOT"];
+            $(element).parents("div.form-group").find("input[name^='CriteriaValue']").hide();
+                //$(element).parents("div.form-group").find("div.genderdiv").attr("class", "display-none");
+                $(element).parents("div.form-group").find("div.genderdiv").each(function () {
+                    if ($(this).attr("class")) {
+                        $(this).addClass("display-none");
+                    } else {
+                        $(this).attr("class", "display-none");
+                    }
+                });
+                //$(element).parents("div.form-group").find("div.DistrictDiv").attr("class", "display-none");
+                $(element).parents("div.form-group").find("div.DistrictDiv").each(function () {
+                    if ($(this).attr("class")) {
+                        $(this).addClass("display-none");
+                    } else {
+                        $(this).attr("class", "display-none");
+                    }
+                });
+                //$(element).parents("div.form-group").find("div.input-group").show();
+                $(element).parents("div.form-group").find("div.input-group").each(function () {
+                    if ($(this).attr("class")) {
+                        $(this).addClass("display-table-important");
+                        $(this).removeClass("display-none");
+                    } else {
+                        $(this).attr("class", "display-table-important");
+                    }
+                });
+            break;
+          case "bit":
+            Equality = ['=', '>', '<', "<=", ">=", "NOT"];
+            $(element).parents("div.form-group").find("input[name^='CriteriaValue']").show();
+                //$(element).parents("div.form-group").find("div.genderdiv").attr("class", "display-none");
+                $(element).parents("div.form-group").find("div.genderdiv").each(function () {
+                    if ($(this).attr("class")) {
+                        $(this).addClass("display-none");
+                    } else {
+                        $(this).attr("class", "display-none");
+                    }
+                });
+                //$(element).parents("div.form-group").find("div.DistrictDiv").attr("class", "display-none");
+                $(element).parents("div.form-group").find("div.DistrictDiv").each(function () {
+                    if ($(this).attr("class")) {
+                        $(this).addClass("display-none");
+                    } else {
+                        $(this).attr("class", "display-none");
+                    }
+                });
+                //$(element).parents("div.form-group").find("div.input-group").hide();
+                $(element).parents("div.form-group").find("div.input-group").each(function () {
+                    if ($(this).attr("class")) {
+                        $(this).addClass("display-none");
+                        $(this).removeClass("display-table-important");
+                    } else {
+                        $(this).attr("class", "display-none");
+                    }
+                });
+            break;
+          default:
+            Equality = ['=', '>', '<', "<=", ">="];
+            $(element).parents("div.form-group").find("input[name^='CriteriaValue']").show();
+                //$(element).parents("div.form-group").find("div.genderdiv").attr("class", "display-none");
+                $(element).parents("div.form-group").find("div.genderdiv").each(function () {
+                    if ($(this).attr("class")) {
+                        $(this).addClass("display-none");
+                    } else {
+                        $(this).attr("class", "display-none");
+                    }
+                });
+                //$(element).parents("div.form-group").find("div.DistrictDiv").attr("class", "display-none");
+                $(element).parents("div.form-group").find("div.DistrictDiv").each(function () {
+                    if ($(this).attr("class")) {
+                        $(this).addClass("display-none");
+                    } else {
+                        $(this).attr("class", "display-none");
+                    }
+                });
+                //$(element).parents("div.form-group").find("div.input-group").hide();
+                $(element).parents("div.form-group").find("div.input-group").each(function () {
+                    if ($(this).attr("class")) {
+                        $(this).addClass("display-none");
+                        $(this).removeClass("display-table-important");
+                    } else {
+                        $(this).attr("class", "display-none");
+                    }
+                });
+            break;
+        }
+        data.append($("<option value='' selected>---Select---</option>"));
+        Equality.forEach((obj, ind) => {
+          data.append($("<option></option>").attr("value", obj).text(obj));
+        });
+        data.select2("val","");
+      }
+    };
+        function ChangeInputField(element) {
+            debugger
+            var AssignmentOperator = $(element).val();
+            var Criteria = $(element).parents("div.form-group").find("select[name^='Criteria']").find(":selected").text();
+            var Datatype = $(element).parents("div.form-group").find("select[name^='Criteria']").find(":selected").val().split("_")[0];
+            if (AssignmentOperator != null && AssignmentOperator != "" && AssignmentOperator != "undefined") {
+                var Operator = ['=', '>', '<', "<=", ">=", "NOT"];
+                if (!Operator.includes(AssignmentOperator)) {
+                    $(element).parents("div.form-group").find("input[name^='CriteriaValue']").show();
+                    //$(element).parents("div.form-group").find("div.genderdiv").attr("class", "display-none");
+                    $(element).parents("div.form-group").find("div.genderdiv").each(function () {
+                        if ($(this).attr("class")) {
+                            $(this).addClass("display-none");
+                        } else {
+                            $(this).attr("class", "display-none");
+                        }
+                    });
+                    //$(element).parents("div.form-group").find("div.DistrictDiv").attr("class", "display-none");
+                    $(element).parents("div.form-group").find("div.DistrictDiv").each(function () {
+                        if ($(this).attr("class")) {
+                            $(this).addClass("display-none");
+                        } else {
+                            $(this).attr("class", "display-none");
+                        }
+                    });
+                    //$(element).parents("div.form-group").find("div.input-group").hide();
+                    $(element).parents("div.form-group").find("div.input-group").each(function () {
+                        if ($(this).attr("class")) {
+                            $(this).addClass("display-none");
+                            $(this).removeClass("display-table-important");
+                        } else {
+                            $(this).attr("class", "display-none");
+                        }
+                    });
+                } else {
+                    switch (Datatype.toLowerCase().trim()) {
+                        case "string":
+                            switch (Criteria.toLowerCase().trim()) {
+                                case "gender":
+                                    $(element).parents("div.form-group").find("div.genderdiv").find("select[name^='Gender']").select2("val", "");
+                                    //$(element).parents("div.form-group").find("div.genderdiv").attr("class", "width-100");
+                                    $(element).parents("div.form-group").find("div.genderdiv").each(function () {
+                                        if ($(this).attr("class")) {
+                                            $(this).removeClass("display-none");
+                                            $(this).addClass("width-100");
+                                        } else {
+                                            $(this).attr("class", "width-100");
+                                        }
+                                    });
+                                    //$(element).parents("div.form-group").find("div.DistrictDiv").attr("class", "display-none");
+                                    $(element).parents("div.form-group").find("div.DistrictDiv").each(function () {
+                                        if ($(this).attr("class")) {
+                                            $(this).addClass("display-none");
+                                        } else {
+                                            $(this).attr("class", "display-none");
+                                        }
+                                    });
+                                    $(element).parents("div.form-group").find("input[name^='CriteriaValue']").hide();
+                                    //$(element).parents("div.form-group").find("div.input-group").hide();
+                                    $(element).parents("div.form-group").find("div.input-group").each(function () {
+                                        if ($(this).attr("class")) {
+                                            $(this).addClass("display-none");
+                                            $(this).removeClass("display-table-important");
+                                        } else {
+                                            $(this).attr("class", "display-none");
+                                        }
+                                    });
+                                    break;
+                                case "district":
+                                    //$(element).parents("div.form-group").find("div.DistrictDiv").find("select[name^='Gender']").select2("val", "");
+                                    //$(element).parents("div.form-group").find("div.DistrictDiv").attr("class", "width-100");
+                                    $(element).parents("div.form-group").find("div.DistrictDiv").each(function () {
+                                        if ($(this).attr("class")) {
+                                            $(this).removeClass("display-none");
+                                            $(this).addClass("width-100");
+                                        } else {
+                                            $(this).attr("class", "width-100");
+                                        }
+                                    });
+                                    //$(element).parents("div.form-group").find("div.genderdiv").attr("class", "display-none");
+                                    $(element).parents("div.form-group").find("div.genderdiv").each(function () {
+                                        if ($(this).attr("class")) {
+                                            $(this).addClass("display-none");
+                                        } else {
+                                            $(this).attr("class", "display-none");
+                                        }
+                                    });
+                                    $(element).parents("div.form-group").find("input[name^='CriteriaValue']").hide();
+                                    //$(element).parents("div.form-group").find("div.input-group").hide();
+                                    $(element).parents("div.form-group").find("div.input-group").each(function () {
+                                        if ($(this).attr("class")) {
+                                            $(this).addClass("display-none");
+                                            $(this).removeClass("display-table-important");
+                                        } else {
+                                            $(this).attr("class", "display-none");
+                                        }
+                                    });
+                                    break;
+                                default:
+                                    $(element).parents("div.form-group").find("input[name^='CriteriaValue']").val("");
+                                    $(element).parents("div.form-group").find("input[name^='CriteriaValue']").show();
+                                    //$(element).parents("div.form-group").find("div.genderdiv").attr("class", "display-none");
+                                    $(element).parents("div.form-group").find("div.genderdiv").each(function () {
+                                        if ($(this).attr("class")) {
+                                            $(this).addClass("display-none");
+                                        } else {
+                                            $(this).attr("class", "display-none");
+                                        }
+                                    });
+                                    //$(element).parents("div.form-group").find("div.DistrictDiv").attr("class", "display-none");
+                                    $(element).parents("div.form-group").find("div.DistrictDiv").each(function () {
+                                        if ($(this).attr("class")) {
+                                            $(this).addClass("display-none");
+                                        } else {
+                                            $(this).attr("class", "display-none");
+                                        }
+                                    });
+                                    //$(element).parents("div.form-group").find("div.input-group").hide();
+                                    $(element).parents("div.form-group").find("div.input-group").each(function () {
+                                        if ($(this).attr("class")) {
+                                            $(this).addClass("display-none");
+                                            $(this).removeClass("display-table-important");
+                                        } else {
+                                            $(this).attr("class", "display-none");
+                                        }
+                                    });
+                                    break;
+                            }
+                            break;
+                        case "datetime":
+                            $(element).parents("div.form-group").find("input[name^='CriteriaValue']").hide();
+                            //$(element).parents("div.form-group").find("div.genderdiv").attr("class", "display-none");
+                            $(element).parents("div.form-group").find("div.genderdiv").each(function () {
+                                if ($(this).attr("class")) {
+                                    $(this).addClass("display-none");
+                                } else {
+                                    $(this).attr("class", "display-none");
+                                }
+                            });
+                            //$(element).parents("div.form-group").find("div.DistrictDiv").attr("class", "display-none");
+                            $(element).parents("div.form-group").find("div.DistrictDiv").each(function () {
+                                if ($(this).attr("class")) {
+                                    $(this).addClass("display-none");
+                                } else {
+                                    $(this).attr("class", "display-none");
+                                }
+                            });
+                            //$(element).parents("div.form-group").find("div.input-group").show();
+                            $(element).parents("div.form-group").find("div.input-group").each(function () {
+                                if ($(this).attr("class")) {
+                                    $(this).addClass("display-table-important");
+                                    $(this).removeClass("display-none");
+                                } else {
+                                    $(this).attr("class", "display-table-important");
+                                }
+                            });
+
+                            break;
+                        case "bit":
+                            $(element).parents("div.form-group").find("input[name^='CriteriaValue']").show();
+                            //$(element).parents("div.form-group").find("div.genderdiv").attr("class", "display-none");
+                            $(element).parents("div.form-group").find("div.genderdiv").each(function () {
+                                if ($(this).attr("class")) {
+                                    $(this).addClass("display-none");
+                                } else {
+                                    $(this).attr("class", "display-none");
+                                }
+                            });
+                            //$(element).parents("div.form-group").find("div.DistrictDiv").attr("class", "display-none");
+                            $(element).parents("div.form-group").find("div.DistrictDiv").each(function () {
+                                if ($(this).attr("class")) {
+                                    $(this).addClass("display-none");
+                                } else {
+                                    $(this).attr("class", "display-none");
+                                }
+                            });
+                            //$(element).parents("div.form-group").find("div.input-group").hide();
+                            $(element).parents("div.form-group").find("div.input-group").each(function () {
+                                if ($(this).attr("class")) {
+                                    $(this).addClass("display-none");
+                                    $(this).removeClass("display-table-important");
+                                } else {
+                                    $(this).attr("class", "display-none");
+                                }
+                            });
+                            break;
+                        default:
+                            $(element).parents("div.form-group").find("input[name^='CriteriaValue']").show();
+                            //$(element).parents("div.form-group").find("div.genderdiv").attr("class", "display-none");
+                            $(element).parents("div.form-group").find("div.genderdiv").each(function () {
+                                if ($(this).attr("class")) {
+                                    $(this).addClass("display-none");
+                                } else {
+                                    $(this).attr("class", "display-none");
+                                }
+                            });
+                            //$(element).parents("div.form-group").find("div.DistrictDiv").attr("class", "display-none");
+                            $(element).parents("div.form-group").find("div.DistrictDiv").each(function () {
+                                if ($(this).attr("class")) {
+                                    $(this).addClass("display-none");
+                                } else {
+                                    $(this).attr("class", "display-none");
+                                }
+                            });
+                            //$(element).parents("div.form-group").find("div.input-group").hide();
+                            $(element).parents("div.form-group").find("div.input-group").each(function () {
+                                if ($(this).attr("class")) {
+                                    $(this).addClass("display-none");
+                                    $(this).removeClass("display-table-important");
+                                } else {
+                                    $(this).attr("class", "display-none");
+                                }
+                            });
+                            break;
+                    }
+                }
+            }
+        }
+    //This is the code for the edit
+      function showPaymentStatusPopup(EmplCode, PayDocNo) {
+
+        $.ajax({
+          url: "/MasterPensioner/GetPaymentdetailsAjax?EmplCode=" + EmplCode + "&PayDocNo=" + PayDocNo,
+          method: "GET",
+          success: function (data) {
+
+            if (data && data.length > 0) {
+              var firstRecord = data[0];
+              //$('#PaymentStatusAccountNo').val(accountNo);
+              $("#PaymentStatusEmplcode").val(EmplCode);
+              $("#APPLICATION_REFERENCE_NO").val(firstRecord.ApplicationReferenceNo);
+
+              // Extract the numeric part of the timestamp string
+              if (firstRecord.TransactionDate != "") {
+                var timestamp = parseInt(firstRecord.TransactionDate.match(/\d+/)[0], 10);
+                var currentDate = new Date(timestamp);
+                var formattedDate = $.datepicker.formatDate('yy-mm-dd', currentDate);
+                $('#TransactionDate').val(formattedDate);
+              }
+
+              //$("#TransactionDate").val(firstRecord.TransactionDate);
+              $("#TransactionNo").val(firstRecord.TransactionRefrenceNo);
+              /* $("#TransactionNo").val(firstRecord.TransactionNo);*/
+              $("#RemarksId").val(firstRecord.Remarks);
+              $("#Name").val(firstRecord.FullName);
+              $("#paymentStatus").val(firstRecord.Status);
+              $("#PayDocNo").val(firstRecord.PayDocNo);
+              $("#PopUpPaymentStatus").popup('show');
+            }
+            else {
+              toasterInfoMessage("No payroll found");
+              return;
+            }
+          },
+          error: function (xhr, textStatus, errorThrown) {
+
+            console.log("AJAX Request Failed", textStatus, errorThrown);
+          }
+        });
+      }
+
+    function oncancelPayment() {
+
+      $('#error-message').hide();
+      $('#PopUpPaymentStatus').popup("hide");;
+    }
+
+
+      function onclickPaymentStatus() {
+
+        var emplcode = $("#PaymentStatusEmplcode").val();
+        var Remark = $("#RemarksId").val();
+        var TransactionDate = $("#TransactionDate").val();
+        var paymentStatus = $("#paymentStatus").val();
+        var ApplicationReferenceNo = $("#APPLICATION_REFERENCE_NO").val();
+        var accountno = $('#PaymentStatusAccountNo').val();
+        var TransactionNo = $("#TransactionNo").val();
+        if (!Remark) {
+
+          $('#error-RemarksId').text('Remark is required.');
+          return;
+        }
+        if (paymentStatus == 0) {
+
+          $('#error-paymentStatus').text('Payment Status is required.');
+          return;
+        }
+        if (paymentStatus == 'Ok') {
+          if (TransactionNo == "") {
+            $('#error-TransactionNo').text('Transaction no is required.');
+            return;
+          }
+        }
+        $.ajax({
+          type: "POST",
+          url: "/MasterPensioner/UpdatePaymentStatusAjax",
+          data: {
+            emplcodes: emplcode,
+            Remarks: Remark,
+            TransactionDates: TransactionDate,
+            paymentStatuses: paymentStatus,
+            ApplicationReferenceNo: ApplicationReferenceNo,
+            accountNos: accountno,
+            TransactionNos: TransactionNo,
+            PayDocNo: $("#PayDocNo").val()
+          },
+          success: function (result) {
+            if (result.Status == true) {
+              toasterSuccessMessage(result.Message);
+            }
+            location.reload();
+          },
+          error: function (xhr, status, error) {
+            console.error("Ajax request failed", error);
+            $('#btn_HoldPayment_loading').hide();
+            $('#IdHoldPayment').show();
+          }
+        });
+        $('#PopUpHoldPayment').hide();
+      }
+
+    //$("#TransactionDate").datepicker({
+    //  dateFormat: 'dd-mm-yy',
+    //  changeMonth: true,
+    //  changeYear: true,
+    //});
+  </script>
+
+
+
+}

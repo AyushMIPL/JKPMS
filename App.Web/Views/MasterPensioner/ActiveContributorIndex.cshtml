@@ -1,0 +1,164 @@
+﻿@model List<App.Data.Entities.MasterContributor>
+@using App.Web.Helper
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+     Beneficiaries
+      
+      @*<ul class="tool-bar">
+        
+      </ul>*@
+    </h4>
+  </div>
+  <div class="panel-body">
+    <table class="table" id="example">
+      <thead>
+        <tr>
+          <th>JKPS ID</th>
+          <th>Name</th>
+          <th>Employer Name</th>
+          <th>S.S.#</th>
+          <th>Gender</th>
+          <th>D.O.B.</th>
+          <th>Postal Address</th>
+          <th>Phone</th>
+          <th>Office Phone</th>
+          <th style="width:120px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @*@foreach (var item in Model)
+        {
+          <tr>
+            <td>@item.PersonID</td>
+            <td>@item.FullName</td>
+            <td>@item.Employer.EmployerName</td>
+            <td>@item.SocialSecurityNo</td>
+            <td>@Html.FormatGender(item.Gender)</td>
+            <td>@Html.FormatDate(item.DateOfBirth)</td>
+            <td>@item.PostalAddress</td>
+            <td>@item.Phone</td>
+            <td>@item.PhoneOffice</td>
+            <td>@item.Status.Name</td>
+            <td>*@
+              @*<a href="/MasterPensioner/MoveToPensionerEdit/@item.Id" class="btn btn-info btn-xs" title="Move to Pensioner"><i class="fa fa-exchange fa-lg"></i></a>*@
+              @*<a href="/MasterPensioner/ContributorDetails/@item.Id" class="btn btn-primary btn-xs">Details</a>*@
+              @*<a href="javascript:;" class="btn btn-danger btn-xs" onclick="javascript:del(@item.Id);">Delete</a>*@
+              
+            @*</td>
+          </tr>
+        }*@
+      </tbody>
+    </table>
+  </div>
+</div>
+@section Scripts {
+<link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+  <script nonce="@ViewBag.StyleNonce">
+    $(function () {
+      debugger
+      doBindData();
+    });
+    function doBindData() {
+
+      var oTable = $('#example').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        //"bProcessing": true,
+        "sAjaxSource": "/MasterPensioner/ActiveContributorAjaxHandler/",
+        "aoColumns": [
+          { "sName": "PersonID" },
+            { "sName": "Name" },
+            { "sName": "EmployerName" },
+            { "sName": "SocialSecurityNo" },
+            {
+              "sName": "Gender",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                if (oObj.aData[4] != "M")
+                  return '<span > Female </span>';
+                else
+                  return '<span >Male</span>';
+              }
+            },
+            { "sName": "DateOfBirth" },
+            { "sName": "PostalAddress" },
+        { "sName": "Phone" },
+        { "sName": "PhoneOffice" },
+            {
+              "sName": "ID",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                var strString = '<a href="/MasterPensioner/MoveToPensionerEdit/' + oObj.aData[9] + '\" class="btn btn-info btn-xs" title="Move to Pensioner"><i class="fa fa-share fa-lg"></i> Move to Beneficiary</a>';
+                return strString;
+              }
+            }
+        ]
+      }).rowGrouping({
+        bExpandableGrouping: false,
+        iGroupingColumnIndex: 2,
+        bHideGroupingColumn: true
+      })
+      //.columnFilter({
+      //  sPlaceHolder: "head:before",
+      //  aoColumns: [null,
+      //		    	 		null,
+      //                            			null,
+      //                                  null,
+      //		    	 		null,
+      //                            			null,
+      //                                  null,
+      //		    	 		null,
+      //                            			null,
+      //                                  null,
+      //                                  { type: "select", values: ['Active Contributor', 'Death In Service', 'Pensioner', 'Resignee', 'Supernumerary'] },
+      //  ]
+
+      //});
+    }
+
+
+
+
+    //$(document).ready(function () {
+    //  var table = $('#example').DataTable({
+    //    "columnDefs": [
+    //        { "visible": false, "targets": 2 }
+    //    ],
+    //    "order": [[2, 'asc']],
+    //    //"displayLength": 25,
+    //    "drawCallback": function (settings) {
+    //      var api = this.api();
+    //      var rows = api.rows({ page: 'current' }).nodes();
+    //      var last = null;
+
+    //      api.column(2, { page: 'current' }).data().each(function (group, i) {
+    //        if (last !== group) {
+    //          $(rows).eq(i).before(
+    //              '<tr class="group"><td colspan="10">' + group + '</td></tr>'
+    //          );
+
+    //          last = group;
+    //        }
+    //      });
+    //    }
+    //  });
+
+    //  // Order by the grouping
+    //  $('#example tbody').on('click', 'tr.group', function () {
+    //    var currentOrder = table.order()[0];
+    //    if (currentOrder[0] === 2 && currentOrder[1] === 'asc') {
+    //      table.order([2, 'desc']).draw();
+    //    }
+    //    else {
+    //      table.order([2, 'asc']).draw();
+    //    }
+    //  });
+    //});
+
+  </script>
+}   

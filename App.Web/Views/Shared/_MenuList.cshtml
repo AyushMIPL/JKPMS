@@ -1,0 +1,268 @@
+﻿@*@model App.Data.Entities.SecModule*@
+@model List<App.Data.Entities.SecModule>
+@{
+  ViewBag.Title = "Create";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+
+  <meta name="apple-mobile-web-app-title" content="CodePen">
+  <title>index</title>
+
+  <link rel="canonical" href="https://codepen.io/jksigns/pen/XzbmNm">
+
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
+
+  <style>
+    /* body {
+      background-color: #a3d5d3;
+      padding-top: 5%;
+    }*/
+
+    .design2 .counter-box i {
+      font-size: 60px;
+      margin: 0 0 15px;
+      color: #bebdbd;
+    }
+
+    .design2 .counter {
+      display: block;
+      font-size: 17px;
+      font-weight: 700;
+      color: #363535;
+      line-height: 28px;
+    }
+
+    .design2 .counter-box p {
+      margin: 5px 0 0;
+      padding: 0;
+      color: #909090;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .row-equal-height {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex;
+    }
+
+    .p_column {
+      background: #fff;
+      color: #000;
+      font-size: 22px;
+      font-weight: 500;
+      margin: 5px 15px 0;
+      padding: 30px 10000px;
+      border: solid 1px #d4d4d4;
+      box-shadow: 0px 0px 20px 1px rgba(0, 0, 0, 0.08);
+      border-radius: 2px;
+      position: relative;
+      -webkit-transition: 0.4s;
+      -o-transition: 0.4s;
+      transition: 0.4s;
+    }
+      /* Change color of your first-child */
+
+
+      /*Code for arrow*/
+
+      .p_column:before,
+      .p_column:after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 0;
+        top: 42%;
+        bottom: 86px;
+        border-style: solid;
+        border-top-color: transparent;
+        border-right-color: transparent;
+        border-bottom-color: transparent;
+        -webkit-transition: 0.4s;
+        -o-transition: 0.4s;
+        transition: 0.4s;
+      }
+      /* Stroke */
+
+      .p_column:before {
+        border-left-color: #d4d4d4;
+        border-width: 23px;
+        right: -44px;
+        top: 41%;
+      }
+      /* Fill */
+
+      .p_column:after {
+        border-left-color: #fff;
+        border-width: 20px;
+        right: -39px;
+      }
+
+      .p_column p {
+        font-size: 16px;
+        line-height: 24px;
+        margin-bottom: 0
+      }
+
+
+
+      /*color change hover*/
+
+      .p_column:hover {
+        background: #eeeeee;
+        color: #fff;
+        border: solid 2px #219cf2;
+      }
+
+        .p_column:hover:before {
+          border-left-color: #b0b9c1;
+        }
+
+        .p_column:hover:after {
+          border-left-color: #219cf2;
+        }
+
+
+    .four.col-md-3.p_column.active {
+      background-color: #eee;
+      border: 2px solid #2196F3;
+    }
+
+      .four.col-md-3.p_column.active:after {
+        right: -45px;
+        border-left-color: #2196F3;
+        border-width: 23px;
+      }
+
+      .four.col-md-3.p_column.active:before {
+        display: none;
+      }
+
+    .row-equal-height {
+      margin-bottom: 20px;
+    }
+
+    .icon-fa {
+      position: absolute;
+      right: 8px;
+      top: 10px;
+      color: #2196f3;
+      display: none;
+    }
+
+    .active .icon-fa {
+      display: block;
+    }
+
+    .p_column:hover:before {
+      display: none;
+    }
+  </style>
+  <script src="https:////ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+</head>
+
+<body translate="no">
+
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+
+
+
+
+
+  @*<div class="container">
+      @foreach (var modulename in Model)
+      {
+        <div class="row row-equal-height design2 text-center">
+          <div class="four col-md-3 p_column">
+            <a href="@Url.Action(modulename.ActionName, modulename.ControllerName)">
+              <div class="icon-fa"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i></div>
+              <div class="counter-box">
+                <i class="fa @modulename.ModuleClass"></i> <span class="counter">@modulename.ModuleName</span>
+                <p>Batch Id: @modulename.Id</p>
+                <p>Process Started On: @modulename.CreatedOn</p>
+                <p>Start By: @modulename.ModifiedOn</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      }
+    </div>*@
+
+
+
+  <div class="container">
+      @foreach (var modulename in Model)
+      {
+        <div class="row row-equal-height design2 text-center">
+          <a href="@Url.Action(modulename.ActionName, modulename.ControllerName)">
+            <div class="four col-md-3 p_column active">
+              <div class="icon-fa"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i></div>
+              <div class="counter-box">
+                <i class="fa fa-thumbs-o-up"></i> <span class="counter">@modulename.ModuleName</span>
+                <p>Batch Id: @modulename.Id  </p>
+                <p>Process Started On: @modulename.CreatedOn</p>
+                <p>Start By: @modulename.ModifiedOn</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      }
+    </div>
+
+  @*<div class="container">
+      <div class="row row-equal-height design2 text-center">
+
+        <div class="four col-md-3 p_column active">
+          <div class="icon-fa"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i></div>
+          <div class="counter-box">
+            <i class="fa fa-thumbs-o-up"></i> <span class="counter">Pension Summary</span>
+            <p>Batch Id:- 10009</p>
+            <p>Process Started On:-11/07/2023</p>
+            <p>Start By:-Director test2</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row row-equal-height design2 text-center">
+
+      </div>
+    </div>*@
+
+
+
+  <script>
+
+
+
+
+
+    $(".p_column").on('click', function (event) {
+      //alert("working")
+
+      $(".p_column").removeClass("active");
+      // add class to the one we clicked
+      $(this).addClass("active");
+    });
+
+
+  </script>
+
+
+
+</body>
+</html>

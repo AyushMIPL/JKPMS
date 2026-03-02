@@ -1,0 +1,305 @@
+﻿@model IEnumerable<App.Data.Entities.RefundApplications>
+@using App.Data
+@using App.Web.Helper
+@{
+  ViewBag.Title = "RefundApplicationApprovalIndex";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+  ViewBag.Title = "Index";
+  //string str = "";
+  var db = new AppDbContext();
+  //var result = (from a in db.ApprovalProcessAssignedUser join b in db.ApprovalProcessLevel on a.ApprovalProcessLevelId equals b.ApprovalProcessLevelId where b.ModuleId == 82 select new { a.ApprovalProcessId, b.ApprovalProcessLevelName }).ToList();
+  //str += "<ul style='list-style-type:none'>";
+  //foreach (var item in result)
+  //{
+  //  str += "<li><input type='checkbox' id='" + item.ApprovalProcessId + "' disabled='disabled'> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'" + item.ApprovalProcessLevelName + "' </li>";
+  //}
+  //str += "</ul>";
+}
+<div class="modal fade in" id="formModal" aria-hidden="false" style="display: none;">
+  <div class="modal-dialog" style="width: 975px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="hidePension();">×</button>
+        <iframe id="reportData" style="border: 0px;height:700px;width:100%;"></iframe>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-sm btn-success" data-dismiss="modal" aria-hidden="true" onclick="hidePension();">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Refund Applications Approval Request
+    </h4>
+  </div>
+  <!--<div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Refund Applications Approval Process-->
+  @*<ul class="tool-bar">
+      <li><a href="/PaymentAndRefund/RefundApplicationForm" data-toggle="tooltip" data-placement="bottom" title="Refund Application Form" data-original-title="Refund Applicatio nForm"><i class="fa fa-plus"></i></a></li>
+
+    </ul>*@
+  <!--</h4>
+  </div>-->
+  <div class="panel-body">
+
+    <table class="table dataTable" id="example">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Post</th>
+          <th>Employer Name</th>
+
+          <th>Date of<br />Appointment</th>
+          <th>Date of Retirement or<br />Resignation</th>
+          <th>Service Length<br />(in Months)</th>
+          <th>Employee Contribution<br />to Pension Fund</th>
+          <th>Interest<br />Compound Annual</th>
+          <th>Employee Contribution<br />to Pension Fund<br />with Interest</th>
+          <th>Job Status</th>
+          <th>Approval Level</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var item in this.Model)
+        {
+          <tr>
+            <td>@item.Contributor.FirstName @item.Contributor.MidName @item.Contributor.LastName</td>
+            @*<td>@item.Designation.Name</td>*@
+            <td></td>
+            <td>@item.Employer.EmployerName</td>
+
+            <td>@Html.FormatDate(item.FirstAppointmentDate)</td>
+            <td>@Html.FormatDate(item.RetirementOrResignationDate)</td>
+            <td>@item.LengthOfServiceInMonths</td>
+            <td>@item.TotalEmployeeContribution</td>
+            <td>@item.AnnualInterest</td>
+            <td>@item.TotalEmployeeContributionWithInterest</td>
+            <td>@item.JobStausName.Name</td>
+            @{
+              string str = "";
+              var Level = (from a in db.ApprovalProcessAssignedUser join b in db.ApprovalProcessLevel on a.ApprovalProcessLevelId equals b.ApprovalProcessLevelId where b.ModuleId == 10 select a.ApprovalProcessId).ToList();
+              int maxLevel = Level.LastOrDefault();
+              int minLevel = Level.FirstOrDefault();
+              int count = db.ApplicationApprovalStatus.Where(x => x.ApplicationId == item.Id && x.ApprovalProcessId <= maxLevel && x.ApprovalProcessId >= minLevel).Count();
+              count = (minLevel + count - 1);
+              var result = (from a in db.ApprovalProcessAssignedUser join b in db.ApprovalProcessLevel on a.ApprovalProcessLevelId equals b.ApprovalProcessLevelId where b.ModuleId == 10 select new { a.ApprovalProcessId, b.ApprovalProcessLevelName }).ToList();
+              str += "<ul style='list-style-type:none'>";
+              foreach (var items in result)
+              {
+                if (items.ApprovalProcessId <= count)
+                {
+                  str += "<li><input type='checkbox' id='" + items.ApprovalProcessId + "' disabled='disabled' checked='checked'> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'" + items.ApprovalProcessLevelName + "' </li>";
+                }
+                else
+                {
+                  str += "<li><input type='checkbox' id='" + items.ApprovalProcessId + "' disabled='disabled'> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'" + items.ApprovalProcessLevelName + "' </li>";
+                }
+
+              }
+              str += "</ul>";
+            }
+            <td>
+              <i class="fa fa-check fa-lg" data-toggle="tooltip" data-placement="bottom" onmouseout="hidediv(@item.Id);" onmouseover="showdiv(@item.Id);">
+
+              </i>
+            </td>
+            <td>
+              <a href="/PaymentAndRefund/RefundApplicationApprovalDetails/@item.Id" class="btn btn-primary btn-xs" title="Details"><i class="fa fa-list"></i> Details</a>
+            </td>
+            @*<td>
+                <a href="/ContributorPersonalDetails/Edit/@item.Id" class="btn btn-primary btn-xs">Details</a>
+                <a href="javascript:;" class="btn btn-danger btn-xs" onclick="javascript:del(@item.Id);">Delete</a>
+              </td>*@
+          </tr>
+
+          <div class="modal-dialog" id="@item.Id" style="display: none;">
+            <h4>Approval Level of @item.Employer.EmployerName</h4>  <br />
+            @MvcHtmlString.Create(@str)
+          </div>
+
+
+        }
+      </tbody>
+
+    </table>
+  </div>
+</div>
+
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Approved Applications Details
+      
+    </h4>
+  </div>
+  @Html.Action("_ApprovedIndexAjax", "PaymentAndRefund")
+
+<div class="panel-body">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Rejected Applications Details
+      
+    </h4>
+  </div>
+  @Html.Action("_RejectedIndexAjax", "PaymentAndRefund")
+</div>
+
+@section Scripts {
+  <script src="~/Scripts/jquery.dataTables.min.js"></script>
+  <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+  <style>
+    .toast-info {
+      background-color: gray;
+    }
+  </style>
+  <script nonce="@ViewBag.StyleNonce">
+    $(document).ready(function () {
+      var indexTable = $('#example').dataTable({}).rowGrouping({
+        bExpandableGrouping: false,
+        iGroupingColumnIndex: 2,
+        bHideGroupingColumn: true
+
+      });
+      var oTable = $('#tblApproved').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "sAjaxSource": "/PaymentAndRefund/ApprovedAjax",
+        "aoColumns": [
+
+            { "sName": "ApplicantName" },
+            { "sName": "Reason" },
+            { "sName": "EmployerName" },
+            { "sName": "AppliedDate" },
+            { "sName": "RejectedDate" },
+            { "sName": "RequestRejectedBy" },
+            {
+              "sName": "Status",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                if (oObj.aData[6] == "R")
+                  return '<span class="badge badge-danger">Rejected</span>';
+                else
+                  return '<span class="badge badge-success">Approved</span>';
+              }
+            },
+            {
+              "sName": "ID",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                var strString = "";
+                if (oObj.aData[8] == "Yes") {
+                  strString = '<a href="javascript:showDivPension(' + oObj.aData[7] + ')" class="btn btn-primary btn-xs" title="Print"><i class="fa fa-print fa-lg"></i> Print</a>';
+                }
+                return strString;
+              }
+            },
+              { "bVisible": false }
+        ]
+      }).rowGrouping({
+        bExpandableGrouping: false,
+        iGroupingColumnIndex: 2,
+        bHideGroupingColumn: true
+
+      });
+
+
+      var ooTable = $('#tblRejected').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "sAjaxSource": "/PaymentAndRefund/RejectedAjax",
+        "aoColumns": [
+
+            { "sName": "ApplicantName" },
+            { "sName": "Reason" },
+            { "sName": "EmployerName" },
+            { "sName": "AppliedDate" },
+            { "sName": "RejectedDate" },
+            { "sName": "RequestRejectedBy" },
+            {
+              "sName": "Status",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                if (oObj.aData[6] == "R")
+                  return '<span class="badge badge-danger">Rejected</span>';
+                else
+                  return '<span class="badge badge-success">Approved</span>';
+              }
+            }
+            ,
+            {
+              "sName": "ID",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                  var strString = '<a href="/PaymentAndRefund/RefundRejectedDetails/' + oObj.aData[7] + '\" class="btn btn-xs btn-primary" title="Details"><i class="fa fa-list"></i> Details</a>';
+
+                return strString;
+              }
+            }
+        ]
+      }).rowGrouping({
+        bExpandableGrouping: false,
+        iGroupingColumnIndex: 2,
+        bHideGroupingColumn: true
+
+      });
+
+    })
+
+    function showdiv(Id) {
+      var title = $('div[id=' + Id + ']').html()
+      toastr.info(title, "Approval Level", { closeButton: true, timeOut: "3000" });
+    }
+    function hidediv() {
+      $('.toast-info').hide();
+    }
+
+    @*function showDivPension(Id) {
+      $.get('@Url.Action("_PrintRefundApplication", "PaymentAndRefund")?Id=' + Id, function (data) {
+        $('#PartialDiv').html(data);
+        $("#formModal").show();
+      })
+
+    }*@
+
+
+
+    function showDivPension(Id) {
+      var id = parseInt(Id);
+      $.ajax({
+        url: '@Url.Action("_RefundDetailsAjax", "PaymentAndRefund")?Id=' + id,
+        type: "GET",
+      }).done(function (result) {
+        var actionRes = result;
+        if (actionRes == "1") {
+          $('#reportData').attr('src', '/ReportForms/ContributionByEmployer.aspx');
+          $("#formModal").show();
+          return false;
+        }
+        else {
+          toasterErrorMessage("Result not found on this search criteria.");
+          return false;
+        }
+      });
+    }
+
+
+
+    function hidePension() {
+      $("#formModal").hide();
+    }
+
+  </script>
+}

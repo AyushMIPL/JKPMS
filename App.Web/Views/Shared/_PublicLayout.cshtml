@@ -1,0 +1,160 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>@ViewBag.Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Bootstrap core CSS -->
+    <link href="~/Content/endless/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="~/Content/endless/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- Pace -->
+    <link href="~/Content/endless/css/pace.css" rel="stylesheet">
+
+    <!-- Endless -->
+    <link href="~/Content/endless/css/endless.min.css" rel="stylesheet">
+    <link href="~/Content/endless/css/endless-landing.min.css" rel="stylesheet">
+
+</head>
+
+<body class="overflow-hidden">
+    <!-- Overlay Div -->
+    <div id="overlay" class="transparent"></div>
+
+    <div id="wrapper" class="preload">
+        <header class="navbar navbar-fixed-top bg-white">
+            <div class="container">
+                <div class="navbar-header">
+                    <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    @*<a href="#" class="navbar-brand"><span class="text-danger">BOSS</span> Rym</a>*@
+                </div>
+                <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#landing-content" class="top-link">Home</a>
+                        </li>
+                        <li>
+                            <a href="#pricing" class="top-link">Pricing</a>
+                        </li>
+                        <li>
+                            <a href="#contact" class="top-link">Contact us</a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("Login","Account")" class=" top-link">Login</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        @RenderBody()
+
+
+        <footer>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-3 padding-md">
+                        <p class="font-lg">About Our Company</p>
+                        <p><small>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum auctor suscipit lobortis.</small></p>
+                    </div><!-- /.col -->
+                    <div class="col-sm-3 padding-md">
+                        <p class="font-lg">Useful Links</p>
+                        <ul class="list-unstyled useful-link">
+                            <li>
+                                <a href="#">
+                                    <small><i class="fa fa-chevron-right"></i> Our Profile</small>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <small><i class="fa fa-chevron-right"></i> New Products</small>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <small><i class="fa fa-chevron-right"></i> Support Portal</small>
+                                </a>
+                            </li>
+                        </ul>
+                    </div><!-- /.col -->
+                    <div class="col-sm-3 padding-md">
+                        <p class="font-lg">Stay Connect</p>
+                        <a href="#" class="social-connect tooltip-test facebook-hover pull-left m-right-xs" data-toggle="tooltip" data-original-title="Facebook"><i class="fa fa-facebook"></i></a>
+                        <a href="#" class="social-connect tooltip-test twitter-hover pull-left m-right-xs" data-toggle="tooltip" data-original-title="Twitter"><i class="fa fa-twitter"></i></a>
+                        <a href="#" class="social-connect tooltip-test google-plus-hover pull-left m-right-xs" data-toggle="tooltip" data-original-title="Google Plus"><i class="fa fa-google-plus"></i></a>
+                        <a href="#" class="social-connect tooltip-test rss-hover pull-left m-right-xs" data-toggle="tooltip" data-original-title="Rss feed"><i class="fa fa-rss"></i></a>
+                        <a href="#" class="social-connect tooltip-test tumblr-hover pull-left m-right-xs" data-toggle="tooltip" data-original-title="Tumblr"><i class="fa fa-tumblr"></i></a>
+                        <a href="#" class="social-connect tooltip-test dribbble-hover pull-left m-right-xs" data-toggle="tooltip" data-original-title="Dribbble"><i class="fa fa-dribbble"></i></a>
+                        <a href="#" class="social-connect tooltip-test linkedin-hover pull-left m-right-xs" data-toggle="tooltip" data-original-title="Linkedin"><i class="fa fa-linkedin"></i></a>
+                        <a href="#" class="social-connect tooltip-test pinterest-hover pull-left" data-toggle="tooltip" data-original-title="Pinterest"><i class="fa fa-pinterest"></i></a>
+                    </div><!-- /.col -->
+                    <div class="col-sm-3 padding-md">
+                        <p class="font-lg">Contact Us</p>
+                        Email : neeraj.p@mishainfotech.com
+                        <div class="seperator"></div>
+                        <a class="btn btn-info"><i class="fa fa-envelope"></i> Contact support</a>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div>
+        </footer>
+    </div><!-- /wrapper -->
+
+    <a href="" id="scroll-to-top" class="hidden-print"><i class="fa fa-chevron-up"></i></a>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!-- Jquery -->
+    @*<script src="~/Content/endless/js/jquery-1.10.2.min.js"></script>*@
+
+    <!-- Bootstrap -->
+    <script src="~/Content/endless/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Waypoint -->
+    <script src='~/Content/endless/js/waypoints.min.js'></script>
+
+    <!-- LocalScroll -->
+    <script src='~/Content/endless/js/jquery.localscroll.min.js'></script>
+
+    <!-- ScrollTo -->
+    <script src='~/Content/endless/js/jquery.scrollTo.min.js'></script>
+
+    <!-- Modernizr -->
+    <script src='~/Content/endless/js/modernizr.min.js'></script>
+
+    <!-- Pace -->
+    <script src='~/Content/endless/js/pace.min.js'></script>
+
+    <!-- Popup Overlay -->
+    <script src='~/Content/endless/js/jquery.popupoverlay.min.js'></script>
+
+    <!-- Slimscroll -->
+    <script src='~/Content/endless/js/jquery.slimscroll.min.js'></script>
+
+    <!-- Cookie -->
+    <script src='~/Content/endless/js/jquery.cookie.min.js'></script>
+
+    <!-- Endless -->
+    <script src="~/Content/endless/js/endless/endless.js"></script>
+
+    <script nonce="@ViewBag.StyleNonce">
+        $(function () {
+            $('.animated-element').waypoint(function () {
+                $(this).removeClass('no-animation');
+            }, { offset: '70%' });
+            $('.nav').localScroll({ duration: 800 });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+﻿@model App.Data.Entities.RefundApplications
+@using App.Web.Helper
+@{
+  Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width" />
+  <title>View</title>
+</head>
+<body style="max-width:615px;max-height:960px;font-size:11px;">
+  <div class="row">
+    @*<div>
+      <img src="~/Images/JKPSLogo.jpg" />
+    </div>
+    <div style="margin-top:-70px;">
+      <div style="text-align:center;font-weight:bold;text-decoration:underline;">PUBLIC SERVICE PENSION FUND</div>
+      <div style="text-align:center;">APPLICATION FOR REFUND OF EMPLOYEE CONTRIBUTIONS TO THE PENSION</div>
+      <div style="text-align:center;">FUND WITH INTEREST COMPOUNDED ANNUALLY</div>
+      <div style="text-align:center;">(to be typed/Written in 4-copies)</div>
+    </div>*@
+  </div>
+
+  <div style="word-wrap: break-word;margin-bottom: 25px;margin-top:20px;">
+    <div style="display:inline-block;width:5%">1.</div>
+    <div style="display:inline-block;width:18%;">Name of Officer</div>
+    <div style="width:75%;display:inline-block;border-bottom:1px solid black;float: right;">&nbsp;@ViewBag.Name</div>
+  </div>
+
+  <div style="word-wrap: break-word;margin-bottom: 25px;">
+    <div style="display:inline-block;width:5%">2.</div><div style="display:inline-block;width:18%;">Post</div>
+    <div style="width:75%;display:inline-block;border-bottom:1px solid black;float: right;">&nbsp;@Model.Designation.Name</div>
+  </div>
+  <div style="word-wrap: break-word;margin-bottom: 25px;">
+    <div style="display:inline-block;width:5%">3.</div><div style="display:inline-block;width:45%;">Date of Retirement/Resignation/Termination</div>
+    <div style="width:48%;display:inline-block;border-bottom:1px solid black;float: right;">&nbsp;@Html.FormatDate(Model.RetirementOrResignationDate)</div>
+  </div>
+  <div style="word-wrap: break-word;margin-bottom: 25px;">
+    <div style="display:inline-block;width:5%">4.</div><div style="display:inline-block;width:45%;">Date of Appointments</div>
+    <div style="width:48%;display:inline-block;border-bottom:1px solid black;float: right;">&nbsp;@Html.FormatDate(Model.FirstAppointmentDate)</div>
+  </div>
+  <div style="word-wrap: break-word;margin-bottom: 25px;">
+    <div style="display:inline-block;width:5%">5.</div><div style="display:inline-block;width:45%;">Length of Service in Months (From Jan 1,2004)</div>
+    <div style="width:48%;display:inline-block;border-bottom:1px solid black;float: right;">&nbsp;@Model.LengthOfServiceInMonths</div>
+  </div>
+  <div style="word-wrap: break-word;margin-bottom: 25px;">
+    <div style="display:inline-block;width:5%">6.</div><div style="display:inline-block;width:45%;">Total Employee Contribution to Pension Fund</div>
+    <div style="width:48%;display:inline-block;border-bottom:1px solid black;float: right;">&nbsp;EC$ @Html.FormatSeparator(Model.TotalEmployeeContribution)</div>
+  </div>
+  <div style="word-wrap: break-word;margin-bottom: 25px;">
+    <div style="display:inline-block;width:5%">7.</div><div style="display:inline-block;width:45%;">Total Interest compounded annually at 3%</div>
+    <div style="width:48%;display:inline-block;border-bottom:1px solid black;float: right;">&nbsp;EC$ @Html.FormatSeparator(Model.AnnualInterest)</div>
+  </div>
+  <div style="word-wrap: break-word;margin-bottom: 25px;">
+    <div style="display:inline-block;width:5%">8.</div><div style="display:inline-block;width:45%;">Total Employee Contribution to PEnsion Fund with Interest compounded annually</div>
+    <div style="width:48%;display:inline-block;border-bottom:1px solid black;float: right;">&nbsp;EC$ @Html.FormatSeparator(Model.TotalEmployeeContributionWithInterest)</div>
+  </div>
+  @*<div style="word-wrap: break-word;margin-bottom: 25px;clear:both">
+    <div style="display:inline-block;width:5%"></div>
+    <div style="display:inline-block;width:14%;">Submitted By</div>
+    <div style="width:30%;display:inline-block;border-bottom:1px solid black;">&nbsp;@Model.SubmittedBy</div>
+    <div style="display:inline-block;width:14%;">Approved By</div>
+    <div style="width:35%;display:inline-block;border-bottom:1px solid black;float: right;">&nbsp;@ViewBag.ApprovedBy</div>
+    <div style="word-wrap: break-word;margin-bottom: 25px;clear:both;width:100%;">
+      <div style="text-align:right;display:inline-block;font-size:12px;width:48%;clear: both;color:#6D6D6D;">signature of Applying Officer</div>
+      <div style="text-align:right;display:inline-block;font-size:12px;width:48%;clear: both;color:#6D6D6D;">signature of Human Resource Officer</div>
+    </div>
+  </div>
+  <div style="word-wrap: break-word;margin-bottom: 25px;">
+    <div style="display:inline-block;width:5%"></div>
+    <div style="display:inline-block;width:45%;">Item 1 to 8 Verified By</div>
+    <div style="width:48%;display:inline-block;border-bottom:1px solid black;float: right;">&nbsp;@ViewBag.Itemsverified</div>
+    <div style="text-align:right;margin-top:-3px;font-size:12px;width:98%;clear: both;color:#6D6D6D;">signature of Administrator,Public Service Pension Fund</div>
+
+  </div>
+  <div style="word-wrap: break-word;margin-bottom: 25px;">
+    <div style="display:inline-block;width:5%"></div>
+    <div style="display:inline-block;width:45%;">Certified for Payment</div>
+    <div style="width:48%;display:inline-block;border-bottom:1px solid black;float: right;">&nbsp;@ViewBag.ItemsPayment</div>
+    <div style="text-align:right;margin-top:-3px;font-size:12px;width:98%;clear: both;color:#6D6D6D;">signature of Chairman,Public Service Pension Board</div>
+
+  </div>
+  <div style="word-wrap: break-word;margin-bottom: 25px;">
+    <div style="display:inline-block;width:5%"></div>
+    <div style="display:inline-block;width:45%;">Audited By</div>
+    <div style="width:48%;display:inline-block;border-bottom:1px solid black;float: right;">&nbsp;@ViewBag.AuditedBy</div>
+    <div style="text-align:right;margin-top:-3px;font-size:12px;width:98%;clear: both;color:#6D6D6D;">signature of Internal Auditor</div>
+
+  </div>
+
+  <div style="word-wrap: break-word;margin-top: 125px;">
+    <div style="width:100%;display:inline-block;float: right;text-align:justify;font-size:smaller;">Note. This Form must be signed by the applicant and Department Head, and then submitted to the Public Service Pension Fund office for Final Processing.After the application has been verified and certified,the original goes to the applicant, 1 copy to the departmental file, 1 copy to the Audit file and 1 copy to the Administrator , Public Service Pension Fund.</div>
+  </div>*@
+</body>
+</html>

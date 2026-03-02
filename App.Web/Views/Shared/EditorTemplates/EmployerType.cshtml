@@ -1,0 +1,6 @@
+﻿@using Microsoft.Owin.Extensions
+@{
+  var type = Nullable.GetUnderlyingType(ViewData.ModelMetadata.ModelType) ?? ViewData.ModelMetadata.ModelType;
+
+  @(typeof(Enum).IsAssignableFrom(type) ? Html.EnumDropDownListFor(x => x,"---Select Employer Type---", new { @class = "form-control select-sm" }) : Html.TextBoxFor(x => x))
+}

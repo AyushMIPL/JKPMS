@@ -1,0 +1,366 @@
+﻿@model App.Data.ViewModels.PensionProcessViewModel
+@using App.Web.Helper;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var currentMonthBatchDetail = ViewBag.CurrentMonthBatch;
+    var currentMonthBatchDetailpybatchid = 0;
+    var Group = @Html.Raw(Json.Encode(ViewBag.Group));
+}
+<style>
+    .btn-success.disabled {
+        color: gray;
+        pointer-events: none;
+        opacity: .8;
+    }
+</style>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row">
+
+            <div class="form-group hidden">
+                <div class="col-sm-4">
+                    @Html.LabelFor(model => model.EmployeeCode, new { @class = "control-label mb-2" })
+                    @Html.TextBoxFor(m => m.EmployeeCode, new { @class = "form-control input-sm", placeholder = "Beneficiary Code" })
+                </div>
+            </div>
+            <div class="form-group mb-6 col-md-6">
+                <div class="col-sm-12">
+                    @Html.LabelFor(model => model.RegionNames, "District", new { @class = "control-label mb-2" })
+                    @Html.TextBoxFor(x => x.RegionNames, new { @class = "form-control", @autocomplete = "off", @placeholder = " Regions" })
+                </div>
+            </div>
+            @*<div class="form-group mb-3 col-md-3">
+                  <div class="col-sm-12">
+                    @Html.LabelFor(model => model.RegionNames, "Month", new { @class = "control-label mb-2" })
+                    <select id="dlMonth" style="width:100%;" onchange="ChangeMonth(event)">
+                      <option value="0">-- Select Month --</option>
+                      <option value="1">Jan</option>
+                      <option value="2">Feb</option>
+                      <option value="3">Mar</option>
+                      <option value="4">Apr</option>
+                      <option value="5">May</option>
+                      <option value="6">June</option>
+                      <option value="7">Jul</option>
+                      <option value="8">Aug</option>
+                      <option value="9">Sept</option>
+                      <option value="10">Oct</option>
+                      <option value="11">Nov</option>
+                      <option value="12">Dec</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group mb-3">
+                  <div class="col-sm-3">
+                    @Html.LabelFor(model => model.RegionNames, "Year", new { @class = "control-label mb-2" })
+                    @Html.DropDownList("Year", null, "---Select---", new { @class = "form-control", @onChange = "ChangeYear(event)" })
+                  </div>
+                </div>*@
+            <div class="form-group" hidden>
+                <div class="col-sm-4">
+                    @Html.LabelFor(model => model.EmpType, new { @class = "control-label mb-2" })
+                    @Html.DropDownList("ddlEmpTypes", ViewBag.EmployeeType as SelectList, " -- Select Type -- ", new { @class = "form-control input-sm" })
+                </div>
+            </div>
+
+            <div class="form-group" hidden>
+                <div class="col-sm-4">
+                    @Html.LabelFor(model => model.LPayDate, new { @class = "control-label mb-2" })
+                    <div class="input-group date">
+
+                        @Html.EditorFor(model => model.LPayDate, new { @placeholder = "Last Pay Date" })
+                        <span class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-4">
+                <div class="form-group hidden">
+
+                    <div class="col-sm-12">
+                        @Html.LabelFor(model => model.FirstName, new { @class = "control-label mb-2" })
+                        @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control input-sm", placeholder = "First Name" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-12">
+                        @Html.LabelFor(model => model.PayrollDate, new { @class = "control-label mb-2" })
+                        <div class="input-group date">
+                            @Html.EditorFor(model => model.PayrollDate, new { @placeholder = "PayRoleDate" })
+                            <span class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group hidden">
+                    <div class="col-sm-12">
+                        @Html.LabelFor(model => model.LastName, new { @class = "control-label mb-2" })
+                        @Html.TextBoxFor(m => m.LastName, new { @class = "form-control input-sm", placeholder = "Last Name" })
+                    </div>
+                </div>
+                <div class="form-group" hidden>
+                    <div class="col-sm-12">
+                        @Html.LabelFor(model => model.EOPDate, new { @class = "control-label mb-2" })
+                        <div class="input-group date">
+                            @Html.EditorFor(model => model.EOPDate, new { @placeholder = "End Of Period" })
+                            <span class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="control-label mb-0 mt-3" for="EmpType"> &nbsp; </div>
+                @*<input type="submit" id="Btn" class="btn btn-success p-3 px-5 mr-4" value="Batch" onclick="batch()" /><i id="spinner" class="fa fa-spinner fa-spin" style="display:none;"></i>*@
+                <input type="submit" id="Btn" class="btn btn-success p-3 px-5 mr-4 @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")" value="Batch" onclick="batch()" />
+                <i id="spinner" class="fa fa-spinner fa-spin" style="display:none; margin-left: 5px;"></i>
+                <button type="button" class="btn btn-success height px-5 hidden" onclick="javascript:return ShowDivPension()"><i class="fa fa-calculator"></i> Calculate</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+@if (currentMonthBatchDetail != null && Model.pybatchid == 0)
+{
+    currentMonthBatchDetailpybatchid = Convert.ToInt32(currentMonthBatchDetail["pybatchid"]);
+    <div class="panel panel-default">
+        <div class="panel-heading clearfix">
+            <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+                Current Month Processed Payroll
+            </h4>
+        </div>
+        <div class="panel-body">
+            <div id="processDetail" class="border">
+                <div class="panel panel-default">
+                    <ul class="list-group">
+                        <li class="list-group-item clearfix">
+                            <div class="pull-left m-left-sm">
+                                <span><b style="font-weight:bolder">Batch Id:- </b></span><label class="control-label">@currentMonthBatchDetail["pybatchid"]</label><br>
+                            </div>
+                            <div class="pull-right">
+                                <span><b style="font-weight:bolder">Process Started On:-</b></span>@currentMonthBatchDetail["insertDate"]<br>
+                            </div>
+                        </li>
+
+                        <li class="list-group-item clearfix">
+                            <div class="pull-left m-left-sm">
+                                <span><b style="font-weight:bolder">Start By:-</b></span><label class="control-label">@currentMonthBatchDetail["BatchCreatedBy"]</label>
+                            </div>
+                        </li>
+                        <li class="list-group-item clearfix">
+                            <div class="pull-left m-left-sm">
+                                <span><b style="font-weight:bolder">Status:- </b><label class="control-label"> Processed </label></span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@{
+    string runningBatchClass = Model.pybatchid != 0 ? "" : "hidden";
+}
+<div class="panel panel-default @runningBatchClass">
+    <div class="panel-heading clearfix">
+        <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+            Payroll Process
+            <ul class="tool-bar"></ul>
+        </h4>
+    </div>
+    <div class="panel-body">
+        @using (Html.BeginForm("Index", "   ", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+        {
+            @Html.HiddenFor(model => model.pybatchid)
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary("", new { @class = "text-danger" })
+
+            <div id="processDetail" class="border">
+                <div class="panel panel-default">
+                    <ul class="list-group">
+                        <li class="list-group-item clearfix">
+                            <div class="pull-left m-left-sm">
+                                @if (Model.pybatchid > 0)
+                                {
+                                    <span><b style="font-weight:bolder">Batch Id:- </b></span>@Html.DisplayFor(model => model.pybatchid, new { @class = "control-label" })<br>
+                                }
+                                else
+                                {
+                                    <span><b style="font-weight:bolder">Batch Id:- </b></span>
+                                }
+                                @*<span><b style="font-weight:bolder">Batch Id:- </b></span>@Html.DisplayFor(model => model.pybatchid, new { @class = "control-label" })<br>*@
+                            </div>
+                            <div class="pull-right">
+                                <span><b style="font-weight:bolder">Process Started On:-</b></span>@Html.FormatDate(Model.processstartedon)<br>
+                            </div>
+                        </li>
+
+                        <li class="list-group-item clearfix">
+                            <div class="pull-left m-left-sm">
+                                <span><b style="font-weight:bolder">Start By:-</b></span>@Html.DisplayFor(model => model.insertbyName, new { @class = "control-label" })
+                            </div>
+                        </li>
+                        <li class="list-group-item clearfix">
+                            <div class="pull-left m-left-sm">
+                                <span><b style="font-weight:bolder">Status:- </b></span>
+                                @if (Model != null)
+                                {
+                                    @Html.FormatProcess(Model.status)<br>
+                                }
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 id="tableHeadLine" class="headline" style="margin:0px;padding:0px;border:none;">
+            Payroll Process
+            <ul class="tool-bar"></ul>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <table id="tbl" class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Process</th>
+                    <th>Start On</th>
+                    <th>End On</th>
+                    <th>Searched</th>
+                    <th>Processed</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/autocomplete.js"></script>
+    <link href="~/Content/endless/css/jquery-ui.css" rel="stylesheet" />
+    <script nonce="@ViewBag.StyleNonce">
+    function batch() {
+      debugger
+      $('#spinner').show();
+      var data = new Array();
+      $('input[type="text"]').each(function () {
+        if ($(this).val() != "") {
+          var Values = $("label[for='" + $(this).attr('id') + "']").text() + "=" + $(this).val();
+          data.push(Values);
+        }
+      });
+
+      var value = $("#ddlEmpTypes option:selected").val();
+      if (value != '') {
+        var ddl = "Pensioner Type=" + $("#ddlEmpTypes option:selected").val();
+        data.push(ddl);
+      }
+
+      $.ajax({
+        url: "@Url.Action("INSERTBatchProcessInfoAjax", "PensionProcessHeaders")?Data=" + data.join("_R_"),
+        type: "GET",
+      }).done(function (result) {
+        debugger
+        location.reload();
+        $('#spinner').hide();
+      });
+    }
+    $(function () {
+      debugger;
+      var pybatchid = parseInt($("#pybatchid").val()) == 0 ?  @currentMonthBatchDetailpybatchid : $("#pybatchid").val()
+      if (pybatchid != 0)
+      {
+        $('input[type="text"]').each(function () {
+          $(this).attr("disabled", true);
+        });
+        //var pybatchid = $("#pybatchid").val();
+        if (parseInt($("#pybatchid").val()) != 0) {
+          $("#Btn").val("Batch:" + pybatchid + " is Active for Pension Process")
+          $('#Btn').attr('disabled', 'disabled');
+          $('input[type="text"]').each(function () {
+            $(this).attr('disabled', 'disabled');
+          });
+
+          $('#ddlEmpTypes').attr('disabled', 'disabled');
+        }
+        else {
+          $("#Btn").val("No Active Batch for Pension Process.. Click to start new Batch");
+          $("#Btn").removeClass("btn btn-success").addClass("btn btn-primary")
+        }
+        $.ajax({
+          url: "@Url.Action("DisplayAjax", "PensionProcessHeaders")?Pybatchid=" + pybatchid,
+          type: "GET",
+        }).done(function (result) {
+          var trHTML = '';
+          $('#tbl> tbody > tr').empty();
+          $.each(result, function (index, item) {
+            debugger
+            trHTML += '<tr><td>' + item.pybatchid + '</td><td>' + item.processname + '</td><td>' + item.processstartedon + '</td><td>' + item.processendedon + '</td><td>' + item.recordssearched + '</td><td>' + item.recordsprocessed + '</td><td>' + item.errormessage + '</td></tr>';
+          })
+          $('#tbl').append(trHTML);
+          debugger;
+        });
+      }
+      else {
+        $("#Btn").val("No Active Batch for Pension Process.. Click to start new Batch");
+        $("#Btn").removeClass("btn btn-success").addClass("btn btn-primary")
+      }
+    })
+    jQuery(document).ready(function ($) {
+      comboTree = $('#RegionNames').comboTree({
+        source: @Group,
+        isMultiple: true,
+        cascadeSelect: true,
+        collapse: false
+      });
+      //TimesheetDownloadPageOnLoad();
+    });
+    //function TimesheetDownloadPageOnLoad() {
+    //  var month = new Date().getMonth() + 1;
+    //  var year = new Date().getFullYear();
+    //  var selectedYear = parseInt($("#Year").val());
+    //  //if (year == selectedYear) {
+    //  //  $('#dlMonth option:gt(' + month + ')').prop('disabled', true);
+    //  //}
+    //  $("#dlMonth").val(month);
+    //  var date = new Date(selectedYear, month - 1, 01);
+    //  $("#PayrollDate").val("01/"+month+"/" + selectedYear);
+    //}
+
+    //function ChangeYear(ev) {
+    //  var selectedMonth = parseInt($("#dlMonth").val());
+    //  var selectedYear = parseInt($("#Year").val());
+
+    //  var date = new Date(selectedYear, selectedMonth, 01);
+    //  $("#PayrollDate").val("05/12/2023");
+    //}
+
+    //function ChangeMonth(ev) {
+    //  var selectedMonth = parseInt($("#dlMonth").val());
+    //  var selectedYear = parseInt($("#Year").val());
+
+    //  var date = new Date(selectedYear, selectedMonth, 01);
+    //  $("#PayrollDate").val("01/" + month + "/" + selectedYear);
+    //}
+
+
+
+
+
+    </script>
+}

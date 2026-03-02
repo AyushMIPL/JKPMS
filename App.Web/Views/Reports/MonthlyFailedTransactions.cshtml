@@ -1,0 +1,419 @@
+﻿@model JKPS.COMMON.DVOMasterEmployee
+@{
+    ViewBag.Title = "YearlyPensionSummary";
+    var Group = Html.Raw(Json.Encode(ViewBag.Group));
+}
+<style>
+    /* Hide the remove (x) icon */
+    .select2-selection__clear {
+        display: none;
+    }
+</style>
+
+<div class="panel panel-default">
+
+    @using (Html.BeginForm())
+    {
+        <div class="panel-body">
+            <div class="row pb-4">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <div class="col-sm-4">
+                            <label>District</label>
+                            @Html.TextBox("RegionNames", "", new { @class = "form-control", @autocomplete = "off", @placeholder = "Select Regions", @id = "RegionNames" })
+                        </div>
+
+                        <div class="col-sm-4">
+                            <label>Scheme</label>
+                            @Html.DropDownList("EmplCode", null, "---Select---", new { @class = "form-control select-sm", @id = "EmplCode" })
+                        </div>
+
+                        <div class="col-sm-2">
+                            <label>Gender</label>
+                            <div class="form-group h_select">
+                                @Html.DropDownList("Gender", null, "---Select---", new { @class = "form-control", @autocomplete = "off", @placeholder = "Select Gender", @id = "Gender" })
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <label>Age</label>
+                            @Html.TextBoxFor(m => m.AgeInYears, new { @class = "form-control", placeholder = "Age(In Years)", min = "0", step = "1", @id = "AgeInYears", @type = "text", @inputmode = "numeric", @pattern = "[0-9]*", @onkeypress = "return event.charCode >= 48 && event.charCode <= 57" })
+                        </div>
+
+                        <div class="col-sm-4">
+                            <label>Pay Period</label>
+                            <select class="form-control" id="PayPeriod" onchange="ShowTheMonthOrYear()">
+                                <option value="">Select Pay Period</option>
+                                @*<option value="ByFinancialYear">Financial Year</option>*@
+                                <option value="ByMonth">Date Range</option>
+                            </select>
+                        </div>
+
+                        <div id="FinancialYearDiv" class="hidden">
+                            <div class="col-md-4">
+                                <label>Years</label>
+                                <select class="form-control FinancialYearDropdownMonthlyPensionSummary" id="FinancialYearDropdown" onchange="SetFromAndToDateValues('ByFinancialYear')"></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Months</label>
+                                <select class="form-control FinancialMonthDropdownMonthlyPensionSummary" id="FinancialMonthDropdown" onchange="SetFromAndToDateValues('ByFinancialYearMonth')">
+                                    <option value="-1">All</option>
+                                    <option value="0">January</option>
+                                    <option value="1">February</option>
+                                    <option value="2">March</option>
+                                    <option value="3">April</option>
+                                    <option value="4">May</option>
+                                    <option value="5">June</option>
+                                    <option value="6">July</option>
+                                    <option value="7">August</option>
+                                    <option value="8">September</option>
+                                    <option value="9">October</option>
+                                    <option value="10">November</option>
+                                    <option value="11">December</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="formToDateDiv" class="hidden">
+                            <div class="col-sm-4">
+                                <label>Date From</label>
+                                <div>
+                                    <input type="date" id="From" class="form-control" placeholder="select date" onchange="validateDateRange()">
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <label>To</label>
+                                <div>
+                                    <input type="date" id="to" class="form-control" placeholder="select date" onchange="validateDateRange()">
+                                </div>
+                            </div>
+                        </div>
+
+
+                        @*<div class="col-sm-3">
+                              <label>Beneficiary</label>
+                              @Html.DropDownList("EmployeeId", null, "---Select---", new { @class = "form-control select-sm", @id = "EmployeeId", @multiple = "multiple" })
+                            </div>*@
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        @*<div class="col-sm-3">
+                              <label>To</label>
+                              <div class="input-group date" id="validateTo">
+                                @Html.TextBox("SelectTo ", "", new { @class = "form-control", @placeholder = "Select End Date", @id = "to" })
+                                <span class="input-group-addon">
+                                  <i class="fa fa-calendar"></i>
+                                </span>
+                              </div>
+                            </div>*@
+
+                        <div class="col-sm-2">
+                            <div class="control-label mb-2 mt-3" for="Name"> &nbsp; </div>
+                            <button type="button" class="btn btn-success px-5 height btn_loadingMonthlyPensionSummary" title="Please Wait While We Process Your Request" id="btn_Yearly_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                            <button type="button" class="btn btn-success height px-5" id="Idbtnyearly" ><i class="fa fa-search"></i> Search </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline headlineMonthlyPensionSummary">
+            Failure Payment Summary
+
+            <ul class="tool-bar">
+            </ul>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="alert alert-warning alert-warningMonthlyPensionSummary">
+                    <h4 class="mb-0"> There is no Record Found</h4>
+                </div>
+                <iframe id="reportData" class="reportDataAction1MonthlyPensionSummary"></iframe>
+            </div>
+        </div>
+    </div>
+
+</div>@section Scripts {
+    <script nonce="@ViewBag.StyleNonce">
+
+        document.getElementById("Idbtnyearly").addEventListener("click", ShowReportData);
+
+    $(function () {
+      debugger
+      $(".alert-warning").hide();
+    });
+
+    jQuery(document).ready(function ($) {
+            comboTree = $('#RegionNames').comboTree({
+                source: @Group,
+                isMultiple: true,
+                cascadeSelect: true,
+                collapse: false
+            });
+
+        // set min and max date restrictions to datepickers as per financial year
+        $('#From').attr('min', $("#hdn_FinancialYearStartDate").val());
+        $('#to').attr('min', $("#hdn_FinancialYearStartDate").val());
+
+        $('#From').attr('max', $("#hdn_FinancialYearEndDate").val());
+        $('#to').attr('max', $("#hdn_FinancialYearEndDate").val());
+
+        $('#From').val($("#hdn_FinancialYearStartDate").val());
+        $('#to').val($("#hdn_FinancialYearEndDate").val());
+
+      BindFinancialYear();
+        $("#PayPeriod").val("ByMonth").trigger('change');
+      ShowTheMonthOrYear();
+    });
+
+        $('#From').keydown(function (event) {
+            debugger
+            event.preventDefault(); // Prevent any key press
+        });
+
+        $('#to').keydown(function (event) {
+            debugger
+            event.preventDefault(); // Prevent any key press
+        });
+
+      function BindFinancialYear() {
+        // Get Current Month
+        var currentMonth = new Date().getMonth();
+        // Get the current year
+        var currentYear = new Date().getFullYear();
+        // Set start financial years
+        var financialYearCount = currentYear - 2022;
+        if (currentMonth < 3) {
+          currentYear = currentYear - 1;
+        }
+        // Create a dropdown element
+        var dropdown = $('#FinancialYearDropdown');
+        // Populate the dropdown with the last 10 years
+        for (var i = 0; i < financialYearCount; i++) {
+          var year = currentYear - i;
+          dropdown.append($('<option>', { value: year + '_' + (year + 1), text: year + '-' + (year + 1) }));
+        }
+      }
+
+      function ShowTheMonthOrYear() {
+        var selectedPeriod = $("#PayPeriod").val();
+        if (selectedPeriod == "ByFinancialYear") {
+          $("#formToDateDiv").addClass("hidden");
+          $("#FinancialYearDiv").removeClass("hidden");
+        } else if (selectedPeriod == "ByMonth") {
+          $("#FinancialYearDiv").addClass("hidden");
+          $("#formToDateDiv").removeClass("hidden");
+        } else {
+
+        }
+        SetFromAndToDateValues(selectedPeriod);
+      }
+
+      function SetFromAndToDateValues(selectedPeriod) {
+        if (selectedPeriod == "ByFinancialYear" || selectedPeriod == "ByFinancialYearMonth") {
+          var finacialYear = $("#FinancialYearDropdown").val().split('_');
+          // Create a new Date object
+          var specificDate = new Date();
+          // Set the year to 2020
+          specificDate.setFullYear(finacialYear[0]);
+          // Set the month to 3 (April, zero-based index)
+          //specificDate.setMonth(3);
+          var selectedMonth = $("#FinancialMonthDropdown").val();
+
+          if (selectedPeriod == "ByFinancialYearMonth" && selectedMonth != "-1") {
+            if (selectedMonth < 3) {
+              specificDate.setFullYear(finacialYear[1]);
+            }
+            specificDate.setMonth(selectedMonth);
+          } else {
+            specificDate.setMonth(3);
+          }
+          // Set the date to 1
+          specificDate.setDate(1);
+          // Format the date as a string (optional)
+          //var formattedDate = specificDate.toDateString();
+          var formattedFirstDay = $.datepicker.formatDate('yy-mm-dd', specificDate);
+          $('#From').val(formattedFirstDay);
+          // Create a new Date object
+          var specificDateL = new Date();
+          // Set the year to 2020
+          specificDateL.setFullYear(finacialYear[1]);
+          //// Set the month to 2 (March, zero-based index)
+          //specificDateL.setMonth(2);
+          //// Set the date to 31
+          //specificDateL.setDate(31);
+          if (selectedPeriod == "ByFinancialYearMonth" && selectedMonth != "-1") {
+            if (selectedMonth > 2) {
+              specificDateL.setFullYear(finacialYear[0]);
+            }
+            specificDateL.setMonth(selectedMonth);
+          } else {
+            specificDateL.setMonth(2);
+          }
+
+          var lastDay = new Date(specificDateL.getFullYear(), specificDateL.getMonth() + 1, 0).getDate();
+          // Set the date to 31
+          specificDateL.setDate(lastDay);
+          // Format the date as a string (optional)
+          //var formattedDateL = specificDateL.toDateString();
+          var formattedLastDay = $.datepicker.formatDate('yy-mm-dd', specificDateL);
+          $('#to').val(formattedLastDay);
+
+
+        } else if (selectedPeriod == "ByMonth") {
+          // Get the current date
+          var currentDate = new Date();
+          // Get the first day of the current month
+          var firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+          // Get the last day of the current month
+          var lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+          // Format the dates if needed
+          var formattedFirstDay = $.datepicker.formatDate('yy-mm-dd', firstDay);
+            var formattedLastDay = $.datepicker.formatDate('yy-mm-dd', lastDay);
+
+
+          //$('#From').val(formattedFirstDay);
+          //$('#to').val(formattedLastDay);
+
+        } else {
+          // Get the current date
+          var currentDate = new Date();
+          // Get the first day of the current month
+          var firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+          // Get the last day of the current month
+            var lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+          // Format the dates if needed
+          //var formattedFirstDay = $.datepicker.formatDate('yy-mm-dd', firstDay);
+          //  var formattedLastDay = $.datepicker.formatDate('yy-mm-dd', lastDay);
+
+            var formattedFirstDay = $("#hdn_FinancialYearStartDate").val();
+            var formattedLastDay = $("#hdn_FinancialYearEndDate").val();
+          $('#From').val(formattedFirstDay);
+          $('#to').val(formattedLastDay);
+        }
+
+      }
+
+      function ShowReportData(evt) {
+        debugger;
+        $(evt).find("i.fa-spinner").show();
+      var Date1 = $("#From").val();
+      var Date2 = $("#to").val();
+      var SchemeType = $("#EmplCode").val();
+      var Gender = $("#Gender").val();
+      var AgeInYears = $("#AgeInYears").val();
+        var BeneficiaryId = $("#EmployeeId").val();
+        var RegionNames = $("#RegionNames").val();
+        //var FinacialYear = $("#FinancialYearDropdown").val();
+          var FinacialYear = $("#hdn_FinancialYear").val();
+      var BeneficiariesId = $("#EmployeeId option:selected").map(function (ind, _el) {
+        debugger
+          return $(_el).val();
+          $(evt).find("i.fa-spinner").hide();
+      });
+
+          $("#btn_Yearly_loading").show();
+          $("#Idbtnyearly").hide();
+      $.ajax({
+        url: "@Url.Action("PensionByYearAjax", "Reports")?emplrId=" + SchemeType + "&empl_code=" + $.makeArray(BeneficiariesId) + "&date1=" + Date1 + "&date2=" + Date2 + "&gender=" + Gender + "&ageInYears=" + AgeInYears + "&regionNames=" + RegionNames + "&finacialYear=" + FinacialYear,
+        type: "GET",
+      }).done(function (result) {
+          $("#Idbtnyearly").show();
+          $("#btn_Yearly_loading").hide();
+        var actionRes = result;
+        $(evt).find("i.fa-spinner").hide();
+        if (actionRes == "1") {
+          $('#reportData').show();
+          $(".alert-warning").hide();
+            $('#reportData').attr('src', '/ReportForms/ContributionByEmployer.aspx');
+            $(evt).find("i.fa-spinner").hide();
+          return false;
+        }
+        else {
+          $(".alert-warning").show();
+          $('#reportData').hide();
+            toasterInfoMessage("Result not found on this search criteria.");
+            $(evt).find("i.fa-spinner").hide();
+        }
+      });
+    }
+    $("#EmplCode").on('change', function () {
+      var SchemeType = $("#EmplCode option:selected").val();
+      var data = $("#Gender");
+      data.empty();
+      if (SchemeType != null && SchemeType != undefined && SchemeType != "") {
+        data.append($("<option value='' selected>---Select---</option>"));
+        data.append($("<option></option>").attr("value", "Male").text("Male"));
+        data.append($("<option></option>").attr("value", "Female").text("Female"));
+        data.append($("<option></option>").attr("value", "Transgender").text("Transgender"));
+        $("#Gender").val("");
+      }
+    });
+    @*$("#Gender").on('change', function () {
+      debugger
+      $('#select2-EmployeeId-container').text('---Select---');
+      var seletedType = $("#EmplCode option:selected").text();
+      var parts = seletedType.split(" | ");
+      var BeneficiaryType = parts[0].trim();
+      var Gender = $("#Gender").val();
+      $.ajax({
+        url: "@Url.Action("PensionerSearchAjax", "Reports")?seletedType=" + BeneficiaryType + "&Gender=" + Gender,
+        success: function (res) {
+          debugger
+          var data = $("#EmployeeId");
+          data.empty();
+          $.each(res, function (index, item) {
+            debugger
+            data.append($("<option></option>").attr("value", item.Key).text(item.Value));
+          });
+          $("#EmployeeId").multiselect("destroy");
+          $("#EmployeeId").multiselect({
+            includeSelectAllOption: true,
+            buttonWidth: '263px'
+          });
+        },
+        error: function (error) {
+          // Handle any errors here
+        }
+      });
+    });*@
+      var currentDate = new Date();
+      var firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      var lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+      // Format the dates if needed
+      var formattedFirstDay = $.datepicker.formatDate('yy-mm-dd', firstDay);
+      var formattedLastDay = $.datepicker.formatDate('yy-mm-dd', lastDay);
+
+      //var lastValidFromDate = formattedFirstDay;
+        //var lastValidToDate = formattedLastDay;
+
+        var lastValidFromDate = $("#hdn_FinancialYearStartDate").val();
+        var lastValidToDate = $("#hdn_FinancialYearEndDate").val();
+
+      function validateDateRange() {
+          debugger
+          var lastValidFromDate = $("#hdn_FinancialYearStartDate").val();
+          var lastValidToDate = $("#hdn_FinancialYearEndDate").val();
+
+        var fromDateInput = $("#From").val();
+        var toDateInput = $("#to").val();
+
+        if (fromDateInput > toDateInput) {
+          toasterErrorMessage("From Date should be less than or equal to To Date");
+          $("#From").val(lastValidFromDate);
+          $("#to").val(lastValidToDate);
+        } else {
+          lastValidFromDate = fromDateInput;
+          lastValidToDate = toDateInput;
+        }
+      }
+    </script>
+}

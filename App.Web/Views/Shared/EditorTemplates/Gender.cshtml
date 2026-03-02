@@ -1,0 +1,34 @@
+﻿@model string
+
+@{
+  bool isMale=false;
+  if (Model != null)
+  {
+    isMale = (Model ?? "M") == "M";
+  }
+  else
+  {
+    isMale = true;
+  }
+}
+ 
+
+
+<div class=" row radio">
+  <div class="col-md-3">@Html.RadioButton("", 'M', @isMale) Male</div>
+  <div class="col-md-2">@Html.RadioButton("", 'F', !@isMale) Female</div>
+</div>
+@*@using Microsoft.Owin.Extensions
+
+@{
+  var type = Nullable.GetUnderlyingType(ViewData.ModelMetadata.ModelType) ?? ViewData.ModelMetadata.ModelType;
+
+  @(typeof(Enum).IsAssignableFrom(type) ? Html.EnumDropDownListFor(x => x, new { @class = "form-control select-sm" }) : Html.TextBoxFor(x => x))
+}*@
+
+@*<div class=" row radio">
+  <div class="col-md-1"><input type="radio" name="Gender" checked="checked" value="Yes" />Male</div>
+  <div class="col-md-2"><input type="radio" name="Gender" checked="1" value="No" />Female</div>
+</div>*@
+
+

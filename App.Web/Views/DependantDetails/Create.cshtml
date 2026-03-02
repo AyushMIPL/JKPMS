@@ -1,0 +1,160 @@
+﻿@model App.Data.Entities.MasterDependantDetails
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create</h2>
+
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+
+  <div class="panel panel-default">
+    <form class="form-horizontal no-margin form-border" id="formWizard1">
+      <div class="panel-heading">
+        Dependants Details
+      </div>
+      <div class="panel-tab">
+        <ul class="wizard-steps wizard-demo" id="wizardDemo1">
+          <li class="">
+            @Html.ActionLink("Contributor Personal Details", "Create", "ContributorPersonalDetails")
+            @*<a href="#wizardContent1" data-toggle="tab">Contributor Personal Details</a>*@
+          </li>
+          <li class="">
+            @Html.ActionLink("Marriage Details", "Create", "MarriageDetails")
+            @*<a href="#wizardContent2" data-toggle="tab">Marriage Details</a>*@
+          </li>
+          <li class="active">
+            @Html.ActionLink("Dependants Details", "Create", "DependantDetails")
+            @*<a href="#wizardContent3" data-toggle="tab">Dependants Details</a>*@
+          </li>
+          <li>
+            @Html.ActionLink("Job Details", "Create", "JobDetails")
+            @*<a href="#wizardContent4" data-toggle="tab">Job Details</a>*@
+          </li>
+        </ul>
+      </div>
+
+      <div class="panel-body">
+        <div class="tab-content">
+          <div class="tab-pane fade" id="wizardContent1">
+
+          </div>
+          <div class="tab-pane fade padding-md" id="wizardContent2">
+          </div>
+          <div class="tab-pane fade active in" id="wizardContent3">
+            <div class="form-horizontal">
+              <h4>Dependant Details</h4>
+              <hr />
+              @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+              <div class="form-group">
+                @Html.LabelFor(model => model.PersonId, htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.EditorFor(model => model.PersonId, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.PersonId, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.FirstName, htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.EditorFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.MidName, htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.EditorFor(model => model.MidName, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.MidName, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.LastName, htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.Gender, htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.EditorFor(model => model.Gender, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.Gender, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.DateOfBirth, htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.EditorFor(model => model.DateOfBirth, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.DateOfBirth, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.RelationshipID, "RelationshipID", htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.DropDownList("RelationshipID", null, htmlAttributes: new { @class = "form-control" })
+                  @Html.ValidationMessageFor(model => model.RelationshipID, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.TerminationDate, htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  @Html.EditorFor(model => model.TerminationDate, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.TerminationDate, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.IsActive, htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-10">
+                  <div class="checkbox">
+                    @Html.EditorFor(model => model.IsActive)
+                    @Html.ValidationMessageFor(model => model.IsActive, "", new { @class = "text-danger" })
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                  <input type="submit" value="Create" class="btn btn-success" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade padding-md" id="wizardContent4">
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer clearfix">
+        <div class="pull-left">
+          <button class="btn btn-success btn-sm" id="prevStep1">Previous</button>
+          <button type="submit" class="btn btn-sm btn-success" id="nextStep1">Next</button>
+        </div>
+
+        <div class="pull-right" style="width:30%">
+          <div class="progress progress-striped active m-top-sm m-bottom-none">
+            <div class="progress-bar progress-bar-success" id="wizardProgress" style="width: 75%;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

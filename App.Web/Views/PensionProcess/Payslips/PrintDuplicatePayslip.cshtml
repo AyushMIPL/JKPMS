@@ -1,0 +1,151 @@
+﻿@model App.Data.ViewModels.GeneratePensionProcessModel
+@{
+  ViewBag.Title = "PrintDuplicatePayslip";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="panel panel-default">
+
+  <div class="panel-body pt-2">
+    @using (Html.BeginForm("PrintDuplicatePayslip", "PensionProcess", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" , id= "IdPrintDuplicatePayslip" }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+      <div class="">
+        <div class="row">
+          <div class="col-sm-3 mb-3">
+            @Html.LabelFor(model => model.PayDate, "Pay Date *", new { @class = "control-label mb-2" })
+            <div class="input-group date">
+              @Html.EditorFor(model => model.PayDate, new { @class = "form-control input-sm" })
+              <span class="input-group-addon">
+                <i class="fa fa-calendar"></i>
+              </span>
+            </div>
+          </div>
+          <div class="col-sm-3 mb-3">
+            @Html.LabelFor(model => model.PayDateTo, " To ", new { @class = "control-label mb-2" })
+            <div class="input-group date">
+              @Html.EditorFor(model => model.PayDateTo, new { @class = "form-control input-sm" })
+              <span class="input-group-addon">
+                <i class="fa fa-calendar"></i>
+              </span>
+            </div>
+          </div>
+          <div class="col-sm-3 mb-3">
+            @Html.LabelFor(model => model.PayrollCashAccount, new { @class = " control-label mb-2" })
+            @Html.DropDownListFor(model => model.PayrollCashAccount, ViewBag.accounttype as SelectList, new { @class = "form-control input-sm" })
+          </div>
+          <div class="col-sm-3 mb-3">
+            @Html.LabelFor(model => model.EmployeeType, "Scheme Type *", new { @class = "control-label mb-2" })
+            @Html.DropDownListFor(model => model.EmployeeType, ViewBag.EmployeeType as SelectList, new { @class = "form-control input-sm" })
+          </div>
+          <div class="col-sm-3 mb-3">
+            @Html.LabelFor(model => model.Department, "Department *", new { id = "Department", @class = "control-label mb-2" })
+            @Html.DropDownListFor(model => model.Department, ViewBag.department as SelectList, new { @class = "form-control input-sm" })
+          </div>
+          <div class="col-sm-3 mb-3">
+            @Html.LabelFor(model => model.EmployeeId, "Beneficiary  ", new { id = "Department", @class = "control-label mb-2" })
+            @Html.DropDownListFor(model => model.EmployeeId, ViewBag.EmployeeId as SelectList, "---Select---", new { @class = "form-control input-sm" })
+          </div>
+          <div class="col-sm-3 mb-3">
+              <div class="control-label mb-2 mt-3" for="Name"> &nbsp; </div>
+              <button type="button" class="btn btn-success px-5 height" style="display: none;" title="Please Wait While We Process Your Request" id="btn_PrintDuplicate_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+              <button type="submit" id="Btn" class="btn btn-success height px-5"><i class="fa fa-print"></i> Print Payslip </button>
+              @*<input type="submit" id="Btn" class="btn btn-success" value="Print Payslip" />*@
+          </div>
+        </div>
+        @*<div class="col-sm-2"> </div>*@
+      </div>
+    }
+  </div>
+</div>
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Print Duplicate Payslip
+      @*<ul class="tool-bar">
+        </ul>*@
+    </h4>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      @*<div class="col-sm-2">
+        </div>*@
+      <div class="col-sm-12">
+        <div class="alert alert-warning" style="display:none;">
+          <h4 class="mb-0"> There is no Record Found</h4>
+        </div>
+        @*<iframe id="reportData" style="border: 0px;height:700px;width:100%;"></iframe>*@
+        <iframe id="RptIframe" width="100%" height="500" frameborder="0"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+@section scripts{
+    <script nonce="@ViewBag.StyleNonce">
+    debugger
+      $("#Department").on('change', function () {
+
+      $("#EmployeeId").select2("val", "");
+      $("#EmployeeId").empty();
+      $('#EmployeeId').append($('<option/>').attr("value", "").text("---Select---"));
+      if ($(this).val() != "") {
+          var eid = $(this).val();
+          //$('#btn_PrintDuplicate_loading').show();
+          //$('#Btn').hide();
+        $.ajax({
+          url: "@Url.Action("GetSegmentsEmployeeAjax", "PensionProcess")?EmplrCode=" + eid,
+          type: "GET",
+          async: true,
+        }).done(function (result) {
+            //$('#Btn').show();
+            //$('#btn_PrintDuplicate_loading').hide();
+          $.each(result, function (i, pensioner) {
+            $('#EmployeeId').append($('<option/>').attr("value", pensioner.Id).text(pensioner.name));
+          });
+        })
+      }
+    });
+    $(document).ready(function () {
+      $(".alert-warning").hide();
+      if ('@ViewBag.RptLoad' == 'rptPaySlipsA4Duplicate.rpt') {
+        document.getElementById('RptIframe').src = "/ReportForms/ContributionByEmployer.aspx";
+      } else {
+        $(".alert-warning").show();
+      }
+    });
+
+
+    /// *** Code By Himanshu Rajput *** ////
+
+
+    $(document).ready(function () {
+      $('form').submit(function () {
+          $('#Btn').hide();
+          $('#btn_PrintDuplicate_loading').show();
+          var form = $("#IdPrintDuplicatePayslip");
+          if (!form.valid()) {
+              $('#Btn').show();
+              $('#btn_PrintDuplicate_loading').hide();
+              return false;
+          }
+      });
+        var error = '@TempData["error"]';
+        if (error && error.length > 0) {
+            $('#Btn').show();
+            $('#btn_PrintDuplicate_loading').hide();
+        }
+        $('#btn_PrintDuplicate_loading').hide();
+    });
+
+
+
+      //function PrintDuplicatePayslip() {
+      //    debugger;
+      //    $('#spinner').show();
+      //    $('#Btn').prop('disabled', true);
+      //    return true;
+      //}
+
+
+    </script>
+}

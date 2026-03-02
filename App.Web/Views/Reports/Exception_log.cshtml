@@ -1,0 +1,276 @@
+﻿@model JKPS.COMMON.DVOMasterEmployee
+@using JKPS.COMMON
+@{
+    ViewBag.Title = "Exception_log";
+}
+<style>
+    table.dataTable thead th, table.dataTable tfoot th, table.dataTable tbody td {
+        text-align: left !important;
+    }
+</style>
+
+<div class="panel panel-default">
+    @using (Html.BeginForm())
+    {
+        <div class="panel-body">
+            <div class="row pb-4">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <div id="formToDateDiv">
+                            <div class="col-sm-4">
+                                <label>From Date</label>
+                                <div>
+                                    <input type="text" id="FromDate" class="form-control" value="@ViewBag.FromDate" placeholder="select date">
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <label>To Date</label>
+                                <div>
+                                    <input type="text" id="toDate" value="@ViewBag.ToDate" class="form-control" placeholder="select date">
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="control-label mb-2 mt-3" for="Name"> &nbsp; </div>
+                                <button type="button" class="btn btn-success px-5 height display-none" title="Please Wait While We Process Your Request" id="btn_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                                <button type="button" id="btnsubmit" class="btn btn-success height px-5"><i class="fa fa-search"></i> Search </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    }
+</div>
+
+
+<div class="panel panel-default">
+    <div class="row">
+
+        <div class="col-md-4"><h4>Exception Summary</h4></div>
+
+        <div class="col-md-8">
+            <button type="button" class="btn btn-success px-5 height btn_PaymentStatus_loading_PaymentHistoty" title="Please Wait While We Process Your Request" id="btn_downloadExcelExceptionlList_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+            <button type="button" class="btn btn-success float-right-element" id="IddownloadExcelExceptionlList">Download Excel</button>
+        </div>
+
+
+
+
+    </div>
+
+    <div class="panel-body">
+      <div class="table-responsive">
+        <table class="table dataTable" id="tbExceptionlList">
+          <thead>
+            <tr>
+              <th>Error Message</th>
+              <th>Date</th>
+              <th>Error Location</th>
+              <th>User Name</th>
+              <th>Machine Info</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+</div>
+
+<div class="custom-popup confirmClass PopUpShowLargeMessages-ExceptionLog p-0" data-keyboard="false" data-backdrop="static" id="PopUpShowLargeMessages">
+    <div class="">
+        <!-- Update Payment Section -->
+        <h3 class="m-top-none py-3 text-white MHeaders-ExceptionLog" id="MHeaders"></h3>
+        <!-- Header Section -->
+        <div class="row MessageTexts-ExceptionLog">
+            <label id="MessageTexts"></label>
+        </div>
+    </div>
+</div>
+
+
+<div id="DivMessageInfo" class="hidden"></div>
+
+@section Scripts {
+    @*<script src="~/Content/endless/js/jquery.dataTables.min.js"></script>*@
+    <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+    <script src="~/Content/endless/LatestJS/jquery.dataTables.min.js"></script>
+
+    <script nonce="@ViewBag.StyleNonce">
+     
+        document.getElementById("btnsubmit").addEventListener("click", ShowExceptionList);
+        document.getElementById("IddownloadExcelExceptionlList").addEventListener("click", downloadExcelExceptionlList);
+
+        ShowExceptionList();
+
+        var ShowExceptionListIds = [];
+
+    function ShowExceptionList() {
+      debugger
+       var Date1 = $("#FromDate").val();
+       var Date2 = $("#toDate").val();
+        var sName = $('#tbExceptionlList').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "bAutoWidth": true,
+            "sAjaxSource": "@Url.Action("Exception_logAjax", "Reports")?date1=" + Date1 + "&date2=" + Date2,
+            "fnDrawCallback": function (setting) {
+                debugger;
+
+                ShowExceptionListIds.forEach(function (item, index) {
+                    debugger
+                    if (document.getElementById("OpenMessagePopup_ExceptionLogId_" + item) != null &&
+                        document.getElementById("OpenMessagePopup_ExceptionLogId_" + item) != undefined) {
+                        document.getElementById("OpenMessagePopup_ExceptionLogId_" + item).addEventListener("click", function () {
+                            OpenMessagePopup('Error Location', item);
+                        });
+                    }
+                });
+
+                ShowExceptionListIds = [];
+            },
+        "aoColumns": [
+          { "sName": "ErrorMessage" },
+          { "sName": "DateOccurred" },
+            {
+              "sname": "StackTrace",
+                "bsearchable": false,
+                "bsortable": false,
+              "render": function (data, type, row) {
+                debugger;
+                var errorMessage = row[2];
+                    var firstTenCharacters = errorMessage.substring(0, 80);
+                    if (errorMessage.length > 10) {
+                        // Get the first 10 characters
+                        var id = generateUniqueNumber();
+                        var str = "<input id='" + id + "' value='" + errorMessage +"'></input>"
+                        $("#DivMessageInfo").append(str);
+                        ShowExceptionListIds.push(id);
+                        return ('<a href="#" class="OpenMessagePopup-ExceptionLog" id="OpenMessagePopup_ExceptionLogId_' + id + '" aria-hidden="true">' + firstTenCharacters + '...</a>');
+                    } else {
+                        return errorMessage;
+                    }
+                }
+          },
+
+          { "sName": "UserName" },
+          { "sName": "MachineName" }
+        ]
+      });
+        }
+
+        // Generate a unique number
+        function generateUniqueNumber() {
+            // Get current timestamp
+            var timestamp = new Date().getTime();
+
+            // Generate a random number
+            var randomNumber = Math.floor(Math.random() * 1000000);
+
+            // Combine timestamp and random number to create a unique number
+            var uniqueNumber = timestamp + randomNumber;
+
+            return uniqueNumber;
+        }
+
+        function OpenMessagePopup(heading, messageId) {
+            debugger;
+            $("#MHeaders").html(heading + '<button type="button" class="close close-MHeaders-ExceptionLog" id="close_MHeaders_ExceptionLog_Id" title="Close" aria-label="Close" ><span aria-hidden="true">&times;</span>');
+            $("#MessageTexts").html($("#" + messageId).val());
+            $("#PopUpShowLargeMessages").popup('show');
+
+            document.getElementById("close_MHeaders_ExceptionLog_Id").addEventListener("click", function () {
+                ClosePopupWindow();
+            });
+        }
+
+        function ClosePopupWindow() {
+            $("#PopUpShowLargeMessages").popup("hide");
+        }
+
+
+        //function downloadExcelExceptionlList() {
+        //    let table = $('#tbExceptionlList');
+        //    TableToExcel.convert(table[0], {
+        //        name: `PaymentCountExcel.xlsx`,
+        //        sheet: {
+        //            name: 'Usermanagement'
+        //        }
+        //    });
+        //}
+
+        $('#FromDate, #toDate').datepicker({
+            format: 'dd/mm/yyyy',
+            autoclose: true,
+            clearBtn: true,
+            enableOnReadonly: false // For disabling date picker
+        });
+        $('#FromDate').datepicker()
+          .on('changeDate', function (e) {
+            validateDateRange();
+          });
+
+        $('#toDate').datepicker()
+          .on('changeDate', function (e) {
+            validateDateRange();
+          });
+
+        function validateDateRange() {
+          var fromDate = $('#FromDate').datepicker('getDate');
+          var toDate = $('#toDate').datepicker('getDate');
+
+          if (fromDate && toDate && fromDate >toDate) {
+            toasterErrorMessage('To Date should be less than From Date.');
+            $('#toDate').val(''); 
+          }
+        }
+        function downloadExcelExceptionlList(evt) {
+
+          $(evt.target).find("i.fa-spinner").show();
+            $('#btn_downloadExcelExceptionlList_loading').show();
+            $('#IddownloadExcelExceptionlList').hide();
+             $.ajax({
+                 type: "POST",
+                 data: {
+                     date1: $("#FromDate").val(),
+                     date2: $("#toDate").val(),
+                     isDownload: true
+                 },
+                 url: '@Url.Action("Exception_logAjax", "Reports")',
+                 cache: false,
+                 success: function (result) {
+                     debugger;
+                     $('#IddownloadExcelExceptionlList').show();
+                     $('#btn_downloadExcelExceptionlList_loading').hide();
+                     if (result != null) {
+                         var bytes = new Uint8Array(result.FileContents);
+                         var blob = new Blob([bytes], { type: '@System.Net.Mime.MediaTypeNames.Application.Octet' });
+                         if (window.navigator.msSaveOrOpenBlob) {
+                             // IE11
+                             window.navigator.msSaveOrOpenBlob(blob, result.FileDownloadName);
+                         } else {
+                             // Google chome, Firefox, ....
+                             var link = document.createElement('a');
+                             link.href = window.URL.createObjectURL(blob);
+                             link.download = result.FileDownloadName;
+                             link.click();
+                             $(evt.target).find("i.fa-spinner").hide();
+                         }
+                     }
+                     else {
+
+                     }
+                 },
+                 error: function (xhr, status, error) {
+                 }
+             });
+         }
+
+
+
+
+    </script>
+}

@@ -1,0 +1,79 @@
+﻿@model App.Data.Entities.MasterEmployerType
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+            Employer Type Details
+
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-sm-8">
+                <dl class="dl-horizontal">
+                    <dt>
+                        @Html.LabelFor(model => model.Name)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Name)
+                    </dd>
+
+                    <dt>
+                        @Html.LabelFor(model => model.RetirementAge)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.RetirementAge)
+                    </dd>
+                    <dt>
+                        @Html.LabelFor(model => model.RetirementAgeAfter2004)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.RetirementAgeAfter2004)
+                    </dd>
+
+                    <dt>
+                        @Html.LabelFor(model => model.MinimumHiringAge)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.MinimumHiringAge)
+                    </dd>
+                    <dt>
+                        @Html.LabelFor(model => model.DependantTerminationAge)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.DependantTerminationAge)
+                    </dd>
+                    <dt>
+                        @Html.LabelFor(model => model.IsActive)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.IsActive)
+                    </dd>
+
+                </dl>
+            </div>
+
+        </div>
+    </div>
+    <div class="panel-footer">
+        <a href="/MasterEmployerTypes/Edit/@ViewBag.EncryptedId" class="btn btn-info"><i class="fa fa-pencil"> </i> Edit</a>
+        <a href="/MasterEmployerTypes/Index" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+
+    </div>
+</div>
+<style>
+    .dl-horizontal dt {
+        width: 170px;
+    }
+</style>
+

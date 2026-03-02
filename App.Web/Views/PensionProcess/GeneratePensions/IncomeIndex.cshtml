@@ -1,0 +1,260 @@
+﻿@model List<JKPS.COMMON.DVOPayrollstypayid>
+
+@{
+  Layout = "~/Views/Shared/_LayoutUpdatePayroll.cshtml";
+}
+@section profileUpdatePayroll
+{
+  @Html.Hidden("PensionerID")
+
+  <div class="panel panel-default">
+    <div class="panel-heading clearfix">
+      <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+        Income Details:@string.Format("{0} ({1})", ViewBag.Name, ViewBag.PensionerID)
+        <ul class="tool-bar">
+          <li>
+          <li><a href="javascript:AddIncome();" data-toggle="tooltip" data-placement="bottom" title="Add Income" data-original-title="Add Income"><i class="fa fa-plus"></i></a></li>
+
+        </ul>
+      </h4>
+    </div>
+    <div class="panel-body">
+      @using (Html.BeginForm("IncomeIndex", "PensionProcess", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "form1" }))
+      {@Html.Hidden("CId")
+        <table class="table dataTable" id="tbl">
+          <thead>
+            <tr>
+              <th style="display:none"></th>
+              <th>Income Code</th>
+              <th>Rate</th>
+              <th>Number</th>
+              <th>Amount</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (Model != null)
+            {
+              for (int i = 0; i < Model.ToArray().Count(); i++)
+              {
+                var btnSave = "btnSave" + i;
+                var btmEdit = "btnEdit" + i;
+
+                <tr>
+                  <td style="display:none">
+                    @Html.HiddenFor(m => Model[i].acct_no)
+                    @Html.HiddenFor(m => Model[i].acctAccountType)
+                    @Html.HiddenFor(m => Model[i].acctAccountTypeId)
+                    @Html.HiddenFor(m => Model[i].acctKeyvalue)
+                    @Html.HiddenFor(m => Model[i].add_code)
+                    @Html.HiddenFor(m => Model[i].Department)
+                    @Html.HiddenFor(m => Model[i].description_MasterIncCodes)
+                    @Html.HiddenFor(m => Model[i].empl_code)
+                    @Html.HiddenFor(m => Model[i].error)
+                    @Html.HiddenFor(m => Model[i].hi_inc_amt)
+                    @Html.HiddenFor(m => Model[i].hi_inc_amt_null)
+                    @Html.HiddenFor(m => Model[i].hours)
+                    @Html.HiddenFor(m => Model[i].inc_type)
+                    @Html.HiddenFor(m => Model[i].lo_inc_amt)
+                    @Html.HiddenFor(m => Model[i].lo_inc_amt_null)
+                    @Html.HiddenFor(m => Model[i].mod_flag)
+                    @Html.HiddenFor(m => Model[i].pay_date)
+                    @Html.HiddenFor(m => Model[i].RowID)
+                    @Html.HiddenFor(m => Model[i].Doc_no)
+                    @Html.HiddenFor(m => Model[i].line_no)
+                  </td>
+                  <td>@Html.DropDownListFor(m => Model[i].inc_code, new SelectList(ViewBag.inc_code, "Value", "Text", Model[i].inc_code), htmlAttributes: new { @class = "form-control input-sm disable" })</td>
+                  @*<td>@Html.TextBoxFor(m => Model[i].inc_code, new { @class = "form-control input-sm allownumericwithdecimal" })</td>*@
+                  <td>@Html.TextBoxFor(m => Model[i].inc_rate, new { @class = "form-control input-sm disable" })</td>
+                  <td>@Html.TextBoxFor(m => Model[i].number, new { @class = "form-control input-sm disable" })</td>
+                  <td>@Html.TextBoxFor(m => Model[i].amount, new { @class = "form-control input-sm disable" })</td>
+                  <td><button type="button" id="@btnSave" onclick="DoSave(@i);" class="btn btn-xs btn-success SaveRow" title="Save"><i class="fa fa-save fa-lg"></i></button>&nbsp;<button type="button" id="@btmEdit" onclick="doedit(@i);" class="btn btn-xs btn-primary" title="Edit"><i class="fa fa-pencil fa-lg"></i></button>&nbsp;<button type="button" class="btn btn-xs btn-danger deleterow" onclick="deleterow(@i);" <i class="fa fa-trash-o fa-lg"></i></button></td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+        <div class="form-group">
+          <label class="col-sm-4 control-label"></label>
+          <div class="col-sm-8">
+            <input type="button" class="btn btn-success" id="next" value="Next" />
+            @Html.ActionLink("Cancel", "IncomeIndex", "PensionProcess", new { id = @ViewBag.PensionerID }, new { @class = "btn btn-primary" })
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  <div class="modal fade in" id="simpleModal1" aria-hidden="false" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" onclick="hidemodal();" aria-hidden="true">×</button>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-sm-11">
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Income Code</label>
+                <div class="col-sm-8">
+                  @Html.DropDownList("inc_code", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm" })
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Income Rate</label>
+                <div class="col-sm-8">
+                  @Html.TextBox("IncomeRate", "", new { @class = "form-control input-sm", placeholder = "Income Rate" })
+
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Number</label>
+                <div class="col-sm-8">
+                  @Html.TextBox("Number", "", new { @class = "form-control input-sm", placeholder = "Amount" })
+
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Amount</label>
+                <div class="col-sm-8">
+                  @Html.TextBox("Amount", "", new { @class = "form-control input-sm", placeholder = "Amount" })
+
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-3 control-label"></label>
+                <div class="col-sm-8">
+                  <input type="button" class="btn btn-success" value="Add Details" onclick="AddIncomeDetails();" />
+                  <input type="button" class="btn btn-primary" value="Cancel" onclick="hidemodal();" />
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div>
+  <style>
+    .select2-container {
+      width: 100% !important;
+    }
+  </style>
+
+}
+@section Scripts {
+  <script src="~/Content/endless/js/jquery.dataTables.min.js"></script>
+  <script nonce="@ViewBag.StyleNonce">
+    //$(function () {
+    //  var pensionerID = $("#PensionerID").val();
+    //  var oTable = $('#tbl').dataTable({
+    //    "bJQueryUI": true,
+    //    "sPaginationType": "full_numbers",
+    //    "bServerSide": true,
+    //    "bDestroy": true,
+    //    "sAjaxSource": "/PensionProcess/IncomeAjaxHandlerOld/?PensionerID=" + pensionerID,
+    //    "aoColumns": [
+
+    //					{ "sName": "IncomeCode" },
+    //					{ "sName": "Rate" },
+    //        { "sName": "Number" },
+    //        { "sName": "Amount" },
+    //        {
+    //          "sName": "DocNo",
+    //          "bSearchable": false,
+    //          "bSortable": false,
+    //          "fnRender": function (oObj) {
+    //            var strString = '<a href="/PensionProcess/EditIncomeDetailsOld/' + oObj.aData[4] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i></a>';
+
+    //            return strString;
+    //          }
+    //        }
+    //    ]
+    //  });
+    //})
+    $(function () {
+      DisableContrls();
+    })
+    function DisableContrls() {
+      $(".disable").each(function () {
+        $(this).prop("disabled", "disabled");
+      });
+      $(".SaveRow").each(function () {
+        $(this).css("display", "none");
+      });
+      return false;
+    }
+
+    $("#next").on('click', function () {
+      $(".disable").each(function () {
+        $(this).prop("disabled", false);
+      });
+      $('#form1').submit();
+    })
+
+    function doedit(x) {
+      debugger
+      $("#btnEdit" + x).css("display", "none");
+      $("#btnSave" + x).css("display", "");
+      $('[name="[' + x + '].inc_code"]').prop("disabled", false);
+      $('[name="[' + x + '].inc_rate"]').prop("disabled", false);
+      $('[name="[' + x + '].number"]').prop("disabled", false);
+      $('[name="[' + x + '].amount"]').prop("disabled", false);
+      return false;
+    }
+    function DoSave(x) {
+      $("#btnEdit" + x).css("display", "");
+      $("#btnSave" + x).css("display", "none");
+      $('[name="[' + x + '].inc_code"]').prop("disabled", "disabled");
+      $('[name="[' + x + '].inc_rate"]').prop("disabled", "disabled");
+      $('[name="[' + x + '].number"]').prop("disabled", "disabled");
+      $('[name="[' + x + '].amount"]').prop("disabled", "disabled");
+      return false;
+    }
+
+    function AddIncome() {
+      $("#simpleModal1").show();
+    }
+    function hidemodal() {
+      $("#simpleModal1").hide();
+    }
+    function AddIncomeDetails() {
+
+      var count = $("#tbl > tbody > tr").length;
+      var inc_code = $("#inc_code").val();
+      var incomeRate = $("#IncomeRate").val();
+      var number = $("#Number").val();
+      var amount = $("#Amount").val();
+      if (inc_code != "" && incomeRate != "" && number != "" && amount != "") {
+        $("#tbl").append('<tr><td ><select class="form-control input-sm disable" name="[' + count + '].inc_code"><option value="PENS">REGULAR PENSION</option></select></td><td >  <input type="text" class="form-control input-sm disable" name="[' + count + '].inc_rate" value="' + incomeRate + '"/></td><td >  <input type="text" class="form-control input-sm disable" name="[' + count + '].number" value="' + number + '"/></td><td >  <input type="text" class="form-control input-sm disable" name="[' + count + '].amount" value="' + amount + '"/></td><td><button type="button"  id="btnSave' + count + '" onclick="javascript: return DoSave(' + count + ');" class="btn btn-xs btn-success SaveRow" title="Save"><i class="fa fa-save fa-lg"></i></button>&nbsp;<button type="button" id="btnEdit' + count + '" onclick="javascript: return doedit(' + count + ');" class="btn btn-xs btn-primary" title="Edit"><i class="fa fa-pencil fa-lg"></i></button>&nbsp;<button type="button" class="btn btn-xs btn-danger deleterow" onclick="deleterow(' + count + ');" <i class="fa fa-trash-o fa-lg"></i></button></td></tr>');
+        $('[name="[' + count + '].inc_code"]').val(inc_code);
+        $('select').select2({
+          placeholder: "---Select---",
+          allowClear: true
+        });
+        DisableContrls();
+        hidemodal();
+        clearPopupValues();
+        toasterSuccessMessage("Details Added Successfully.");
+      }
+      else {
+        toasterErrorMessage("Fill All Details to Add Income.");
+      }
+
+    }
+
+    function clearPopupValues() {
+      $("#inc_code").select2("val", "");
+      $("#IncomeRate").val("");
+      $("#Number").val("");
+      $("#Amount").val("");
+    }
+
+    function deleterow(x) {
+      $(".deleterow").on('click', function () {
+        $(this).closest('tr').hide();
+        $('[name="[' + x + '].description_MasterIncCodes"]').val("deleted");
+      })
+    }
+  </script>
+}

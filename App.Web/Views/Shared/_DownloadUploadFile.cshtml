@@ -1,0 +1,906 @@
+﻿@using App.Data
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    bool IsGeneratePensionWithoutSftp = ViewBag.IsGeneratePensionWithoutSftp;
+}
+
+@if (ViewBag.DownloadNUploadFile == DownloadNUploadFile.UploadVerification.ToString())
+{
+    <div class="content">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title headline Dash_contributorSummary">
+                    Upload Verification File
+                    @*<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne"><i class="fa fa-plus" style="font-size:18px; float:right; text-align:right;"></i></a>*@
+                </h4>
+            </div>
+            <div id="collapseOne" @*class="panel-collapse collapse"*@>
+                <div class="panel-body">
+                    <div class="row py-12">
+                        <div class="col-sm-4">
+                            <div class="control-label mb-2 mt-3" for="EmpType"> &nbsp; </div>
+                            <div class="upload-file">
+                                <input type="file" id="file" name="file" class="upload-demo" accept=".xlsx, .xls" required data-val="true" data-val-required="please select a file">
+                                <label data-title="Select file" for="file">
+                                    <span data-title="No file selected..."></span>
+                                </label>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="control-label mb-2 mt-3" for="EmpType"> &nbsp; </div>
+                            <button type="button" class="btn btn-success px-5 height display_none" title="Please Wait While We Process Your Request" id="btn_Verification_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                            <button type="button" class="btn btn-success height px-5 border-raduis mr-2 @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")" id="MasterEmployeeExcelUpload"><i class="fa fa-save"> </i> Upload</button>
+                            <button type="button" class="btn btn-success px-5 height display_none" title="Please Wait While We Process Your Request" id="btn_Saved_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                            <button type="button" class="btn btn-success height px-5 border-raduis mr-2 display_none" id="MasterEmployeeExcelSave"><i class="fa fa-save"> </i> Save&nbsp;<i class="fa fa-spinner fa-spin display_none"></i></button>
+
+                            <button type="button" class="btn btn-primary height px-5 border-raduis mr-2 display_none" id="MasterEmployeeExcelCancel"><i class="fa fa-times-circle"> </i> Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-body">
+                <table class="table dataTable mt-4" id="tblUploadVerification">
+                    <thead>
+                        <tr>
+
+                            <th>File Name</th>
+                            <th>Beneficiary</th>
+                            <th>Validated</th>
+                            <th>Not validated</th>
+                            <th>Uploaded</th>
+                            <th>Uploaded Date</th>
+                            <th>Created By</th>
+                            <th>Remark</th>
+                            @*<th>CreatedBy</th>
+                                <th>Uploaded By</th>*@
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+            </div>
+
+
+
+        </div>
+    </div>
+}
+else if (ViewBag.DownloadNUploadFile == DownloadNUploadFile.DownloadVerification.ToString())
+{
+
+    <div class="content">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title headline Dash_contributorSummary">
+                    Forward File - Unapproved Bank Account
+                    @*<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne"><i class="fa fa-plus" style="font-size:18px; float:right; text-align:right;"></i></a>*@
+                </h4>
+            </div>
+            <div id="collapseOne" @*class="panel-collapse collapse"*@>
+                <div class="panel-body">
+
+                    <div class="row">
+                        <div class="col-sm-5 col-md-4" id="bankDropdownContainer">
+                            <label>Bank Name</label>
+
+                            <div class="input-group form-group h_select">
+                                @Html.DropDownList("BanksName", null, new { @class = "form-control", @id = "BanksName", @multiple = "multiple" })
+
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-success display_none uploadfile_border_radius" title="Please Wait While We Process Your Request" id="btn_loading_Bank"><i class="fa fa-spinner fa-spin"></i> Download Processing</button>
+
+                                    <button class="btn btn-success btnDownload_class" type="button" id="btnDownload">
+                                        <i class="fa fa-save"></i> Download
+                                    </button>
+                                </span>
+
+                            </div>
+
+                            <input type="hidden" value="" name="formattedName" id="formattedName" />
+                        </div>
+
+                        <div class="col-sm-12  text-right">
+                            <label>@*Forward to FSTP server*@</label>
+
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    @if (IsGeneratePensionWithoutSftp)
+                                    {
+                                        <button type="button" class="btn btn-success display_none" title="Please Wait While We Process Your Request" id="btn_MasterForwardToFSTP_loading"><i class="fa fa-spinner fa-spin"></i>Validation File downloading</button>
+                                        <button class="btn btn-success @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")" id="IdMasterForwardToFSTP" type="button">
+                                            <i class="fa fa-arrow-down"></i> Download Validation File
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-success display_none" title="Please Wait While We Process Your Request" id="btn_MasterForwardToFSTP_loading"><i class="fa fa-spinner fa-spin"></i>Forward to SFTP server Processing</button>
+                                        <button class="btn btn-success @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")" id="IdMasterForwardToFSTP" type="button">
+                                            <i class="fa fa-save"></i> Forward to SFTP server
+                                        </button>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="panel-body">
+                <table class="table dataTable mt-4" id="tblPensionProcess">
+                    <thead>
+                        <tr>
+                            @*<th>Beneficiy</th>
+                                <th>Validated</th>
+                                <th>Not validated</th>
+                                <th>IFSC Code</th>
+                                <th>Downloaded By</th>
+                                <th>Downloaded On</th>*@
+                            <th>File Name</th>
+                            <th>Beneficiary</th>
+                            <th>Validated</th>
+                            <th>Not validated</th>
+                            <th>Processed</th>
+                            @*<th>Account Status</th>*@
+                            <th>Processed On</th>
+                            <th>Processed By</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+}
+else if (ViewBag.DownloadNUploadFile == DownloadNUploadFile.UploadBankMedia.ToString())
+{
+    <div class="content">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title headline Dash_contributorSummary">
+                    Uploaded Media File
+                    @*<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne"><i class="fa fa-plus" style="font-size:18px; float:right; text-align:right;"></i></a>*@
+                </h4>
+            </div>
+            <div id="collapseOne" @*class="panel-collapse collapse"*@>
+                <div class="panel-body">
+                    <div class="row py-4">
+                        <div class="col-sm-4">
+                            <div class="upload-file">
+                                <input type="file" id="file" name="file" class="upload-demo" accept=".xlsx, .xls, .csv" required data-val="true" data-val-required="please select a file">
+                                <label data-title="Select file" for="file">
+                                    <span data-title="No file selected..."></span>
+                                </label>
+                                @*<input type="hidden" id="formattedName" value="" />*@
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <button type="button" class="btn btn-success px-5 height display_none" title="Please Wait While We Process Your Request" id="btn_BankMediaExcelUpload_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                            <button type="button" class="btn btn-success height px-5 border-raduis mr-2 @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")" id="BankMediaExcelUpload"><i class="fa fa-save"> </i> Upload</button>
+
+                            <button type="button" class="btn btn-success px-5 height display_none" title="Please Wait While We Process Your Request" id="btn_BankMediaSave_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                            <button type="button" class="btn btn-success height px-5 border-raduis mr-2 display_none" id="BankMediaExcelSave"><i class="fa fa-save"> </i> Save</button>
+                            <button type="button" class="btn btn-primary height px-5 border-raduis mr-2 display_none" id="BankMediaExcelCancel"><i class="fa fa-times-circle"> </i> Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-body">
+                <table class="table dataTable mt-4" id="tblUploadMediaFile">
+                    <thead>
+                        <tr>
+                            <th>BankName</th>
+                            @*<th>IFSC Code</th>*@
+                            <th>Downloaded By</th>
+                            <th>Downloaded On</th>
+                            <th>IsUpload</th>
+                            <th>Uploaded By</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+
+
+        </div>
+    </div>
+}
+
+else if (ViewBag.DownloadNUploadFile == DownloadNUploadFile.DownloadbaknkMedia.ToString())
+{
+    <div class="panel panel-default">
+        <div class="panel-heading clearfix">
+            <h4 class="headline Dash_contributorSummary">
+                Download Bank Media
+                @*<ul class="tool-bar">
+
+                    </ul>*@
+            </h4>
+        </div>
+        <div class="panel-body">
+            <table class="table dataTable mt-4" id="tbl">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Bank Code</th>
+                        <th>Created On</th>
+                        <th>Download</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+}
+
+<input type="hidden" id="formattedName" value="" />
+<input type="hidden" id="ValidationRemark" value="" />
+<div class="custom-popup confirmClass display_none uploadfile_PopUpShowLarge" data-keyboard="false" data-backdrop="static" id="PopUpShowLargeMessage">
+    <div class="padding-md">
+        <!-- Update Payment Section -->
+        <h3 class="m-top-none py-3 text-white uploadfile_bM" id="MHeader"></h3>
+        <!-- Header Section -->
+        <div class="row uploadfile_PopUpShowLargesl">
+            <label id="MessageText"></label>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{`
+    <script nonce="@ViewBag.StyleNonce">
+      debugger
+      if (document.getElementById("IdMasterForwardToFSTP") != null && document.getElementById("IdMasterForwardToFSTP") != undefined) {
+        document.getElementById("IdMasterForwardToFSTP").addEventListener("click", function () {
+          MasterForwardToFSTP();
+        });
+      }
+
+    //binding For bank Media beneficiary details
+    $(document).ready(function () {
+
+      var table = $('#tbl');
+      $.ajax({
+        url: "/MasterPensioner/GetAllFilesAjax",
+        type: 'GET',
+        cache: false,
+        context: table,
+        success: function (allfilesList) {
+          debugger;
+          var tableBody = this.find('tbody');
+          tableBody.empty();
+          $.each(allfilesList, function (index, file) {
+            var newRow = '<tr><td>' + file.FileName + '</td><td>' + file.Bank + '</td><td>' + file.Dated + '</td><td><a class="link" href="/PensionProcess/DownloadAjax?date=' + file.Dated + '&file=' + file.FileName + '">Download</a></td></tr>';
+            $('#tbl tr:last').after(newRow);
+          });
+        },
+        error: function () {
+        }
+      });
+
+
+
+      // for ifsc code
+      @*$("#BanksName").change(function () {
+        debugger
+            var selectedSchemeType = $(this).val();
+            $.ajax({
+                url: '@Url.Action("GetIFSCCodes", "PensionProcess")',
+                type: 'GET',
+              data: { schemeType: selectedSchemeType },
+              success: function (data) {
+                debugger
+                    var ifscDropdown = $("#ApplicantIFSCCode");
+                    ifscDropdown.empty();
+                    $.each(data, function (index, item) {
+                        ifscDropdown.append($('<option>', {
+                            value: item.Value,
+                            text: item.Text
+                        }));
+                    });
+                },
+                error: function () {
+                    alert("Error fetching IFSC codes");
+                }
+            });
+        });*@
+      //
+      DownloadData();
+      UploadVerificationData();
+      //BindUploadBankMediaData();
+    });
+
+      const btnDownload_ClassBtn = document.querySelectorAll('.btnDownload_class');
+      btnDownload_ClassBtn.forEach(button => {
+        button.addEventListener('click', MasterEmployeeExcelDownload);
+      });
+
+
+    //download for verification beneficiary details
+    //function MasterEmployeeExcelDownload(evt) {
+    //    try {
+    //        debugger;
+    //        //$(evt.target).find("btn_loading").show();
+    //        $('#btn_loading_Bank').show();
+    //        $('#btnDownload').hide();
+    //      var bankname = $("#BanksName").val();
+    //    var ApplicantIFSCCode = $("#ApplicantIFSCCode").val();
+    //    if (bankname == "" || bankname == undefined || bankname == "undefined") {
+    //        toasterErrorMessage("Select Bank Name before download.");
+    //        $('#btn_loading_Bank').hide();
+    //        $('#btnDownload').show();
+    //    } else {
+    //        bankname = bankname.map(function (element) {
+    //            return element.replace('&', 'ANDSYMBOL');
+    //        });
+    //      var xhr = new XMLHttpRequest();
+    //      xhr.open('GET', '/MasterPensioner/MasterEmployeeExcelDownloadAjax?BankName=' + bankname, true);//+ '&BankName=' + bankname
+    //      /*xhr.open('GET', '/MasterPensioner/MasterEmployeeExcelDownload?ApplicantIFSCCode=' + ApplicantIFSCCode, true);*/
+    //      xhr.responseType = 'blob';
+    //        xhr.onload = function () {
+    //            $('#btnDownload').show();
+    //            $('#btn_loading_Bank').hide();
+    //          if (xhr.status === 200) {
+
+    //            var blob = xhr.response;
+    //            debugger
+
+    //          var url = window.URL.createObjectURL(blob);
+    //          var a = document.createElement('a');
+    //          a.href = url;
+    //          var name = xhr.getResponseHeader('Content-Disposition').split(" ")[1];
+    //          if (name.indexOf("filename") > -1) {
+    //            name = name.split("=")[1];
+    //          }
+    //            a.download = name;
+    //            a.className = 'display_none';
+    //          document.body.appendChild(a);
+    //          a.click();
+    //          window.URL.revokeObjectURL(url);
+    //        } else {
+    //          console.error('Request failed with status:', xhr.status);
+    //          }
+    //          //$(evt.target).find("i.fa-spinner").hide();
+    //      };
+    //      xhr.onerror = function () {
+    //          console.error('Request error');
+    //          $('#btn_loading_Bank').hide();
+    //      };
+    //      xhr.send();
+    //    }
+    //  } catch (e) {
+
+    //  }
+    //  }
+
+
+
+      function MasterEmployeeExcelDownload(evt) {
+        try {
+          $('#btn_loading_Bank').show();
+          $('#btnDownload').hide();
+
+          var bankname = $("#BanksName").val();
+          if (!bankname) {
+            toasterErrorMessage("Select Bank Name before download.");
+            $('#btn_loading_Bank').hide();
+            $('#btnDownload').show();
+            return;
+          }
+
+          bankname = bankname.map(function (element) {
+            return element.replace('&', 'ANDSYMBOL');
+          });
+
+          $.ajax({
+            url: '/MasterPensioner/MasterEmployeeExcelDownloadAjax',
+            type: 'GET',
+            data: { BankName: bankname.join(',') },
+            success: function (response) {
+              $('#btn_loading_Bank').hide();
+              $('#btnDownload').show();
+
+              if (response.Error) {
+                console.error("Error:", response.Error);
+                return;
+              }
+
+              if (Array.isArray(response)) {
+                response.forEach((file, index) => {
+                  setTimeout(() => downloadFile(file), index * 1000);
+                });
+              }
+            },
+            error: function () {
+              $('#btn_loading_Bank').hide();
+              $('#btnDownload').show();
+              console.error("Failed to fetch files.");
+            }
+          });
+        } catch (e) {
+          console.error("Error:", e);
+          $('#btn_loading_Bank').hide();
+          $('#btnDownload').show();
+        }
+      }
+
+      function downloadFile(file) {
+        const link = document.createElement('a');
+        const blob = new Blob([Uint8Array.from(atob(file.FileContent), c => c.charCodeAt(0))], { type: file.ContentType });
+        const url = window.URL.createObjectURL(blob);
+
+        link.href = url;
+        link.download = file.FileName;
+        link.click();
+        setTimeout(() => window.URL.revokeObjectURL(url), 100);
+      }
+
+
+
+    //forward to fstp server
+    function MasterForwardToFSTP(evt) {
+      debugger
+        try {
+            //$(evt.target).find("i.fa-spinner").show();
+            $('#btn_MasterForwardToFSTP_loading').show();
+            $('#IdMasterForwardToFSTP').hide();
+        var ApplicantIFSCCode = "JKB";// $("#ApplicantIFSCCode").val();
+        if (ApplicantIFSCCode == "" || ApplicantIFSCCode == undefined || ApplicantIFSCCode == "undefined") {
+            toasterErrorMessage("Select IFSC code before download.");
+            $('#IdMasterForwardToFSTP').hide();
+            //$(evt.target).find("i.fa-spinner").hide();
+        } else {
+
+          var bankname = "JKB,THE JAMMU AND KASHMIR BANK LTD.";
+          var url = '/MasterPensioner/MasterJKBankEmployeeExcelDownloadAjax?BankName=' + bankname;
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', url, true);
+          xhr.responseType = 'blob';
+          xhr.onload = function () {
+            console.log("success");
+              //$(evt.target).find("i.fa-spinner").hide();
+              $('#IdMasterForwardToFSTP').show();
+            $('#btn_MasterForwardToFSTP_loading').hide();
+            debugger
+            if (xhr.status === 200) {
+              toasterSuccessMessage("File forward to sftp server successfully.");
+            }
+            else {
+              console.error('Request failed with status:', xhr.status);
+              toasterErrorMessage("Failed forward to sftp server file.");
+            }
+            if (xhr.status === 200) {
+              var blob = xhr.response;
+              var url = window.URL.createObjectURL(blob);
+              var a = document.createElement('a');
+              a.href = url;
+              var name = xhr.getResponseHeader('Content-Disposition').split(" ")[1];
+              if (name.indexOf("filename") > -1) {
+                name = name.split("=")[1];
+              }
+              a.download = name;
+              a.style.display = 'none';
+              document.body.appendChild(a);
+              a.click();
+              window.URL.revokeObjectURL(url);
+            } else {
+              console.error('Request failed with status:', xhr.status);
+            }
+          };
+          xhr.onerror = function () {
+              console.error('Request error');
+              $('#btn_MasterForwardToFSTP_loading').hide();
+            //$(evt.target).find("i.fa-spinner").hide();
+          };
+            xhr.send();
+            //$(evt.target).find("i.fa-spinner").hide();
+        }
+      } catch (e) {
+
+      }
+    }
+    if (document.getElementById("MasterEmployeeExcelUpload") != null && document.getElementById("MasterEmployeeExcelUpload") != undefined) {
+      document.getElementById("MasterEmployeeExcelUpload").addEventListener("click", function () {
+        MasterEmployeeExcelUpload();
+      });
+    }
+
+    //UploadVerification File beneficiary details
+    function MasterEmployeeExcelUpload(evt) {
+        var IsFile = $("#file").val();
+        //$(evt.target).find("i.fa-spinner").show();
+        $('#btn_Verification_loading').show();
+        $('#MasterEmployeeExcelUpload').hide();
+        if ($("#file").val() == "") {
+            toasterErrorMessage("please select a file");
+            $('#btn_Verification_loading').hide();
+            $('#MasterEmployeeExcelUpload').show();
+            //$(evt.target).find("i.fa-spinner").hide();
+
+        }
+        var region = $("#dynamicText").text();
+      if (IsFile != null && IsFile != "" && IsFile != undefined) {
+        var fileUpload = $("#file").get(0);
+        var files = fileUpload.files;
+        // Create FormData object
+        var fileData = new FormData();
+        // Looping over all files and add it to FormData object
+        for (var i = 0; i < files.length; i++) {
+          fileData.append(files[i].name, files[i]);
+          }
+        $.ajax({
+          type: "POST",
+            url: "@Url.Action("MasterEmployeeExcelUploadAjax", "MasterPensioner")?regiontext=" + region,
+          contentType: false, // Not to set any content header
+          processData: false, // Not to process data
+          data: fileData,
+            success: function (data) {
+                if (!data.status) {
+                    toasterErrorMessage(data.Error);
+                    $('#btn_Verification_loading').hide();
+                    $('#MasterEmployeeExcelUpload').show();
+                }
+                else {
+                    $('#MasterEmployeeExcelUpload').show();
+                    $('#btn_Verification_loading').hide();
+
+                    if (data.formattedName != "") {
+                        $("#formattedName").val(data.formattedName);
+                        $("#MasterEmployeeExcelUpload").toggle();
+                        $("#MasterEmployeeExcelSave").toggle();
+                        $("#MasterEmployeeExcelCancel").toggle();
+                        toasterSuccessMessage("Upload Successfully.");
+                        $(evt.target).find("i.fa-spinner").hide();
+                        UploadVerificationData();
+
+                    } else {
+                        //toastr.error(data.Error);
+                        $("#ValidationRemark").val(data.Error);
+                        OpenMessagePopup('Notes', 'ValidationRemark');
+                        UploadVerificationData();
+                    }
+                    //$(evt.target).find("i.fa-spinner").hide();
+                    $('#btn_Verification_loading').hide();
+                }
+          }
+        });
+        }
+        //$(evt.target).find("i.fa-spinner").hide();
+    }
+    //save  beneficiary details
+
+    if (document.getElementById("MasterEmployeeExcelSave") != null && document.getElementById("MasterEmployeeExcelSave") != undefined) {
+      document.getElementById("MasterEmployeeExcelSave").addEventListener("click", function () {
+        AddMasterEmployeeExcelDatabase();
+      });
+    }
+
+    function AddMasterEmployeeExcelDatabase(evt) {
+        $('#btn_Saved_loading').show();
+        $('#MasterEmployeeExcelSave').hide();
+        //$(evt.target).find("i.fa-spinner").show();
+      var fileName = $("#formattedName").val();
+      if (fileName == "" || fileName == null || fileName == undefined || fileName == "undefined") {
+          toasterWarningMessage("First upload the file then save.");
+          $('#MasterEmployeeExcelSave').hide();
+          //$(evt.target).find("i.fa-spinner").hide();
+        return false;
+      }
+      // Create FormData object
+      var fileData = new FormData();
+      // Adding one more key to FormData object
+      fileData.append('formattedName', fileName);
+      $.ajax({
+        type: "POST",
+        url: "@Url.Action("AddMasterEmployeeExcelDatabaseAjax", "MasterPensioner")",
+        contentType: false, // Not to set any content header
+        processData: false, // Not to process data
+        data: fileData,
+        success: function (data) {
+            if (data == "1") {
+                $('#MasterEmployeeExcelSave').show();
+                $('#btn_Saved_loading').hide();
+            toasterSuccessMessage("Save Successfully.");
+            location.reload();
+          } else {
+            toastr.error("Opps! Something went wrong. Please try again.");
+                $('#btn_Saved_loading').hide();
+            }
+            $('#btn_Saved_loading').hide();
+            //$(evt.target).find("i.fa-spinner").hide();
+        }
+      });
+    }
+
+    //cancel beneficiary details
+    //function MasterEmployeeExcelCancelUpload() {
+    //  window.location.reload();
+    //  }
+
+    if (document.getElementById("MasterEmployeeExcelCancel") != null && document.getElementById("MasterEmployeeExcelCancel") != undefined) {
+      document.getElementById("MasterEmployeeExcelCancel").addEventListener("click", function () {
+        MasterEmployeeExcelCancelUpload();
+      });
+    }
+
+
+      function MasterEmployeeExcelCancelUpload()
+      {
+           $.ajax({
+               type: "POST",
+             url: '@Url.Action("MasterEmployeeExcelCancelUploadAjax", "PensionProcess")',
+               //cache: false,
+               success: function (response) {
+                   debugger;
+                   if (response.success) {
+                       toasterSuccessMessage("File Cancel Successfully.");
+                       location.reload();
+                   } else {
+                       toasterErrorMessage('Failed to cancel upload.');
+                   }
+               },
+               error: function (xhr, status, error) {
+               }
+           });
+
+        }
+
+
+    if (document.getElementById("BankMediaExcelUpload") != null && document.getElementById("BankMediaExcelUpload") != undefined) {
+      document.getElementById("BankMediaExcelUpload").addEventListener("click", function () {
+        debugger;
+        BankMediaExcelUpload();
+      });
+    }
+          //Upload Bank Media Generate Bank Media
+      function BankMediaExcelUpload(evt) {
+      try {
+          var IsFile = $("#file").val();
+          //$(evt.target).find("i.fa-spinner").show();
+          $('#btn_BankMediaExcelUpload_loading').show();
+          $('#BankMediaExcelUpload').hide();
+          if ($("#file").val() == "") {
+              toasterErrorMessage("please select a file");
+              $('#btn_BankMediaExcelUpload_loading').hide();
+              $('#BankMediaExcelUpload').show();
+              //$(evt.target).find("i.fa-spinner").hide();
+          }
+        if (IsFile != null && IsFile != "" && IsFile != undefined) {
+          var fileUpload = $("#file").get(0);
+          var files = fileUpload.files;
+          // Create FormData object
+          var fileData = new FormData();
+          // Looping over all files and add it to FormData object
+          for (var i = 0; i < files.length; i++) {
+            fileData.append(files[i].name, files[i]);
+          }
+          $.ajax({
+            type: "POST",
+            url: '@Url.Action("BankMediaExcelUploadAjax", "PensionProcess")',
+            contentType: false, // Not to set any content header
+            processData: false, // Not to process data
+            //contentType: "application/json; charset=utf-8",
+            //dataType: "json",
+            data: fileData,
+            success: function (data) {
+                if (data != "") {
+                    $('#BankMediaExcelUpload').show();
+                    $('#btn_BankMediaExcelUpload_loading').hide();
+
+                $("#formattedName").val(data);
+                $("#BankMediaExcelUpload").toggle();
+                $("#BankMediaExcelSave").toggle();
+                $("#BankMediaExcelCancel").toggle();
+                    toasterSuccessMessage("Upload Successfully.");
+                    $('#btn_BankMediaExcelUpload_loading').hide();
+                  //$(evt.target).find("i.fa-spinner").hide();
+              } else {
+                    toasterErrorMessage("Opps! Somthing went wrong. Please try again.");
+                    $('#btn_BankMediaExcelUpload_loading').hide();
+                  //$(evt.target).find("i.fa-spinner").hide();
+              }
+            },
+            error: function (a, b, c) {
+            }
+          });
+         }
+      }
+      catch (e) {
+      }
+    }
+
+    if (document.getElementById("BankMediaExcelSave") != null && document.getElementById("BankMediaExcelSave") != undefined) {
+      document.getElementById("BankMediaExcelSave").addEventListener("click", function () {
+        AddBankMediaExcelDatabase();
+      });
+    }
+
+    //save Generate Bank Media
+      function AddBankMediaExcelDatabase(evt) {
+          //$(evt.target).find("i.fa-spinner").show();
+          $('#btn_BankMediaSave_loading').show();
+          $('#BankMediaExcelSave').hide();
+        if ($("#formattedName").val() == "" || $("#formattedName").val() == null || $("#formattedName").val() == undefined || $("#formattedName").val() == "undefined") {
+            toasterWarningMessage("First upload the file then save.");
+            $('#btn_BankMediaSave_loading').show();
+            $('#BankMediaExcelSave').hide();
+          return false;
+        }
+        // Create FormData object
+        var fileData = new FormData();
+        // Adding one more key to FormData object
+        fileData.append('formattedName', $("#formattedName").val());
+        $.ajax({
+          type: "POST",
+          url: "@Url.Action("AddBankMediaIntoDatabaseAjax", "PensionProcess")",
+          contentType: false, // Not to set any content header
+          processData: false, // Not to process data
+          data: fileData,
+            success: function (data) {
+                //$('#BankMediaExcelSave').show();
+                if (data == "1") {
+                    $('#BankMediaExcelSave').show();
+                    //$('#btn_BankMediaSave_loading').hide();
+                    toasterSuccessMessage("Save Successfully.");
+                    $('#btn_BankMediaSave_loading').hide();
+              location.reload();
+            } else {
+                    toasterErrorMessage("Opps! Somthing went wrong. Please try again.");
+                    $('#btn_BankMediaSave_loading').hide();
+                    $('#BankMediaExcelSave').show();
+                //$(evt.target).find("i.fa-spinner").hide();
+            }
+          }
+        });
+    }
+    if (document.getElementById("BankMediaExcelCancel") != null && document.getElementById("BankMediaExcelCancel") != undefined) {
+      document.getElementById("BankMediaExcelCancel").addEventListener("click", function () {
+        BankMediaExcelCancelUpload();
+      });
+    }
+    //cancel Generate Bank Media
+    function BankMediaExcelCancelUpload() {
+      window.location.reload();
+    }
+    ///////
+
+    function DownloadData() {
+      var oTable = $('#tblPensionProcess').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+          "bAutoWidth": false,
+          "aaSorting": [[0, "desc"]],
+        "sAjaxSource": "/MasterPensioner/AjaxHandlerDownloadAjax",
+        "aoColumns": [
+
+          { "sName": "FileName" },
+          { "sName": "TotalBeneficiary" },
+          { "sName": "TotalValidated" },
+          { "sName": "TotalNotvalidated" },
+          { "sName": "IsProcessed" },
+          { "sName": "CreatedOn" },
+          { "sName": "CreatedBy" },
+        ]
+      });
+    }
+
+
+
+
+    function UploadVerificationData() {
+      var oTable = $('#tblUploadVerification').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "bAutoWidth": false,
+        "sAjaxSource": "/MasterPensioner/UploadVerificationAjaxHandlerAjax",
+        "aoColumns": [
+          { "sName": "FilePath" },
+          { "sName": "TotalBeneficiary" },
+          { "sName": "TotalValidated" },
+          { "sName": "TotalNotvalidated" },
+          { "sName": "IsUploaded" },
+          /* { "sName": "IsActive" },*/
+          { "sName": "UploadedDate" },
+          { "sName": "CreatedBy" },
+          {
+            "sname": "Remark",
+            "bsearchable": false,
+            "bsortable": false,
+            "fnRender": function (oObj) {
+              if (oObj.aData[7].length > 10) {
+                // Get the first 10 characters
+                var firstTenCharacters = oObj.aData[7].substring(2, 10);
+                $("#ValidationRemark").val(oObj.aData[7]);
+                return ('<span style="cursor: pointer;" onclick="OpenMessagePopup(\'Notes\', \'ValidationRemark \')">' + firstTenCharacters + '...</span>');
+              } else {
+                return (oObj.aData[7]);
+              }
+            }
+          },
+          //{
+          //  "sName": "IsUpload",
+          //  "bSearchable": false,
+          //  "bSortable": false,
+          //  "fnRender": function (oObj) {
+          //    if (oObj.aData[4] == "False")
+          //      return '<span class="badge badge-danger">inactive</span>';
+          //    else
+          //      return '<span class="badge badge-success">active</span>';
+          //  }
+          //},
+          //{ "sName": "FirstName" }
+        ]
+      });
+    }
+    function OpenMessagePopup(heading, messageId) {
+
+      $("#MHeader").html(heading);
+      $("#MessageText").html($("#" + messageId).val());
+      $("#PopUpShowLargeMessage").popup('show');
+
+    }
+
+    //function BindUploadBankMediaData() {
+    //  debugger
+    //  var oTable = $('#tblUploadMediaFile').dataTable({
+    //    "bJQueryUI": true,
+    //    "sPaginationType": "full_numbers",
+    //    "bServerSide": true,
+    //    "bDestroy": true,
+    //    "bAutoWidth": false,
+    //    "sAjaxSource": "/PensionProcess/UploadBankAjaxHandler",
+    //    "aoColumns": [
+    //      { "sName": "BankName" },
+    //      //{ "sName": "IFSCCode" },
+    //      { "sName": "downloadedBy" },
+    //      { "sName": "downloadedOn" },
+    //      {
+    //        "sName": "IsUpload",
+    //        "bSearchable": false,
+    //        "bSortable": false,
+    //        "fnRender": function (oObj) {
+    //          if (oObj.aData[4] == "False")
+    //            return '<span class="badge badge-danger">inactive</span>';
+    //          else
+    //            return '<span class="badge badge-success">active</span>';
+    //        }
+    //      },
+    //      { "sName": "FirstName" }
+    //    ]
+    //  });
+    //  }
+
+      $("#BankMediaExcelUploa").on("click", function () {
+          if ($("form#form").valid()) {
+              $(this).find("i.fa-spinner").show();
+          }
+      });
+
+    </script>
+
+
+    <script nonce="@ViewBag.StyleNonce">
+        document.addEventListener("DOMContentLoaded", function () {
+            var dropdown = document.getElementById("BanksName");
+            if (dropdown != null) {
+                if (dropdown.options.length === 0) {
+                    var container = document.getElementById("bankDropdownContainer");
+                    container.className = "display_none";
+                }
+            }
+        });
+    </script>
+}

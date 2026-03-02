@@ -1,0 +1,233 @@
+﻿@model IEnumerable<App.Data.Entities.PensionApplications>
+@using App.Web.Helper
+@{
+  ViewBag.Title = "Index";
+}
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row py-4">
+
+            <div class="col-sm-3">
+                @Html.DropDownList("EmployerTypeID", null, "---All---", htmlAttributes: new { @class = "form-control input-sm" })
+            </div>
+            <div class="col-sm-3">
+                <button type="button" class="btn btn-success height px-5" onclick="javascript:return ShowDivPension()"><i class="fa fa-calculator"></i> Calculate</button>
+            </div>
+    
+            </div>
+        </div>
+   
+    </div>
+
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+      <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+          Pensioners Application Request
+          <ul class="tool-bar inline" style="margin-top: 0px;">
+              <li style="margin-right:5px;"><a href="/PensionApplications/Create" data-toggle="tooltip" data-placement="bottom" title="Pension Application Form" data-original-title="Pension Application Form"><i class="fa fa-plus"></i></a></li>
+
+          </ul>
+      </h4>
+     
+      
+    
+  </div>
+  <div class="panel-body" id="public">
+    <table class="table dataTable" id="tbl">
+      <thead>
+        <tr>
+          <th>Pensioner ID</th>
+          <th>Name</th>
+          <th>Employer Name</th>
+          <th>Post</th>
+          <th>Service Length<br />(Upto Dec 2003)<br />(in Months)</th>
+          <th>Service Length<br />(From Jan 2004)<br />(in Months)</th>
+          <th>Pension<br />(Upto Dec 2003)</th>
+          <th>Pension<br />(From Jan 2004)</th>
+          <th>Total Pension</th>
+          <th>Max Pension</th>
+          <th>Gratuity</th>
+          <th></th>
+        </tr>
+
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div class="panel-body" id="police" style="display:none">
+    <table class="table dataTable" id="tblPolice">
+      <thead>
+        <tr>
+          <th>Pensioner ID</th>
+          <th>Name</th>
+          <th>Employer Name</th>
+          <th>Post</th>
+          <th>Completed Years of <br />Pensionable Service <br />(up to 20 years)</th>
+          <th>Completed Six (6) Months<br /> period of Pensionable Service<br /> (from 20 ½ to 30 years)     </th>
+          <th>Salary</th>
+          <th>Full Pension</th>
+          <th>Reduced Pension</th>
+          <th>Gratuity</th>
+          <th style="width:100px"></th>
+        </tr>
+
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+<div class="modal fade in" id="formModal" aria-hidden="false" style="display: none;">
+  <div class="modal-dialog" style="width:975px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="hidePension();">×</button>
+        <iframe id="reportData" style="border: 0px;height:700px;width:100%;"></iframe>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-sm btn-success" data-dismiss="modal" aria-hidden="true" onclick="hidePension();">Close</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+  <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+  <script nonce="@ViewBag.StyleNonce">
+    function hidePension() {
+      $("#formModal").hide();
+    }
+    function showDivPension(Id) {
+      var id = parseInt(Id);
+      $.ajax({
+        url: '@Url.Action("_PensionApplicationAjax", "PensionApplications")?Id=' + id,
+        type: "GET",
+      }).done(function (result) {
+        var actionRes = result;
+        if (actionRes == "1") {
+          $('#reportData').attr('src', '/ReportForms/ContributionByEmployer.aspx');
+          $("#formModal").show();
+          return false;
+        }
+        else {
+          toasterErrorMessage("Result not found on this search criteria.");
+          return false;
+        }
+      });
+    }
+    $(function () {
+
+      debugger
+      doBindData();
+    });
+    $("#EmployerTypeID").on('change', function () {      
+      if ($("#EmployerTypeID").val() == "")
+      {
+        $("#EmployerTypeID").select2("val", 2);
+      }
+      if ($("#EmployerTypeID").val() == "1")
+      {
+        $("#police").show();
+        $("#public").hide();        
+        doPoliceBindData();
+      }
+      else {
+        $("#police").hide();
+        $("#public").show();
+        
+        doBindData();
+      }
+      
+    })
+    function doBindData() {
+      var id = $("#EmployerTypeID").val();
+      var oTable = $('#tbl').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        //"bProcessing": true,
+        "sAjaxSource": "/PensionApplications/AjaxHandler/?Id=" + id,
+        "aoColumns": [
+
+						{ "sName": "PersonId" },
+            { "sName": "Name" },
+            { "sName": "EmployerName" },
+            { "sName": "Post" },
+            { "sName": "ServiceLength(Upto Dec 2003 in Months)" },
+            { "sName": "Service Length(From Jan 2004 in Months)" },
+            { "sName": "Pension(Upto Dec 2003)" },
+            { "sName": "Pension(From Jan 2004)" },
+            { "sName": "TotalPension" },
+            { "sName": "MaximumPension" },
+            { "sName": "Gratuity" },
+						{
+						  "sName": "ID",
+						  "bSearchable": false,
+						  "bSortable": false,
+						  "sWidth": "80px",
+						  "fnRender": function (oObj) {
+						    var strString = '<a href="/PensionApplications/Details/' + oObj.aData[11] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i> Edit</a>';
+						    //strString += '&nbsp;<a href="javascript:showDivPension(' + oObj.aData[11] + ')" class="btn btn-danger btn-xs" title="Print"><i class="fa fa-print fa-lg"></i></a>';
+						    return strString;
+						  }
+						}
+        ]
+      }).rowGrouping({
+        bExpandableGrouping: false,
+        iGroupingColumnIndex: 2,
+        bHideGroupingColumn: true
+
+      });
+    }
+
+    function doPoliceBindData() {
+      var id = $("#EmployerTypeID").val();
+      var oTable = $('#tblPolice').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        //"bProcessing": true,
+        "sAjaxSource": "/PensionApplications/ListAjaxHandler/?Id=" + id,
+        "aoColumns": [
+
+						{ "sName": "PersonId" },
+            { "sName": "Name" },
+            { "sName": "EmployerName" },
+            { "sName": "Post" },
+            { "sName": "ServiceLength(Upto Dec 2003 in Months)" },
+            { "sName": "Service Length(From Jan 2004 in Months)" },
+            { "sName": "Salary" },
+            { "sName": "TotalPension" },
+            { "sName": "ReducedPension" },
+            { "sName": "Gratuity" },
+						{
+						  "sName": "ID",
+						  "bSearchable": false,
+						  "bSortable": false,
+						  "sWidth": "80px",
+						  "fnRender": function (oObj) {
+						    var strString = '<a href="/PensionApplications/Details/' + oObj.aData[10] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i> Edit</a>';
+						    //strString += '&nbsp;<a href="javascript:showDivPension(' + oObj.aData[10] + ')" class="btn btn-danger btn-xs" title="Print"><i class="fa fa-print fa-lg"></i></a>';
+						    return strString;
+						  }
+						}
+        ]
+      }).rowGrouping({
+        bExpandableGrouping: false,
+        iGroupingColumnIndex: 2,
+        bHideGroupingColumn: true
+
+      });
+    }
+  </script>
+}
+
+
+
+
+
+

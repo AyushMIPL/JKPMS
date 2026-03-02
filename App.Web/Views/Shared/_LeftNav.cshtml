@@ -1,0 +1,152 @@
+﻿@using App.Web.Models;
+@using App.Data.ViewModels;
+@{
+  List<App.Data.ViewModels.SessionViewModel> model;
+  List<DynamicMenuItem> menus = new List<DynamicMenuItem>();
+  if (Session["list"] == null || Session["list"] == "")
+  {
+    FormsAuthentication.SignOut();
+    foreach (var cookie in Request.Cookies.AllKeys)
+    {
+      Request.Cookies.Remove(cookie);
+    }
+    foreach (var cookie in Response.Cookies.AllKeys)
+    {
+      Response.Cookies.Remove(cookie);
+    }
+    //Response.Redirect("/Account/LogOffsss");
+    //AuthenticationManager.lo
+    //Response.Redirect("~/Views/Account/Login.cshtml");
+  }
+  else
+  {
+    model = (List<App.Data.ViewModels.SessionViewModel>)Session["list"];
+    if (model != null)
+    {
+      foreach (var item in model.Where(x => x.ViewPermission == true))
+      {
+        int parentId = 0;
+        if (item.ParentId == 0)
+        {
+          parentId = 1;
+        }
+
+        menus.Add(new DynamicMenuItem { LinkText = @item.ModuleName, ActionName = @item.ActionName, ControllerName = @item.ControllerName, Class = item.ModuleClass, IsParent = parentId, MenuId = Convert.ToInt32(@item.ModuleID), ParentMenuId = @item.ParentId, DisplayOrder = @item.DisplayOrder });
+      }
+      // menus.Add(new DynamicMenuItem { LinkText = "GenericPensionProcess", ActionName = "Index", ControllerName = "GenericPensionProcess", Class = "fa fa-retweet fa-lg", IsParent = 1, MenuId = Convert.ToInt32(110), ParentMenuId = 0, DisplayOrder = 155 });
+    }
+  }
+
+
+}
+<style>
+  aside.skin-6 .main-menu ul ul.submenu.menu-active a {
+    background-color: #2181a5 !important;
+    padding-left: 25px;
+  }
+
+  aside.skin-6 .main-menu ul ul.submenu.menu-active ul.submenu li a {
+    background-color: #68a0bf !important;
+    padding-left: 26px;
+  }
+
+  aside.skin-6 .main-menu ul ul.submenu.menu-active span.badge.badge-success.bounceIn.animation-delay5 {
+    position: absolute;
+    top: 12px;
+    right: 7px;
+  }
+</style>
+<div class="main-menu">
+  <ul>
+    @if (HttpContext.Current.User.Identity.IsAuthenticated)
+    {
+      //if (User.IsInRole("Admin"))
+      //{
+      var list = menus;
+      foreach (var link in menus.OrderBy(x => x.DisplayOrder))
+      {
+        int menuId = link.MenuId;
+        if (link.IsParent == 1 && (list.Where(x => x.ParentMenuId == menuId).Count()) > 0)
+        {
+          var subMenu = menus.Where(x => x.ParentMenuId == menuId);
+          <li class="openable">
+            <a href="#">
+              <span class="menu-icon">
+                <i class="@link.Class"></i>
+              </span>
+              <span class="text" data-toggle="tooltip" data-placement="bottom" data-original-title="@link.LinkText">
+                @link.LinkText
+              </span>
+              <span class="badge badge-success bounceIn animation-delay5">@subMenu.ToList().Count</span>
+            </a>
+
+            @foreach (var subLink in subMenu.OrderBy(x => x.DisplayOrder))
+            {
+              int SmenuId = subLink.MenuId;
+              if ((list.Where(x => x.ParentMenuId == SmenuId).Count()) > 0)
+              {
+                var SsubMenu = menus.Where(x => x.ParentMenuId == SmenuId);
+                <ul class="submenu menu-active">
+                  <li class="openable">
+                    <a href="#">
+                      <span class="menu-icon">
+                        <i class="@subLink.Class"></i>
+                      </span>
+                      <span class="text" data-toggle="tooltip" data-placement="bottom" data-original-title="@subLink.LinkText">
+                        @subLink.LinkText
+                      </span>
+                      <span class="badge badge-success bounceIn animation-delay5">@SsubMenu.ToList().Count</span>
+                    </a>
+                    @foreach (var SsubLink in SsubMenu.OrderBy(x => x.DisplayOrder))
+                    {
+                      <ul class="submenu">
+                        <li class="">
+                          <a href="@Url.Action(SsubLink.ActionName, SsubLink.ControllerName)">
+                            <span class="menu-icon">
+                              <i class="@SsubLink.Class"></i>
+                            </span>
+                            <span class="submenu-label" data-toggle="tooltip" data-placement="bottom" data-original-title="@SsubLink.LinkText">@SsubLink.LinkText</span>
+                          </a>
+                        </li>
+                      </ul>
+                    }
+                  </li>
+                </ul>
+              }
+              else
+              {
+                <ul class="submenu">
+                  <li>
+                    <a href="@Url.Action(subLink.ActionName, subLink.ControllerName)">
+                      <span class="menu-icon">
+                        <i class="@subLink.Class"></i>
+                      </span>
+                      <span class="submenu-label" data-toggle="tooltip" data-placement="bottom" data-original-title="@subLink.LinkText">@subLink.LinkText</span>
+                    </a>
+                  </li>
+                </ul>
+              }
+            }
+          </li>
+        }
+        else if (link.IsParent == 1 && link.ParentMenuId == 0)
+        {
+          <li>
+            <a href="@Url.Action(link.ActionName,link.ControllerName)">
+              <span class="menu-icon">
+                <i class="@link.Class"></i>
+              </span>
+              <span class="text" data-toggle="tooltip" data-placement="bottom" data-original-title="@link.LinkText">
+                @link.LinkText
+              </span>
+              <span class="menu-hover"></span>
+            </a>
+          </li>
+        }
+      }
+    }
+
+
+  </ul>
+</div>
+

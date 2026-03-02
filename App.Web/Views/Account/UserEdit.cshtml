@@ -1,0 +1,409 @@
+﻿@model App.Data.Entities.UserProfile
+@using App.Web.Helper
+@{
+  ViewBag.Title = "UserEdit";
+  var RegionNames = @Html.Raw(Json.Encode(ViewBag.RegionNames));
+}
+<style nonce="@ViewBag.StyleNonce">
+  .span#maskinputadhar-2 {
+    position: absolute;
+    right: 0;
+  }
+
+  span#maskinputadhar {
+    position: absolute;
+    right: 35px;
+    top: 12px;
+    z-index: 99;
+  }
+
+  span#maskinputadhar {
+    display: none;
+  }
+
+  .hoverIcebuttonid:hover span#maskinputadhar {
+    display: block;
+  }
+</style>
+
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline headlineuser">
+      Update Details
+
+      @*<ul class="tool-bar">
+
+        </ul>*@
+    </h4>
+  </div>
+  <div class="panel-body">
+    @using (Html.BeginForm("UserEdit", "Account", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "IdUserEdit" }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+      @Html.HiddenFor(model => model.Id)
+      @Html.HiddenFor(model => model.UserId)
+      <p id="RegionNamesErr" class="red"></p>
+      <div class="row">
+        <div class="col-sm-8">
+          <div class="form-group">
+            <label class="col-sm-4 control">User Name: <span class="text-danger">*</span></label>
+            <div class="col-sm-8">
+              @Html.TextBox("UserName", "UserName", new { id = "UserName", name = "UserName", @class = "form-control input-sm", @readonly = "readonly", @Value = ViewBag.UserName })
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-4 control">Name: <span class="text-danger">*</span></label>
+            <div class="col-sm-8">
+              <div class="col-sm-4 usertext">
+                @Html.TextBoxFor(model => model.FirstName, new { @placeholder = "First Name", @class = "form-control" })
+              </div>
+              <div class="col-sm-4">
+                @Html.TextBoxFor(model => model.MiddleName, new { @placeholder = "Middle Name", @class = "form-control" })
+              </div><div class="col-sm-4">
+                @Html.TextBoxFor(model => model.LastName, new { @placeholder = "Last Name", @class = "form-control" })
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-4 control">Employee Code: <span class="text-danger">*</span></label>
+            <div class="col-sm-8">
+              <div class="col-sm-4 usertext">
+                @Html.TextBoxFor(model => model.EmployeeCode, new { @placeholder = "Employee Code", @class = "form-control" })
+              </div>
+              <label class="col-sm-2 control">Gender:</label>
+              <div class="col-sm-6">
+                @Html.EditorFor(model => model.Gender, new { htmlAttributes = new { @class = "form-control" } })
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-4 control">
+              @Html.DisplayNameFor(model => model.DOB)
+              <span class="text-danger">*</span>
+            </label>
+            @*@Html.LabelFor(model => model.DOB, new { @class = "col-sm-4 control-label" })*@
+            <div class="col-sm-8">
+              <div class="input-group date" id="Date">
+                @Html.EditorFor(m => m.DOB, new { @placeholder = "Date Of Birth" })
+                @*@Html.TextBoxFor(m => m.DOB, new { @class = "form-control", @placeholder = "Date Of Birth",@type="date" })*@
+                @*@{ string dOB = Convert.ToDateTime(Model.DOB).ToString("MM/dd/yyyy"); @Html.TextBoxFor(m => m.DOB, new { @class = "form-control", placeholder = "HireDate", @Value = @dOB })  }*@
+                @*@Html.EditorFor(m => m.DOB, new { @class = "form-control", placeholder = "Date Of Birth" ,id="dob_current", onchange = "myFunction()" })*@
+                @*@Html.EditorFor(m => m.DOB, new { @class = "form-control", placeholder = "Date Of Birth", id = "dob_current" })*@
+                @*@Html.EditorFor(m => m.DOB, new { @class = "form-control", placeholder = "Date Of Birth", id = "dob_current", onchange = "updateDOB()" })*@
+                <span class="input-group-addon">
+                  <i class="fa fa-calendar"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          @*<div class="form-group">
+              @Html.LabelFor(model => model.DOB, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                <div class="input-group">
+                  @{ string dOB = Convert.ToDateTime(Model.DOB).ToString("MM/dd/yyyy"); @Html.EditorFor(m => m.DOB, new { @class = "form-control", placeholder = "Date Of Birth", @Value = @dOB })  }
+
+                  <span class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                  </span>
+                </div>
+              </div>
+            </div>*@
+          <div class="form-group">
+            <label class="col-sm-4 control">Aadhar Number:</label>
+            <div class="col-sm-8 hoverIcebuttonid">
+              <span class="input-group-text span#maskinputadhar-2" id="maskinputadhar">
+                @*<i class="fa fa-eye"></i>*@
+                <i class="fa-eye-slash fa"></i>
+              </span>
+              <input type="hidden" id="orignalAdhar" name="SocialSecurityNumber" />
+              @Html.TextBoxFor(model => model.SocialSecurityNumber, new { @placeholder = "", @class = "form-control", @id = "numericInput", @maxLength = "118" })
+              @Html.ValidationMessage("", new { @class = "text-danger", @id = "validationMessage" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-4 control">
+              @Html.DisplayNameFor(model => model.HireDate)
+              <span class="text-danger">*</span>
+            </label>
+            @*@Html.LabelFor(model => model.HireDate, "Hire Date", new { @class = "col-sm-4 control-label" })*@
+
+            <div class="col-sm-8">
+
+              <div class="input-group date">
+                @Html.EditorFor(m => m.HireDate, new { @class = "form-control", placeholder = "HireDate", @onchange = "validateDates(this)" })
+                @*@Html.TextBoxFor(m => m.HireDate, new { @class = "form-control", placeholder = "HireDate", @onchange = "validateDates(this)",@type="date" })*@
+
+                @*@{ string hireDate = Convert.ToDateTime(Model.HireDate).ToString("MM/dd/yyyy"); @Html.TextBoxFor(m => m.HireDate, new { @class = "form-control", placeholder = "HireDate", @Value = @hireDate })  }*@
+
+                <span class="input-group-addon">
+                  <i class="fa fa-calendar"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-4 control">Role: <span class="text-danger">*</span></label>
+            @*@Html.Label("Role", "Role", new { id = "Role", @class = "col-sm-4 control-label" })*@
+            <div class="col-sm-8">
+              @Html.DropDownList("Role", null, "---Select---", new { @class = "form-control select-sm", @disabled = "disabled" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-4 control">District: <span class="text-danger">*</span></label>
+            <div class="col-sm-8">
+              @Html.TextBox("RegionNames", "", new { @class = "form-control", @autocomplete = "off", @placeholder = "Select Regions" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-4 control">Email Id: <span class="text-danger">*</span></label>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(m => m.Email, new { @class = "form-control input-sm", @readonly = "readonly", placeholder = "Email" })
+            </div>
+          </div>
+          <div class="form-group">
+            @Html.LabelFor(model => model.IsActive, new { @class = "col-sm-4 control" })
+            <div class="col-sm-8">
+              @Html.EditorFor(model => model.IsActive)
+            </div>
+          </div>
+          <div class="form-group">
+            @*@Html.Hidden("userType", ViewBag.userType)*@
+            <input type="hidden" name="userType" id="userType" value="@ViewBag.userType">
+
+
+          </div>
+
+
+          <div class="form-group">
+            <label class="col-sm-4 control-label"></label>
+            <div class="col-sm-8">
+              <button type="button" class="btn btn-success px-5 height userbutton" title="Please Wait While We Process Your Request" id="btn_User_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+              <button type="submit" id="IdUpdatedUser" class="btn btn-success"><i class="fa fa-save"> </i> Update </button>
+              <a href="/Account/UserProfiles?userType=@ViewBag.userType" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+              @*<button type="submit" class="btn btn-success"><i class="fa fa-save"> </i> Update</button>
+                @Html.ActionLink("Back to List", "UserProfiles", "Account", null, new { @class = "btn btn-primary" })*@
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2">
+
+          <div class="media profilepathuser">
+            @if (Model.ProfilePath != null)
+            {
+              var path = SiteHelper.GetProfileImagePath + Model.ProfilePath;
+              <a href="#" class="thumbnail pull-left" @*onclick="javascript: return ShowUpload('NewfileUploadProfile')"*@>
+                <img id="imgProfileNew" class="editable img-responsive cursoruser" alt="Alex's Avatar" src='@path' title="Upload Image" />
+              </a>
+            }
+            else
+            {
+              <a href="#" class="thumbnail pull-left" @*onclick="javascript: return ShowUpload('NewfileUploadProfile')"*@>
+                <img id="imgProfileNew" class="editable img-responsive cursoruser" alt="Alex's Avatar" src="~/Images/noimage.jpg" title="Upload Image" />
+              </a>
+            }
+
+          </div>
+          <input type="file" id="NewfileUploadProfile" class="cursoruserss" name="NewfileUploadProfile" onchange="ShowImagePreview(this, 'imgProfileNew', 1024)" />
+        </div>
+
+
+      </div>
+    }
+  </div>
+</div>
+
+@section Scripts {
+  @Scripts.Render("~/bundles/jqueryval")
+  <script nonce="@ViewBag.StyleNonce" src="https://cdn.jsdelivr.net/npm/inputmask@5.0.8/dist/inputmask.min.js"></script>
+  <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+  <script src="~/Content/endless/LatestJS/jquery.dataTables.min.js"></script>
+  <script src="~/Scripts/FileUpload.js"></script>
+
+
+  <script nonce="@ViewBag.StyleNonce">
+
+    let originalValue = "";
+    function maskAadhar(aadharNumber) {
+      return aadharNumber.replace(/\d(?=\d{4})/g, 'x');
+    }
+    debugger
+    let input = $("#numericInput");
+     originalValue = input.val();
+    input.val(maskAadhar(originalValue));
+
+    $('#maskinputadhar').click(function () {
+      debugger
+      var r = $("#numericInput").val();
+      let isMasked = input.data("masked");
+        if (isMasked) {
+          input.val(maskAadhar(r));
+        } else {
+          input.val(originalValue);
+        }
+        input.data("masked", !isMasked);
+      $(this).find('i').toggleClass('fa-eye-slash fa fa fa-eye');
+    });
+
+     jQuery(document).ready(function ($) {
+      comboTree = $('#RegionNames').comboTree({
+        source: @RegionNames,
+        isMultiple: true,
+        cascadeSelect: true,
+        collapse: false
+      });
+    });
+
+    $('#IdUpdatedUser').on('click', function (e) {
+      debugger
+      var ReasonForChange = $('#RegionNames').val();
+      if (ReasonForChange === null || ReasonForChange.trim() === '') {
+        e.preventDefault();
+        $("#RegionNamesErr").text("RegionNames is Required..");
+      }
+      else {
+        $("#RegionNamesErr").text("");
+      }
+    });
+
+    $("#LastName").on('blur', function () {
+      $("#UserName").val($("#FirstName").val() + "." + $("#LastName").val());
+    });
+    var date = new Date();
+    var dob = date.getMonth() + "/" + date.getDate() + "/" + (date.getFullYear() - 18);
+    $('#DOB').datepicker({
+      endDate: dob,
+      startView: 1,
+      format: "mm/dd/yyyy",
+      autoclose: true
+    });
+    $('#HireDate').datepicker({
+      endDate: dob,
+      startView: 1,
+      format: "mm/dd/yyyy",
+      autoclose: true
+    });
+    //$('#SocialSecurityNumber').keypress(function (event) {
+    //  if ((event.which > 31 && (event.which < 48 || event.which > 57))) {
+    //    event.preventDefault();
+    //  }
+    //})
+    //$("#SocialSecurityNumber").mask("999-99-9999");
+    $("#numericInput").on('blur', function () {
+      debugger
+      /*var number = $("#numericInput").val();*/
+      var number = originalValue;
+      if (number != "" && /^\d{12}$/.test(number)) {
+        $("#numericInput").val(maskAadhar(number));
+        var span = $('#maskinputadhar');
+        var icon = span.find('i');
+        icon.toggleClass('fa-eye fa-eye-slash');
+        $.ajax({
+          type: 'Get',
+          url: '/Account/SocialSecurityNoIndex?Number=' + number + "&UserId=" + $("#UserId").val(),
+          dataType: 'json'
+        }).done(function (result) {
+          if (result != "0") {
+            toasterErrorMessage("This Aadhar Number already exist");
+            //$("#numericInput").val("");
+          }
+        });
+      }
+      else {
+        toasterErrorMessage("Aadhar number must be a 12-digit numeric value.");
+        //$("#numericInput").val("");
+      }
+    });
+
+
+
+
+    //$(document).ready(function () {
+    //  $('#numericInput').on('input', function (event) {
+    //    debugger
+    //    // Get the current input value
+    //    let inputValue = $(this).val();
+    //    // Remove non-numeric characters using a regular expression
+    //    let numericValue = inputValue.replace(/[^0-9]/g, '');
+
+    //    if (inputValue !== numericValue) {
+    //      // Display validation message if non-numeric characters are present
+    //      $('#validationMessage').text('Please enter only numeric characters.');
+    //    } else {
+    //      $('#validationMessage').text('');
+    //    }
+
+    //    // Update the input field with the numeric value
+    //    $(this).val(numericValue);
+    //  });
+    //});
+  </script>
+
+  <!-------***** Code By Himanshu ****---------->
+
+  <script nonce="@ViewBag.StyleNonce">
+
+      $(document).ready(function () {
+        $('form').submit(function () {
+          $("#orignalAdhar").val(originalValue);
+          $('#IdUpdatedUser').hide();
+          $('#btn_User_loading').show();
+          var form = $("#IdUserEdit");
+          if (!form.valid()) {
+              $('#IdUpdatedUser').show();
+              $('#btn_User_loading').hide();
+              return false;
+          }
+      });
+        var error = '@TempData["error"]';
+        if (error && error.length > 0) {
+            $('#IdUpdatedUser').show();
+            $('#btn_User_loading').hide();
+        }
+          $('#btn_User_loading').hide();
+    });
+
+
+
+        //debugger;
+        //$("#IdUpdated10").on('click', function () {
+        //    $("i.fa-spinner").show();
+        //    setTimeout(function () {
+        //        $("i.fa-spinner").hide();
+        //    }, 1000);
+        //});
+  </script>
+
+  <!---Code By Himanshu Rajput-->
+
+  <script nonce="@ViewBag.StyleNonce">
+
+    $(document).ready(function () {
+      // Attach onchange event handlers
+      $('#HireDate').on('change', function () {
+        validateDates();
+      });
+
+      function validateDates() {
+        debugger
+        var dob = $('#DOB').val();
+        var hireDate = $('#HireDate').val();
+
+        // Convert string dates to Date objects
+        var dobDate = new Date(dob);
+        var hireDateDate = new Date(hireDate);
+
+        // Perform comparison
+        debugger;
+        if (dobDate > hireDateDate) {
+          toasterErrorMessage("Hire Date must be greater than Date of Birth.");
+          $('#HireDate').val('');
+          // You can also reset the date or perform other actions here
+        }
+      }
+    });
+  </script>
+} 

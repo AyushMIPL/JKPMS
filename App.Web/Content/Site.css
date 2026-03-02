@@ -1,0 +1,298 @@
+﻿/*body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}*/
+
+/* Set padding to keep content from hitting the edges */
+/*.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}*/
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+/*.dl-horizontal dt {
+    white-space: normal;
+}*/
+
+/* Set width on the form input elements since they're 100% wide by default */
+/*input,
+select,
+textarea {
+    max-width: 280px;
+}*/
+.TextRight {
+    text-align: right;
+}
+
+.pstyle {
+    width: 45px;
+    height: 45px;
+    border: 1px solid rgb(219, 219, 219);
+    border-radius: 50%;
+}
+
+    .pstyle img {
+        width: 40px;
+        height: 40px;
+        border: 1px solid rgb(219, 219, 219);
+        border-radius: 50%;
+    }
+
+.widget-blue {
+    background-color: #3498db;
+    color: #fff;
+    border: 1px solid #217dbb;
+    border-bottom: 1px solid #196090;
+    background-image: linear-gradient(to bottom, #3498db 0%, #258cd1 100%);
+    background-repeat: repeat-x;
+    padding: 10px 15px;
+    border-radius: 5px 5px 0px 0px;
+}
+
+.widget-red {
+    background-color: #e74c3c;
+    color: #fff;
+    border: 1px solid #d62c1a;
+    border-bottom: 1px solid #a82315;
+    background-image: linear-gradient(to bottom, #e74c3c 0%, #e43725 100%);
+    background-repeat: repeat-x;
+    padding: 10px 15px;
+    border-radius: 5px 5px 0px 0px;
+}
+
+.widget-green {
+    background-color: #1abc9c;
+    color: #fff;
+    border: 1px solid #148f77;
+    border-bottom: 1px solid #0e6252;
+    background-image: linear-gradient(to bottom, #1abc9c 0%, #17a689 100%);
+    background-repeat: repeat-x;
+    padding: 10px 15px;
+    border-radius: 5px 5px 0px 0px;
+}
+
+.widget-content {
+    border-radius: 0px 0px 4px 4px;
+    border: 1px solid #cccccc;
+    border-top: none;
+    background-image: linear-gradient(to bottom, #fff 0%, #f9f9f9 100%);
+    background-repeat: repeat-x;
+    box-shadow: inset 0px -2px 2px 0px #fff;
+}
+
+.input-abs-icon {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: #aaa;
+    font-size: 18px;
+}
+
+.relative-w {
+    position: relative;
+}
+
+tr .group:hover {
+    background-color: rgba(128, 128, 128, 0.55);
+}
+
+table.dataTable tr.odd:hover, table.dataTable tr.even:hover {
+    background-color: rgba(204, 204, 204, 0.48);
+    border-color: #ccc;
+}
+
+/*table.dataTable td.dataTables_empty:hover {
+    background-color: rgb(255, 215, 128);
+}*/
+
+.sidebar-inner.scrollable-sidebar {
+    overflow: scroll !important;
+}
+
+.stepper-item {
+  position: relative;
+  /* display: flex; */
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  float: left;
+  width: 25%;
+  margin-bottom: 20px;
+}
+
+  .stepper-item::before {
+    position: absolute;
+    content: "";
+    border-bottom: 2px solid #ccc;
+    width: 62%;
+    top: 47%;
+    left: -50%;
+    z-index: 2;
+  }
+
+  .stepper-item::after {
+    position: absolute;
+    content: "";
+    border-bottom: 2px solid #ccc;
+    width: 32%;
+    top: 47%;
+    left: 50%;
+    z-index: 2;
+  }
+
+
+
+.w-100 {
+    width: 100%;
+}
+
+    .stepper-item .step-counter {
+        position: relative;
+        z-index: 5;
+        /* display: flex; */
+        /* justify-content: center; */
+        align-items: center;
+        /*width: 220px;*/
+        height: 200px;
+        border-radius: 20px;
+        background: #dcd8d8;
+        margin-bottom: 6px;
+        margin: 0px 10px;
+        padding: 20px;
+        cursor: pointer;
+    }
+
+  .stepper-item.active {
+    font-weight: bold;
+  }
+
+.stepper-item .step-counter:hover {
+    background-color: #cdcbcb;
+}
+  .stepper-item.completed .step-counter {
+    background-color: #1e87f0;
+    color: #fff;
+  }
+
+  .stepper-item.completed::after {
+    position: absolute;
+    content: "";
+    border-bottom: 2px solid #1e87f0;
+    width: 100%;
+    top: 47%;
+    left: 50%;
+    z-index: 3;
+  }
+
+  .stepper-item:first-child::before {
+    content: none;
+  }
+
+  .stepper-item:last-child::after {
+    content: none;
+  }
+
+.uk-timeline-item {
+  display: flex;
+  position: relative;
+}
+
+  .uk-timeline-item::before {
+    background: #dadee4;
+    content: "";
+    height: 100%;
+    left: 19px;
+    position: absolute;
+    top: 0px;
+    width: 2px;
+    z-index: 9;
+  }
+
+.uk-timeline .uk-timeline-item .uk-timeline-icon .uk-badge {
+  margin-top: 20px;
+  width: 40px;
+  height: 40px;
+}
+
+.uk-badge {
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  padding: 0 5px;
+  border-radius: 500px;
+  vertical-align: middle;
+  background: #1e87f0;
+  color: #fff;
+  font-size: .875rem;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 30px;
+  position: absolute;
+  top: 46%;
+  z-index:99;
+}
+
+.uk-timeline-icon {
+  width: 40px;
+}
+
+.uk-icon {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+  color: inherit;
+  text-transform: none;
+  padding: 0;
+  background-color: transparent;
+  display: inline-block;
+  fill: currentcolor;
+  line-height: 0;
+}
+
+.stepper-item.active .step-counter {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 85%;
+  height: 200px;
+  border-radius: 20px;
+  background: #ececec;
+  margin-bottom: 6px;
+  margin: 10px;
+  background-color: #666;
+}
+
+span.counter {
+  border: 1px solid #666;
+  padding: 10px;
+  border-radius: 4px;
+  display: block;
+  margin: 10px 0px;
+}
+
+.completed span.counter {
+  border: 1px solid #fff;
+  padding: 10px;
+  border-radius: 4px;
+  display: block;
+  margin: 15px 0px;
+}
+
+
+.completed .icon-fa {
+  display: block;
+}
+
+.icon-fa {
+  position: absolute;
+  left: 8px;
+  top: 10px;
+  color: #fff;
+  display: none;
+}

@@ -1,0 +1,214 @@
+﻿@model JKPS.COMMON.DVOMasterEmployee
+@{
+    ViewBag.Title = "BeneficiaryStatus";
+    var Group = @Html.Raw(Json.Encode(ViewBag.Group));
+}
+<style>
+    .ui-autocomplete {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        position: absolute;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .ui-menu-item {
+        padding: 8px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+    }
+
+        .ui-menu-item:last-child {
+            border-bottom: none;
+        }
+
+    .ui-state-focus {
+        background-color: #007bff;
+        color: lightgrey;
+    }
+
+
+    .dataTables_wrapper .dt-buttons {
+        float: none;
+        text-align: right;
+    }
+
+    span.select2.select2-container.select2-container--default {
+        width: 100% !important;
+    }
+
+    .dropdown-item:hover {
+        background-color: #bbbfc3; /* Set your desired hover color */
+        padding: 5px;
+    }
+
+    .dropdown-menu {
+        font-size: 11px;
+        padding: 5px;
+    }
+
+    .dropdown-item {
+        padding: 4px 0px;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0 !important;
+        left: auto !important;
+    }
+
+    .dropdown-item:hover {
+        background-color: #e8e9ea;
+        padding: 5px;
+        color: #262626;
+    }
+
+    .dropdown-item {
+        padding: 5px;
+    }
+
+    a.disabled {
+        color: gray;
+        pointer-events: none;
+        opacity: .8;
+    }
+</style>
+
+
+<div class="panel panel-default">
+    <div class="panel-body">
+
+        <div class="row py-4">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>District</label>
+                    @Html.TextBox("RegionNames", "", new { @class = "form-control", @autocomplete = "off", @placeholder = "Select Regions", @id = "RegionNames" })
+                </div>
+            </div>
+
+            <div class="col-sm-4">
+
+                <label>Account Status</label>
+                <div class="form-group h_select">
+                    @Html.DropDownList("AccountStatus", new SelectList(new[]
+                    {
+                      new SelectListItem{Value="ALL",Text="ALL"},
+                      new SelectListItem{Value="ACTIVE",Text="Validated"},
+                      new SelectListItem{Value="INACTIVE ACCOUNT",Text="Not Validated "},
+                    }, "Value", "Text"), new { @class = "form-control", @autocomplete = "off", @placeholder = "Select Account Status" })
+                </div>
+
+            </div>
+
+            <div class="col-sm-2">
+                <div class="control-label mb-2 mt-3" for="Name"> &nbsp; </div>
+                <button type="button" class="btn btn-success px-5 height display-none" title="Please Wait While We Process Your Request" id="btn_Yearly_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                <button type="button" class="btn btn-success height px-5" id="Idbtnyearly"><i class="fa fa-search"></i> Search </button>
+            </div>
+
+
+
+        </div>
+
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline headlineMonthlyPensionSummary">
+            Beneficiary Details
+            <ul class="tool-bar">
+            </ul>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="alert alert-warning display-none">
+                    <h4 class="mb-0"> There is no Record Found</h4>
+                </div>
+                <iframe id="reportData" class="reportDataAction1MonthlyPensionSummary"></iframe>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@section Scripts {
+    <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+    <script nonce="@ViewBag.StyleNonce">
+
+        document.getElementById("Idbtnyearly").addEventListener("click", ShowReportData);
+
+        $(function () {
+            $(".alert-warning").hide();
+        });
+
+    jQuery(document).ready(function ($) {
+        debugger;
+      comboTree = $('#RegionNames').comboTree({
+        source: @Group,
+        isMultiple: true,
+        cascadeSelect: true,
+        collapse: false
+      });
+      $("#AccountStatus").val("ACTIVE");
+      //dobind(); GetAccountNo(); GetReferenceNo();
+        $('.select2-dropdown').select2();
+    });
+
+
+    function ShowReportData(evt) {
+        debugger;
+        $(evt).find("i.fa-spinner").show();
+      var Date1 = $("#From").val();
+      var Date2 = $("#to").val();
+      var SchemeType = $("#EmplCode").val();
+        var Gender = "";//$("#Gender").val();
+        var AgeInYears = $("#AgeInYears").val();
+        var FinacialYear = $("#FinancialYearDropdown").val();
+        var BeneficiaryId = $("#EmployeeId").val();
+        var RegionNames = $("#RegionNames").val();
+        var AccountStatus = $("#AccountStatus").val();
+        var FinacialYear = $("#FinancialYearDropdown").val();
+      var BeneficiariesId = $("#EmployeeId option:selected").map(function (ind, _el) {
+        debugger
+          return $(_el).val();
+          $(evt).find("i.fa-spinner").hide();
+      });
+        debugger;
+          $("#btn_Yearly_loading").show();
+          $("#Idbtnyearly").hide();
+      $.ajax({
+          url: "@Url.Action("BeneficiaryStatusAjax", "Reports")?emplrId=" + SchemeType + "&empl_code=" + $.makeArray(BeneficiariesId) + "&date1=" + Date1 + "&date2=" + Date2 + "&gender=" + Gender + "&ageInYears=" + AgeInYears + "&regionNames=" + RegionNames + "&accountStatus=" + AccountStatus + "&finacialYear=" + FinacialYear,
+          type: "GET",
+
+      }).done(function (result) {
+         $("#Idbtnyearly").show();
+        $("#btn_Yearly_loading").hide();
+          debugger;
+        var actionRes = result;
+        $(evt).find("i.fa-spinner").hide();
+        if (actionRes == "1") {
+          $('#reportData').show();
+          $(".alert-warning").hide();
+            $('#reportData').attr('src', '/ReportForms/ContributionByEmployer.aspx');
+            $(evt).find("i.fa-spinner").hide();
+          return false;
+        }
+        else {
+          $(".alert-warning").show();
+          $('#reportData').hide();
+            toasterInfoMessage("Result not found on this search criteria.");
+            $(evt).find("i.fa-spinner").hide();
+        }
+      });
+    }
+
+
+
+    </script>
+}
+

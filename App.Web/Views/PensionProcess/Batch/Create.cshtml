@@ -1,0 +1,43 @@
+﻿@model App.Data.Entities.MasterPensioner
+@{
+  ViewBag.Title = "Create";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Add Details
+      @*<ul class="tool-bar">
+        
+      </ul>*@
+    </h4>
+  </div>
+  <div class="panel-body">
+    @using (Html.BeginForm("Create", "PensionProcess", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+      <div class="row">
+        <div class="col-sm-5">
+          <div class="form-group">
+            <label class="col-sm-4 control-label"></label>
+            <div class="col-sm-8">
+              <button type="submit" class="btn btn-success"><i class="fa fa-save"> </i> Create</button>
+              @Html.ActionLink("Back to List", "Index", "PensionProcess", null, new { @class = "btn btn-primary" })
+            </div>
+          </div>
+        </div>
+      </div>
+
+    }
+  </div>
+</div>
+@section scripts{
+  <script nonce="@ViewBag.StyleNonce">
+    $(function(){
+      $("#IsActive").on("click", function () {
+        toasterErrorMessage("If you Uncheck This field..Then this Record is treated as Inactive Record");
+      })
+    })
+  </script>
+}

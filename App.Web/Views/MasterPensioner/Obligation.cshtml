@@ -1,0 +1,61 @@
+﻿@model App.Data.Entities.MasterPensionerObligations
+
+@{
+  Layout = "~/Views/Shared/_LayoutPensioner.cshtml";
+}
+@section profilePensioner
+{@Html.Hidden("PensionerID")
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Obligation Details:@string.Format("{0} ({1})", ViewBag.Name, ViewBag.PensionerID)
+      <ul class="tool-bar">
+        <li><a href="/MasterPensioner/AddObligationDetails/@ViewBag.Id" data-toggle="tooltip" data-placement="bottom" title="Add details" data-original-title="Add Details"><i class="fa fa-plus"></i></a></li>
+        
+      </ul>
+    </h4>
+  </div>
+  <div class="panel-body">
+    <table class="table dataTable" id="tbl">
+      <thead>
+        <tr>
+          <th>Obligation Code</th>
+          <th>Rate</th>
+          <th>Annual Limit</th>
+          <th>Pay Limit</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+ 
+}
+@section Scripts {
+  <script src="~/Content/endless/js/jquery.dataTables.min.js"></script>
+  <script nonce="@ViewBag.StyleNonce">
+    $(function () {
+      var pensionerID = $("#PensionerID").val();
+			var oTable = $('#tbl').dataTable({
+				"bJQueryUI": true,
+				"sPaginationType": "full_numbers",
+				"bServerSide": true,
+				"bDestroy": true,
+				"sAjaxSource": "/MasterPensioner/ObligationAjaxHandler/?PensionerID=" + pensionerID,
+				"aoColumns": [
+
+						{ "sName": "DeductionCode" },
+						{ "sName": "Rate" },
+            { "sName": "AnnualLimit" },
+            { "sName": "PayLimit" }
+				]
+			});
+    })
+
+
+  </script>
+}
+
+
+

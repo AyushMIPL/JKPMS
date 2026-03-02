@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Social Welfare Pension System</title>
+    @Styles.Render("~/Content/css")
+    @*@Scripts.Render("~/bundles/modernizr")*@
+    <link href="~/Content/endless/LatestJS/font-awesome.min.css" rel="stylesheet" />
+    <style>
+        .jkpsLogo {
+            margin-top: -20px;
+        }
+    </style>
+</head>
+
+<body class="pace-done">
+    <div class="login-wrapper">
+        <div class="text-center jkpsLogo">
+            <img src="../Images/jkpslogo.PNG" height="80" />
+        </div>
+        @*<div class="text-center">
+              <h2 class="fadeInUp animation-delay8" style="font-weight:bold;">
+                <span style="color:#ccc; text-shadow:0 1px #fff">JKPS</span> <span class="text-success">Management</span>
+              </h2>
+            </div>*@
+        <div class="login-widget animation-delay1">
+            @RenderBody()
+        </div>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/jqueryval")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,350 @@
+﻿
+<div class="modal fade in" id="simpleModal" aria-hidden="false" style="display: none;text-align: center;margin-top:100px;">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width:850px;">
+            <div class="modal-header">
+                Below Listed Data already Exist in Moving Contributor. Do you still want to Replace?
+                <button type="button" class="close" onclick="hidemodal();" aria-hidden="true">×</button>
+            </div>
+            <div id="PartialDiv">
+
+            </div>
+            @*<div class="modal-footer">
+                    <button class="btn btn-sm btn-success" data-dismiss="modal" onclick="continueReplace('0');" aria-hidden="true"> Replace</button>
+                    <a href="javascript:continueReplace(1);" class="btn btn-primary btn-sm">Leave</a>
+                </div>*@
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row py-4">
+
+            <div class="col-sm-3">
+                @Html.DropDownList("EmployerId", null, "---Select---", new { @class = "form-control select-sm" })
+            </div>
+            <div class="col-sm-3">
+                @Html.DropDownList("PersonID", null, "---Select---", new { @class = "form-control select-sm" })
+            </div>
+            <div class="col-sm-3">
+                <div class="input-group date" id="Date">
+                    @Html.TextBox("SelectFrom ", "", new { @class = "form-control", @placeholder = "Select Start Date", @id = "From" })
+                    <span class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="input-group date" id="Date">
+                    @Html.TextBox("SelectTo ", "", new { @class = "form-control", @placeholder = "Select End Date", @id = "to" })
+                    <span class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="col-sm-3 mt-5">
+                @Html.DropDownList("ContributorId", null, "---Select---", new { @class = "form-control select-sm " })
+            </div>
+            <div class="col-sm-5 mt-5">
+                <button type="button" class="btn btn-success height px-5 mr-4" onclick="detailSearch()"><i class="fa fa-search"></i> Search</button>
+                @*<button type="button" class="btn btn-danger btn-xs" onclick="deleteAll()"><i class="fa fa-trash-o fa-lg"></i> Delete Selected Record</button>*@
+               
+                <button type="button" class="btn btn-info height px-5 border-raduis" onclick="deleteAll()"><i  class="fa fa-share fa-lg"></i> Move Selected Contribution</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+            Modify Finalized Details
+        </h4>
+    </div>
+    <div class="panel-body">
+
+        @Html.ValidationSummary("", new { @class = "text-danger" })
+ 
+  
+        <ul class="tool-bar inline" style="margin-top: -30px;">
+            <li style="margin-right:5px;"></li>
+            <li style="margin-right:5px;">
+           </li>
+
+
+        </ul>
+        <table class="table dataTable" id="tblList">
+            <thead>
+                <tr class="th-color">
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th colspan="3" style="border:inherit; text-align:center">System Defined</th>
+                    <th colspan="3" style="border:inherit; text-align:center">Get Amount From Employer</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th><input id="parentCheckbox" type="checkbox" style="position:relative"></th>
+                    <th>JKPS ID</th>
+                    <th>Contributor Name</th>
+                    <th>Source</th>
+                    <th>Salary</th>
+                    <th>Employee’s <br /> Contribution<br /><label id="SystemContributorTotalContribution"></label></th>
+                    <th>Employer<br /> Contribution<br /><label id="SystemEmployerTotalContribution"></label></th>
+                    <th>Salary</th>
+                    <th>Employee’s <br /> Contribution<br /><label id="lblEmp"></label></th>
+                    <th>Employer <br />Contribution<br /><label id="lblCont"></label></th>
+                    <th>Period</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+
+
+    </div>
+</div>
+<div class="custom-popup width-100 confirmClass" id="confirmDeleteContribution" style="display:none;">
+    <div class="padding-md">
+        <h4 class="m-top-none"> Selected contributions will be moved Permanently. Are you sure want to continue?</h4>
+    </div>
+    <div class="text-center">
+        <a class="btn btn-success m-right-sm" onclick="onClickDeleteConfirm()">Yes</a>
+        <a class="btn btn-danger confirmDeleteContribution_close">No</a>
+    </div>
+</div>
+@section scripts{
+
+    <script nonce="@ViewBag.StyleNonce">
+
+        $(document).ajaxStart(function () { Pace.restart(); });
+        $("#parentCheckbox").on("click", function () {
+            if (this.checked) {
+                $(".childcheckbox").each(function () {
+                    $(this).prop("checked", true);
+                })
+            }
+            else {
+                $(".childcheckbox").each(function () {
+                    $(this).prop("checked", false);
+                })
+            }
+        })
+
+        function hidemodal() {
+            dobind();
+            $("#parentCheckbox").prop("checked", false);
+            $("#simpleModal").hide();
+        }
+
+        function deleteAll() {
+            var conId = $("#ContributorId").val();
+            var oldconId = $("#PersonID").val();
+            if (conId == "") {
+                toasterErrorMessage("Please select Contributor to move contribution to that contributor");
+            }
+                //else if (conId == oldconId) {
+                //    toasterErrorMessage("Contributor cannot be moved with in same contributor");
+                //}
+            else {
+                var grp = [];
+                $(".childcheckbox").each(function () {
+                    if (this.checked) {
+                        grp.push($(this).val());
+                    }
+                })
+                if (grp.length > 0) {
+                    $('#confirmDeleteContribution').popup("show");
+
+                }
+                else {
+                    toasterErrorMessage("Please select atleast one contribution to move");
+                }
+            }
+        }
+
+        function onClickDeleteConfirm() {
+            $('#confirmDeleteContribution').popup("hide");
+            debugger
+            var grp = [];
+            $(".childcheckbox").each(function () {
+                if (this.checked) {
+                    grp.push($(this).val());
+                }
+            })
+
+            var conId = $("#ContributorId").val();
+            var oldconId = $("#PersonID").val();
+            var oldEmpId = $("#EmployerId").val();
+            var params = {
+                Data: grp,
+                conId: parseInt(conId),
+                oldconId: parseInt(oldconId),
+                oldEmpId: parseInt(oldEmpId)
+            };
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("MoveContributorAjax", "MoveContributorContribution")",
+                dataType: 'json',
+                contentType: 'application/json; charset=UTF-8',
+                data: JSON.stringify(params),
+                async: false,
+                success: function (result) {
+                    if (result.success == "1") {
+                        dobind();
+                        $("#parentCheckbox").prop("checked", false);
+                        toasterSuccessMessage("Record Moved Successfully");
+                    }
+                    else if (result.Error != "" && result.Error != null) {
+                        toasterErrorMessage(result.Error);
+                    }
+                    else {
+                        debugger;
+                        $("#PartialDiv").empty();
+                        var str = "<table border='1' style='width:800px;margin-left:5px;'><tr><td></td><td></td><td colspan='5'>" + result.Record[0].OldContributorName + "</td><td colspan='5'>" + result.Record[0].NewContributorName + "</td></tr><tr><td>Month</td><td>Year</td><td>ContributorName</td><td>Salary Amount</td><td>Contributor Contribution</td><td>Employer Contribution</td><td></td><td>ContributorName</td><td>Salary Amount</td><td>Contributor Contribution</td><td>Employer Contribution</td><td></td></tr>";
+                        $.each(result.Record, function (i, item) {
+                            str += "<tr><td>" + item.Month + "</td><td>" + item.Year + "</td><td>" + item.OldContributorName + "</td><td>" + item.OldSalaryAmount + "</td><td>" + item.OldContributorContribution + "</td><td>" + item.OldEmployerContribution + "</td><td><button class='btn btn-sm btn-success' onclick='continueReplace(0,this);' value='" + item.NewDetailId + "," + item.NewDetailFinalizedId + "," + item.OldDetailId + "," + item.OldDetailFinalizedId + "'> Apply</button></td><td>" + item.NewContributorName + "</td><td>" + item.NewSalaryAmount + "</td><td>" + item.NewContributorContribution + "</td><td>" + item.NewEmployerContribution + "</td><td><button class='btn btn-sm btn-success' onclick='continueReplace(1,this);' value='" + item.NewDetailId + "," + item.NewDetailFinalizedId + "," + item.OldDetailId + "," + item.OldDetailFinalizedId + "'> Apply</button></td></tr>";
+                        })
+                        str += "</table>";
+                        $("#Replacelist").val();
+                        $("#PartialDiv").append(str);
+                        $('#simpleModal').show();
+                    }
+
+                }
+            })
+
+        }
+
+        function continueReplace(op, Ctrl) {
+            debugger
+            var grp = $(Ctrl).val();
+
+            var params = {
+                Data: grp,
+                Oper: parseInt(op)
+            };
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("replaceRecordAjax", "MoveContributorContribution")",
+                dataType: 'json',
+                contentType: 'application/json; charset=UTF-8',
+                data: JSON.stringify(params),
+                success: function (result) {
+                    if (result == "1") {
+                        var tr = $(Ctrl).closest("tr");
+                        tr.remove();
+                        toasterSuccessMessage("Record moved successfully");
+                    }
+                    else {
+                        toasterErrorMessage("Please Try Again Later");
+                    }
+                }
+            })
+        }
+
+        function dobind() {
+            $("#parentCheckbox").css('display', '');
+            var empId = $("#EmployerId").val();
+            var conId = $("#PersonID").val();
+            var Date1 = $("#From").val();
+            var Date2 = $("#to").val();
+            //year = $("#Year").val();
+            var oTable = $('#tblList').dataTable({
+                "bJQueryUI": true,
+                "sPaginationType": "full_numbers",
+                "bServerSide": true,
+                "bDestroy": true,
+                "bAutoWidth": false,
+                "sAjaxSource": "@Url.Action("EditDetailSearchAjax", "MoveContributorContribution")?empId=" + empId + "&conId=" + conId + "&fromDate=" + Date1 + "&to=" + Date2,
+                "aoColumns": [
+        {
+            "sName": "SelectAll",
+            "bSearchable": false,
+            "bSortable": false,
+            "fnRender": function (oObj) {
+                var strString = '<input class="childcheckbox" value="' + oObj.aData[0] + '" type="checkbox">';
+                return strString;
+            }
+        },
+            { "sName": "JKPSID" },
+                        { "sName": "ContributorName" },
+                        { "sName": "Source" },
+                        { "sName": "SystemSalary" },
+                        { "sName": "SystemContributorContribution" },
+                        { "sName": "SystemEmployerContribution" },
+                        { "sName": "Salary" },
+                        { "sName": "ContributorContribution" },
+                        { "sName": "EmployerContribution" },
+                        {
+                          "sName": "Period",
+                          "fnRender": function (oObj) {
+                            $("#lblEmp").text(oObj.aData[12]);
+                            $("#lblCont").text(oObj.aData[11]);
+                            $("#SystemContributorTotalContribution").text(oObj.aData[13]);
+                            $("#SystemEmployerTotalContribution").text(oObj.aData[14]);
+                            var strString = oObj.aData[10] ;
+                            //strString += '&nbsp;<a href="javascript:;"  onclick="javascript:del(' + oObj.aData[9] + ');" class="btn btn-xs btn-danger" title="Delete"><i class="fa fa-trash-o fa-lg"></i> Delete</a>';
+                            return strString;
+                          }
+                        },
+                ]
+            })
+
+          if ($(".dataTables_empty")) {
+            $("#lblEmp").text('EC$ 0.00');
+            $("#lblCont").text('EC$ 0.00');
+            $("#SystemContributorTotalContribution").text('EC$ 0.00');
+            $("#SystemEmployerTotalContribution").text('EC$ 0.00');
+
+          }
+        }
+
+
+
+        function detailSearch() {
+            var empId = $("#EmployerId").val();
+            var conId = $("#PersonID").val();
+            var Date1 = $("#From").val();
+            var Date2 = $("#to").val();
+            if (empId == "" || conId == "" || Date1 == "" || Date2 == "") {
+                toasterErrorMessage("Please fill all the required fields")
+            }
+            else {
+                dobind();
+            }
+        }
+
+
+        $(function () {
+            $("#parentCheckbox").css('display', 'none');
+        })
+
+
+        $("#EmployerId").on('change', function () {
+            var empId = $("#EmployerId").val();
+            $("#PersonID").select2("val", "");
+            $("#PersonID").empty();
+            $('#PersonID').append($('<option/>').attr("value", "").text("---Select---"));
+            if (empId != "") {
+                $.ajax({
+                    url: "@Url.Action("GetContributorAjax", "MoveContributorContribution")?EmpId=" + empId,
+                    type: "GET",
+                }).done(function (result) {
+
+                    debugger
+                    $.each(result, function (i, Contributor) {
+                        $('#PersonID').append($('<option/>').attr("value", Contributor.Id).text(Contributor.Name));
+
+                    })
+                })
+            }
+        })
+    </script>
+}
+

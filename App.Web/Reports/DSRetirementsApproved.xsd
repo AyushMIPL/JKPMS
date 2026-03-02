@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Table">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="EmployerName" type="xs:string" minOccurs="0" />
+              <xs:element name="PersonID" type="xs:string" minOccurs="0" />
+              <xs:element name="Column1" type="xs:string" minOccurs="0" />
+              <xs:element name="Gender" type="xs:string" minOccurs="0" />
+              <xs:element name="DateOfBirth" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="RetirementOrResignationDate" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="LengthOfServiceInMonths" type="xs:int" minOccurs="0" />
+              <xs:element name="TotalEmployeeContribution" type="xs:decimal" minOccurs="0" />
+              <xs:element name="AnnualInterest" type="xs:decimal" minOccurs="0" />
+              <xs:element name="TotalEmployeeContributionWithInterest" type="xs:decimal" minOccurs="0" />
+              <xs:element name="ApprovalProcessId" type="xs:int" minOccurs="0" />
+              <xs:element name="ApprovalStatus" type="xs:string" minOccurs="0" />
+              <xs:element name="Notes" type="xs:string" minOccurs="0" />
+              <xs:element name="ApprovedDate" type="xs:dateTime" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

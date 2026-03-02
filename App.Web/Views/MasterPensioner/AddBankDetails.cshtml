@@ -1,0 +1,134 @@
+﻿@model App.Data.Entities.MasterEmpBankDetails
+
+@{
+  Layout = "~/Views/Shared/_LayoutPensioner.cshtml";
+}
+@section profilePensioner
+{
+  <div class="panel panel-default">
+    <div class="panel-heading clearfix">
+      <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+        Bank Details:@string.Format("{0} ({1})", ViewBag.Name, ViewBag.PensionerID)
+        
+        @*<ul class="tool-bar">
+            
+          </ul>*@
+      </h4>
+    </div>
+    <div class="panel-body">
+      @using (Html.BeginForm("AddBankDetails", "MasterPensioner", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+      {
+        @Html.Hidden("PensionerID")
+        @Html.HiddenFor(model => model.emp_bank_ID, new { @Value = ViewBag.CId })
+        @Html.ValidationSummary("", new { @class = "text-danger" })
+        <div class="row">
+          <div class="col-sm-10">
+            <div class="form-group">
+              @Html.LabelFor(model => model.empl_code, "Beneficiary ID", new { @class = "col-sm-3 control-label" })
+              <div class="col-sm-7">
+                @Html.TextBoxFor(m => m.empl_code, new { @class = "form-control input-sm", placeholder = "Beneficiary ID", @readonly = "readonly", @Value = ViewBag.PensionerID })
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.bank_code, "Bank *", new { @class = "col-sm-3 control-label" })
+              <div class="col-sm-7">
+                @Html.DropDownList("bank_code", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm" })
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.typeofacct, new { @class = "col-sm-3 control-label" })
+              <div class="col-sm-7">
+                @Html.DropDownList("typeofacct", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm" })
+                @*@Html.TextBoxFor(m => m.typeofacct, new { @class = "form-control input-sm", placeholder = "C/S", required = "required" })*@
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.bank_acct_no, new { @class = "col-sm-3 control-label" })
+              <div class="col-sm-7">
+                @Html.TextBoxFor(m => m.bank_acct_no, new { @class = "form-control input-sm", placeholder = "Enter Bank Account Number" })
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.type, new { @class = "col-sm-3 control-label" })
+              <div class="col-sm-7">
+                @Html.DropDownList("type", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm" })
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.amount, new { @class = "col-sm-3 control-label" })
+              <div class="col-sm-7">
+                @Html.TextBoxFor(m => m.amount, new { @class = "form-control input-sm groupOfTexbox allownumericwithdecimal", placeholder = "Amount" })
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-sm-3 control-label"></label>
+              <div class="col-sm-7">
+                <button type="submit" class="btn btn-success"><i class="fa fa-save"> </i> Save</button>
+                <a href="/MasterPensioner/BankDetailsIndex/@ViewBag.CId" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+                @*@Html.ActionLink("Cancel", "BankDetailsIndex", "MasterPensioner", new { id = @ViewBag.CId }, new { @class = "btn btn-primary" })*@
+              </div>
+            </div>
+          </div>
+        </div>
+
+      }
+    </div>
+  </div>
+}
+
+@section scripts{
+  <script nonce="@ViewBag.StyleNonce">
+    $("#bank_code").on('change', function () {
+      if ($("#bank_code").val() != null) {
+        $.ajax({
+          type: "POST",
+          url: '@Url.Action("BankDetailsDropDownAjax", "MasterPensioner")',
+          dataType: "json",
+          data: JSON.stringify({ emplcode: $("#empl_code").val(), bankcode: $("#bank_code").val() }),
+          contentType: "application/json; charset=utf-8",
+
+        }).done(function (result) {
+          debugger
+          if (result == "Error") {
+            toasterErrorMessage("This Bank Code Already Exist For this Beneficiary");
+          }
+        })
+      }
+    })
+
+    $("#amount").blur(function () {
+      if ($("#amount").val() != null) {
+        var amount = parseFloat($('#amount').text());
+        if (amount > 100 || amount < 0) {
+          toasterErrorMessage("Percentage should between 0 to 100.");
+        }
+        else if ($("#bank_code").val() == null) {
+          toasterErrorMessage("Please select bank code.");
+        }
+        else {
+          $.ajax({
+            type: "POST",
+            url: '@Url.Action("BankDetailsAjax", "MasterPensioner")',
+            dataType: "json",
+            data: JSON.stringify({ emplcode: $("#empl_code").val(), bankcode: $("#bank_code").val(), amount: $("#amount").val() }),
+            contentType: "application/json; charset=utf-8",
+
+          }).done(function (result) {
+            debugger
+            if (result == "Error") {
+              toasterErrorMessage("Total Percentage of direct deposit lines should between 0 to 100.");
+            }
+          })
+        }
+      }
+    })
+
+    $('#amount').keypress(function (event) {
+      if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+        event.preventDefault();
+      }
+    });
+
+  </script>
+}

@@ -1,0 +1,84 @@
+﻿@model JKPS.COMMON.DVOPayrollstypaydd
+
+@{
+  ViewBag.Title = "AddDeductionDetails";
+  Layout = "~/Views/Shared/_LayoutUpdatePayroll.cshtml";
+}
+@section profileUpdatePayroll
+{
+  <div class="panel panel-default">
+    <div class="panel-heading clearfix">
+      <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+        Add Details:@string.Format("{0} ({1})", ViewBag.Name, ViewBag.PensionerID)
+        
+        @*<ul class="tool-bar">
+            
+          </ul>*@
+      </h4>
+    </div>
+    <div class="panel-body">
+      @using (Html.BeginForm("EditDeductionDetails", "PensionProcess", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+      {
+        @Html.Hidden("PensionerID")
+        @Html.HiddenFor(model => model.RowID)
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary("", new { @class = "text-danger" })
+        <div class="row">
+          <div class="col-sm-6">
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.ded_code, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.DropDownList("Ded_Code", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm" })
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.ded_rate, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.ded_rate, new { @class = "form-control input-sm allownumericwithdecimal", placeholder = "Deduction Rate" })
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.amount, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.amount, new { @class = "form-control input-sm allownumericwithdecimal", placeholder = "Balance Amount" })
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-4 control-label"></label>
+              <div class="col-sm-8">
+                <button type="submit" class="btn btn-success"><i class="fa fa-save"> </i> Save</button>
+                @Html.ActionLink("Cancel", "DeductionIndex", "PensionProcess", new { id = @ViewBag.CId }, new { @class = "btn btn-primary" })
+              </div>
+            </div>
+          </div>
+        </div>
+
+      }
+    </div>
+
+  </div>
+}
+@section scripts{
+  <script nonce="@ViewBag.StyleNonce">
+    $("#DeductionCode").on('change', function () {
+      if ($("#DeductionCode").val() != null) {
+        var value = $("#DeductionCode").val();
+        $.ajax({
+          url: "@Url.Action("DeductionDropDownBind", "MasterPensioner")?Value=" + value,
+          type: "Get"
+        }).done(function (result) {
+          debugger
+          $("#Deductionrate").val(result.dflt_rate);
+          $("#BalanceAmount").val(result.dflt_limit);
+          $("#PayLimit").val(result.dflt_pay_limit);
+        })
+      }
+      else {
+        $("#Deductionrate").val("");
+        $("#BalanceAmount").val("");
+        $("#PayLimit").val("");
+      }
+    })
+  </script>
+}

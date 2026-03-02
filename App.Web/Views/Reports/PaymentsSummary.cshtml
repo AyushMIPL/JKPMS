@@ -1,0 +1,680 @@
+﻿@model IEnumerable<JKPS.COMMON.DVOMasterEmployee>
+
+
+@using App.Web.Helper
+@{
+    ViewBag.Title = "Index";
+    //var GroupList = Model.GroupBy(x => x.TypeCode);
+}
+<style>
+    .ui-autocomplete {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        position: absolute;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .ui-menu-item {
+        padding: 8px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+    }
+
+        .ui-menu-item:last-child {
+            border-bottom: none;
+        }
+
+    .ui-state-focus {
+        background-color: #007bff;
+        color: lightgrey;
+    }
+
+
+    .dataTables_wrapper .dt-buttons {
+        float: none;
+        text-align: right;
+    }
+
+    span.select2.select2-container.select2-container--default {
+        /*width: 100% !important;*/
+    }
+
+    .dropdown-item:hover {
+        background-color: #bbbfc3; /* Set your desired hover color */
+        padding: 5px;
+    }
+
+    .dropdown-menu {
+        font-size: 11px;
+        padding: 5px;
+    }
+
+    .dropdown-item {
+        padding: 4px 0px;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0 !important;
+        left: auto !important;
+    }
+
+    .dropdown-item:hover {
+        background-color: #e8e9ea;
+        padding: 5px;
+        color: #262626;
+    }
+
+    .dropdown-item {
+        padding: 5px;
+    }
+
+    a.disabled {
+        color: gray;
+        pointer-events: none;
+        opacity: .8;
+    }
+
+    table.dataTable thead th, table.dataTable tfoot th, table.dataTable tbody td {
+        text-align: left !important;
+    }
+
+</style>
+<link href="~/Content/endless/LatestJS/jquery.dataTables.min.css" rel="stylesheet" />
+<div class="panel panel-default">
+    <div class="panel-body">
+        @using (Html.BeginForm("Index", "MasterPensioner", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "return Index();", id = "IdMasterPensioner" }))
+        {
+            <div class="row py-4">
+                <div class="col-sm-4">
+                    <div class="form-group h_select">
+                        <label>Scheme Type</label>
+                        @Html.DropDownList("BeneficiariesType", null, "Select Type", new { @class = "form-control", @autocomplete = "off", @placeholder = "Beneficiaries Type" })
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="form-group">
+                        <button type="button" class="btn btn-success px-5 height btn_Beneficiary_loadingPaymentSummary" title="Please Wait While We Process Your Request" id="btn_Beneficiary_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                        <button class="btn btn-success height mr-2 px-5 searchBtn-PaymentSummary" id="Btn" type="button">
+                            <i class="fa fa-search fa-lg"></i> Search
+                        </button>
+                    </div>
+                </div>
+
+
+
+                <div class="col-sm-4 hidden">
+                    <div class="form-group ">
+                        <label>Tehsil</label>
+                        @Html.TextBox("Tehsil", "", new { @class = "form-control", @autocomplete = "off", @placeholder = "Enter Tehsil" })
+                    </div>
+                </div>
+
+                <div class="col-sm-4 hidden">
+
+                    <label>Gender</label>
+                    <div class="form-group h_select">
+                        @Html.DropDownList("Gender", new SelectList(new[]
+                        {
+                          new SelectListItem{Value="",Text="All",Selected=true},
+                          new SelectListItem{Value="M",Text="Male"},
+                          new SelectListItem{Value="F",Text="Female"},
+                          new SelectListItem{Value="T",Text="Transgender"},
+                        }, "Value", "Text"), new { @class = "form-control", @autocomplete = "off", @placeholder = "Select Gender" })
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+            </div>
+
+        }
+    </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline headlineMonthlyPensionSummary">
+      Payments Summary
+      <button type="button" class="btn btn-success px-5 height hidden btn_downloadExcel_loadingMonthlyPensionSummary" title="Please Wait While We Process Your Request" id="btn_downloadExcel_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+      <button class="btn btn-success hidden float-right-element" id="IddownloadExcel" onclick="downloadExcel(event)">Download Excel</button>
+
+    </h4>
+  </div>
+  <div class="panel-body">
+    <div class="table-responsive MpTable">
+      <div class="loader display_none" id="loader"></div>
+      <table id="Payment_example" class="display nowrap" cellspacing="0" width="100%">
+        <thead>
+          <tr>
+            <th>Application Reference No</th>
+            <th>Name</th>
+            <th>Gender</th>
+            <th>Age</th>
+            <th class="exampleMonthlyPensionSummary">Address</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Account No</th>
+            <th>IFSC Code</th>
+            <th>Bank Name</th>
+            <th>Account Status</th>
+
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <input type="hidden" id="hiddenIdField" value="" />
+
+
+  <div class="custom-popup width-100 confirmClass display-none" id="PopUpHoldPayment">
+
+    <div class="padding-md">
+      <h4 class="m-top-none"> Are you sure want to De-Activate Payment?</h4>
+      <label for="stopPaymentReason">Reason:</label>
+      <textarea type="text" id="holdPaymentReason" class="form-control" placeholder="Enter reason"></textarea>
+      <div id="error-message error-message-MonthlyPensionSummary"></div>
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn btn-success px-5 height btn_HoldPayment_loading_MonthlyPensionSummary" title="Please Wait While We Process Your Request" id="btn_HoldPayment_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+      <a class="btn btn-success m-right-sm @(ViewBag.EditPermission == true ? "" : "disabled")" id="IdHoldPayment" onclick="OnclickHoldPayment()">Yes</a>
+      <a class="btn btn-danger" onclick="oncancelHoldPayment()">Cancel</a>
+    </div>
+  </div>
+
+  <div class="custom-popup width-100 confirmClass display-none" id="PopUpResumePayment">
+    <div class="padding-md">
+      <h4 class="m-top-none"> Are you sure want to Activate Payment?</h4>
+      <label for="stopPaymentReason">Reason:</label>
+      <textarea type="text" id="resumePaymentReason" class="form-control" placeholder="Enter reason"></textarea>
+      <div id="error-message1 error-message-MonthlyPensionSummary"></div>
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn btn-success px-5 height display-none" title="Please Wait While We Process Your Request" id="btn_Resume_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+      <a class="btn btn-success   m-right-sm @(ViewBag.EditPermission == true ? "" : "disabled")" id="IdResumePayment" onclick="OnclickResumePayment()"> Yes</a>
+      <a class="btn btn-danger" onclick="oncancelResumePayment()">Cancel</a>
+    </div>
+  </div>
+
+  <div class="custom-popup width-100 confirmClass display-none" id="PopUpStopPayment">
+    <div class="padding-md">
+      <h4 class="m-top-none"> Are you sure want to Stop Payment?</h4>
+      <label for="stopPaymentReason">Reason:</label>
+      <textarea type="text" id="stopPaymentReason" class="form-control" placeholder="Enter reason"></textarea>
+      <div id="error-message2 error-message-MonthlyPensionSummary"></div>
+    </div>
+    <div class="text-center">
+      <a class="btn btn-success m-right-sm @(ViewBag.EditPermission == true ? "" : "disabled")" onclick="OnclickStopPayment()">Yes</a>
+      <a class="btn btn-danger" onclick="oncancelStopPayment()">Cancel</a>
+    </div>
+  </div>
+
+  <div class="custom-popup confirmClass PopUpShowLargeMessage-MonthlyPensionSummary" data-keyboard="false" data-backdrop="static" id="PopUpShowLargeMessage">
+    <div class="padding-md">
+      <!-- Update Payment Section -->
+      <h3 class="m-top-none py-3 text-white MHeader-MonthlyPensionSummary" id="MHeader"></h3>
+      <!-- Header Section -->
+      <div class="row MessageText-MonthlyPensionSummary">
+        <label id="MessageText"></label>
+      </div>
+    </div>
+  </div>
+
+  @section Scripts {
+    <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+    <script src="~/Content/endless/LatestJS/jquery.dataTables.min.js"></script>
+    <script nonce="@ViewBag.StyleNonce">
+
+            document.getElementById("Btn").addEventListener("click", PaymentSummary_dobind);
+
+     
+          $('.select2-dropdown').select2();
+
+
+     
+     PaymentSummary_dobind();
+      function PaymentSummary_dobind() {
+        document.getElementById("loader").style.display = "block";
+        debugger
+        $('#Payment_example').dataTable({
+          "bJQueryUI": true,
+          "sPaginationType": "full_numbers",
+          "bServerSide": true,
+          "bDestroy": true,
+          //"bProcessing": true,
+          "sAjaxSource": "/Reports/PaymentsSummaryAjaxHandler?Tehsil=" + $("#Tehsil").val() + "&BeneficiariesType=" + $("#BeneficiariesType").val() + "&Gender=" + '@ViewBag.Gender' + "&ACCOUNT_STATUS=" + '@ViewBag.ACCOUNT_STATUS',
+          "fnDrawCallback": function (setting) {
+            debugger
+           document.getElementById("loader").style.display = "none";
+           GroupDataTable(this.api(), 7, 11);
+          },
+          "aoColumns": [
+            { "sname": "ApplicationReferenceNo" },
+            { "sname": "NameOfTheApplicant" },
+            { "sname": "Gender" },
+            { "sname": "Age_InYears" },
+            { "sname": "PermanentAddress" },
+            { "sname": "MobileNumber" },
+            { "sname": "EMail" },
+            { "sname": "AccountNoOfTheApplicant" },
+            { "sname": "IFSCCode" },
+            { "sname": "BankName" },
+            { "sname": "CurrentStatus" }
+          ],          
+         "columnDefs": [
+            {
+              "targets": [7],
+              "visible": false
+            }
+          ],
+
+        });
+        //  .rowGrouping({
+        //  bExpandableGrouping: true,
+        //  iGroupingColumnIndex: 7,
+        //  bHideGroupingColumn: true
+
+        //});
+        $('[data-toggle="tooltip"]').tooltip();
+      }
+
+
+
+
+        function OpenMessagePopup(heading, message) {
+
+            $("#MHeader").html(heading + '<button type="button" class="close close-MHeader-MonthlyPensionSummary" title="Close" aria-label="Close" onclick="ClosePopupWindow()"><span aria-hidden="true">&times;</span>');
+        $("#MessageText").html(message);
+        $("#PopUpShowLargeMessage").popup('show');
+
+      }
+      function ClosePopupWindow() {
+        $("#PopUpShowLargeMessage").popup("hide");
+      }
+
+      function clearLocatMenuStorage() {
+        localStorage.setItem('activeIndex', "0");
+      }
+
+      function downloadExcel(evt) {
+          debugger
+
+          try {
+              $(evt.target).find("i.fa-spinner").show();
+              $('#btn_downloadExcel_loading').show();
+              $('#IddownloadExcel').hide();
+                     $.ajax({
+                         type: "POST",
+                       /*data: {Tehsil: $("#Tehsil").val(), BeneficiariesType: $("#BeneficiariesType").val(), Gender: $("#Gender").val(), RegionNames: $("#RegionNames").val(),isDownload: true },*/
+                         data: { Tehsil: $("#Tehsil").val(), BeneficiariesType: $("#BeneficiariesType").val(), Gender: '@ViewBag.Gender', RegionNames: $("#RegionNames").val(), AccountStatus:'@ViewBag.ACCOUNT_STATUS', bank_acct_no: $("#bank_acct_no").val(), APPLICATION_REFERENCE_NO: $("#APPLICATION_REFERENCE_NO").val(), isDownload: true },
+                       url: '@Url.Action("PaymentsSummaryAjaxHandler", "Reports")',
+                         cache: false,
+                         success: function (result) {
+                             $('#IddownloadExcel').show();
+                             $('#btn_downloadExcel_loading').hide();
+                             if (result != null) {
+                                 var bytes = new Uint8Array(result.FileContents);
+                                 var blob = new Blob([bytes], { type: '@System.Net.Mime.MediaTypeNames.Application.Octet' });
+                                 if (window.navigator.msSaveOrOpenBlob) {
+                                     // IE11
+                                     window.navigator.msSaveOrOpenBlob(blob, result.FileDownloadName);
+                                 } else {
+                                     debugger
+                                     // Google chome, Firefox, ....
+                                     var link = document.createElement('a');
+                                     link.href = window.URL.createObjectURL(blob);
+                                     link.download = result.FileDownloadName;
+                                     link.click();
+                                     $(evt.target).find("i.fa-spinner").hide();
+                                 }
+                             }
+                             else {
+
+                             }
+                         },
+                         error: function (xhr, status, error) {
+                         }
+                     });
+
+                 } catch (e) {
+                 }
+    }
+
+      function AddMasterEmployeeExcelDatabase() {
+      if ($("#formattedName").val() == "" || $("#formattedName").val() == null || $("#formattedName").val() == undefined || $("#formattedName").val() == "undefined") {
+        toasterWarningMessage("First upload the file then save.");
+        return false;
+      }
+      // Create FormData object
+      var fileData = new FormData();
+      // Adding one more key to FormData object
+      fileData.append('formattedName', $("#formattedName").val());
+      $.ajax({
+        type: "POST",
+        url: "@Url.Action("AddMasterEmployeeExcelDatabase", "MasterPensioner")",
+        contentType: false, // Not to set any content header
+        processData: false, // Not to process data
+        data: fileData,
+        success: function (data) {
+          if (data == "1") {
+            toasterSuccessMessage("Save Successfully.");
+            location.reload();
+          } else {
+            toastr.error("Opps! Something went wrong. Please try again.");
+
+          }
+        }
+      });
+    }
+
+
+
+    function MasterEmployeeExcelCancelUpload() {
+      window.location.reload();
+    }
+    function MasterEmployeeExcelUpload() {
+      var IsFile = $("#file").val();
+      if (IsFile != null && IsFile != "" && IsFile != undefined) {
+        var fileUpload = $("#file").get(0);
+        var files = fileUpload.files;
+        // Create FormData object
+        var fileData = new FormData();
+        // Looping over all files and add it to FormData object
+        for (var i = 0; i < files.length; i++) {
+          fileData.append(files[i].name, files[i]);
+        }
+        $.ajax({
+          type: "POST",
+          url: "@Url.Action("MasterEmployeeExcelUpload", "MasterPensioner")",
+          contentType: false, // Not to set any content header
+          processData: false, // Not to process data
+          data: fileData,
+          success: function (data) {
+            if (data != "") {
+              $("#formattedName").val(data);
+              $("#MasterEmployeeExcelUpload").toggle();
+              $("#MasterEmployeeExcelSave").toggle();
+              $("#MasterEmployeeExcelCancel").toggle();
+              toasterSuccessMessage("Upload Successfully.");
+            } else {
+              toastr.error("Opps! Somthing went wrong. Please try again.");
+            }
+          }
+        });
+      }
+    }
+    function MasterEmployeeExcelDownload() {
+      try {
+        var ApplicantIFSCCode = $("#ApplicantIFSCCode").val();
+        if (ApplicantIFSCCode == "" || ApplicantIFSCCode == undefined || ApplicantIFSCCode == "undefined") {
+           toasterErrorMessage("Select IFSC code before download.");
+        } else {
+
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', '/MasterPensioner/MasterEmployeeExcelDownloadAjax?ApplicantIFSCCode=' + ApplicantIFSCCode, true);
+          xhr.responseType = 'blob';
+          xhr.onload = function () {
+            if (xhr.status === 200) {
+              var blob = xhr.response;
+              var url = window.URL.createObjectURL(blob);
+              var a = document.createElement('a');
+              a.href = url;
+              var name = xhr.getResponseHeader('Content-Disposition').split(" ")[1];
+              if (name.indexOf("filename") > -1) {
+                name = name.split("=")[1];
+              }
+              a.download = name;
+              a.style.display = 'none';
+              document.body.appendChild(a);
+              a.click();
+              window.URL.revokeObjectURL(url);
+            } else {
+              console.error('Request failed with status:', xhr.status);
+            }
+          };
+          xhr.onerror = function () {
+            console.error('Request error');
+          };
+          xhr.send();
+        }
+      } catch(e) {
+
+      }
+    }
+
+    //hold payment
+    function showHoldPaymentPopup(detailsLink, id) {
+      var Id = detailsLink.split('/');
+    var EncryptId=  Id.filter(segment => segment !== '').pop();
+      $('#hiddenIdField').val(EncryptId);
+      $('#PopUpHoldPayment').popup("show");
+    }
+
+    function oncancelHoldPayment() {
+      $('#holdPaymentReason').removeClass('error');
+      $('#error-message').hide();
+      $('#PopUpHoldPayment').popup("hide");;
+    }
+
+    function OnclickHoldPayment() {
+        $('#btn_HoldPayment_loading').show();
+        $('#IdHoldPayment').hide();
+      var holdPaymentReason = $('#holdPaymentReason').val();
+      if (!holdPaymentReason.trim()) {
+        $('#holdPaymentReason').addClass('error');
+          $('#error-message').text('Please enter a reason').show();
+          $('#btn_HoldPayment_loading').hide();
+          $('#IdHoldPayment').show();
+        return;
+      }
+      else {
+        $('#holdPaymentReason').removeClass('error');
+          $('#error-message').hide();
+          $('#btn_HoldPayment_loading').hide();
+          $('#IdHoldPayment').show();
+      }
+
+      var Id = $('#hiddenIdField').val();
+      var paymentStatus = "Y";
+      $.ajax({
+        type: "POST",
+        url: "/MasterPensioner/HoldPaymentStatusAjax",
+        data: {
+          id: Id,
+          HoldPaymentReason: holdPaymentReason,
+          holdpaymentStatus: paymentStatus,
+        },
+        success: function (result) {
+            $('#btn_HoldPayment_loading').hide();
+            $('#IdHoldPayment').show();
+          if (result.Status == true) {
+            toasterSuccessMessage(result.Message)
+            location.reload();
+          }
+        },
+        error: function (xhr, status, error) {
+            console.error("Ajax request failed", error);
+            $('#btn_HoldPayment_loading').hide();
+            $('#IdHoldPayment').show();
+        }
+      });
+      $('#PopUpHoldPayment').hide();
+    }
+
+
+    //resume payment
+    function showResumePaymentPopup(detailsLink, id) {
+      debugger
+      var Id = detailsLink.split('/');
+      var EncryptId = Id.filter(segment => segment !== '').pop();
+      $('#hiddenIdField').val(EncryptId);
+      $('#PopUpResumePayment').popup("show");;
+    }
+
+    function oncancelResumePayment() {
+      debugger
+      $('#resumePaymentReason').removeClass('error');
+      $('#error-message1').hide();
+      $('#PopUpResumePayment').popup("hide");;
+    }
+
+
+    function OnclickResumePayment() {
+        $("#btn_Resume_loading").show();
+        $("#IdResumePayment").hide();
+      var resumePaymentReason = $('#resumePaymentReason').val();
+      if (!resumePaymentReason.trim()) {
+        $('#resumePaymentReason').addClass('error');
+          $('#error-message1').text('Please enter a reason').show();
+          $("#btn_Resume_loading").hide();
+          $("#IdResumePayment").show();
+        return;
+      }
+      else {
+        $('#resumePaymentReason').removeClass('error');
+          $('#error-message1').hide();
+          $("#btn_Resume_loading").hide();
+          $("#IdResumePayment").show();
+      }
+
+      var Id = $('#hiddenIdField').val();
+      var paymentStatus = "N";
+      $.ajax({
+        type: "POST",
+        url: "/MasterPensioner/ResumePaymentStatusAjax",
+        data: {
+          id: Id,
+          resumePaymentReason: resumePaymentReason,
+          resumepaymentStatus: paymentStatus,
+        },
+        success: function (result) {
+            debugger
+            $("#btn_Resume_loading").hide();
+            $("#IdResumePayment").show();
+          if (result.Status == true) {
+            debugger
+            toasterSuccessMessage(result.Message)
+            location.reload();
+          }
+        },
+        error: function (xhr, status, error) {
+          debugger
+            console.error("Ajax request failed", error);
+            $("#btn_Resume_loading").hide();
+            $("#IdResumePayment").show();
+        }
+      });
+      $('#PopUpHoldPayment').hide();
+    }
+
+
+    //stop payment
+
+    function showStopPaymentPopup(detailsLink, id) {
+      debugger
+      var Id = detailsLink.split('/');
+      var EncryptId = Id.filter(segment => segment !== '').pop();
+      $('#hiddenIdField').val(EncryptId);
+      $('#PopUpStopPayment').popup("show");;
+    }
+
+    function oncancelStopPayment() {
+      debugger
+      $('#stopPaymentReason').removeClass('error');
+      $('#error-message2').hide();
+      $('#PopUpStopPayment').popup("hide");;
+    }
+
+
+
+    function OnclickStopPayment() {
+      debugger
+         var stopPaymentReason = $('#stopPaymentReason').val();
+      var stopPaymentReason = $('#holdPaymentReason').val();
+      if (!stopPaymentReason.trim()) {
+        $('#stopPaymentReason').addClass('error');
+        $('#error-message2').text('Please enter a reason').show();
+        return;
+      }
+      else {
+        debugger
+        $('#stopPaymentReason').removeClass('error');
+        $('#error-message2').hide();
+      }
+      //   if (stopPaymentReason == undefined || stopPaymentReason == null || stopPaymentReason == "") {
+      //     return     toasterErrorMessage("Reason Field Is Mendatory.");
+      //}
+
+
+      var Id = $('#hiddenIdField').val();
+      var paymentStatus = "N";
+      $.ajax({
+        type: "POST",
+        url: "/MasterPensioner/StopPaymentStatusAjax",
+        data: {
+          id: Id,
+          stopPaymentReason: stopPaymentReason,
+          stoppaymentStatus: paymentStatus,
+        },
+        success: function (result) {
+          debugger
+          if (result.Status == true) {
+            debugger
+            toasterSuccessMessage(result.Message)
+            location.reload();
+          }
+        },
+        error: function (xhr, status, error) {
+          debugger
+          console.error("Ajax request failed", error);
+        }
+      });
+      $('#PopUpHoldPayment').hide();
+      }
+
+      function Index() {
+          debugger
+          $('#spinner').show();
+          $('#Btn').prop('disabled', true);
+          return true;
+      }
+
+      $(document).ready(function () {
+      $('form').submit(function () {
+            $('#Btn').hide();
+          $('#btn_Beneficiary_loading').show();
+          var form = $("#IdMasterPensioner");
+          if (!form.valid()) {
+              $('#Btn').show();
+              $('#btn_Beneficiary_loading').hide();
+              return false;
+          }
+      });
+        var error = '@TempData["error"]';
+        if (error && error.length > 0) {
+            $('#Btn').show();
+            $('#btn_Beneficiary_loading').hide();
+        }
+        $('#btn_Beneficiary_loading').hide();
+
+
+
+
+      });
+
+    </script>
+  }

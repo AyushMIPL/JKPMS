@@ -1,0 +1,729 @@
+﻿@model App.Data.Entities.MasterPFRate
+
+@{
+  ViewBag.Title = "Edit";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Update Details
+
+      @*<ul class="tool-bar">
+
+        </ul>*@
+    </h4>
+  </div>
+  <div class="panel-body">
+    @using (Html.BeginForm("Edit", "PFRate", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "form1" }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+      @Html.HiddenFor(model => model.Id)
+      <div class="row">
+        <div class="col-sm-4">
+
+         
+            @Html.LabelFor(model => model.PfType, new { @class = "control-label mb-2" })
+         
+              @Html.DropDownList("PfType", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm" })
+            </div>
+          
+
+           
+        <div class="col-sm-4">
+          @Html.LabelFor(model => model.Name, new { @class = "control-label mb-2" })
+          @Html.TextBoxFor(m => m.Name, new { @class = "form-control input-sm", placeholder = "PF for" })
+        </div>
+      
+            
+        <div class="col-sm-4">
+          @Html.LabelFor(model => model.PFRate, new { @class = "control-label mb-2" })
+          @Html.TextBoxFor(m => m.PFRate, new { @class = "form-control input-sm allownumericwithdecimal", placeholder = "PF Rate (%)" })
+        </div>
+        
+        
+            
+        <div class="col-sm-4">
+          @Html.LabelFor(model => model.EffectiveDate, new { @class = "control-label mb-2" })
+          <div class="input-group date">
+            @Html.EditorFor(model => model.EffectiveDate, new { @placeholder = "Effective Start Date" })
+            <span class="input-group-addon">
+              <i class="fa fa-calendar"></i>
+            </span>
+          </div>
+        </div>
+       
+       
+           
+        <div class="col-sm-4">
+          @Html.LabelFor(model => model.EffectiveEndDate, new { @class = "control-label mb-2" })
+          <div class="input-group date">
+            @Html.EditorFor(model => model.EffectiveEndDate, new { @placeholder = "Effective End Date" })
+            <span class="input-group-addon">
+              <i class="fa fa-calendar"></i>
+            </span>
+          </div>
+        </div>
+        
+          @*<div class="form-group">
+              <label for="IsActive" class="control-label mb-2">Status:</label>
+              <div class="col-sm-8">
+                <div class="checkbox">
+                  @Html.CheckBoxFor(m => m.IsActive, new { @class = "form-control input-sm" })
+                </div>
+              </div>
+            </div>*@
+          @*<hr>*@
+         
+           
+      <div class="col-sm-4">
+        <div class="control-label mb-2 mt-3" for="Name"> &nbsp; </div>
+        <button type="submit" id="btn_Update" onclick="DisableThis()" class="btn btn-success height px-5"><i class="fa fa-save"> </i> Update</button>
+        <a href="/PFRate/Index" id="btn_cancel" class="btn btn-primary border-radius height line-height"><i class="fa fa-reply"> </i> Back to List</a>
+      </div>
+          </div>
+     
+        <div class="col-sm-2">
+
+          <span class="field-validation-error text-danger" id="fileValidate"></span>
+
+        </div>
+  
+    }
+  </div>
+</div>
+<div class="panel panel-default" id="Employer_Div">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Manage Employers PF History
+      @*<ul class="tool-bar">
+          <li><a href="/Employers/Create" data-toggle="tooltip" data-placement="bottom" title="Add details" data-original-title="Add Details"><i class="fa fa-plus"></i></a></li>
+        </ul>*@
+    </h4>
+  </div>
+  <div class="panel-body">
+    <div class="row" style="margin-bottom:10px;">
+
+      <div class="form-group">
+        <div class="col-md-12">
+          @Html.LabelFor(model => model.PfRateId, "PF Rate *", new { @class = "col-sm-1 control-label" })
+          <div class="col-sm-6">
+            @Html.DropDownList("PfRateId", null, "---Select ---", htmlAttributes: new { @class = "form-control" })
+          </div>
+          <div class="col-sm-1">
+            <input type="text" id="PFRateEmp" class="form-control input-sm" readonly="" />
+          </div>
+          <div class="col-sm-2">
+            <a class="btn btn-success" onclick="UpateEmployerPfDetails()">Apply</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <table class="table dataTable" id="tbl">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Employer Name</th>
+          <th>Employer Address</th>
+          @*<th>City</th>*@
+          <th>PO.Box No.</th>
+          <th>Contact Person</th>
+          <th>Mobile</th>
+          <th>PF Rate</th>
+          <th>PF Rate Effective Date</th>
+          <th>
+            <input type="checkbox" id="AllCheck" class="AllCheck" style="margin-top:-16px;margin-left:-3px;">
+          </th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+<div class="panel panel-default" id="Contributor_Div">
+  <div class="panel-heading clearfix">
+    <h4>Manage Contributor PF History</h4>
+    @*<ul class="tool-bar inline">
+        <li style="margin-right:5px;">@Html.DropDownList("EmployerName", null, "---All---", htmlAttributes: new { @class = "form-control input-sm" })</li>
+        <li style="margin-right:5px;">@Html.DropDownList("JobStatusID", null, "---All---", htmlAttributes: new { @class = "form-control input-sm" })</li>
+
+      </ul>*@
+
+  </div>
+  <div class="panel-body">
+    <div class="row" style="margin-bottom:10px;">
+
+      <div class="form-group">
+        <div class="col-md-12">
+          <div class="col-sm-2">
+            @Html.DropDownList("EmployerName", null, "---All---", htmlAttributes: new { @class = "form-control" })
+          </div>
+          <div class="col-sm-2">
+            @Html.DropDownList("JobStatusID", null, "---All---", htmlAttributes: new { @class = "form-control" })
+          </div>
+          @*@Html.LabelFor(model => model.PfRateIdContributor, "PF Rate *", new { @class = "col-sm-1 control-label" })*@
+          <div class="col-sm-6">
+            @Html.DropDownList("PfRateIdContributor", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+          </div>
+          <div class="col-sm-1">
+            <input type="text" id="PFRateContributor" class="form-control input-sm" readonly="" />
+          </div>
+          <div class="col-sm-1">
+            <a class="btn btn-success" onclick="UpateContributorPfDetails()">Apply</a>
+          </div>
+        </div>
+        @*<div class="col-md-1">
+            <input type="text" id="PFRateContributor" class="form-control input-sm" readonly="" />
+          </div>
+          <div class="col-md-2">
+            <a class="btn btn-success" onclick="UpateContributorPfDetails()">Apply</a>
+          </div>*@
+      </div>
+    </div>
+    <table class="table dataTable" id="tblContributor">
+      <thead>
+        <tr>
+          <th style="width:100px">Photo</th>
+          <th>JKPS ID</th>
+          <th>Person ID</th>
+          <th>Name</th>
+          <th>Employer Name</th>
+          <th>S.S.#</th>
+          <th>Gender</th>
+          <th>D.O.B.</th>
+          <th>Postal Address</th>
+          <th>Phone</th>
+          <th>Pf Rate</th>
+          <th>PF Rate Efective Date</th>
+          <th>
+            <input type="checkbox" id="AllCheckContributor" class="AllCheckContributor" style="margin-top:-16px;margin-left:-3px;">
+          </th>
+        </tr>
+
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+<div class="custom-popup width-100 confirmClass" id="confirmUpdate" style="display:none;">
+  <div class="padding-md">
+    <h4 class="m-top-none" id="EmployerConfirmMessage"></h4>
+  </div>
+  <div class="text-center">
+    <a class="btn btn-success m-right-sm" onclick="onUpdateConfirm()">Ok</a>
+    <a class="btn btn-danger " onclick="CancelClick()">Cancel</a>
+  </div>
+</div>
+@*<div class="custom-popup width-100 confirmClass" id="confirmUpdateAll" style="display:none;">
+    <div class="padding-md">
+      <h4 class="m-top-none"> Do you want to Apply Pf Rate to All Employer?</h4>
+    </div>
+    <div class="text-center">
+      <a class="btn btn-success m-right-sm" onclick="onUpdateConfirmAll()">Ok</a>
+      <a class="btn btn-danger " onclick="CancelClickAll()">Cancel</a>
+    </div>
+  </div>*@
+
+<div class="custom-popup width-100 confirmClass" id="confirmUpdateContributor" style="display:none;">
+  <div class="padding-md">
+    <h4 class="m-top-none" id="ContributorConfirmMessage"> </h4>
+  </div>
+  <div class="text-center">
+    <a class="btn btn-success m-right-sm" onclick="onUpdateConfirmContributor()">Ok</a>
+    <a class="btn btn-danger " onclick="CancelClickContributor()">Cancel</a>
+  </div>
+</div>
+@*<div class="custom-popup width-100 confirmClass" id="confirmUpdateAllContributor" style="display:none;">
+    <div class="padding-md">
+      <h4 class="m-top-none"> Do you want to Apply Pf Rate to All Contributor?</h4>
+    </div>
+    <div class="text-center">
+      <a class="btn btn-success m-right-sm" onclick="onUpdateConfirmAllContributor()">Ok</a>
+      <a class="btn btn-danger " onclick="CancelClickAllContributor()">Cancel</a>
+    </div>
+  </div>*@
+@section Scripts {
+  <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+  <script nonce="@ViewBag.StyleNonce">
+    $(function () {
+      debugger
+      $("#Employer_Div").hide();
+      $("#Contributor_Div").hide();
+      if ('@Model.PfType' == 'E') {
+        $("#Employer_Div").show();
+        doBindData();
+      }
+      else {
+        $("#Contributor_Div").show();
+        doBindDataContributor();
+      }
+
+    });
+    function DisableThis() {
+      $("#btn_Update").html('<i class="fa fa-spinner fa-spin"></i> Update');
+      $("#btn_Update").prop('disabled', true);
+      $("#btn_cancel").removeAttr('href');
+      $('#form1').submit();
+    }
+    $("#PfRateId").change(function () {
+      debugger
+      UniqueIds = [];
+      $('.AllCheck').prop("checked", false);
+      var pfRateID = $("#PfRateId").val();
+      if (pfRateID != "") {
+        var id = parseInt(pfRateID);
+        $.ajax({
+          url: '/Employers/PFAjax?Id=' + id,
+          type: 'Get',
+          dataType: 'json'
+        }).done(function (result) {
+          $("#PFRateEmp").val(result + ".00");
+        });
+      }
+      else {
+        toasterErrorMessage("Please Select PF Rate.");
+        $("#PFRate").val("");
+      }
+      doBindData(pfRateID);
+    });
+    function doBindData(id) {
+      var oTable = $('#tbl').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        //"bProcessing": true,
+        "sAjaxSource": "/PFRate/BindEmployerAjaxHandler?PfRateId=" + id,
+        "aoColumns": [
+          { "sName": "ID" },
+            { "sName": "EmployerName" },
+            { "sName": "EmployerAddress" },
+            //{ "sName": "City" },
+            { "sName": "POBoxNo" },
+            { "sName": "ContactPerson" },
+            { "sName": "Mobile" },
+            //{ "sName": "PFRate" },
+            {
+              "sName": "Pf Rate",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                var strString = "";
+                strString += oObj.aData[6];
+                if (oObj.aData[12] == "True")
+                  strString += '<span class="fa fa-times text-danger fa-lg" title="PF Rate has been expired" style="margin-left:10px;"></span>';
+                else
+                  strString += '<span class="fa fa-check-circle text-success fa-lg" title="Active" style="margin-left:10px;"></span>';
+                return strString;
+              }
+            },
+            {
+              "sName": "Effective Date",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                var strString = "";
+                strString += oObj.aData[10] + " - " + oObj.aData[11];
+                //if(oObj.aData[12]=="True")
+                //  strString+='<span class="fa fa-times text-danger fa-lg" title="Expired"></span>';
+                //else
+                //  strString+='<span class="fa fa-check-circle text-success fa-lg" title="Active"></span>';
+                return strString;
+              }
+            },
+        {
+          "sName": "CheckBox",
+          "bSearchable": false,
+          "bSortable": false,
+          "fnRender": function (oObj) {
+            if (oObj.aData[9] == "True")
+              var strString = '<input type="checkbox" class="SingleCheck" checked value="' + oObj.aData[0] + '" disabled>';
+            else
+              var strString = '<input type="checkbox" class="SingleCheck" value="' + oObj.aData[0] + '">';
+            return strString;
+          }
+        }
+        ]
+      });
+    }
+    var UniqueIds = [];
+    $(document).on("click", '.SingleCheck', function () {
+      debugger
+      if (this.checked) {
+        UniqueIds.push(this.value);
+        //$('#confirmUpdate').popup("show");
+      }
+      else {
+        UniqueIds.splice($.inArray(this.value, UniqueIds), 1);
+      }
+    })
+    function UpateEmployerPfDetails() {
+      var PfRateId = $("#PfRateId").val();
+      var PfRateText = $('#PfRateId option:selected').text();
+      if (PfRateId == "" || PfRateId == null || PfRateId == undefined) {
+        toasterErrorMessage("Please Select Pf Rate.");
+      }
+      else if (UniqueIds.length == 0) {
+        toasterErrorMessage("Please Select Atleast One Employer.");
+      }
+      else {
+        $("#EmployerConfirmMessage").text("Do You Really Want To Update " + PfRateText + " For The Selected Employers");
+        $('#confirmUpdate').popup("show");
+      }
+    }
+    function onUpdateConfirm() {
+      var PfRateId = $("#PfRateId").val();
+      $.ajax({
+        url: "@Url.Action("ManageEmployerPfHistoryAjax", "PFRate")?UniqueIdsString=" + UniqueIds + "&PfRateId=" + PfRateId,
+        type: "GET",
+      })
+      .done(function (result) {
+        debugger
+        if (result == 1) {
+          toasterSuccessMessage("Employer Pf Rate History Updated Successfully.");
+          UniqueIds = [];
+          $('.AllCheck').prop("checked", false);
+          $('#tbl').dataTable().fnDraw();
+        }
+        else if (result == 0) {
+          toasterErrorMessage("Please Select Atleast One Employer.");
+        }
+        else {
+          toasterErrorMessage("Something Wrong.");
+        }
+        $('#confirmUpdate').popup("hide");
+      });
+    }
+    function CancelClick() {
+      //UniqueIds = [];
+      $('#confirmUpdate').popup("hide");
+    }
+
+    $('.AllCheck').click(function () {
+      debugger
+      if ($(this).is(':checked')) {
+        //$('#confirmUpdateAll').popup("show");
+        $('.SingleCheck').prop("checked", true);
+        $('.SingleCheck').each(function (index, obj) {
+          if (this.checked === true && this.disabled == false) {
+            UniqueIds.push(this.value);
+          }
+        });
+      }
+      else {
+        $('.SingleCheck').each(function (index, obj) {
+          if (this.checked === true && this.disabled == false) {
+            $(this).prop("checked", false);
+          }
+        });
+        //$('.SingleCheck').prop("checked", false);
+        UniqueIds = [];
+      }
+    });
+    @*function onUpdateConfirmAll() {
+
+      $.ajax({
+        url: "@Url.Action("ManageAllEmployerPfHistoryAjax", "PFRate")?PfRateId=" + @Model.Id,
+        type: "GET",
+      })
+    .done(function (result) {
+      debugger
+      if (result == 1) {
+        toasterSuccessMessage("Employer Pf Rate History Updated Successfully.");
+        $('#tbl').dataTable().fnDraw();
+      }
+      else {
+        toasterErrorMessage("Something Wrong.");
+      }
+      $('#confirmUpdateAll').popup("hide");
+    });
+    }
+    function CancelClickAll(){
+      debugger
+      $('#confirmUpdateAll').popup("hide");
+      $(".AllCheck").attr('checked', false);
+    }*@
+
+
+    $("#PfRateIdContributor").change(function () {
+      debugger
+      UniqueIds = [];
+      $('.AllCheckContributor').prop("checked", false);
+      var pfRateID = $("#PfRateIdContributor").val();
+      if (pfRateID != "") {
+        var id = parseInt(pfRateID);
+        $.ajax({
+          url: '/Employers/PFAjax?Id=' + id,
+          type: 'Get',
+          dataType: 'json'
+        }).done(function (result) {
+          $("#PFRateContributor").val(result + ".00");
+        });
+      }
+      else {
+        toasterErrorMessage("Please Select PF Rate.");
+        $("#PFRateContributor").val("");
+      }
+      doBindDataContributor(pfRateID);
+    });
+
+    function doBindDataContributor(id) {
+      var Id = $("#EmployerName").val();
+      var JobStatusId = $("#JobStatusID").val();
+      var oTable = $('#tblContributor').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        //"bProcessing": true,
+        "sAjaxSource": "/PFRate/BindContributorAjaxHandler/?Id=" + Id + "&JobStatusId=" + JobStatusId + "&PfRateId=" + id,
+        "aoColumns": [
+          {
+            "sName": "Photo",
+            "bSearchable": false,
+            "bSortable": false,
+            "fnRender": function (oObj) {
+              if (oObj.aData[0] != null)
+                return '<div class="pstyle"><img src="../UserFiles/ProfileImages/' + oObj.aData[0] + '" /></div>';
+              else
+                return '<div class="pstyle"><img src="../Images/noimage.jpg" /></div>';
+
+            }
+          },
+          { "sName": "PersonID" },
+            { "sName": "OldPersonID" },
+            { "sName": "Name" },
+            { "sName": "EmployerName" },
+            { "sName": "SocialSecurityNo" },
+            {
+              "sName": "Gender",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                if (oObj.aData[6] != "M")
+                  return '<span > Female </span>';
+                else
+                  return '<span >Male</span>';
+              }
+            },
+            { "sName": "DateOfBirth" },
+            { "sName": "PostalAddress" },
+        { "sName": "Phone" },
+        //{ "sName": "PhoneOffice" },
+        //{
+        //  "sName": "ActiveStatus",
+        //  "bSearchable": false,
+        //  "bSortable": false,
+        //  "fnRender": function (oObj) {
+        //    if (oObj.aData[11] == "False")
+        //      return '<span class="badge badge-danger">Not Applied</span>';
+        //    else
+        //      return '<span class="badge badge-success">Applied</span>';
+        //  }
+        //},
+        {
+          "sName": "Pf Rate",
+          "bSearchable": false,
+          "bSortable": false,
+          "fnRender": function (oObj) {
+            var strString = "";
+            strString += oObj.aData[14];
+            if (oObj.aData[17] == "True")
+              strString += '<span class="fa fa-times text-danger fa-lg" title="PF Rate has been expired" style="margin-left:10px;"></span>';
+            else
+              strString += '<span class="fa fa-check-circle text-success fa-lg" title="Active" style="margin-left:10px;"></span>';
+            return strString;
+          }
+        },
+            {
+              "sName": "Effective Date",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                var strString = "";
+                strString += oObj.aData[15] + " - " + oObj.aData[16];
+                //if(oObj.aData[12]=="True")
+                //  strString+='<span class="fa fa-times text-danger fa-lg" title="Expired"></span>';
+                //else
+                //  strString+='<span class="fa fa-check-circle text-success fa-lg" title="Active"></span>';
+                return strString;
+              }
+            },
+            {
+              "sName": "CheckBox",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                if (oObj.aData[13] == "True")
+                  var strString = '<input type="checkbox" id="CheckId' + oObj.aData[1] + '" class="SingleCheckContributor" checked value="' + oObj.aData[1] + '" disabled>';
+                else
+                  var strString = '<input type="checkbox" id="CheckId' + oObj.aData[1] + '" class="SingleCheckContributor" value="' + oObj.aData[1] + '">';
+                return strString;
+              }
+            }
+        ],
+        "fnDrawCallback": function (oSettings) {
+          if ($('input.AllCheckContributor').is(':checked')) {
+                $(".SingleCheckContributor").prop("checked", true);
+              }
+        }
+      }).rowGrouping({
+        bExpandableGrouping: false,
+        iGroupingColumnIndex: 4,
+        bHideGroupingColumn: true
+
+      })
+    }
+    $("#EmployerName").on('change', function () {
+      UniqueIds = [];
+      $('.AllCheckContributor').prop("checked", false);
+      var PfRateId = $("#PfRateIdContributor").val();
+      var Id = $("#EmployerName").val();
+      if (Id != "") {
+        doBindDataContributor(PfRateId);
+      }
+    })
+    $("#JobStatusID").on('change', function () {
+      UniqueIds = [];
+      $('.AllCheckContributor').prop("checked", false);
+      var PfRateId = $("#PfRateIdContributor").val();
+      var JobStatusId = $("#JobStatusID").val();
+      if (JobStatusId != "") {
+        doBindDataContributor(PfRateId);
+      }
+    })
+    $(document).on("click", '.SingleCheckContributor', function () {
+      debugger
+      if (this.checked) {
+        UniqueIds.push(this.value);
+        //$('#confirmUpdateContributor').popup("show");
+      }
+      else {
+        UniqueIds.splice($.inArray(this.value, UniqueIds), 1);
+      }
+
+      //debugger
+      //if (this.checked) {
+      //  UniqueIds.push(this.value);
+      //  $('#confirmUpdateContributor').popup("show");
+      //}
+    })
+    function UpateContributorPfDetails() {
+      var PfRateId = $("#PfRateIdContributor").val();
+      var PfRateText = $('#PfRateIdContributor option:selected').text();
+      if ($('input.AllCheckContributor').is(':checked')) {
+        if (PfRateId == "" || PfRateId == null || PfRateId == undefined) {
+          toasterErrorMessage("Please Select Pf Rate.");
+        }
+        else {
+          $("#ContributorConfirmMessage").text("Do You Really Want To Update " + PfRateText + " For The Selected Contributors?");
+          $('#confirmUpdateContributor').popup("show");
+        }
+      }
+      else {
+        if (PfRateId == "" || PfRateId == null || PfRateId == undefined) {
+          toasterErrorMessage("Please Select Pf Rate.");
+        }
+        else if (UniqueIds.length == 0) {
+          toasterErrorMessage("Please Select Atleast One Contributor.");
+        }
+        else {
+          $("#ContributorConfirmMessage").text("Do You Really Want To Update " + PfRateText + " For The Selected Contributors?");
+          $('#confirmUpdateContributor').popup("show");
+        }
+      }
+    }
+    function onUpdateConfirmContributor() {
+      var PfRateId = $("#PfRateIdContributor").val();
+      var Id = $("#EmployerName").val();
+      var JobStatusId = $("#JobStatusID").val();
+      var url = "";
+      if ($('input.AllCheckContributor').is(':checked')) {
+        url = "@Url.Action("ManageAllContributorPfHistoryAjax", "PFRate")?PfRateId=" + PfRateId + "&Id=" + Id + "&JobStatusID=" + JobStatusId;
+      }
+      else {
+        url = "@Url.Action("ManageContributorPfHistoryAjax", "PFRate")?PersonIdsString=" + UniqueIds + "&PfRateId=" + PfRateId;
+      }
+
+      $.ajax({
+        url: url,
+        type: "GET",
+      })
+    .done(function (result) {
+      debugger
+      if (result == 1) {
+        toasterSuccessMessage("Contributor Pf Rate History Updated Successfully.");
+        UniqueIds = [];
+        $('.AllCheckContributor').prop("checked", false);
+        $('#tblContributor').dataTable().fnDraw();
+      }
+      else if (result == 0) {
+        toasterErrorMessage("Please Select Atleast One Contributor.");
+      }
+      else {
+        toasterErrorMessage("Something Wrong.");
+      }
+      $('#confirmUpdateContributor').popup("hide");
+    });
+    }
+    function CancelClickContributor() {
+      //UniqueIds = [];
+      $('#confirmUpdateContributor').popup("hide");
+    }
+
+    $('.AllCheckContributor').click(function () {
+      debugger
+      if ($(this).is(':checked')) {
+        //$('#confirmUpdateAll').popup("show");
+        $('.SingleCheckContributor').prop("checked", true);
+        $('.SingleCheckContributor').each(function (index, obj) {
+          if (this.checked === true && this.disabled == false) {
+            UniqueIds.push(this.value);
+          }
+        });
+      }
+      else {
+        $('.SingleCheckContributor').each(function (index, obj) {
+          if (this.checked === true && this.disabled == false) {
+            $(this).prop("checked", false);
+          }
+        });
+        //$('.SingleCheck').prop("checked", false);
+        UniqueIds = [];
+      }
+
+      //debugger
+      //if ($(this).is(':checked')) {
+      //  //UniqueIds.push(this.value);
+      //  $('#confirmUpdateAllContributor').popup("show");
+      //}
+    });
+    @*function onUpdateConfirmAllContributor() {
+      var Id = $("#EmployerName").val();
+      var JobStatusId = $("#JobStatusID").val();
+
+      $.ajax({
+        url: "@Url.Action("ManageAllContributorPfHistoryAjax", "PFRate")?PfRateId=" + @Model.Id+"&Id="+Id+"&JobStatusID="+JobStatusId,
+        type: "GET",
+      })
+    .done(function (result) {
+      debugger
+      if (result == 1) {
+        toasterSuccessMessage("Contributor Pf Rate History Updated Successfully.");
+        $('#tblContributor').dataTable().fnDraw();
+      }
+      else {
+        toasterErrorMessage("Something Wrong.");
+      }
+      $('#confirmUpdateAllContributor').popup("hide");
+    });
+    }
+    function CancelClickAllContributor(){
+      debugger
+      $('#confirmUpdateAllContributor').popup("hide");
+      $(".AllCheckContributor").attr('checked', false);
+    }*@
+  </script>
+}

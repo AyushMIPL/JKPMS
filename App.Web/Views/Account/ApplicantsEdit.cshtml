@@ -1,0 +1,201 @@
+﻿@model List<App.Data.ViewModels.EditApplicantFieldsViewModel>
+@using App.Web.Helper;
+@{
+  //var Groups = Model.FirstOrDefault().Group;
+  ViewBag.Title = "ApplicantsEdit";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline ApplicantsEdit">
+      Applicant Fields Editable Settings
+      @*<ul class="tool-bar">
+          <li><a href="/Account/AddModule" data-toggle="tooltip" data-placement="bottom" title="Add Module" data-original-title="Add Module"><i class="fa fa-plus"></i></a></li>
+        </ul>*@
+    </h4>
+  </div>
+  <div class="panel-body">
+    @using (Html.BeginForm("ApplicantsEdit", "Account", FormMethod.Post, new
+    {
+      enctype = "multipart/form-data",
+      @class = "form-horizontal",
+      role = "form",
+      id = "IdRoleModule"@*, onsubmit = "return ApplicantsEditModule();"*@ }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+      <div class="row">
+        <div class="col-sm-10">
+          <div class="form-group">
+            <div class="col-sm-5">
+              @Html.DropDownList("RoleID", null, "---Select Role---", htmlAttributes: new  {  @class = "form-control"@*, onchange = "javascript:sendParam();"*@})
+            </div>
+            <div class="col-sm-5">
+              @Html.DropDownList("TableName", null, "---Select Type---", htmlAttributes: new
+              {
+                @class = "form-control"@*, onchange = "javascript:sendParam();"*@})
+            </div>
+
+            <button type="button" class="btn btn-success px-5 height processapplicantedit" title="Please Wait While We Process Your Request" id="btn_RoleModule_loading">
+              <i class="fa fa-spinner fa-spin"></i> Processing
+            </button>
+            <button type="submit" id="IdRoleEdit" class="btn btn-success height px-5"><i class="fa fa-save"> </i> Save </button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <table class="table">
+          <thead>
+            <tr><th>Field  Name</th><th>AllowEdit</th><th></th></tr>
+          </thead>
+          <tbody>
+            @if (Model != null)
+            {
+              for (int i = 0; i < Model.Count; i++)
+              {
+                var result = Model[i];
+                if (!string.IsNullOrEmpty(result.FieldName))
+                {
+                  <tr>
+                    @Html.HiddenFor(m => m[i].Id)
+                    @Html.HiddenFor(m => m[i].RoleID)
+                    <td>@result.FieldName</td>
+                    <td>@Html.CheckBoxFor(m => m[i].AllowEdit, new { @id = "AllowEdit_" + i, @onclick = "checkView('" + result.AllowEdit + "','AllowEdit' )" })</td>
+                    @Html.HiddenFor(m => m[i].FieldName)
+                  </tr>
+                }
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+@section scripts{
+  @Scripts.Render("~/bundles/jqueryval")
+  <script nonce="@ViewBag.StyleNonce">
+    $("#RoleID,#TableName").on("change", function () {
+      sendParam();
+    });
+
+      function sendParam() {
+        debugger;
+        var roleid = $("#RoleID").val();
+        var tableName = $("#TableName").val();
+        if (roleid == "" || roleid == "1") {
+          alert("Please Select a Role.");
+          return false;
+        }
+        else if (tableName == "" || tableName == null)
+        {
+          alert("Please Select a table Name .");
+        }
+        else {
+          /* window.location = "/Account/ApplicantsEdit/" + roleid + "&TableName=" + tableName;*/
+          window.location = "/Account/ApplicantsEdit?Id=" + roleid + "&TableName=" + tableName;
+
+        }
+
+   /*   window.location = "/Account/ApplicantsEdit/" + $("#RoleID").val();*/
+      }
+      function checkView(id, status) {
+        debugger
+
+        if (status == "AllowEdit") {
+          if ($('input[type="checkbox"][name="[' + (id - 1) + '].EditPermission"]').prop('checked')) {
+            $('input:checkbox[id="' + id + 'AllowEdit"]').each(function () {
+              $(this).prop("checked", true);
+            })
+          }
+          else {
+            $('input:checkbox[id="' + id + 'AllowEdit"]').each(function () {
+              $(this).prop("checked", false);
+            })
+          }
+        }
+
+      }
+     function AssignRole() {
+      $("#divLoading").show();
+      var data = new Array();
+      $('input[type=checkbox]:checked').each(function () {
+        data.push($(this).attr("name"));
+      });
+      role = $("#RoleID").val();
+      debugger
+      $.ajax({
+        url: "@Url.Action("AddPermission", "Account")?Data=" + data + "&RoleId=" + role,
+        type: "Get"
+      }).done(function () {
+        $("#divLoading").fadeOut();
+        toasterSuccessMessage("Permission Assigned Sucessfully.");
+      })
+     }
+
+      //*** Code By Himanshu Rajput ***/
+
+      $(document).ready(function () {
+        @*$('form').submit(function () {
+          debugger
+          $('#IdRoleEdit').hide();
+          $('#btn_RoleModule_loading').show();
+          var form = $("#IdRoleModule");
+          if (!form.valid()) {
+
+              $('#IdRoleEdit').show();
+              $('#btn_RoleModule_loading').hide();
+              return false;
+          }
+        });
+        var error = '@TempData["error"]';
+        if (error && error.length > 0) {
+            $('#IdRoleEdit').show();
+            $('#btn_RoleModule_loading').hide();
+        }
+          $('#btn_RoleModule_loading').hide();*@
+      });
+
+    document.getElementById("IdRoleEdit").addEventListener("click", ApplicantsEditModule);
+
+      function ApplicantsEditModule() {
+        debugger
+        var roleid = $("#RoleID").val();
+        if (roleid == "" || roleid == "1") {
+          toasterErrorMessage("Please Select a Role.");
+          var form = $("#IdRoleModule");
+          if (!form.valid()) {
+            $('#IdRoleEdit').show();
+            $('#btn_RoleModule_loading').hide();
+            //return false;
+          }
+          return false;
+        }
+        else {
+          $('form').submit(function () {
+          debugger
+          $('#IdRoleEdit').hide();
+          $('#btn_RoleModule_loading').show();
+          var form = $("#IdRoleModule");
+          if (!form.valid()) {
+
+              $('#IdRoleEdit').show();
+              $('#btn_RoleModule_loading').hide();
+              return false;
+          }
+        });
+        var error = '@TempData["error"]';
+        if (error && error.length > 0) {
+            $('#IdRoleEdit').show();
+            $('#btn_RoleModule_loading').hide();
+        }
+          $('#btn_RoleModule_loading').hide();
+          $('#spinner').show();
+
+          $('#Btn').prop('disabled', true);
+          return true;
+        }
+      }
+
+
+  </script>
+}

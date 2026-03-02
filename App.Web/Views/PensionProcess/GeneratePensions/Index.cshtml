@@ -1,0 +1,75 @@
+﻿@model IEnumerable<App.Data.Entities.PensionProcessHeader>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Pension Process Details
+      
+      <ul class="tool-bar">
+        <li><a href="/PensionProcess/GeneratePensionProcess" data-toggle="tooltip" data-placement="bottom" title="Generate Pension Process" data-original-title="Generate Pension Process"><i class="fa fa-plus"></i></a></li>
+        
+      </ul>
+    </h4>
+  </div>
+  <div class="panel-body">
+    <table class="table dataTable" id="tbl">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+@section Scripts {
+  <script nonce="@ViewBag.StyleNonce">
+    $(function () {
+      doBindData();
+    });
+    function doBindData() {
+      var oTable = $('#tbl').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "sAjaxSource": "/PensionProcess/AjaxHandler",
+        "aoColumns": [
+
+						{ "sName": "Name" },
+						{
+						  "sName": "ActiveStatus",
+						  "bSearchable": false,
+						  "bSortable": false,
+						  "fnRender": function (oObj) {
+						    if (oObj.aData[1] == "False")
+						      return '<span class="badge badge-danger">inactive</span>';
+						    else
+						      return '<span class="badge badge-success">active</span>';
+						  }
+						},
+						{
+						  "sName": "ID",
+						  "bSearchable": false,
+						  "bSortable": false,
+						  "fnRender": function (oObj) {
+						    var strString = '<a href="/PensionProcess/Edit/' + oObj.aData[2] + '\" class="btn btn-success btn-xs">Edit</a>';
+						    strString += '&nbsp;<a href="/PensionProcess/Details/' + oObj.aData[2] + '\" class="btn btn-primary btn-xs">Details</a>';
+						    strString += '&nbsp;<a href="javascript:;" class="btn btn-danger btn-xs" onclick="javascript:del(' + oObj.aData[2] + ');">Delete</a> ';
+
+						    return strString;
+						  }
+						}
+        ]
+      });
+    }
+
+  </script>
+}

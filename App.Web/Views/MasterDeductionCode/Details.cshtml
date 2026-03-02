@@ -1,0 +1,130 @@
+﻿@model App.Data.Entities.MasterDedcodes
+
+@{
+  ViewBag.Title = "Details";
+}
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Deduction Code Details
+      @*<ul class="tool-bar">
+
+        </ul>*@
+    </h4>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-sm-4">
+        <dl class="dl-horizontal">
+          <dt>
+            @Html.DisplayNameFor(model => model.ded_code)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.ded_code)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.ded_type)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.ded_type)
+          </dd> 
+        </dl>
+      </div>
+      <div class="col-sm-4">
+        <dl class="dl-horizontal">
+          <dt>
+            @Html.DisplayNameFor(model => model.description)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.description)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.tax_jur)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.tax_jur)
+          </dd>  
+        </dl>
+      </div>
+
+    </div>
+    Defaults for manual entry:
+    <div class="row">
+      <div class="col-sm-4">
+        <dl class="dl-horizontal">
+          <dt>
+            @Html.DisplayNameFor(model => model.ded_taxred)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.ded_taxred)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.dflt_rate)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.dflt_rate)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.dflt_apply)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.dflt_apply)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.dflt_lo_ded_amt)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.dflt_lo_ded_amt)
+          </dd>
+        </dl>
+      </div>
+      <div class="col-sm-4">
+        <dl class="dl-horizontal">
+          <dt>
+            @Html.DisplayNameFor(model => model.state_ein)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.state_ein)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.dflt_limit)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.dflt_limit)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.dflt_pay_limit)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.dflt_pay_limit)
+          </dd>
+          <dt>
+            @Html.DisplayNameFor(model => model.dflt_hi_ded_amt)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.dflt_hi_ded_amt)
+          </dd>
+        </dl>
+      </div>
+
+    </div>
+  </div>
+  <div class="panel-footer">
+    <a href="/MasterDeductionCode/Edit/@Model.ded_code_id" class="btn btn-info"><i class="fa fa-pencil"> </i> Edit</a>
+    <a href="/MasterDeductionCode/Index" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+    
+  </div>
+</div>

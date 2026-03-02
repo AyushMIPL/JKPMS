@@ -1,0 +1,56 @@
+﻿@model App.Data.Entities.MasterSource
+
+@{
+  ViewBag.Title = "Edit";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Update Details
+      
+
+      @*<ul class="tool-bar">
+          
+        </ul>*@
+    </h4>
+  </div>
+  <div class="panel-body">
+    @using (Html.BeginForm("Edit", "MasterSource", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+      @Html.HiddenFor(model => model.Id)
+      <div class="row">
+        <div class="col-sm-5">
+          <div class="form-group">
+            @Html.LabelFor(model => model.Name, new { @class = "col-sm-4 control-label" })
+            <div class="col-sm-8">
+              @Html.TextBoxFor(m => m.Name, new { @class = "form-control input-sm", placeholder = "Enter Name Here" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="IsActive" class="col-sm-4 control-label">Status:</label>
+            <div class="col-sm-8">
+              <div class="checkbox">
+                @Html.CheckBoxFor(m => m.IsActive, new { @class = "form-control input-sm" })
+              </div>
+            </div>
+          </div>
+          @*<hr>*@
+          <div class="form-group">
+            <label class="col-sm-4 control-label"></label>
+            <div class="col-sm-8">
+              <button type="submit" class="btn btn-success"><i class="fa fa-save"> </i> Update</button>
+              @Html.ActionLink("Back to List", "Index", "MasterSource", null, new { @class = "btn btn-primary" })
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2">
+
+          <span class="field-validation-error text-danger" id="fileValidate"></span>
+
+        </div>
+      </div>
+    }
+  </div>
+</div>

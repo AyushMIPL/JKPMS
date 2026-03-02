@@ -1,0 +1,215 @@
+﻿@model App.Data.Entities.MasterDiscountForGratuityMain
+@{
+  ViewBag.Title = "Index";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Discount Rates
+      <ul class="tool-bar">
+        <li><a href="/MasterDiscountForGratuityMain/Create" data-toggle="tooltip" data-placement="bottom" title="Add Module" data-original-title="Add Module"><i class="fa fa-plus"></i></a></li>
+      </ul>
+    </h4>
+  </div>
+  @*<div class="panel-body" id="AddModule" style="display:none">
+      @using (Html.BeginForm("Create", "MasterDiscountForGratuityMain", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+      {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary("", new { @class = "text-danger" })
+        <div class="row">
+          <div class="col-sm-5">
+            <div class="form-group">
+              @Html.LabelFor(model => model.EmployerTypeID, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.DropDownList("EmployerTypeID", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-4 control-label">Max Year &nbsp;<i class="fa fa-question-circle fa-lg Public" data-toggle="tooltip" data-placement="bottom" title="Max Year to normal retirement"></i></label>
+
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.MaxYearsToNormalRetirement, new { @class = "form-control input-sm", placeholder = "Max Years To NormalRetirement" })
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.DiscountFactorPercent, new { @class = "col-sm-4 control-label" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.DiscountFactorPercent, new { @class = "form-control input-sm allownumericwithdecimal", placeholder = "Discount Factor" })
+              </div>
+            </div>
+            </div>
+            <div class="col-sm-5">
+              <div class="form-group">
+                @Html.LabelFor(model => model.DateFrom, new { @class = "col-sm-4 control-label" })
+                <div class="col-sm-8">
+                  <div class="input-group date" id="StartDate">
+                    @Html.TextBoxFor(m => m.DateFrom, new { @class = "form-control", placeholder = "Date From" })
+                    <span class="input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.DateTo, new { @class = "col-sm-4 control-label" })
+                <div class="col-sm-8">
+                  <div class="input-group date" id="EndDate">
+                    @Html.TextBoxFor(m => m.DateTo, new { @class = "form-control", placeholder = "Date To" })
+                    <span class="input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="col-sm-4 control-label"></label>
+                <div class="col-sm-8">
+                  <button type="submit" class="btn btn-success"><i class="fa fa-save"> </i> Create</button>
+                  <input type="button" onclick="hidemodule()" value="Back to List" class="btn btn-primary" />
+                </div>
+              </div>
+            </div>
+          <div class="col-sm-2">
+
+            <span class="field-validation-error text-danger" id="fileValidate"></span>
+
+          </div>
+        </div>
+
+      }
+    </div>*@
+  <div class="panel-body">
+    <table class="table dataTable" id="tbl">
+      <thead>
+        <tr>
+          <th>Date From - Date To</th>
+          <th>Public/Police</th>
+          <th>Discount Factor (%)</th>
+          <th>Max Years To <br />Normal Retirement</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+<div class="modal fade in" id="discountDetails" aria-hidden="false" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content" style="width:800px;">
+      <div class="modal-header">
+        <button type="button" class="close" onclick="hidemodal();" aria-hidden="true">×</button>
+      </div>
+      <div class="modal-body" id="partialDiv">
+
+      </div>
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+@section scripts{
+  <style>
+    .select2-container {
+      width: 100% !important;
+    }
+  </style>
+
+  <script nonce="@ViewBag.StyleNonce">
+
+    $(function () {
+      doBindData();
+    });
+    function doBindData() {
+      var oTable = $('#tbl').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "bAutoWidth": false,
+        "sAjaxSource": "/MasterDiscountForGratuityMain/AjaxHandler",
+        "aoColumns": [
+
+              { "sName": "DateFrom - DateTo" },
+              { "sName": "EmployerTypeID" },
+              { "sName": "DiscountFactorPercent" },
+              { "sName": "MaxYearsToNormalRetirement" },
+              {
+                "sName": "ID",
+                "bSearchable": false,
+                "bSortable": false,
+                "fnRender": function (oObj) {
+                  var strString = '<a href="/MasterDiscountForGratuityMain/Edit/' + oObj.aData[4] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i> Edit</a>';
+                  strString += '&nbsp;<a href="javascript:;"  onclick="javascript:detail(' + oObj.aData[4] + ');" class="btn btn-xs btn-primary" title="Details"><i class="fa fa-list"></i> Details</a>';
+                  strString += '&nbsp;<a href="javascript:;"  onclick="javascript:del(' + oObj.aData[4] + ');" class="btn btn-xs btn-danger"> <i class="fa fa-trash-o fa-lg"></i> Delete</a>';
+                  return strString;
+                }
+              }
+        ]
+      });
+    }
+
+    //function Module() {
+    //  $("#AddModule").show();
+    //}
+    //function hidemodule() {
+    //  $("#AddModule").hide();
+    //}
+    //$("#EndDate").change(function (ev) {
+    //  debugger
+    //  var Sdate = $("#DateFrom").val();
+    //  if (Sdate == '') {
+    //    toasterErrorMessage("Please ensure that the End Date is greater than or equal to the Start Date.");
+    //    $("#DateTo").val("")
+    //    return false;
+    //  }
+    //});
+    //$("#StartDate").on("change", function (ev) {
+    //  var Sdate = new Date($("#DateFrom").val());
+    //  if (Sdate != '') {
+    //    $('#EndDate').datepicker('setStartDate', Sdate);
+    //  }
+    //})
+    function detail(ctrl) {
+      debugger
+      $.get('@Url.Action("Details", "MasterDiscountForGratuityMain")?id=' + ctrl, function (data) {
+        $('#partialDiv').html(data);
+        $("#discountDetails").show();
+      });
+    }
+    function hidemodal() {
+      $("#discountDetails").hide();
+    }
+    function del(ctrlId) {
+      $("#hdDocumentId").val(ctrlId);
+      $('#confirmDelete').popup("show");
+    }
+    const Confirm_Delete_ClassBtn = document.querySelectorAll('.Confirm_Delete_Class');
+    debugger
+    Confirm_Delete_ClassBtn.forEach(button => {
+      button.addEventListener('click', onDeleteConfirm);
+    });
+    function onDeleteConfirm() {
+      var id = $("#hdDocumentId").val();
+      var name = "DiscountForGratuityMainId";
+      $.ajax({
+        url: "@Url.Action("Remove", "MasterDiscountForGratuityMain")?Id=" + id + "&name=" + name,
+        type: "GET",
+        })
+    .done(function (result) {
+      var actionRes = result;
+      if (actionRes == "0") {
+        toasterErrorMessage("There is some error, please try again.");
+        return actionRes;
+      }
+      else if (actionRes == "1") {
+        toasterSuccessMessage("Status changed sucessfully.");
+        $('#confirmDelete').popup("hide");
+        doBindData();
+      } else {
+        toasterErrorMessage("Already in Use.");
+        $('#confirmDelete').popup("hide");
+      }
+    });
+    }
+  </script>
+}

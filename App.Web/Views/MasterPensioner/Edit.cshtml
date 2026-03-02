@@ -1,0 +1,996 @@
+﻿@model JKPS.COMMON.DVOMasterEmployee
+@using App.Web.Helper
+@{
+  ViewBag.Title = "Details";
+  Layout = "~/Views/Shared/_LayoutPensioner.cshtml";
+}
+@{
+  // Assuming ViewBag.Email has a value
+  var PensionerID = ViewBag.EmplCode as string;
+  var roleid = ViewBag.roleidlist;
+  var ReasonForChange = @Html.Raw(Model.ReasonForChange);
+}
+
+@section profilePensioner
+{
+
+  <link href="~/Content/toggle.css" rel="stylesheet" />
+
+  <!-- Include Bootstrap JS (jQuery and Popper.js are required for some Bootstrap components) -->
+  @*<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>*@
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="headline Mpheadline">
+        Pensioner General Details: @string.Format("{0} ({1})", ViewBag.Name, ViewBag.PensionerID)
+
+      </h4>
+    </div>
+    @using (Html.BeginForm("Edit", "MasterPensioner", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", onsubmit = "return Edit();", id = "BeneficiaryId" }))
+    {
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel-body panel-height">
+            <div class="">
+              @Html.AntiForgeryToken()
+              @Html.ValidationSummary("", new { @class = "text-danger" })
+
+              @Html.HiddenFor(x => x.EmplrCode)
+              @Html.HiddenFor(x => x.EmplStatus)
+              @Html.HiddenFor(x => x.FlexDeptAcctType)
+              @Html.HiddenFor(x => x.acct_type)
+              @Html.HiddenFor(x => x.Address2)
+              @Html.HiddenFor(x => x.Allowances)
+              @Html.HiddenFor(x => x.BankAcctNo)
+              @Html.HiddenFor(x => x.cash_acct_kv)
+              @Html.HiddenFor(x => x.CashAcct)
+              @Html.HiddenFor(x => x.ChkDigit)
+              @Html.HiddenFor(x => x.ded_code)
+              @Html.HiddenFor(x => x.Department)
+              @Html.HiddenFor(x => x.DfiDest)
+              @Html.HiddenFor(x => x.inc_code)
+              @Html.HiddenFor(x => x.JobCode)
+              @Html.HiddenFor(x => x.JobTitle)
+              @Html.HiddenFor(x => x.LastIncDate)
+              @Html.HiddenFor(x => x.LastPay)
+              @Html.HiddenFor(x => x.LengthOfQualifyingServiceInMonthsFrom1Jan2014)
+              @Html.HiddenFor(x => x.LengthOfQualifyingServiceInMonthsTo31Dec2003)
+              @Html.HiddenFor(x => x.LocTaxCode)
+              @Html.HiddenFor(x => x.MaritalStat)
+              @Html.HiddenFor(x => x.month)
+              @Html.HiddenFor(x => x.PayPeriod)
+              @Html.HiddenFor(x => x.RowID)
+              @Html.HiddenFor(x => x.segment_code)
+              @Html.HiddenFor(x => x.segment_value)
+              @Html.HiddenFor(x => x.SickAccrCodr)
+              @Html.HiddenFor(x => x.SickAccrCtr)
+              @Html.HiddenFor(x => x.SickAllowed)
+              @Html.HiddenFor(x => x.SickCode)
+              @Html.HiddenFor(x => x.SickLapseDate)
+              @Html.HiddenFor(x => x.SickUsed)
+              @Html.HiddenFor(x => x.StaTaxCode)
+              @Html.HiddenFor(x => x.State)
+              @Html.HiddenFor(x => x.StateAllow)
+              @Html.HiddenFor(x => x.StateUdf)
+              @Html.HiddenFor(x => x.type_code)
+              @Html.HiddenFor(x => x.type_desc)
+              @Html.HiddenFor(x => x.TypeCode)
+              @Html.HiddenFor(x => x.VacAccrCode)
+              @Html.HiddenFor(x => x.VacAccrCtr)
+              @Html.HiddenFor(x => x.VacAllowed)
+              @Html.HiddenFor(x => x.VacCode)
+              @Html.HiddenFor(x => x.VacLapseDate)
+              @Html.HiddenFor(x => x.VacUsed)
+              @Html.HiddenFor(x => x.year)
+              @Html.HiddenFor(x => x.Zip)
+              @Html.HiddenFor(x => x.SocSecNum)
+              @Html.HiddenFor(x => x.Phone)
+              @Html.HiddenFor(x => x.DirDept)
+              @Html.HiddenFor(x => x.Prefix)
+              @Html.HiddenFor(x => x.Suffix)
+              @Html.HiddenFor(x => x.Address1)
+              @Html.HiddenFor(x => x.PersonID)
+              @Html.HiddenFor(x => x.mailid)
+
+              <div class="panel-group" id="accordion">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <h4 class="panel-title">
+                      <a data-toggle="collapse" data-parent="#accordion" href="#collapse1"><i class="fa fa-user" aria-hidden="true"></i> Personal Details</a>
+                    </h4>
+                  </div>
+                  <div id="collapse1" class="panel-collapse collapse in">
+                    <div class="panel-body">
+                      <div>
+                        <div class="form-group">
+                          <div class="col-sm-6">
+                            @Html.HiddenFor(m => m.EmplCode, new { @class = "form-control", placeholder = "Pensioner ID", @readonly = "readonly" })
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.ApplicationReferenceNo, "Application Reference No", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6 custom-color">
+                            @Html.TextBoxFor(m => m.ApplicationReferenceNo, new { @class = "form-control", placeholder = "Application Reference No", @readonly = "readonly" })
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.FirstName, "First Name", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "first_name")
+                              {
+                                @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control disable-textbox " + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "First Name" })
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.MiddleName, "Middle Name", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "middle_name")
+                              {
+                                @Html.TextBoxFor(m => m.MiddleName, new { @class = "form-control disable-textbox  " + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Mid Name" })
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.LastName, "Last Name", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "last_name")
+                              {
+                                @Html.TextBoxFor(m => m.LastName, new { @class = "form-control input-sm " + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Last Name" })
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.FatherOrHusbandOrGuardianName, "Father / Husband / Guardian Name", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "FatherOrHusbandOrGuardianName")
+                              {
+
+                                @Html.TextBoxFor(m => m.FatherOrHusbandOrGuardianName, new { @class = "form-control input-sm disable-textbox " + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Father / Husband / Guardian Name" })
+
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.Gender, "Gender", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @Html.DropDownListFor(model => model.Gender,
+                                new List<SelectListItem>
+                                {
+                                    new SelectListItem { Text = "--select Gender--" },
+                                    new SelectListItem { Text = "Male", Value = "M" },
+                                    new SelectListItem { Text = "Female", Value = "F" },
+                                    new SelectListItem { Text = "Transgender", Value = "T" }
+                                },
+                                "Select Gender",
+                                new { @class = "form-control input-sm disable-dropdown" }
+                            )
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.Birthdate, "Date Of Birth", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "birthdate")
+                              {
+                                @*<div class=" ">
+                                      @Html.TextBoxFor(m => m.Birthdate, new { @class = "form-control disable-textbox" + (item.AllowEdit == false ? "" : "readonlyy"), placeholder = "Date Of Birth", type = "date" })
+                                  </div>*@
+                                <div class="input-group date ">
+                                  @Html.TextBoxFor(m => m.Birthdate, new { @class = "form-control disable-textbox" + (item.AllowEdit == false ? "" : "readonlyy"), placeholder = "Date Of Birth" })
+                                  <span class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                  </span>
+                                </div>
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.AgeInYears, "Age (In Years)", new { @class = "col-sm-3 control" })
+                          <!--<div class="col-sm-6">-->
+                          @*@Html.TextBoxFor(m => m.AgeInYears, new { @class = "form-control", placeholder = "  Age (In Years)" })*@
+                          <!--@Html.TextBoxFor(m => m.AgeInYears, new { @class = "form-control disable-textbox", placeholder = "Age (In Years)", type = "number", step = "1" })
+                           </div>-->
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "Age_InYears")
+                              {
+                                @Html.TextBoxFor(m => m.AgeInYears, new { @class = "form-control disable-textbox   " + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Age (In Years)", type = "number", step = "1" })
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.PercentageofDisability, "Percentage of Disability", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "PercentageofDisability")
+                              {
+                                @Html.TextBoxFor(m => m.PercentageofDisability, new { @class = "form-control disable-textbox   " + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Percentage of Disability", type = "number", step = "1" })
+                              }
+
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.Last_pay_date, "Last pay date", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @*<div class="">
+                                  @Html.TextBoxFor(m => m.Last_pay_date, new { @class = "form-control disable-textbox", placeholder = "Last pay date", type = "date" })
+                              </div>*@
+
+                            <div class="input-group date">
+                              @Html.TextBoxFor(m => m.Last_pay_date, new { @class = "form-control disable-textbox", placeholder = "Last pay date" })
+                              <span class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.Application_approve_on, "Application approve on", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "Application_approve_on")
+                              {
+
+                                @Html.TextBoxFor(m => m.Application_approve_on, new { @class = "form-control disable-textbox  " + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Application approve on" })
+
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group hidden">
+                          @Html.LabelFor(model => model.AppliedBy, " Applied By", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @Html.TextBoxFor(m => m.AppliedBy, new { @class = "form-control disable-textbox", placeholder = " Applied By" })
+                          </div>
+                        </div>
+                        <div class="form-group hidden">
+                          @Html.LabelFor(model => model.NameoftheApplicant, "  Name of the Applicant", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @Html.TextBoxFor(m => m.NameoftheApplicant, new { @class = "form-control disable-textbox", placeholder = "  Name of the Applicant", @readonly = "readonly" })
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <h4 class="panel-title">
+                      <a data-toggle="collapse" data-parent="#accordion" href="#collapse2"><i class="fa fa-phone" aria-hidden="true"></i> Contact Details</a>
+                    </h4>
+                  </div>
+                  <div id="collapse2" class="panel-collapse collapse">
+                    <div class="panel-body">
+                      <div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.Nationality, new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6 DroupDown_With">
+                            @Html.DropDownList("Nationality", null, htmlAttributes: new { @class = "form-control disable-dropdown w-100" })
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.Mobile, "Mobile Number", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "Mobile")
+                              {
+                                @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control input-sm disable-textbox " + (item.AllowEdit == true ? "" : "readonlyy"), @type = "number", placeholder = "Mobile" })
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.EMail, new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "EMail")
+                              {
+                                @Html.TextBoxFor(m => m.EMail, new { @class = "form-control input-sm disable-textbox " + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Email", })
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.PresentAddress, "Present Address", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "PresentAddress")
+                              {
+                                @Html.TextBoxFor(m => m.PresentAddress, new { @class = "form-control disable-textbox " + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Present Address" })
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.PresentDistrict, "Present District", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6 DroupDown_With">
+                            @Html.DropDownList("PresentDistrict", null, "---Select District---", htmlAttributes: new { @class = "form-control input-sm disable-dropdown" })
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.PresentVillageName, "Present Village Name", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "PresentVillageName")
+                              {
+                                @Html.TextBoxFor(m => m.PresentVillageName, new { @class = "form-control disable-textbox" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Present Village Name" })
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.Pincode, "Pincode", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "zip")
+                              {
+                                @Html.TextBoxFor(m => m.Pincode, new { @class = "form-control disable-textbox" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Pincode" })
+                              }
+                            }
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.PresentTehsil, "Present Tehsil", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6 DroupDown_With">
+                            @Html.DropDownList("PresentTehsil", null, htmlAttributes: new { @class = "form-control disable-dropdown" })
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.PermanentAddress, "Permanent Address", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "PermanentAddress")
+                              {
+                                @Html.TextBoxFor(m => m.PermanentAddress, new { @class = "form-control disable-textbox" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = " Permanent Address" })
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.PermanentDistrict, "Permanent District", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "PermanentDistrict")
+                              {
+                                @Html.TextBoxFor(m => m.PermanentDistrict, new { @class = "form-control disable-textbox" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = " Permanent District" })
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.PermanentTehsil, "Permanent Tehsil", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6 DroupDown_With">
+                            @Html.DropDownList("PermanentTehsil", null, htmlAttributes: new { @class = "form-control disable-dropdown" })
+                          </div>
+                        </div>
+                        <div class="form-group DroupDown_With">
+                          @Html.LabelFor(model => model.PermanentHalqaPanchayatMunicipalityName, "Permanent Tehsil Permanent Halqa Panchayat / Municipality Name", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @*@Html.DropDownList("PermanentHalqaPanchayatMunicipalityName", null, htmlAttributes: new { @class = "form-control disable-dropdown" })*@
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "PermanentHalqaPanchayatOrMunicipalityName")
+                              {
+                                @Html.TextBoxFor(m => m.PermanentHalqaPanchayatMunicipalityName, new { @class = "form-control disable-textbox" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Permanent Tehsil Permanent Halqa Panchayat" })
+                                <i class="fa fa-search SearchPresentHalqa" aria-hidden="true"></i>
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group DroupDown_With">
+                          @Html.LabelFor(model => model.PresentHalqaPanchayatMunicipalityName, "Present Halqa Panchayat / Municipality Name", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @*@Html.DropDownList("PresentHalqaPanchayatMunicipalityName", null, htmlAttributes: new { @class = "form-control disable-dropdown" })*@
+
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "PresentHalqaPanchayatOrMunicipalityName")
+                              {
+                                @Html.TextBoxFor(m => m.PresentHalqaPanchayatMunicipalityName, new { @class = "form-control disable-textbox" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Present Halqa Panchayat" })
+                                <i class="fa fa-search SearchPresentHalqa" aria-hidden="true"></i>
+                              }
+                            }
+
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.PermanentVillageName, "Permanent Village Name", new { @class = "col-sm-3 control-l" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "PermanentVillageName")
+                              {
+                                @Html.TextBoxFor(m => m.PermanentVillageName, new { @class = "form-control disable-textbox" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = " Permanent Village Name" })
+                              }
+                            }
+                          </div>
+                        </div>
+
+
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.City, "City", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "city")
+                              {
+                                @Html.TextBoxFor(m => m.City, new { @class = "form-control disable-textbox" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = " City" })
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.TSWO, " Select Tehsil Social Welfare Office", new { @class = "col-sm-3 control" })
+                          <!--<div class="col-sm-6">
+                               @Html.TextBoxFor(m => m.TSWO, new { @class = "form-control disable-textbox", placeholder = " Select Tehsil Social Welfare Office" })-->
+                          <!--</div>-->
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "SelectTehsilSocialWelfareOffice_TSWO")
+                              {
+                                @Html.TextBoxFor(m => m.TSWO, new { @class = "form-control disable-textbox" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = " Select Tehsil Social Welfare Office" })
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.SelectDistrict, " Select District", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6 DroupDown_With">
+                            @Html.DropDownList("SelectDistrict", null, "---Select District---", htmlAttributes: new { @class = "form-control input-sm disable-dropdown" })
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <h4 class="panel-title">
+                      <a data-toggle="collapse" data-parent="#accordion" href="#collapse3"><i class="fa fa-connectdevelop"></i> Social Status</a>
+                    </h4>
+                  </div>
+                  <div id="collapse3" class="panel-collapse collapse">
+                    <div class="panel-body">
+                      <div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.JKISSS, "Are you previously taking Pension from JK-ISSS / GOI-NSAP", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            <button type="button" class="btn btn-sm btn-toggle active disable-dropdown" id="toggleButton" data-toggle="button" aria-pressed="@Model.JKISSS == 'YES' ? 'true' : 'false'" autocomplete="off">
+                              <div class="handle"></div>
+                            </button>
+                            <input type="hidden" id="JKISSS" name="JKISSS" />
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.PensionerType, "Pensioner Type", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6 DroupDown_With">
+                            @Html.DropDownList("PensionerType", null, htmlAttributes: new { @class = "form-control disable-dropdown" })
+
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.SubmissionLocation, "Submission Location", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "SelectTehsilSocialWelfareOffice_TSWO")
+                              {
+                                @Html.TextBoxFor(m => m.SubmissionLocation, new { @class = "form-control disable-textbox" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Submission Location" })
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.SubmissionDate, "Submission Date", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @*<div class="">
+                                  @Html.TextBoxFor(m => m.SubmissionDate, new { @class = "form-control disable-textbox", placeholder = "Submission Date", type = "date" })
+
+                              </div>*@
+                            <div class="input-group date">
+                              @Html.TextBoxFor(m => m.SubmissionDate, new { @class = "form-control disable-textbox", placeholder = "Submission Date" })
+                              <span class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.Category, "Category", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "Category")
+                              {
+                                @Html.TextBoxFor(m => m.Category, new { @class = "form-control disable-textbox" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Category" })
+                              }
+                            }
+                          </div>
+                        </div>
+                        <!--<div class="form-group">
+                        @Html.LabelFor(model => model.DoyouhaveBPLcard, "Do you have BPL card", new { @class = "col-sm-3 control" })
+                        <div class="col-sm-6">-->
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.DoyouhaveBPLcard, "Do you have BPL card", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            <button type="button" class="btn btn-sm btn-toggle disable-dropdown" id="toggleDoyouhaveBPLcard" data-toggle="button" autocomplete="off">
+                              <div class="handle"></div>
+                            </button>
+                            <input type="hidden" id="DoyouhaveBPLcard" name="DoyouhaveBPLcard" />
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.ApplicationSanctionedunderSchemeName, "Application Sanctioned under Scheme Name", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "ApplicationSanctionedunderSchemeName")
+                              {
+                                @Html.TextBoxFor(m => m.ApplicationSanctionedunderSchemeName, new { @class = "form-control disable-textbox" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Application Sanctioned under Scheme Name" })
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.CivilCondition, "Civil Condition", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @Html.TextBoxFor(m => m.CivilCondition, new { @class = "form-control disable-textbox", placeholder = "Civil Condition" })
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.CurrentTask, "Current Task", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "CurrentTask")
+                              {
+                                @Html.TextBoxFor(m => m.CurrentTask, new { @class = "form-control disable-textbox" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Current Task" })
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.CurrentStatus, "Current Status", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "CurrentStatus")
+                              {
+                                @Html.TextBoxFor(m => m.CurrentStatus, new { @class = "form-control disable-textbox" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Current Status" })
+                              }
+                            }
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.LastTask, "Last Task", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "LastTask")
+                              {
+                                @Html.TextBoxFor(m => m.LastTask, new { @class = "form-control disable-textbox" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Last Task" })
+                              }
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          @Html.LabelFor(model => model.VersionNo, "Version No", new { @class = "col-sm-3 control" })
+                          <div class="col-sm-6">
+                            @foreach (var item in @ViewBag.permitionlist)
+                            {
+                              if (item.FieldName.Trim() == "VersionNo")
+                              {
+                                @Html.TextBoxFor(m => m.VersionNo, new { @class = "form-control disable-textbox" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Version No" })
+                              }
+                            }
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <br />
+              <div class="form-group">
+                <div class="col-md-12">
+                  <div class="form-group ">
+                    @Html.LabelFor(model => model.ReasonForChange, "Remark *", new { @class = "col-sm-3 control Color-Red-asterisk" })
+                    <div class="col-sm-8">
+                      <div id="ReasonForChangeDiv" class="row hidden MPSReason">
+                        <label>@ReasonForChange</label>
+                      </div>
+                    </div>
+                    @Html.LabelFor(model => model.ReasonForChange, " ", new { @class = "col-sm-3 control" })
+                    <div class="col-sm-8 MPSReasonmargin">
+                      @Html.TextAreaFor(m => m.ReasonForChange, new { @class = "form-control input-sm spaceNotAllowed MPSReasRN", placeholder = "Enter your Remark" })
+                    </div>
+                  </div>
+                </div>
+
+                <div class="text-right MPSReasonmarginR">
+                  <button type="button" class="btn btn-success px-5 height Mpdisplaynone" title="Please Wait While We Process Your Request" id="Beneficiary_loaderId"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                  <button type="submit" id="Beneficiary_EditId" class="btn btn-success height px-5 border-raduis mr-2 @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")"><i class="fa fa-save"> </i> Update</button>
+                  @Html.ActionLink("Back To List", "Index", "MasterPensioner", null, new { @class = "btn btn-primary height border-radius line-height" })
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+  </div>
+
+
+  @*Creating Transaction Log*@
+
+  <div class="panel panel-default">
+    <div class="panel-heading clearfix">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <div class="col-sm-12">
+              <h4 class="headline  Mpheadline">
+                Audit Log - Beneficiary details: @string.Format("{0} ({1})", ViewBag.Name, ViewBag.PensionerID)
+              </h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="table-responsive">
+        <table class="table" id="reportData">
+          <thead>
+            <tr>
+              <th>Modified By</th>
+              <th>Modified On</th>
+              <th>Field Name</th>
+              <th>Old Value</th>
+              <th>New Value</th>
+
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="custom-popup confirmClass MPPop" data-keyboard="false" data-backdrop="static" id="PopUpShowLargeMessages">
+    <div class="padding-md">
+      <!-- Update Payment Section -->
+      <h3 class="m-top-none py-3 text-white MPHeaderText" id="MHeaders"></h3>
+      <!-- Header Section -->
+      <div class="row MPMassageText2 text-align-left">
+        <label id="MessageTexts"></label>
+      </div>
+    </div>
+  </div>
+
+
+}
+@section scripts{
+  <script nonce="@ViewBag.StyleNonce" src="~/Scripts/Master.js"></script>
+  <script nonce="@ViewBag.StyleNonce" src="~/Scripts/Pensioner.js"></script>
+  <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+  <script src="~/Content/endless/LatestJS/jquery.dataTables.min.js"></script>
+  <script nonce="@ViewBag.StyleNonce">
+    $(document).ready(function () {
+    $(function () {
+      $("#FirstName,#LastName").change(function () {
+        var firstname = $("#FirstName").val();
+        var MiddleName = $("#MiddleName").val();
+        var LastName = $("#LastName").val();
+        var NameoftheApplicant = firstname + " " + MiddleName + " " + LastName;
+        $("#NameoftheApplicant").val(NameoftheApplicant);
+          });
+     });
+      var firstname = $("#FirstName").val();
+      var LastName = $("#LastName").val();
+      var MiddleName = $("#MiddleName").val();
+      var NameoftheApplicant = firstname + " " + MiddleName + " " + LastName;
+      $("#NameoftheApplicant").val(NameoftheApplicant);
+      FunctionUserLog();
+      $("#ReasonForChange").val('');
+      if ('@Model.ReasonForChange'.length <= 0) {
+        $("#ReasonForChangeDiv").addClass("hidden");
+      } else {
+        $("#ReasonForChangeDiv").removeClass("hidden");
+      }
+    });
+
+    $(document).ready(function () {
+      $("#toggleButton").on('click', function () {
+        var isActive = $(this).hasClass('active');
+        if (isActive) {
+          $(this).removeClass('active');
+          $("#JKISSS").val("NO");
+        } else {
+          $(this).addClass('active');
+          $("#JKISSS").val("YES");
+        }
+      });
+
+      $("#toggleDoyouhaveBPLcard").on('click', function () {
+        var isActive = $(this).hasClass('active');
+        if (isActive) {
+          $(this).removeClass('active');
+          $("#DoyouhaveBPLcard").val("NO");
+        } else {
+          $(this).addClass('active');
+          $("#DoyouhaveBPLcard").val("YES");
+        }
+      });
+    });
+
+    //document.addEventListener('DOMContentLoaded', function () {
+    //  var toggleButton = document.getElementById('toggleButton');
+    //  toggleButton.addEventListener('click', function () {
+    //    var isActive = toggleButton.classList.contains('active');
+    //    if (isActive) {
+    //      $("#JKISSS").val("NO")
+    //    } else {
+    //      $("#JKISSS").val("YES")
+    //    }
+    //  });
+    //  var toggleDoyouhaveBPLcard = document.getElementById('toggleDoyouhaveBPLcard');
+    //  toggleDoyouhaveBPLcard.addEventListener('click', function () {
+    //    var isActive = toggleDoyouhaveBPLcard.classList.contains('active');
+    //    if (isActive) {
+    //      $("#DoyouhaveBPLcard").val("NO")
+    //    } else {
+    //      $("#DoyouhaveBPLcard").val("YES")
+    //    }
+    //  });
+    //});
+
+    $(document).ready(function () {
+      var modelvalue = "@Model.JKISSS";
+      var DoyouhaveBPLcardValue = "@Model.DoyouhaveBPLcard";
+      if (DoyouhaveBPLcardValue === "") {
+         DoyouhaveBPLcardValue = "No";
+        }
+      var toggleButton = document.getElementById('toggleButton');
+      if (modelvalue == "YES") {
+        $("#JKISSS").val("YES")
+        $(toggleButton).addClass('active');
+        toggleButton.setAttribute('aria-pressed', 'true');
+
+
+      }
+      else {
+        $("#JKISSS").val("NO")
+        $(toggleButton).removeClass('active');
+        toggleButton.setAttribute('aria-pressed', 'false');
+      }
+      var toggleDoyouhaveBPLcard = document.getElementById('toggleDoyouhaveBPLcard');
+      if (DoyouhaveBPLcardValue == "YES")
+      {
+        $("#DoyouhaveBPLcard").val("YES");
+        $(toggleDoyouhaveBPLcard).addClass('active');
+        toggleDoyouhaveBPLcard.setAttribute('aria-pressed', 'true');
+      } else {
+        $("#DoyouhaveBPLcard").val("NO");
+        $(toggleDoyouhaveBPLcard).removeClass('active');
+        toggleDoyouhaveBPLcard.setAttribute('aria-pressed', 'false');
+      }
+    });
+
+    function OnclickUserLog() {
+      $('#exampleModal').modal('show');
+    }
+
+
+    function ClosePopup() {
+      location.reload();
+      $("#exampleModal").popup("hide");
+    }
+      var OpenMessagePopupArr=[];
+    ////// Added Log //////////
+    let i = 0;
+    function FunctionUserLog() {
+      debugger;
+      var Username = $("#EMail").val();
+      var Emplcode = "@PensionerID";
+      var sName = $('#reportData').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "bAutoWidth": true,
+        "sAjaxSource": "@Url.Action("MasterBeneficiaryHistoryAjax", "MasterPensioner")?EmplCode=" + Emplcode,//",
+        "fnDrawCallback": function (setting) {
+          OpenMessagePopupArr.forEach(function (item, index) {
+            debugger
+            var items = item.split("~")[0];
+            var itemArray = items.split('_');
+            var oldNew = "Old Remark";
+            if (itemArray[1] == 2) {
+              oldNew = "New Remark";
+            }
+            document.getElementById(item).addEventListener("click", function () {
+              OpenMessagePopup(oldNew, itemArray[2]);
+            });
+
+          });
+
+        },
+        "aoColumns": [
+            { "sName": "empl_code" },
+            { "sName": "update_date" },
+            { "sName": "field_name" },
+            {
+                "sname": "old_value",
+                "bsearchable": false,
+                "bsortable": false,
+                "fnRender": function (oObj) {
+                    debugger;
+                    if (oObj.aData[3].length > 10) {
+                        // Get the first 10 characters
+                      var firstTenCharacters = oObj.aData[3].substring(2, 10);
+                      i = i + 1;
+                      var id = "OpenMessagePopup_1_" + oObj.aData[3]+"~"+i;
+                      OpenMessagePopupArr.push(id);
+                      return ('<a href="#" class="MPCursor1" id="' + id +'" >' + firstTenCharacters + '...</a>');
+                    } else {
+                        return (oObj.aData[3]);
+                    }
+                }
+          },
+
+          {
+            "sname": "new_value",
+            "bsearchable": false,
+            "bsortable": false,
+            "fnRender": function (oObj) {
+              if (oObj.aData[4].length > 10) {
+                // Get the first 10 characters
+                i = i + 1;
+                var firstTenCharacters = oObj.aData[4].substring(2, 10);
+                var id = "OpenMessagePopup_2_" + oObj.aData[4]+"~"+i;
+                OpenMessagePopupArr.push(id);
+                return ('<a href="#" class="MPCursor1" id="' + id + '" >' + firstTenCharacters + '...</a>');
+              } else {
+                return (oObj.aData[4]);
+              }
+            }
+          },
+        ]
+      });
+      }
+      function Edit() {
+          $('#spinner').show();
+          $('#Btn').prop('disabled', true);
+          return true;
+      }
+      $('form').submit(function () {
+          $('#Beneficiary_EditId').hide();
+          $('#Beneficiary_loaderId').show();
+          var form = $("#BeneficiaryId");
+          if (!form.valid()) {
+              $('#Beneficiary_EditId').show();
+              $('#Beneficiary_loaderId').hide();
+              return false;
+          }
+      });
+        var error = '@TempData["error"]';
+        if (error && error.length > 0) {
+            $('#Beneficiary_EditId').show();
+            $('#Beneficiary_loaderId').hide();
+        }
+        $('#Beneficiary_loaderId').hide();
+
+
+    function OpenMessagePopup(heading, message) {
+          $("#MHeaders").html(heading + '<button  type="button" class="close MPSClose" id="ClosePopupWindow" title="Close" aria-label="Close"><span aria-hidden="true">&times;</span>');
+            $("#MessageTexts").html(message);
+            $("#PopUpShowLargeMessages").popup('show');
+      document.getElementById("ClosePopupWindow").addEventListener("click", ClosePopupWindow);
+    }
+
+
+    //const closemodalpopup_ClassBtn = document.querySelectorAll('.close');
+    //  closemodalpopup_ClassBtn.forEach(button => {
+    //    button.addEventListener('click', ClosePopupWindow);
+    //  });
+
+    function ClosePopupWindow() {
+          debugger
+            $("#PopUpShowLargeMessages").popup("hide");
+    }
+
+
+
+
+  </script>
+
+  <script nonce="@ViewBag.StyleNonce">
+
+    
+
+  $("#PermanentHalqaPanchayatMunicipalityName").autocomplete({
+      source: function (request, response) {
+        $.ajax({
+          url: '/MasterPensioner/GetPermanentMunicipalityAjax/?term=' + request.term,
+          method: "GET",
+          data: { term: request.term },
+          success: function (data) {
+            debugger
+            if (data.length === 0) {
+              toasterErrorMessage("Permanent Halqa Panchayat Municipality Name is not valid");
+              $("#PermanentHalqaPanchayatMunicipalityName").focus().val(""); // Keep the input active
+            } else {
+              response($.map(data, function (item) {
+                return { label: item.Value/*, id: item.Key*/ };
+              }));
+            }
+          }
+        });
+      },
+    });
+
+    $("#PresentHalqaPanchayatMunicipalityName").autocomplete({
+      source: function (request, response) {
+        debugger; // Open dev tools to check if this is hit
+        $.ajax({
+          url: '/MasterPensioner/GetPresentMunicipalityAjax?term=' + request.term, // Adjust URL as needed
+          type: "GET",
+          success: function (data) {
+            debugger;
+            if (!data || data.length === 0) {
+              toasterErrorMessage("Present Halqa Panchayat Municipality Name is not valid");
+              $("#PresentHalqaPanchayatMunicipalityName").focus().val(""); // Keep the input active
+              return false;
+            }
+            response($.map(data, function (item) {
+              return { label: item.Value };
+            }));
+          },
+          error: function (xhr, status, error) {
+            console.error("Error fetching data:", error);
+            toasterErrorMessage("Failed to fetch data. Please try again later.");
+          }
+        });
+      }
+    });
+  </script>
+
+}

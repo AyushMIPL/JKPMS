@@ -1,0 +1,914 @@
+﻿@model List<App.Data.ViewModels.ExcelFileViewModel>
+@using App.Web.Helper;
+@{
+    ViewBag.Title = "ContributionExcelUpload";
+}
+@Html.Hidden("InValid")
+@Html.Hidden("Error")
+@Html.Hidden("NewEntry")
+@{
+    var isfileSaved = TempData["Isfilesave"] as string;
+    var isfileSaved1 = @Html.Raw(Json.Encode(TempData["Isfilesave"] as string));
+    var groups = @Html.Raw(Json.Encode(ViewBag.Group));
+}
+
+
+
+@*<style>
+    .error-title {
+        color: black; /* Set the text color to black for "Error Summary" */
+    }
+
+    .red-text {
+        color: red; /* Set the text color to red for error messages */
+    }
+</style>*@
+@*<style>
+    .btn-success.disabled {
+        color: #f5e9e9;
+        pointer-events: none;
+        opacity: .5;
+    }
+
+
+
+    select.input-sm {
+        height: 30px;
+        line-height: 30px;
+        border: 1px solid #aaa;
+        font-size: 16px !important;
+        border-radius: 20px !important;
+        -moz-border-radius: 20px !important;
+        -webkit-border-radius: 20px !important;
+        margin: 0;
+        padding: 6px 10px;
+        box-shadow: inset 3px 3px 6px #BFC3CF, inset -3px -3px 6px #ffffff;
+        background-color: transparent !important;
+        box-shadow: inset 3px 3px 6px #BFC3CF, inset -3px -3px 6px #ffffff;
+        cursor: default;
+        display: -ms-flexbox;
+        -ms-flex-wrap: wrap;
+        -webkit-justify-content: space-between;
+        -ms-flex-pack: justify;
+        -webkit-transition: all 100ms;
+        transition: all 100ms;
+        border: none !important;
+        height: 40px !important;
+        color: #aeadad !important;
+    }
+</style>*@
+<div class="panel panel-default">
+    <div class="panel-body">
+        <ul class="hidden contribution_upload_fpm" >
+            <li class="dropdown">
+                <a class="dropdown-toggle DownloadDropdown" data-toggle="dropdown" href="#">
+                    <span><i class="fa fa-ellipsis-v fa-2x"></i></span>
+                </a>
+                <ul class="dropdown-menu" id="DownloadOptions">
+                    <li class="hidden">
+                        <a tabindex="-1" id="DownloadDetails" class="Download_ExcelDetails"><i class="fa fa-save"> </i> Download</a>
+                    </li>
+                    <li>
+                        <a tabindex="-1" onclick="javascript: ShowHelpDiv();"><i class="fa fa-question"> </i> Help</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <div class="row py-4">
+            @using (Html.BeginForm("ContributionExcelUpload", "ContributorPersonalDetails", FormMethod.Post, new { enctype = "multipart/form-data", id = "form" }))
+            {
+                @Html.ValidationSummary("", new { @class = "text-danger" })
+
+                <div class="col-sm-4">
+                    <label>Upload File</label>
+                    <div class="upload-file">
+                        <input type="file" id="file" name="file" class="upload-demo" accept=".xlsx" required data-val="true" data-val-required="please select a file">
+                        <label data-title="Select file" for="file">
+                            <span data-title="No file selected..."></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-5">
+                    <label>Region</label>
+                    <div class="form-group">
+
+                        @Html.TextBox("RegionNames", "", new { @class = "form-control", @autocomplete = "off", @placeholder = "Select Regions" })
+                    </div>
+                </div>
+                @Html.Hidden("regiontext", "", new { @class = "form-control", name = "regiontext" })
+
+                <div class="col-sm-2">
+                    <button type="button" class="btn btn-success px-5 height display_none mmargin-top " title="Please Wait While We Process Your Request" id="btn_File_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                    <button type="submit" class="btn btn-success height mr-2 px-5 mmargin-top  @(ViewBag.AddPermission == true ? "" : "disabled")" id="UploadBtn"><i class="fa fa-upload fa-lg"></i> Upload File</button>
+
+                </div>
+            }
+            @using (Html.BeginForm("AddExcelSheetIntoDatabase", "ContributorPersonalDetails", FormMethod.Post, new { enctype = "multipart/form-data", id = "form1" }))
+            {
+                <input type="hidden" value="@ViewBag.formattedName" name="formattedName" id="formattedName" />
+                <div class="col-sm-3 contriutionfr pt-3">
+                  <div> &nbsp;</div>
+                  <button type="button" class="btn btn-success px-5 height display_none" title="Please Wait While We Process Your Request" id="btn_Saved_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                  <button type="button" class="btn btn-success height px-5 border-raduis mr-2 display_none" id="SaveDetails"><i class="fa fa-save"> </i> Save </button>
+                  <a href="/ContributorPersonalDetails/ContributionExcelUpload" class="btn btn-primary height px-5 border-raduis mr-2 display_none" id="CancelBtn"><i class="fa fa-times-circle"> </i> Cancel</a>
+                  <a class="btn btn-danger height border-raduis px-5 display_none dash_float_rigt Co_margin-right" id="summary">
+                    <i class="fa fa-warning"> </i> Error Summary
+                  </a>
+                </div>
+            }
+            <div class="col-sm-3"></div>
+        </div>
+
+
+
+
+        <div id="error-message" class="col-sm-12 text-danger display_none" ></div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+    <div class="row py-4">
+      <div class="col-sm-4">
+        <label>Gender</label>
+        <div class="form-group h_select">
+          @Html.DropDownList("Gender", new SelectList(new[]
+          {
+            new SelectListItem{Value="",Text="All",Selected=true},
+            new SelectListItem{Value="MALE",Text="Male"},
+            new SelectListItem{Value="FEMALE",Text="Female"},
+            new SelectListItem{Value="TRANSGENDER",Text="Transgender"},
+          }, "Value", "Text"), new { @class = "form-control", @autocomplete = "off", @placeholder = "Select Gender" })
+        </div>
+      </div>
+
+      <div class="col-sm-4">
+        <label>Scheme</label>
+        @Html.DropDownList("EmplCode", null, "---Select---", new { @class = "form-control select-sm", @id = "EmplCode" })
+      </div>
+      <button class="btn btn-success height mr-2 px-5 martop Search_dobind" id="Btn" type="button">
+        <i class="fa fa-search fa-lg"></i> Search
+      </button>
+
+
+
+
+
+    </div>
+
+  </div>
+</div>
+
+<div class="panel panel-default display_none" id="errorSummary" >
+    <div class="panel-body">
+        <div class="error-summary">
+            <h2 class="error-title">Error Summary</h2>
+            <div id="errorMessages" class="red-text">Error message goes here</div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="panel panel-default display_none" id="ColumnValidateErrorMessage" >
+    <div class="panel-body">
+
+        <div class="error-summary">
+            <h4>Error Summary</h4>
+
+            <strong>Error:</strong><p class=""></p>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+      <h4 class="headline contrbution_UploadDiv">
+        Beneficiaries Detail
+        @if (@ViewBag.Employer != null)
+        {
+          <span>
+            @*:--Employer-*@
+            - @ViewBag.Employer (@ViewBag.EId) Salary Contribution Details for  @ViewBag.Month  @ViewBag.Year
+          </span>
+        }
+
+        @*Code by Himanshu Rajput*@
+        <button type="button" class="btn btn-success px-5 height dash_button" title="Please Wait While We Process Your Request" id="btn_downloadExcel_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+        <button class="btn btn-success dash_button_right UploadExcel_download" id="IddownloadExcel">Download Excel</button>
+        <button class="btn btn-success dash_button_right AllSummary" id="BtnAllSummary"> <i class="fa fa-spinner fa-spin display-none" id="spinnerSummary"></i>  All Summary</button>
+
+
+
+      </h4>
+        <h5 id="ColumnErrorMessage" class="redtext"></h5>
+
+    </div>
+
+
+    <div class="panel-body">
+        <div>
+          <ul class="contutionupload_flex">
+            <li class="font-sizetext redtext"><span class="fa fa-square"></span> Invalid Entries in Rows</li>&nbsp; &nbsp; &nbsp; &nbsp;
+            @*<li style="color: blue; font-size: 16px;"><span class="fa fa-square"></span> Contributions Varies with System Defined Values</li>*@
+            <li class="green_text font-sizetext green_text"><span class="fa fa-square"></span> All Entries are correct</li>&nbsp; &nbsp; &nbsp; &nbsp;
+            <li class="green_text font-sizetext green_text"><span class="fa fa-square"></span> Current Records - <label id="oldRecordCount"></label></li>
+            &nbsp; &nbsp; &nbsp; &nbsp;
+            <li class="green_text font-sizetext green_text"><span class="fa fa-square"></span> All Records - <label id="Allrecourds"></label></li>
+            &nbsp; &nbsp; &nbsp; &nbsp;
+            <li class="green_text font-sizetext display_none" id="NewUploadedShowId"><span class="fa fa-square"></span> New Uploaded Records <label id="NewRecordCount"></label></li>
+          </ul>
+        </div>
+        <div class="table-responsive height">
+          <div class="loader display_none" id="loader"></div>
+            <table class="table" id="tbl">
+                <thead>
+                    <tr>
+
+                        <th>SNo</th>
+                        <th>IsActive</th>
+                        <th>Application Reference No</th>
+                        <th>Submission Location</th>
+                        <th>Submission Date</th>
+                        <th>Applied By</th>
+                        <th>Select Tehsil Social Welfare Office (TSWO)</th>
+                        <th>Select District</th>
+                        <th>Name Of The Applicant</th>
+                        <th>Date Of Birth</th>
+                        <th>Age In Years</th>
+                        <th>Mobile Number</th>
+                        <th>Do You Have BPL Card</th>
+                        <th>Father / Husband / Guardian Name</th>
+                        <th>EMail</th>
+                        <th>Category</th>
+                        <th>Gender</th>
+                        <th>Present Address</th>
+                        <th>Present District</th>
+                        <th>Present Village Name</th>
+                        <th>Pincode</th>
+                        <th>Present Halqa Panchayat / Municipality Name</th>
+                        <th>Present Tehsil</th>
+                        <th>Permanent Address</th>
+                        <th>Permanent District</th>
+                        <th>Permanent Tehsil</th>
+                        <th>Permanent Halqa Panchayat / Municipality Name</th>
+                        <th>Permanent Village Name</th>
+                        <th>Branch Name</th>
+                        <th>IFSC Code</th>
+                        <th>Account No Of The Applicant</th>
+                        <th>Bank Name</th>
+                        <th>Select Pension Type</th>
+                        <th>Percentage Of Disability</th>
+                        <th>Civil Condition</th>
+                        <th>Are You Previously Taking Pension From JK-ISSS-GOI-NSAP</th>
+                        <th>Bank Name</th>
+                        <th>Branch Name</th>
+                        <th>IFSC Code</th>
+                        <th>Account Number</th>
+                        <th>Application Sanctioned Under Scheme Name</th>
+                        <th>Current Task</th>
+                        <th>Current Status</th>
+                        <th>Last Task</th>
+                        <th>Version No</th>
+                        <th>Last Pay Date</th>
+                        <th>Application Approve On</th>
+                        <th>Action On Date</th>
+                        @*<th>AADHAR</th>*@
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade in display_none" id="simpleModal1" aria-hidden="false" >
+    <div class="modal-dialog">
+        <div class="modal-content w-800">
+            <div class="modal-header">
+                <button type="button" class="close hidemodal2"  aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body" id="partialDiv">
+
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+@*<div class="custom-popup width-100 confirmClass" id="DataSave">
+      <div class="padding-md">
+        <h4 class="m-top-none">You have unsaved Data. Are you sure you want to leave this page? If you leave, your data will be lost.</h4>
+      </div>
+
+      <div class="text-center">
+        <a class="btn btn-danger confirmVerify_close" onclick="onCancel()">No</a>
+      </div>
+    </div>*@
+
+
+@*<script src="~/Scripts/jquery-3.7.1.min.js"></script>
+    <script src="~/Content/endless/js/jquery-3.7.1.js"></script>
+    <script src="~/Scripts/jquery.dataTables.rowGrouping.js"></script>*@
+
+
+@section scripts{
+    <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+
+    @*<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>*@
+
+    <script src="~/Content/endless/LatestJS/jquery.dataTables.min.js"></script>
+    <script nonce="@ViewBag.StyleNonce">
+
+  $(document).ready(function () {
+      var r = $('#dynamicText').text();
+      if (r != null && r != "") {
+          $("#regiontext").val(r);
+      }
+
+      if ('@ViewBag.isSave' == 'False') {
+          $('#UploadBtn').removeClass('disabled');
+      }
+      debugger
+    var isfileSaved1 = @isfileSaved1;
+    if (isfileSaved1 === "false") {
+      window.onbeforeunload = function (event) {
+        var message = "You have unsaved Data. Are you sure you want to leave this page? If you leave, your data will be lost.";
+        return message;
+      };
+    }
+  });
+
+  //const Search_dobind_ClassBtn = document.querySelectorAll('.Search_dobind');
+  //Search_dobind_ClassBtn.forEach(button => {
+  //  button.addEventListener('click', dobind);
+  //});
+
+    const Search_Search_dobind_ClassBtn = document.querySelectorAll('.Search_dobind');
+      Search_Search_dobind_ClassBtn.forEach(button => {
+        button.addEventListener('click', () => dobind(false));
+      });
+      const allSummary_ClassBtn = document.querySelectorAll('.AllSummary');
+      allSummary_ClassBtn.forEach(button => {
+        button.addEventListener('click', () => dobind(true));
+      });
+
+  function onCancel() {
+    window.onbeforeunload = null;
+    $('#DataSave').hide();
+  }
+
+    jQuery(document).ready(function ($) {
+      comboTree = $('#RegionNames').comboTree({
+        source: @groups,
+        isMultiple: true,
+        cascadeSelect: true,
+        collapse: false
+      });
+        $("#UploadBtn").on("click", function () {
+          debugger
+          if ($("form#form").valid()) {
+                $('#btn_File_loading').show();
+            var btnId = document.getElementById("UploadBtn");
+            btnId.className = "display_none";
+            }
+        });
+    });
+    function currencyFormat(num) {
+      return "" + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+    }
+    function errorList() {
+      var oTable = $('#tblErrors').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        //"bProcessing": true,
+        "sAjaxSource": "/ContributorPersonalDetails/ErrorListAjaxHandler",
+        "aoColumns": [
+          { "sName": "error" },
+          { "sName": "status" }
+        ]
+      }).rowGrouping({
+        bExpandableGrouping: true,
+        iGroupingColumnIndex: 1,
+        bHideGroupingColumn: true
+
+      });
+
+      }
+
+
+      ////
+      const UploadExcel_download_ClassBtn = document.querySelectorAll('.UploadExcel_download');
+      UploadExcel_download_ClassBtn.forEach(button => {
+        button.addEventListener('click', UploadExceldownload);
+      });
+
+
+      function UploadExceldownload(evt) {
+          debugger
+
+          try {
+              $(evt.target).find("i.fa-spinner").show();
+              $('#btn_downloadExcel_loading').show();
+            $('#IddownloadExcel').hide();
+
+             // Create XMLHttpRequest object
+   var xhr = new XMLHttpRequest();
+
+   // Configure it: POST-request for the URL
+   xhr.open('POST', '@Url.Action("UploadExcelAjaxHandler", "ContributorPersonalDetails")', true);
+   xhr.responseType = 'arraybuffer'; // Expect binary data
+
+
+   // Set up event handlers
+ xhr.onload = function () {
+     debugger
+     if (xhr.status === 200) {
+         debugger
+           // Success: Convert arraybuffer to blob and initiate download
+           var blob = new Blob([xhr.response], { type: 'application/octet-stream' });
+           var url = window.URL.createObjectURL(blob);
+           var a = document.createElement('a');
+           a.href = url;
+       a.download = 'Beneficiary Details.xlsx'; // Default filename
+
+           // Check Content-Disposition header for filename if available
+           var disposition = xhr.getResponseHeader('Content-Disposition');
+           if (disposition) {
+               var matches = /filename="([^"]*)"/.exec(disposition);
+               if (matches != null && matches[1]) {
+                   a.download = matches[1];
+               }
+           }
+
+           // Append the anchor to the document body and trigger the download
+           document.body.appendChild(a);
+           a.click();
+
+           // Clean up
+           window.URL.revokeObjectURL(url);
+         document.body.removeChild(a);
+
+         $('#btn_downloadExcel_loading').hide();
+         $('#IddownloadExcel').show();
+       } else {
+           // Handle HTTP errors
+         console.error('Error downloading file:', xhr.statusText);
+         $('#btn_downloadExcel_loading').hide();
+         $('#IddownloadExcel').show();
+       }
+   };
+
+ xhr.onerror = function () {
+     debugger
+       // Handle network errors
+     console.error('Network error.');
+   $('#btn_downloadExcel_loading').hide();
+   $('#IddownloadExcel').show();
+   };
+
+   // Prepare form data and send
+   var formData = new FormData();
+   formData.append('RegionNames', $("#RegionNames").val());
+   formData.append('SchemeType', $('#EmplCode').val());
+   formData.append('Gender', $('#Gender').val());
+   formData.append('ACCOUNT_STATUS', '@ViewBag.ACCOUNT_STATUS');
+   formData.append('isDownload', true);
+
+   // Send the request with form data
+   xhr.send(formData);
+
+
+
+
+
+
+
+
+
+
+                 } catch (e) {
+                 }
+    }
+
+
+
+
+    /////////
+
+      function dobind(e) {
+        debugger
+       var  allSummarystatus = "";
+        var Summary = e;
+        if (e != undefined && e == true) {
+          document.getElementById("spinnerSummary").style.display = "inline-block";
+          allSummarystatus = e;
+        }
+        var onlyselectedGender = "@ViewBag.Redirectgender";
+        var onlyselectedACCOUNT_STATUS = "@ViewBag.ACCOUNT_STATUS";
+        var onlyselectedBeneficiariesTyp = "@ViewBag.RedirectBeneficiariesType";
+        if ((onlyselectedGender != "" && onlyselectedGender != null) || (onlyselectedACCOUNT_STATUS != "" && onlyselectedACCOUNT_STATUS != null) || (onlyselectedBeneficiariesTyp != "" && onlyselectedBeneficiariesTyp != null)) {
+          allSummarystatus = "true";
+        }
+
+      var errorFound = false;
+      var errorMessage = "";
+      document.getElementById("loader").style.display = "block";
+      $('#tbl').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "sAjaxSource": "/ContributorPersonalDetails/ExcelAjaxHandler?formattedName=" + $("#formattedName").val() + "&RegionNames=" + $("#RegionNames").val() + "&Gender=" + $("#Gender").val() + "&SchemeType=" + $("#EmplCode").val() + "&ACCOUNT_STATUS=" + '@ViewBag.ACCOUNT_STATUS' + "&allSummary=" + allSummarystatus,
+          "fnRowCallback": function (nRow, aData) {
+            debugger;
+          if (aData[1].toLowerCase().trim() == "false") {
+            $('td', nRow).css('color', 'Red');
+            $('td', nRow).css('font-weight', 'bold');
+            errorFound = true;
+            errorMessage = "File contains other District data. Please select the correct file.";
+          }
+          if (aData[1].toLowerCase().trim() == "true") {
+            $('td', nRow).css('color', 'Green');
+            $('td', nRow).css('font-weight', 'bold');
+          }
+        },
+               "aocolumns": [
+          { "sname": "sno", "stitle": "sno" },
+          { "sname": "applicationreferenceno" },
+          { "sname": "submissionlocation" },
+          { "sname": "submissiondate" },
+          { "sname": "appliedby" },
+          { "sname": "selecttehsilsocialwelfareoffice_tswo" },
+          { "sname": "selectdistrict" },
+          { "sname": "nameoftheapplicant" },
+          { "sname": "dateofbirth" },
+          { "sname": "age_inyears" },
+          { "sname": "mobilenumber" },
+          { "sname": "doyouhavebplcard" },
+          { "sname": "fatherorhusbandorguardianname" },
+          { "sname": "email" },
+          { "sname": "category" },
+          { "sname": "gender" },
+          { "sname": "presentaddress" },
+          { "sname": "presentdistrict" },
+          { "sname": "presentvillagename" },
+          { "sname": "pincode" },
+          { "sname": "presenthalqapanchayatormunicipalityname" },
+          { "sname": "presenttehsil" },
+          { "sname": "permanentaddress" },
+          { "sname": "permanentdistrict" },
+          { "sname": "permanenttehsil" },
+          { "sname": "permanenthalqapanchayatormunicipalityname" },
+          { "sname": "permanentvillagename" },
+          { "sname": "branchname" },
+          { "sname": "ifsccode" },
+          { "sname": "accountnooftheapplicant" },
+          { "sname": "bankname" },
+          { "sname": "selectpensiontype" },
+          { "sname": "percentageofdisability" },
+          { "sname": "civilcondition" },
+          { "sname": "areyoupreviouslytakingpensionfromjk_isss_goi_nsap" },
+          { "sname": "bankname1" },
+          { "sname": "branchname1" },
+          { "sname": "ifsccode1" },
+          { "sname": "accountnumber" },
+          { "sname": "applicationsanctionedunderschemename" },
+          { "sname": "currenttask" },
+          { "sname": "currentstatus" },
+          { "sname": "lasttask" },
+          { "sname": "versionno" },
+          { "sname": "last_pay_date" },
+          { "sname": "application_approve_on" },
+          { "sname": "actionondate" }
+          //{ "sname": "AADHAR" }
+        ],
+        "fnServerData": function (sSource, aoData, fnCallback) {
+          $.ajax({
+            dataType: 'json',
+            type: 'POST',
+            url: sSource,
+            data: aoData,
+            success: function (data) {
+              debugger
+              document.getElementById("loader").style.display = "none";
+              document.getElementById("spinnerSummary").style.display = "none";
+                if (data.errorMessage != "" || data.errorMessage != null) {
+                    $('#ColumnErrorMessage').text(data.errorMessage);
+                }
+
+                if (data.errorList != undefined) {
+                    if (data.errorList != "" || data.errorList != null) {
+                        debugger
+                        var errorListArray = data.errorList.split("##");
+                        for (var i = 0; i < errorListArray.length; i++) {
+                            $('#ColumnValidateErrorMessage').append(errorListArray[i] + "<br/>");
+
+                        }
+                        $('#ColumnValidateErrorMessage').show();
+
+
+                    }
+                }
+
+                //if (data.errorMessage != "" || data.errorMessage != null) {
+                //    $('#ColumnErrorMessage').text(data.errorMessage);
+              //}
+              if (allSummarystatus == true || allSummarystatus =="true") {
+                $("#Allrecourds").text(data.iTotalRecords);
+                $("#oldRecordCount").text(0);
+              }
+              else {
+                $("#Allrecourds").text(0);
+                if (data.isfile != true) {
+                  $("#oldRecordCount").text(data.iTotalRecords);
+                }
+                else {
+                  $("#NewUploadedShowId").show();
+                  $("#NewRecordCount").text(data.iTotalRecords);
+                  if (data.oldRecordsCount != 0) {
+                    $("#oldRecordCount").text(data.oldRecordsCount);
+                  }
+                }
+              }
+              var eSummary = data.eSummary;
+              var errorMessagesDiv = $('#errorMessages'); // Get the error messages container
+
+              errorMessagesDiv.empty();
+
+              if (eSummary.length > 0) {
+                var errorList = "<strong>Error:</strong><ul>";
+
+                Object.entries(data.eSummary).forEach(([obj, el]) => {
+                  if (el.length > 0) {
+                    //console.log([...new Set(el.map((obj) => obj.PropertyName))].join(','));
+                    let PropertyName = [...new Set(el.map((obj) => obj.PropertyName))].join(',');
+                    let RowIndex = [...new Set(el.map((obj) => obj.RowIndex))].join(',');
+                    errorList += "<li>You have wrong data at the column named <span style='font-weight: bold;'> " + PropertyName + "</span> at the following index: <span style='font-weight: bold;'>" + RowIndex + " </span></li>";
+                  }
+                });
+
+                errorList += "</ul>";
+
+                errorMessagesDiv.append(errorList);
+                //$('#SaveDetails').prop('disabled', true);
+                //$('#UploadBtn').prop('disabled', true);
+                if (eSummary.length > 0) {
+                  debugger
+                  // Display errors and disable the Save and Upload buttons
+                  $('#SaveDetails').prop('disabled', true);
+                  $('#UploadBtn').prop('disabled', true);
+
+                  // Add the onbeforeunload event to warn the user
+                }
+
+                $('#errorSummary').show();
+              } else {
+
+                $('#errorSummary').hide();
+
+              }
+
+              fnCallback(data);
+            },
+            error: function (xhr, error, thrown) {
+              document.getElementById("loader").style.display = "none";
+              console.log('An error occurred: ' + error);
+            }
+          });
+        }
+      });
+
+
+    }
+
+    $(document).ready(function () {
+      dobind();
+      $(document).click(function () {
+        $("#DownloadOptions").hide();
+      });
+      $(".DownloadDropdown").click(function () {
+        $("#DownloadOptions").toggle();
+      });
+      debugger
+      var formattedName = $("#formattedName").val()
+      if (formattedName != '' && formattedName != null && formattedName != undefined) {
+        $("#UploadBtn").toggle();
+        $("#SaveDetails").toggle();
+        $("#CancelBtn").toggle();
+      }
+      //$(".DownloadDropdown").hover(function () { $("#DownloadOptions").show(); }, function () { $("#DownloadOptions").hide(); })
+      //if ($("#PensionRefund").val() != "") {
+      //  $("#simpleModal2").show();
+      //  pensionRecalculateBind();
+
+      //  $("#finalizeDetails").css("display", "");
+      //  $("#reCalculatebtn").css("display", "none");
+      //  $("#savereCalculatebtn").css("display", "none");
+      //}
+    });
+
+    if ($("#Error").val() == "fileformat") {
+      ShowHelpDiv();
+      }
+
+      const dhidemodal2_ClassBtn = document.querySelectorAll('.hidemodal2');
+      dhidemodal2_ClassBtn.forEach(button => {
+        button.addEventListener('click', hidemodal2);
+      });
+
+    function hidemodal2() {
+      $("#simpleModal1").hide();
+    }
+    //if ($("#InValid").val() == "false") {
+    //  $("#summary").show();
+    //  $("#SaveDetails").prop('disabled', true);
+    //}
+
+    $("#SaveDetails").click(function (evt) {
+      debugger;
+
+      // Remove onbeforeunload event
+      window.onbeforeunload = null;
+
+      // Show loading indicators
+      $(evt.target).find("i.fa-spinner").show();
+      $('#btn_Saved_loading').show();
+      $('#SaveDetails').hide();
+
+      $.ajax({
+        dataType: 'json',
+        type: 'POST',
+        url: "/ContributorPersonalDetails/CheckForExistingRecordAjax?FileName=" + $("#formattedName").val(),
+        success: function (data) {
+          debugger;
+          // Hide loading indicators
+          $('#SaveDetails').show();
+          $('#btn_Saved_loading').hide();
+
+          console.log(data);
+          if (data != "null" && data.replace(/"/g, '') == "existed") {
+            debugger;
+            var newdata = document.getElementById("oldRecordCount").textContent;
+            var NewEntry = $("#NewEntry").val();
+            if (NewEntry != null && NewEntry != "") {
+              if (newdata != 0) {
+                debugger;
+                $('#confirmCancel').popup("show");
+              } else {
+                $('#newDatasaveconfirm').popup("show");
+              }
+            }
+          } else {
+            onConfirmSelect();
+          }
+        },
+        complete: function () {
+          // Hide loading indicator after completing the AJAX request
+          $(evt.target).find("i.fa-spinner").hide();
+        },
+        error: function (xhr, error, thrown) {
+          console.log('An error occurred: ' + error);
+        }
+      });
+    });
+
+
+    //$("#SaveDetails").click(function (evt) {
+    //  debugger
+    //  window.onbeforeunload = null;
+    //  $(evt.target).find("i.fa-spinner").show();
+    //    $('#btn_Saved_loading').show();
+    //    $('#SaveDetails').hide();
+
+
+
+    //  $.ajax({
+    //    dataType: 'json',
+    //    type: 'POST',
+    //    url: "/ContributorPersonalDetails/CheckForExistingRecordAjax?FileName=" + $("#formattedName").val(),
+    //    success: function (data) {
+    //        debugger
+    //        $('#SaveDetails').show();
+    //        $('#btn_Saved_loading').hide();
+    //      console.log(data);
+    //      if (data != "null" && data.replace(/"/g, '') == "existed") {
+    //        debugger
+    //        var newdata = document.getElementById("oldRecordCount").textContent;
+    //        var NewEntry = $("#NewEntry").val();
+    //        if (NewEntry != null && NewEntry != "") {
+    //          if (newdata != 0) {
+    //            debugger
+    //            $('#confirmCancel').popup("show");
+    //          }
+    //          else {
+    //            $('#newDatasaveconfirm').popup("show");
+    //          }
+    //        }
+    //      } else {
+    //        onConfirmSelect();
+    //      }
+    //      },
+    //      complete: function () {
+    //          $(evt.target).find("i.fa-spinner").hide();
+    //      },
+    //    error: function (xhr, error, thrown) {
+    //      console.log('An error occurred: ' + error);
+    //    }
+    //  });
+    //});
+    function onConfirmSelect() {
+      debugger
+      window.onbeforeunload = null;
+      $('#form1').submit();
+      $('#confirmCancel').popup("hide");
+      $('#newDatasaveconfirm').popup("hide");
+    }
+
+       const onCancel_ClassBtn = document.querySelectorAll('.onCancel_class');
+    onCancel_ClassBtn.forEach(button => {
+      button.addEventListener('click', onCancel);
+    });
+    function onCancel() {
+      $('#confirmCancel').popup("hide");
+      $('#newDatasaveconfirm').popup("hide");
+    }
+    const onConfirmSelect_ClassBtn = document.querySelectorAll('.onConfirmSelect_Class');
+    onConfirmSelect_ClassBtn.forEach(button => {
+      button.addEventListener('click', onConfirmSelect);
+    });
+
+    function ShowHelpDiv() {
+      $.get('@Url.Action("HelpForErrorAjax", "ContributorPersonalDetails")', function (data) {
+        $('#partialDiv').html(data);
+        $("#simpleModal1").show();
+      })
+      }
+
+      document.getElementById("summary").addEventListener("click", function () {
+        AllErrorList();
+      });
+
+    function AllErrorList() {
+      $.get('@Url.Action("_ErrorInExcelSheetAjax", "ContributorPersonalDetails")', function (data) {
+        $('#partialDiv').html(data);
+        $("#simpleModal1").show();
+        errorList();
+      });
+      }
+
+
+      const Download_ExcelDetails_ClassBtn = document.querySelectorAll('.Download_ExcelDetails');
+      Download_ExcelDetails_ClassBtn.forEach(button => {
+        button.addEventListener('click', ContributionExcelDownload);
+      });
+
+    function ContributionExcelDownload() {
+      debugger
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/ContributorPersonalDetails/ContributionExcelDownload', true);
+        xhr.responseType = 'blob';
+        xhr.onload = function () {
+            debugger;
+          if (xhr.status === 200) {
+            var blob = xhr.response;
+            var url = window.URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            var name = xhr.getResponseHeader('Content-Disposition').split(" ")[1];
+            if (name.indexOf("filename") > -1) {
+              name = name.split("=")[1];
+            }
+            a.download = name;
+            a.className = "display_none";
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+          } else {
+            console.error('Request failed with status:', xhr.status);
+          }
+        };
+
+        xhr.onerror = function () {
+          console.error('Request error');
+        };
+
+        xhr.send();
+
+      }
+
+      attachFileUploadValidation({
+        uploadButtonId: "UploadBtn",
+        fileInputId: "file"
+      });
+
+    </script>
+}
+
+
+
+
+

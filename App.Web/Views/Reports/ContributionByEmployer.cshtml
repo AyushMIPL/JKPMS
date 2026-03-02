@@ -1,0 +1,102 @@
+﻿@{
+  ViewBag.Title = "ContributionByEmployer";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Contributions By Employer
+      
+      @*<ul class="tool-bar">
+        
+      </ul>*@
+    </h4>
+  </div>
+  @using (Html.BeginForm())
+  {
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <div class="col-sm-3">
+              @Html.DropDownList("EmployeeId", null, "---Select---", new { @class = "form-control select-sm", @id = "ddlEmployee" })
+            </div>
+            <div class="col-sm-3">
+              @Html.DropDownList("Month", null, "---Select---", new { @class = "form-control select-sm", @id = "ddlMonth" })
+            </div>
+            <div class="col-sm-3">
+              @Html.DropDownList("Year", null, "---Select---", new { @class = "form-control select-sm",@id="ddlYear" })
+            </div>
+            <div class="col-sm-2">
+              <button type="button" class="btn btn-success btn-group-sm" onclick="javascript:return ShowReport()"><i class="fa fa-search"></i> Search</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        @*<div class="col-sm-2">
+        </div>*@
+        <div class="col-sm-13">
+          
+          <iframe id="reportData" style="border: 0px;height:700px;width:100%;"></iframe>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+@section Scripts {
+  <script nonce="@ViewBag.StyleNonce">
+    $(document).ready(function () {
+      ShowReport();
+    });
+    function ShowReport() {
+      debugger;
+
+      var empId = $("#ddlEmployee").val();
+      var month = $("#ddlMonth").val();
+      var year = $("#ddlYear").val();
+      $.ajax({
+        url: "@Url.Action("ShowReport", "Reports")?EmployeeID=" + empId + "&month=" + month + "&year=" + year + "",
+        type: "GET",
+      async: true,
+      })
+    .done(function (result) {
+      var actionRes = result;
+      if (actionRes == "1") {
+        $('#reportData').attr('src', '/ReportForms/ContributionByEmployer.aspx');
+        return false;
+      }
+      else {
+        toasterInfoMessage("Result not found on this search criteria.");
+        return false;
+      }
+    });
+      //$.ajax({
+      //  url: '../../Reports/ShowReport',
+      //  data: JSON.stringify({
+      //    compId: comp, deptId: dept, riskRating: riskRate, issueSaverty: issueSave, subriskImpact: subriskImp
+      //      , subriskLikehood: subrisklike, mitigantImportance: mitigant
+      //  }),
+      //  type: 'POST',
+      //  contentType: 'application/json;',
+      //  dataType: 'json',
+      //  async: false,
+      //  success: function (response) {
+      //    debugger;
+      //    $('#error').hide();
+      //    var v = response;
+      //    if (v == "1") {
+      //      $('#reportData').attr('src', '/ReportForms/CustomizedReport.aspx');
+      //      return false;
+      //    }
+      //    else {
+      //      $('#reportData').hide();
+      //      $('#error').show();
+      //      return false;
+      //    }
+      //  }
+      //});
+    }
+  </script>
+}

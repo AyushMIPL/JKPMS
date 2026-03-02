@@ -1,0 +1,116 @@
+﻿@model  IList<App.Web.Models.DynamicMenuItem>
+@{
+    ViewBag.Title = "Generic Pension Process";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int loop = 0;
+    int loopx = 0;
+    var closingTags = @Html.Raw("</div></div></div>");
+    var startingTags = @Html.Raw("<div class=\"uk-timeline-item\">  <div class=\"uk-timeline-icon\"> <span class=\"uk-badge\"><i class=\"fa fa-check-circle fa-lg\" aria-hidden=\"true\"></i></span> </div><div class=\"row w-100\"><div class=\"stepper-wrapper\">");
+}
+<style>
+</style>
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+            Generic Pension Process
+            @*<ul class="tool-bar">
+
+                </ul>*@
+        </h4>
+    </div>
+    <div class="panel-body">
+        @*<div class="uk-timeline-item">
+            <div class="uk-timeline-icon">
+              <span class="uk-badge"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i></span>
+            </div>
+            <div class="row">*@
+        @foreach (var modulename in Model)
+        {
+            if (loop == 0)
+            {
+                @startingTags;
+            }
+            loop++; loopx++;
+            <div class="stepper-item" id="@modulename.ActionName">
+                <div class="step-counter">
+                    <div class="four p_column">
+                        <div class="icon-fa"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i></div>
+                        <div class="four p_column">
+                            <span class="counter" onclick="handleClick('@modulename.ActionName')"> <i class="fa @modulename.Class"></i>  @modulename.LinkText</span>
+                            <p class="counter">Pension Summary</p>
+                            <p>Batch Id:- 10009</p>
+                            <p>Process Started On:-11/07/2023</p>
+                            <p>Start By:-Director test2</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            if (loop == 4)
+            {
+                @closingTags
+                loop = 0;
+
+            }
+            if (loopx == Model.Count())
+            {
+                @closingTags;
+                loop = 0;
+                <br />
+            }
+        }
+        @*</div>
+            </div>*@
+    </div>
+    @section scripts{
+        <script nonce="@ViewBag.StyleNonce">
+            var stprarray = [];
+
+            $(".stepper-item").on('click', function (event) {
+                if (jQuery.inArray($(this).attr('id'), stprarray) == -1) {
+                    stprarray.push($(this).attr('id'));
+                }
+                //$(".stepper-item").removeClass("completed");
+                $(this).addClass("completed");
+
+            });
+            $(function () {
+                $("#IsActive").on("click", function () {
+                    toasterErrorMessage("If you Uncheck This field..Then this Record is treated as Inactive Record");
+                })
+            })
+
+            function handleClick(obj) {
+                var _url = '/GenericPensionProcess/' + obj;
+                $.ajax({
+                    url: _url,
+                    success: function (data) {
+                        console.log('Success:', data);
+                    }
+                });
+            }
+
+            //    function handleClick(actionName) {
+            //      alert(actionName);
+            //      var _url = '/GenericPensionProcess/' + actionName;
+            //      alert(_url);
+            //  $.ajax({
+            //    url: _url,
+            //    type: 'POST',
+            //  //data: data,
+            //  success: function (result) {
+            //    debugger
+            //        console.log('Success:', result);
+            //  },
+            //  error: function (error) {
+            //    debugger
+            //        console.error('Error:', error);
+            //    }
+            //});
+
+            //}
+
+        </script>
+        <style>
+        </style>
+
+    }

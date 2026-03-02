@@ -1,0 +1,317 @@
+﻿@model IEnumerable<App.Data.Entities.PensionApplications>
+@using App.Web.Helper
+@using App.Data
+@{
+  ViewBag.Title = "Index";
+  //string str = "";
+  var db = new AppDbContext();
+  //int MaxLevel=(from a in db.ApprovalProcessAssignedUser join b in db.ApprovalProcessLevel on a.ApprovalProcessLevelId equals b.ApprovalProcessLevelId where b.ModuleId == 81 orderby a.ApprovalProcessId descending select  a.ApprovalProcessId).FirstOrDefault();
+  //foreach(var items in Model)
+  //{
+  //  int count = db.ApplicationApprovalStatus.Where(x => x.ApplicationId == items.Id && x.ApprovalProcessId <= MaxLevel).Count();
+  //  var result = (from a in db.ApprovalProcessAssignedUser join b in db.ApprovalProcessLevel on a.ApprovalProcessLevelId equals b.ApprovalProcessLevelId where b.ModuleId == 81 select new { a.ApprovalProcessId, b.ApprovalProcessLevelName }).ToList();
+
+  //  str += "<ul style='list-style-type:none'>";
+  //  foreach (var item in result)
+  //  {
+  //    if (item.ApprovalProcessId <= count)
+  //    {
+  //      str += "<li><input type='checkbox' id='" + item.ApprovalProcessId + "' disabled='disabled' checked='checked'> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'" + item.ApprovalProcessLevelName + "' </li>";
+  //    }
+  //    else {
+  //      str += "<li><input type='checkbox' id='" + item.ApprovalProcessId + "' disabled='disabled'> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'" + item.ApprovalProcessLevelName + "' </li>";
+  //    }
+
+  //  }
+  //  str += "</ul>";
+
+  //}
+
+}
+<div class="modal fade in" id="formModal" aria-hidden="false" style="display: none;">
+  <div class="modal-dialog" style="width:73%">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="hidePension();">×</button>
+        <iframe id="reportData" style="border: 0px;height:700px;width:100%;"></iframe>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-sm btn-success" data-dismiss="modal" aria-hidden="true" onclick="hidePension();">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Pensioners Application Approval Process
+
+      @*<ul class="tool-bar">
+          <li><a href="/PensionApplications/Create" data-toggle="tooltip" data-placement="bottom" title="Pension Application Form" data-original-title="Pension Application Form"><i class="fa fa-plus"></i></a></li>
+
+        @*</ul>*@
+    </h4>
+  </div>
+  @*<div>    You have been Assigned For Approval Level Process - </div>*@
+<div class="panel-body">
+
+  <div class="panel panel-default">
+    <div class="panel-heading clearfix">
+      <h5 class="headline" style="margin:0px;padding:0px;border:none;">
+        Pensioners Applications Approval Request
+      </h5>
+    </div>
+    <div class="panel-body">
+      <table class="table dataTable" id="example">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Post</th>
+            <th>Employer Name</th>
+            <th>Service Length<br />(Upto Dec 2003)<br />(in Months)</th>
+            <th>Service Length<br />(From Jan 2004)<br />(in Months)</th>
+            <th>Pension<br />(Upto Dec 2003)</th>
+            <th>Pension<br />(From Jan 2004)</th>
+            <th>Total Pension</th>
+            <th>Maximum Pension</th>
+            <th>Gratuity</th>
+            <th>Approved <br />at Level</th>
+            <th></th>
+            @*<th style="width:160px"></th>*@
+          </tr>
+        </thead>
+        <tbody>
+          @if (Model != null)
+          {
+            foreach (var item in Model)
+            {
+              <tr>
+                <td>@item.Contributor.FirstName @item.Contributor.MidName @item.Contributor.LastName</td>
+                <td>@item.Designation.Name</td>
+                <td>@item.Employer.EmployerName</td>
+                <td>@item.QualifyingServiceRate1</td>
+                <td>@item.QualifyingServiceRate2</td>
+                <td>@item.FullpensionAmount1</td>
+                <td>@item.FullpensionAmount2</td>
+                <td>@item.TotalFullpension</td>
+                <td>@item.MaxPension</td>
+                <td>@item.Gratuity</td>
+                @{
+                  string str = "";
+                  int MaxLevel = (from a in db.ApprovalProcessAssignedUser join b in db.ApprovalProcessLevel on a.ApprovalProcessLevelId equals b.ApprovalProcessLevelId where b.ModuleId == 16 orderby a.ApprovalProcessId descending select a.ApprovalProcessId).FirstOrDefault();
+                  int count = db.ApplicationApprovalStatus.Where(x => x.ApplicationId == item.Id && x.ApprovalProcessId <= MaxLevel).Count();
+                  var result = (from a in db.ApprovalProcessAssignedUser join b in db.ApprovalProcessLevel on a.ApprovalProcessLevelId equals b.ApprovalProcessLevelId where b.ModuleId == 16 select new { a.ApprovalProcessId, b.ApprovalProcessLevelName }).ToList();
+
+                  str += "<ul style='list-style-type:none'>";
+                  foreach (var items in result)
+                  {
+                    if (items.ApprovalProcessId <= count)
+                    {
+                      str += "<li><input type='checkbox' id='" + items.ApprovalProcessId + "' disabled='disabled' checked='checked'> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'" + items.ApprovalProcessLevelName + "' </li>";
+                    }
+                    else
+                    {
+                      str += "<li><input type='checkbox' id='" + items.ApprovalProcessId + "' disabled='disabled'> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'" + items.ApprovalProcessLevelName + "' </li>";
+                    }
+
+                  }
+                  str += "</ul>";
+                }
+                <td>
+                  <i class="fa fa-check fa-lg" data-toggle="tooltip" data-placement="bottom" onmouseout="hidediv(@item.Id);" onmouseover="showdiv(@item.Id);">
+
+                  </i>
+                  @*@MvcHtmlString.Create(@str)*@
+                </td>
+                <td>
+                  <a href="/MasterPensioner/PensionApplicationApprovalDetails/@item.Id" class="btn btn-primary btn-xs" title="Details"><i class="fa fa-list"></i> Details</a>
+                </td>
+              </tr>
+              <div class="modal-dialog" id="@item.Id" style="display: none;">
+                <h4>Approval Level of @item.Contributor.FirstName @item.Contributor.MidName @item.Contributor.LastName</h4>  <br />
+                @MvcHtmlString.Create(@str)
+              </div>
+            }
+          }
+        </tbody>
+
+      </table>
+    </div>
+  </div>
+</div>
+
+
+
+    <div class="panel-body">
+  
+      @Html.Action("_ApprovedIndex", "MasterPensioner")
+    </div>
+    <div class="panel-body">
+    
+      @Html.Action("_RejectedIndex", "MasterPensioner")
+    </div>
+
+  </div>
+  @section Scripts {
+    <script src="~/Scripts/jquery.dataTables.min.js"></script>
+    <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+    <style>
+      .toast-info {
+        background-color: gray;
+      }
+    </style>
+    <script nonce="@ViewBag.StyleNonce">
+    $(document).ready(function () {
+      var indexTable = $('#example').dataTable({}).rowGrouping({
+        bExpandableGrouping: false,
+        iGroupingColumnIndex: 2,
+        bHideGroupingColumn: true
+
+      });
+      var oTable = $('#tblApproved').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "sAjaxSource": "/MasterPensioner/ApprovedAjax",
+        "aoColumns": [
+
+            { "sName": "ApplicantName" },
+            { "sName": "Reason" },
+            { "sName": "EmployerName" },
+            { "sName": "AppliedDate" },
+            { "sName": "RejectedDate" },
+            { "sName": "RequestRejectedBy" },
+            {
+              "sName": "Status",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                if (oObj.aData[6] == "R")
+                  return '<span class="badge badge-danger">Rejected</span>';
+                else
+                  return '<span class="badge badge-success">Approved</span>';
+              }
+            },
+            {
+              "sName": "ID",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                var strString = "";
+                if (oObj.aData[8] == "Yes") {
+                  strString = '<a href="javascript:showDivPension(' + oObj.aData[7] + ')" class="btn btn-primary btn-xs" title="Print"><i class="fa fa-print fa-lg"></i> Print</a>';
+                }
+                return strString;
+              }
+            },
+              { "bVisible": false }
+        ]
+      }).rowGrouping({
+        bExpandableGrouping: false,
+        iGroupingColumnIndex: 2,
+        bHideGroupingColumn: true
+
+      });
+
+
+      var ooTable = $('#tblRejected').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "sAjaxSource": "/MasterPensioner/RejectedAjax",
+        "aoColumns": [
+
+            { "sName": "ApplicantName" },
+            { "sName": "Reason" },
+            { "sName": "EmployerName" },
+            { "sName": "AppliedDate" },
+            { "sName": "RejectedDate" },
+            { "sName": "RequestRejectedBy" },
+            {
+              "sName": "Status",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                if (oObj.aData[6] == "R")
+                  return '<span class="badge badge-danger">Rejected</span>';
+                else
+                  return '<span class="badge badge-success">Approved</span>';
+              }
+            },
+            {
+              "sName": "ID",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                  var strString = '<a href="/PensionApplications/pensionRejectedDetails/' + oObj.aData[7] + '\" class="btn btn-xs btn-primary" title="Details"><i class="fa fa-list"></i> Details</a>';
+
+                return strString;
+              }
+            }
+        ]
+      }).rowGrouping({
+        bExpandableGrouping: false,
+        iGroupingColumnIndex: 2,
+        bHideGroupingColumn: true
+
+      });
+
+    })
+
+
+    function showdiv(Id) {
+      var title = $('div[id=' + Id + ']').html()
+      toastr.info(title, "Approval Level", { closeButton: true, timeOut: "3000" });
+    }
+    function hidediv() {
+      $('.toast-info').hide();
+    }
+    function showDivPension(Id) {
+      var id = parseInt(Id);
+      $.ajax({
+        url: '@Url.Action("_PensionApplicationAjax", "PensionApplications")?Id=' + id,
+        type: "GET",
+      }).done(function (result) {
+        var actionRes = result;
+        if (actionRes == "1") {
+          $('#reportData').attr('src', '/ReportForms/ContributionByEmployer.aspx');
+          $("#formModal").show();
+          return false;
+        }
+        else {
+          toasterErrorMessage("Result not found on this search criteria.");
+          return false;
+        }
+      });
+    }
+
+    @*function showDivPension(Id) {
+      $.get('@Url.Action("_PrintPensionApplication", "PensionApplications")?Id=' + Id, function (data) {
+        $('#PartialDiv').html(data);
+        $("#formModal").show();
+      })
+
+    }*@
+    function hidePension() {
+      $("#formModal").hide();
+    }
+    //function printdiv() {
+    //  var divToPrint = document.getElementById('PartialDiv');
+    //  var popupWin = window.open('', '_blank', 'width=615,height=960');
+    //  popupWin.document.open();
+    //  popupWin.document.write('<html><body onload="window.print()">' + divToPrint.innerHTML + '</html>');
+    //  popupWin.document.close();
+    //}
+    </script>
+  }
+
+
+
+
+
+

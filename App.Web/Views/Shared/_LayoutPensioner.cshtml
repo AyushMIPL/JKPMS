@@ -1,0 +1,121 @@
+﻿@using App.Web.Helper;
+@using Microsoft.AspNet.Identity;
+
+
+
+@{
+  Layout = "~/Views/Shared/_Layout.cshtml";
+  //int Id = Convert.ToInt32(User.Identity.GetUserId());
+  //string IdUrl = UrlEncryption.EncryptURL(Convert.ToString(Id));
+}
+
+
+@*<style>
+  .bg-primary {
+    background-color: #95c7e5;
+    color: #BECFDF;
+  }
+
+  .menu-grid .inbox-menu > li {
+    border-bottom: 0px solid #86a2b3;
+    box-shadow: none;
+    -moz-box-shadow: inherit;
+    -webkit-box-shadow: none;
+    list-style: none;
+  }
+
+  .menu-grid .menu-header {
+    border-bottom: 0px solid #86a2b3;
+    box-shadow: none;
+    -moz-box-shadow: 0 1px 0 #57566c;
+    -webkit-box-shadow: none;
+    padding: 10px 20px;
+    font-size: 18px;
+    color: #fff;
+  }
+
+  .menu-grid .inbox-menu > li > a:focus, .menu-grid .inbox-menu > li > a:hover {
+    background: #097eaa;
+  }
+
+  .menu-grid .inbox-menu > li.active a {
+    background: #097eaa;
+  }
+</style>*@
+
+<div class="row">
+  <div class="col-sm-2 bg-primary custom-grid menu-grid">
+    <button type="button" class="navbar-toggle" id="inboxMenuToggle">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <div class="menu-header">
+      Menu
+    </div>
+    <ul class="inbox-menu" id="inboxMenu">
+      <li class="active">
+        <a href="/MasterPensioner/Edit?Id=@ViewBag.CId"><i class="fa fa-user-times fa-lg"></i> <span class="m-left-xs" title="Beneficiary Details">Beneficiary Details</span></a>
+      </li>
+      <li>
+        <a href="/MasterPensioner/IncomeIndex?Id=@ViewBag.CId">
+          @*@ViewBag.CId*@
+          <i class="fa fa-inr fa-lg"></i>
+          <span class="m-left-xs" title="Income">Monthly Pension</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/MasterPensioner/BankDetailsIndex?Id=@ViewBag.CId">
+          <i class="fa fa-university fa-lg"></i>
+          <span class="m-left-xs" title="Bank Detail">Bank Detail</span>
+        </a>
+      </li>
+
+      @******Code by Himanshu Rajpu ******@
+
+      <li>
+        @*<a href="/MasterPensioner/_PaymentHistory?Id=@IdUrl">*@
+        <a href="/MasterPensioner/PaymentHistoryAjax?Id=@ViewBag.CId">
+          <i class="fa fa-history fa-lg"></i>
+          <span class="m-left-xs" title="Payment History">Payment History</span>
+        </a>
+      </li>
+
+
+    </ul>
+  </div>
+  <div class="col-sm-10">
+    @RenderSection("profilePensioner", required: false)
+  </div>
+</div>
+
+@section scripts{
+
+
+  <script nonce="@ViewBag.StyleNonce">
+    $(document).ready(function () {
+      var activeIndex = localStorage.getItem('activeIndex');
+      if (activeIndex !== null) {
+        $('#inboxMenu li').removeClass('active');
+        $('#inboxMenu li').eq(activeIndex).addClass('active');
+      }
+      $('#inboxMenu li').click(function(){
+        $('#inboxMenu li').removeClass('active');
+      $(this).addClass('active');
+      var currentIndex = $('#inboxMenu li').index(this);
+      localStorage.setItem('activeIndex', currentIndex.toString());
+      });
+    });
+  </script>
+
+  @*<style>
+    .menu-grid .inbox-menu > li > a {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>*@
+
+  @RenderSection("Scripts", false);
+}

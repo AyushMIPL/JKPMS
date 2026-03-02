@@ -1,0 +1,140 @@
+<?xml version="1.0" standalone="yes"?>
+<xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:MainDataTable="DSEXCEPTIONREPORTS" msdata:UseCurrentLocale="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="DSEXCEPTIONREPORTS">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="first_name" type="xs:string" minOccurs="0" />
+              <xs:element name="flexdeptaccttype" type="xs:string" minOccurs="0" />
+              <xs:element name="last_name" type="xs:string" minOccurs="0" />
+              <xs:element name="last_pay" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="middle_name" type="xs:string" minOccurs="0" />
+              <xs:element name="pay_period" type="xs:string" minOccurs="0" />
+              <xs:element name="sick_allowed" type="xs:decimal" minOccurs="0" />
+              <xs:element name="sick_code" type="xs:string" minOccurs="0" />
+              <xs:element name="sick_used" type="xs:decimal" minOccurs="0" />
+              <xs:element name="soc_sec_num" type="xs:string" minOccurs="0" />
+              <xs:element name="terminated" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="vac_allowed" type="xs:decimal" minOccurs="0" />
+              <xs:element name="vac_code" type="xs:string" minOccurs="0" />
+              <xs:element name="vac_used" type="xs:decimal" minOccurs="0" />
+              <xs:element name="cash_acct_no" type="xs:int" minOccurs="0" />
+              <xs:element name="cash_amount" type="xs:decimal" minOccurs="0" />
+              <xs:element name="check_no" type="xs:int" minOccurs="0" />
+              <xs:element name="ded_fedtax" type="xs:decimal" minOccurs="0" />
+              <xs:element name="ded_fica" type="xs:decimal" minOccurs="0" />
+              <xs:element name="ded_loctax" type="xs:decimal" minOccurs="0" />
+              <xs:element name="ded_medicare" type="xs:decimal" minOccurs="0" />
+              <xs:element name="ded_other" type="xs:decimal" minOccurs="0" />
+              <xs:element name="ded_statax" type="xs:decimal" minOccurs="0" />
+              <xs:element name="department" type="xs:string" minOccurs="0" />
+              <xs:element name="doc_date" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="doc_no" type="xs:long" minOccurs="0" />
+              <xs:element name="empl_code" type="xs:string" minOccurs="0" />
+              <xs:element name="eop_date" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="inc_expense" type="xs:decimal" minOccurs="0" />
+              <xs:element name="inc_gross" type="xs:decimal" minOccurs="0" />
+              <xs:element name="inc_net" type="xs:decimal" minOccurs="0" />
+              <xs:element name="inc_taxable" type="xs:decimal" minOccurs="0" />
+              <xs:element name="obl_fica" type="xs:decimal" minOccurs="0" />
+              <xs:element name="obl_futa" type="xs:decimal" minOccurs="0" />
+              <xs:element name="obl_medicare" type="xs:decimal" minOccurs="0" />
+              <xs:element name="obl_other" type="xs:decimal" minOccurs="0" />
+              <xs:element name="obl_total" type="xs:decimal" minOccurs="0" />
+              <xs:element name="pay_date" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="total_hours" type="xs:decimal" minOccurs="0" />
+              <xs:element name="emp_cash_acct" type="xs:int" minOccurs="0" />
+              <xs:element name="emp_department" type="xs:string" minOccurs="0" />
+              <xs:element name="accrue_vac" type="xs:string" minOccurs="0" />
+              <xs:element name="accrue_sick" type="xs:string" minOccurs="0" />
+              <xs:element name="print_check" type="xs:string" minOccurs="0" />
+              <xs:element name="deposit" type="xs:string" minOccurs="0" />
+              <xs:element name="bonus" type="xs:string" minOccurs="0" />
+              <xs:element name="vac_accr_code" type="xs:string" minOccurs="0" />
+              <xs:element name="vac_accr_ctr" type="xs:int" minOccurs="0" />
+              <xs:element name="vac_lapse_date" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="sick_accr_code" type="xs:string" minOccurs="0" />
+              <xs:element name="sick_accr_ctr" type="xs:int" minOccurs="0" />
+              <xs:element name="sick_lapse_date" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="allowances" type="xs:int" minOccurs="0" />
+              <xs:element name="type_code" type="xs:string" minOccurs="0" />
+              <xs:element name="PayProcess_ID" type="xs:long" minOccurs="0" />
+              <xs:element name="ApplicationReferenceNo" type="xs:string" minOccurs="0" />
+              <xs:element name="warn_0" type="xs:string" minOccurs="0" />
+              <xs:element name="warn_1" type="xs:string" minOccurs="0" />
+              <xs:element name="warn_2" type="xs:string" minOccurs="0" />
+              <xs:element name="warn_3" type="xs:string" minOccurs="0" />
+              <xs:element name="warn_4" type="xs:string" minOccurs="0" />
+              <xs:element name="warn_5" type="xs:string" minOccurs="0" />
+              <xs:element name="warn_6" type="xs:string" minOccurs="0" />
+              <xs:element name="warn_7" type="xs:string" minOccurs="0" />
+              <xs:element name="warn_8" type="xs:string" minOccurs="0" />
+              <xs:element name="warn_9" type="xs:string" minOccurs="0" />
+              <xs:element name="warn_10" type="xs:string" minOccurs="0" />
+              <xs:element name="warn_11" type="xs:string" minOccurs="0" />
+              <xs:element name="warn_12" type="xs:string" minOccurs="0" />
+              <xs:element name="warn_13" type="xs:string" minOccurs="0" />
+              <xs:element name="Problem0" type="xs:string" minOccurs="0" />
+              <xs:element name="Problem1" type="xs:string" minOccurs="0" />
+              <xs:element name="Problem2" type="xs:string" minOccurs="0" />
+              <xs:element name="Problem3" type="xs:string" minOccurs="0" />
+              <xs:element name="Problem4" type="xs:string" minOccurs="0" />
+              <xs:element name="Problem5" type="xs:string" minOccurs="0" />
+              <xs:element name="Problem6" type="xs:string" minOccurs="0" />
+              <xs:element name="Problem7" type="xs:string" minOccurs="0" />
+              <xs:element name="Problem8" type="xs:string" minOccurs="0" />
+              <xs:element name="Problem9" type="xs:string" minOccurs="0" />
+              <xs:element name="err_0" type="xs:string" minOccurs="0" />
+              <xs:element name="err_1" type="xs:string" minOccurs="0" />
+              <xs:element name="err_2" type="xs:string" minOccurs="0" />
+              <xs:element name="err_3" type="xs:string" minOccurs="0" />
+              <xs:element name="err_4" type="xs:string" minOccurs="0" />
+              <xs:element name="err_5" type="xs:string" minOccurs="0" />
+              <xs:element name="post_seq" type="xs:string" minOccurs="0" />
+              <xs:element name="basicSalary" type="xs:string" minOccurs="0" />
+              <xs:element name="oiTaxable" type="xs:string" minOccurs="0" />
+              <xs:element name="oiNonTaxable" type="xs:string" minOccurs="0" />
+              <xs:element name="bonus_check" type="xs:string" minOccurs="0" />
+              <xs:element name="ded_total" type="xs:string" minOccurs="0" />
+              <xs:element name="txt_doc_no" type="xs:string" minOccurs="0" />
+              <xs:element name="grand_basic" type="xs:string" minOccurs="0" />
+              <xs:element name="grand_oi_tax" type="xs:string" minOccurs="0" />
+              <xs:element name="grand_oi_nontax" type="xs:string" minOccurs="0" />
+              <xs:element name="grand_ded" type="xs:string" minOccurs="0" />
+              <xs:element name="ok_to_post" type="xs:string" minOccurs="0" />
+              <xs:element name="ded_ssd" type="xs:string" minOccurs="0" />
+              <xs:element name="ded_ssl" type="xs:string" minOccurs="0" />
+              <xs:element name="obl_ssd" type="xs:string" minOccurs="0" />
+              <xs:element name="obl_ssib" type="xs:string" minOccurs="0" />
+              <xs:element name="obl_ssd1" type="xs:string" minOccurs="0" />
+              <xs:element name="obl_ssib1" type="xs:string" minOccurs="0" />
+              <xs:element name="pay_code" type="xs:string" minOccurs="0" />
+              <xs:element name="code_desc" type="xs:string" minOccurs="0" />
+              <xs:element name="pay_acct_no" type="xs:string" minOccurs="0" />
+              <xs:element name="pay_dept" type="xs:string" minOccurs="0" />
+              <xs:element name="pay_amount" type="xs:string" minOccurs="0" />
+              <xs:element name="pay_lo_amt" type="xs:string" minOccurs="0" />
+              <xs:element name="pay_hi_amt" type="xs:string" minOccurs="0" />
+              <xs:element name="flexdept" type="xs:string" minOccurs="0" />
+              <xs:element name="flexdeptdesc" type="xs:string" minOccurs="0" />
+              <xs:element name="cash_acct_key" type="xs:string" minOccurs="0" />
+              <xs:element name="CurrentPeriod" type="xs:string" minOccurs="0" />
+              <xs:element name="CurrentYear" type="xs:string" minOccurs="0" />
+              <xs:element name="IncomeCodeREG" type="xs:string" minOccurs="0" />
+              <xs:element name="IncomeRateREG" type="xs:string" minOccurs="0" />
+              <xs:element name="IncomeHoursREG" type="xs:string" minOccurs="0" />
+              <xs:element name="IncomeCodeOT" type="xs:string" minOccurs="0" />
+              <xs:element name="IncomeRateOT" type="xs:string" minOccurs="0" />
+              <xs:element name="IncomeHoursOT" type="xs:string" minOccurs="0" />
+              <xs:element name="IncomeCodeDT" type="xs:string" minOccurs="0" />
+              <xs:element name="IncomeRateDT" type="xs:string" minOccurs="0" />
+              <xs:element name="IncomeHoursDT" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

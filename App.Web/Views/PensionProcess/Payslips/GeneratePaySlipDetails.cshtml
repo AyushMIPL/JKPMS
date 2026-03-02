@@ -1,0 +1,156 @@
+﻿@model App.Data.ViewModels.GeneratePensionProcessModel
+
+@{
+    ViewBag.Title = "GeneratePaySlipDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var Group = @Html.Raw(Json.Encode(ViewBag.Group));
+}
+
+<style>
+    #Btn {
+        float: right;
+        margin-right: 30px;
+    }
+
+    .btn-success.disabled {
+        color: gray;
+        pointer-events: none;
+        opacity: .8;
+    }
+</style>
+
+<div class="panel panel-default">
+
+    <div class="panel-body">
+        @using (Html.BeginForm("GeneratePaySlipDetails", "PensionProcess", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", onsubmit = "return generatePaySlipDetails();" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary("", new { @class = "text-danger" })
+            <div class="">
+                <div class="row">
+                    @Html.HiddenFor(model => model.DirectDepositsCheques)
+                    @*<div class="col-sm-4">
+
+                              @Html.LabelFor(model => model.DirectDepositsCheques, new { @class = "control-label mb-2" })
+                              @Html.TextBoxFor(model => model.DirectDepositsCheques, new { @class = "form-control input-sm" })
+
+                        </div>*@
+
+                    <div class="col-sm-12">
+                        <label>District</label>
+                        @Html.TextBoxFor(x => x.RegionNames, "", new { @class = "form-control", @autocomplete = "off", @placeholder = " Regions" })
+                    </div>
+                    <div class="col-sm-4" hidden>
+                        @Html.LabelFor(model => model.EmployeeType, new { id = "EmployeeType", @class = " control-label mb-2" })
+                        @Html.DropDownListFor(x => x.EmpType, ViewBag.EmployeeType as SelectList, new { @class = "form-control input-sm" })
+                    </div>
+
+                    <div class="col-sm-4" hidden>
+
+                        @Html.LabelFor(model => model.PayrollCashAccount, new { id = "PayrollCashAccount", @class = "control-label mb-2" })
+                        @Html.DropDownListFor(model => model.PayrollCashAccount, ViewBag.PayrollCashAccount as SelectList, new { @class = "form-control input-sm" })
+
+                    </div>
+
+                    <div class="col-sm-4" hidden>
+                        @Html.LabelFor(model => model.StartingChequeNo, new { @class = "control-label mb-2" })
+                        @Html.TextBoxFor(model => model.StartingChequeNo, new { @class = "form-control input-sm" })
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-3" hidden>
+                        </div>
+                        <div class="col-sm-3" hidden>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <div class="control-label mb-2 mt-3" for="StartingChequeNo"> &nbsp;</div>
+                                <button type="submit" id="Btn" class="btn btn-success px-5 height @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")"><i class="fa fa-cogs fa-lg"></i> Generate Pension Details <i id="spinner" class="fa fa-spinner fa-spin" style="display:none;"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div>
+                @*<iframe id="RptIframe" width="100%" height="500" frameborder="0"></iframe>*@
+            </div>
+        }
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline" style="margin:0px;padding:0px;border:none;" id="GeneratePaySlipDetailsId">
+            Payroll Process - Generate Pension Details
+            @*<ul class="tool-bar">
+
+                </ul>*@
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div class="row py-3">
+            <div class="col-sm-12 hidden" id="DivRptIframe">
+                <iframe id="RptIframe" width="100%" height="500" frameborder="0"></iframe>
+            </div>
+            <div class="col-sm-12 hidden" id="DivRecordFound">
+                <div class="alert alert-warning">
+                    <h4 class="mb-0"> There is no Record Found</h4>
+                </div>
+
+                @*<div class="alert alert-info">
+                        <h4 class="mb-0"> There is no Record Found</h4>
+                    </div>*@
+                @*<iframe id="reportData" style="border: 0px;height:700px;width:100%;"></iframe>*@
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@section scripts{
+    <script nonce="@ViewBag.StyleNonce">
+      $("#GeneratePaySlipDetailsId").hide();
+    // By Sujeet No action name "CheckProcessAdded" method found int the solution. So comment the code on class ".btn-success" click function
+    //$('.btn-success').click(function () {
+    //  $.ajax({
+    //    url: '/PensionProcess/CheckProcessAdded',
+    //    type: 'Get',
+    //    dataType: 'json'
+    //  }).done(function (result) {
+    //    if (result.length <= 0) {
+    //      toasterErrorMessage("No Active Batch for Payroll Process,Please Create a New Batch & Refresh"); return false;
+    //    }
+    //  });
+    //});
+
+    $(document).ready(function () {
+        if ('@ViewBag.RptLoad' == 'rptGeneratePaySlipDetails.rpt') {
+            $("#GeneratePaySlipDetailsId").show();
+            $("#DivRptIframe").removeClass("hidden");
+            document.getElementById('RptIframe').src = "/ReportForms/ContributionByEmployer.aspx";
+        }
+        else {
+            $("#DivRecordFound").removeClass("hidden");
+        }
+    });
+   jQuery(document).ready(function ($) {
+      comboTree = $('#RegionNames').comboTree({
+        source: @Group,
+        isMultiple: true,
+        cascadeSelect: true,
+        collapse: false
+      });
+   });
+
+    function generatePaySlipDetails() {
+      debugger
+      $('#spinner').show();
+
+      $('#Btn').prop('disabled', true);
+      return true;
+    }
+    </script>
+}

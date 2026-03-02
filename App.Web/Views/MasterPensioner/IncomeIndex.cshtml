@@ -1,0 +1,309 @@
+﻿@model IEnumerable<JKPS.COMMON.DVOMasterEmployeeIncomes>
+
+@{
+    Layout = "~/Views/Shared/_LayoutPensioner.cshtml";
+}
+@{
+    // Assuming ViewBag.Email has a value
+    var email = ViewBag.Email as string;
+    var PensionerID = ViewBag.PensionerID as string;
+}
+
+@section profilePensioner
+{@Html.Hidden("PensionerID")
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <div class="col-sm-7">
+                        <span class="headline Dash_contributorSummary font-sizetext">
+                            Monthly Pension Details:@string.Format("{0} ({1})", ViewBag.Name, ViewBag.ApplicationReferenceNo)
+                        </span>
+                    </div>
+                    <div class="col-sm-5">
+                        <h4 class="headline Dash_contributorSummary text-align">
+                            Scheme Type:@string.Format("({0})", ViewBag.TypeCode)
+                            @*<ul class="tool-bar">
+                                  <li><a href="/MasterPensioner/AddIncomeDetails/@ViewBag.CId" data-toggle="tooltip" data-placement="bottom" title="Add details" data-original-title="Add Details"><i class="fa fa-plus"></i></a></li>
+
+                                </ul>*@
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-body">
+        <table class="table dataTable" id="tbl">
+            <thead>
+                <tr>
+                    <th>Monthly Pension</th>
+                    <th>Rate</th>
+                    <th>Number</th>
+                    <th>Amount</th>
+                    <th>Remarks</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+
+
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <div class="col-sm-12">
+                        <h4 class="headline Dash_contributorSummary">
+                            Audit Log - Monthly Pension details:@string.Format("{0} ({1})", ViewBag.Name, ViewBag.ApplicationReferenceNo)
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table class="table" id="reportDataIncomeDetails">
+                <thead>
+                    <tr>
+                        @*<th>Created By</th>
+                            <th>Created On</th>*@
+                        <th>Modified By</th>
+                        <th>Modified On</th>
+                        @*<th>Event Type</th>*@
+                        @*<th>Table Name</th>*@
+                        <th>Field Name</th>
+                        <th>Old Value</th>
+                        <th>New Value</th>
+                        @*<th>Url</th>
+                            <th>Controller</th>
+                            <th>Action</th>
+                            <th>Area</th>
+                            <th>IP Address</th>
+                            <th>Record Id</th>
+                            <th>Old SystemId</th>
+                            <th>Message</th>*@
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="custom-popup confirmClass incomindexmodal p-0" data-keyboard="false" data-backdrop="static" id="PopUpShowLargeMessage" >
+    <div class="padding-md p-0">
+        <!-- Update Payment Section -->
+        <h3 class="m-top-none py-3 text-white uploadfile_background" id="uploadfile_bM"></h3>
+        <!-- Header Section -->
+        <div class="row incomindexmodal2" style="">
+            <label id="MessageText"></label>
+        </div>
+    </div>
+</div>
+
+}
+@section Scripts {
+    <script src="~/Content/endless/js/jquery.dataTables.min.js"></script>
+    <script nonce="@ViewBag.StyleNonce">
+
+
+    var RemarkArr = [];
+    $(function () {
+      var pensionerID = $("#PensionerID").val();
+      var oTable = $('#tbl').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "sAjaxSource": "/MasterPensioner/IncomeAjaxHandler/?PensionerID=" + pensionerID,
+        "fnDrawCallback": function (setting) {
+          RemarkArr.forEach(function (item, index) {
+          debugger
+           var itemArray = item.split('_')[1];
+          var Remark = "Remark";
+          document.getElementById(item).addEventListener("click", function () {
+            OpenMessagePopup(Remark, itemArray);
+          });
+
+        });
+      },
+        "aoColumns": [
+
+          { "sName": "IncomeCode" },
+          {
+            "sName": "Rate",
+            "fnRender": function (oObj) {
+              return '<span class="auto">' + oObj.aData[1] + '</span>';
+            }
+          },
+          {
+            "sName": "Number",
+            "fnRender": function (oObj) {
+              return '<span class="auto">' + oObj.aData[2] + '</span>';
+            }
+          },
+          {
+            "sName": "Amount",
+            "fnRender": function (oObj) {
+              return '<span class="auto">' + oObj.aData[3] + '</span>';
+            }
+          },
+          //{
+          //  "sName": "ReasonForChange",
+          //  "fnRender": function (oObj) {
+          //    return '<span class="auto">' + oObj.aData[4] + '</span>';
+          //  }
+          //},
+          {
+            "sname": "ReasonForChange",
+            "bsearchable": false,
+            "bsortable": false,
+            "fnRender": function (oObj) {
+              if (oObj.aData[4].length > 10) {
+                // Get the first 10 characters
+                var firstTenCharacters = oObj.aData[4].substring(6, 30);
+                var id = "OpenMessagePopup_" + oObj.aData[4].trim().replace(/\s\s+/g, ' ');
+                RemarkArr.push(id);
+                return ('<a href="#" class="MPCursor1" id="' + id + '" >' + firstTenCharacters + '...</a>');                      
+              } else {
+                return (oObj.aData[4]);
+              }
+            }
+          },
+          {
+            "sName": "ID",
+            "bSearchable": false,
+            "bSortable": false,
+            "fnRender": function (oObj) {
+              var strString = '<a href="/MasterPensioner/EditIncomeDetails/' + oObj.aData[5] + '\" class="btn btn-info btn-xs" title="Edit" enable><i class="fa fa-pencil"></i> Edit</a>';
+
+              return strString;
+            }
+          }
+        ]
+      });
+    })
+
+    $(document).ajaxStop(function () {
+      $(".auto").autoNumeric({ aSep: ',', aDec: '.' });
+    });
+
+    //////////////
+    $(document).ready(function () {debugger
+      FunctionUserLog();
+    });
+      var OpenMessagePopupArr = [];
+    function FunctionUserLog() {
+      debugger
+      var Username = "@email";
+      var PensionerId = "@PensionerID";
+      var sName = $('#reportDataIncomeDetails').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "bAutoWidth": true,
+        "sAjaxSource": "@Url.Action("MasterPensionerHistoryAjax", "MasterPensioner")?Email=" + Username + "&EmplCode=" + PensionerId,//",
+        "fnDrawCallback": function (setting) {
+          OpenMessagePopupArr.forEach(function (item, index) {
+            debugger
+            var itemArray = item.split('_');
+            var oldNew = "Old Remark";
+            if (itemArray[1] == 2) {
+              oldNew = "New Remark";
+            }
+            document.getElementById(item).addEventListener("click", function () {
+              OpenMessagePopup(oldNew, itemArray[2]);
+            });
+
+          });
+
+        },
+        "aoColumns": [
+
+        //{ "sName": "CreatedBy" },
+        //{ "sName": "CreatedOn" },
+        { "sName": "ModifiedBy" },
+        { "sName": "ModifiedOn" },
+        //{ "sName": "EventType" },
+        //{ "sName": "TableName" },
+        { "sName": "ColumnName" },
+            ////{ "sName": "OldValue" },
+            {
+                "sname": "OldValue",
+                "bsearchable": false,
+                "bsortable": false,
+                "fnRender": function (oObj) {
+                    debugger;
+                    if (oObj.aData[3].length > 10) {
+                        // Get the first 10 characters
+                      var firstTenCharacters = oObj.aData[3].substring(2, 10);
+                      var id = "OpenMessagePopup_1_" + oObj.aData[3].replace(/\s\s+/g, ' ');
+                      OpenMessagePopupArr.push(id);
+                      return ('<a href="#" class="MPCursor1" id="' + id + '" >' + firstTenCharacters + '...</a>');                      
+                    } else {
+                        return (oObj.aData[3
+                        ]);
+                    }
+                }
+          },
+
+          {
+            "sname": "NewValue",
+            "bsearchable": false,
+            "bsortable": false,
+            "fnRender": function (oObj) {
+              debugger;
+              if (oObj.aData[4].length > 10) {
+                // Get the first 10 characters
+                var firstTenCharacters = oObj.aData[4].substring(2, 10);
+                var id = "OpenMessagePopup_2_" + oObj.aData[4].replace(/\s\s+/g, ' ');
+                OpenMessagePopupArr.push(id);
+                return ('<a href="#" class="MPCursor1" id="' + id + '" >' + firstTenCharacters + '...</a>');
+              } else {
+                return (oObj.aData[4]);
+              }
+            }
+          },
+
+        //{ "sName": "NewValue" },
+        //{ "sName": "Url" },
+        //{ "sName": "Controller" },
+        //{ "sName": "Action" },
+        //{ "sName": "Area" },
+        //{ "sName": "IPAddress" },
+        //{ "sName": "RecordId" },
+        //{ "sName": "OldSystemId" },
+        //{ "sName": "Message" }
+
+        ]
+      });
+    }
+    //function OpenMessagePopup(heading, message) {
+    //  $("#MHeader").html(heading);
+    //  $("#MessageText").html(message);
+    //  $("#PopUpShowLargeMessage").popup('show');
+    //  }
+
+      function OpenMessagePopup(heading, message) {
+        debugger
+        $("#uploadfile_bM").html(heading + '<button   type="button" class="close MPSClose" title="Close" aria-label="Close" id="ClosePopupWindow"><span aria-hidden="true">&times;</span>');
+            $("#MessageText").html(message);
+          $("#PopUpShowLargeMessage").popup('show');
+          document.getElementById("ClosePopupWindow").addEventListener("click", ClosePopupWindow);
+
+      }
+      function ClosePopupWindow() {
+          $("#PopUpShowLargeMessage").popup("hide");
+      }
+
+
+    </script>
+}

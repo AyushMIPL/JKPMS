@@ -1,0 +1,178 @@
+﻿@model App.Data.ViewModels.PensionCalculationViewModel
+@using App.Web.Helper
+
+@{
+    Layout = null;
+}
+@Html.Hidden("Error")
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <title>Html</title>
+</head>
+<body style="max-width:615px;max-height:960px;font-size:11px;">
+  <div style="text-align:center;"><img src="~/Images/JKPSLogo.jpg" /></div>
+  <div style="text-align:center;font-weight:bold;text-decoration:underline;">PUBLIC SERVICE PENSION FUND</div>
+  <div style="text-align:center;">APPLICATION FOR P
+    <a href="~/Views/PaymentAndRefund/_PrintApplication.cshtml">~/Views/PaymentAndRefund/_PrintApplication.cshtml</a>ENSIONS AND OTHER RETIRING ALLOWANCES</div>
+  @*<div style="text-align:center;">(For Officers whose pension payable exceeds 2/3 of their pensionable emoluments)</div>
+  <div style="text-align:center;">(to be typed/Written in 4-copies)</div>*@
+  <div style="word-wrap: break-word;margin:0px auto;margin-bottom: 10px;margin-top:10px;">
+    <div style="display:inline-block;width:5%;">1.</div>
+    <div style="display:inline-block;width:20%;">Name of Officer</div>
+    <div style="width:72%;display:inline-block;border-bottom:1px solid black;float: right;"><b>@ViewBag.Name</b></div>
+  </div>
+  @*<div style="word-wrap: break-word;margin:0px auto;margin-bottom: 10px;margin-top:10px;">
+      <div style="display:inline-block;width:5%;">2.</div>
+      <div style="display:inline-block;width:20%;">Name of Officer</div>
+      <div style="width:72%;display:inline-block;border-bottom:1px solid black;float: right;"><b>@Model.Designation.Name</b></div>
+    </div>*@
+
+  @*<div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;">
+      <div style="display:inline-block;width:5%">3.</div><div style="display:inline-block;width:30%">Status of Post</div>
+      <div style="width:62%;display:inline-block;float: right;">@Html.CheckBoxFor(model => model.PensionableStatus, new { @disabled = "disabled" })Pensionable</div>
+    </div>
+
+    <div style="word-wrap: break-word;margin:0px auto;margin-bottom: 50px;">
+      <div style="display:inline-block;width:5%">4.</div><div style="display:inline-block;width:30%">Type of benifit requested</div>
+      <div style="width:62%;display:inline-block;float: right;"><input type="checkbox"> Pension</div>
+      <div style="width:62%;display:inline-block;float: right;"><input type="checkbox"> Gratuity Reduced Pension</div>
+      <div style="width:62%;display:inline-block;float: right;"><input type="checkbox"> Discounted gratuity Reduced Pension</div>
+    </div>*@
+
+  @*<div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;clear:both">
+      <div style="display:inline-block;width:5%">5.</div><div style="display:inline-block;width:20%;">Leave Due</div>
+      <div style="width:72%;display:inline-block;border-bottom:1px solid black;float: right;"><b>@Model.LeaveDue</b></div>
+    </div>*@
+
+  <div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;clear:both">
+    <div style="display:inline-block;width:5%">2.</div>
+    <div style="display:inline-block;width:33%;">(a)Date of Retirement/Resignation</div>
+    <div style="width:18%;display:inline-block;border-bottom:1px solid black;"><b>@ViewBag.RetirementDate</b></div>
+    <div style="display:inline-block;width:18%;">(b)Date of Birth</div>
+    <div style="display:inline-block;border-bottom:1px solid black;float: right;width:20%;"><b>@ViewBag.DOB</b></div>
+  </div>
+  <div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;clear:both">
+    <div style="display:inline-block;width:5%">3.</div>
+    <div style="display:inline-block;width:28%;">(a) Date of first Appointment</div>
+    <div style="width:15%;display:inline-block;border-bottom:1px solid black;"><b>@Html.FormatDate(Model.FirstAppointmentDate)</b></div>
+    <div style="display:inline-block;width:30%;">(b) Date of Last Appointment</div>
+    <div style="display:inline-block;border-bottom:1px solid black;float: right;width:20%;"><b>@ViewBag.LastAppointment</b></div>
+
+  </div>
+  <div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;">
+    <div style="display:inline-block;width:5%">4.</div><div style="display:inline-block;">Length Of Qualifying Service in Months(to Dec 31,2003)</div>
+    <div style="width:47%;display:inline-block;border-bottom:1px solid black;float: right;"><b>@Model.LengthOfQualifyingServiceInMonthsTo31Dec2003</b></div>
+  </div>
+  <div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;">
+    <div style="display:inline-block;width:5%">5.</div><div style="display:inline-block;">Length Of Qualifying Service in Months(from Jan 1,2004)</div>
+    <div style="width:46%;display:inline-block;border-bottom:1px solid black;float: right;"><b>@Model.LengthOfQualifyingServiceInMonthsFrom1Jan2014</b></div>
+  </div>
+  @*<div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;clear:both">
+    <div style="display:inline-block;width:4%">10.</div>
+
+    <div style="width:93%;display:inline-block;vertical-align:top;">If Length of Qualifying Service is longer or Shorter than Period between date of first appointment and date of retirement.State Why? <u><b>@Model.LongerShorterReason</b></u></div>
+    @*<div style="width:95%;display:inline-block;border-bottom:1px solid black;float:right;"></div>
+  </div>*@
+  <div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;clear:both">
+    <div style="display:inline-block;width:5%;float:left;">6.</div>
+    <div style="width:95%;display:inline-block;vertical-align:top;float:left;">  Salary P.A/Salary P.A plus responsibility/inducement allowance at date of retirement,if in post longer than 3 Years <u><b>EC$ @Html.FormatSeparator(Model.SalaryAmount)</b></u></div>
+    @*<div style="display:inline-block;border-bottom:1px solid black;float:right;"></div>*@
+  </div>
+  @*<div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;clear:both">
+    <div style="display:inline-block;width:5%"></div>
+
+    <div style="display:inline-block;width:93%; vertical-align:top;">(b)  Average Salary P.A/Salary P.A plus responsibility/inducement allowance over past three (3) years at date of retirement,if in post less than three (3) Years <u><b>EC$ @Html.FormatSeparator(Model.SalaryAmount)</b></u></div>*@
+    @*<div style="display:inline-block;border-bottom:1px solid black;">EC$ @Model.RetirementAnnualSalary2</div>*@
+  @*</div>*@
+  @*<div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;clear:both">
+      <div style="display:inline-block;width:5%;float:left;">&nbsp;</div>
+      <div style="display:inline-block;width:15%;float:left;">Submitted By</div>
+      <div style="width:30%;display:inline-block;border-bottom:1px solid black;">&nbsp;<b>@Model.ApplicationSubmittedBy</b></div>
+      <div style="display:inline-block;width:10%;">Noted By</div>
+      <div style="width:38%;display:inline-block;border-bottom:1px solid black;float:right;">&nbsp;<b>@ViewBag.NotedBy</b></div>
+      <div style="display:inline-block;text-align:right;margin-top:0px;font-size:11px;width:49%;clear: both;color:#6D6D6D;">signature of Applying Officer</div>
+      <div style="display:inline-block;text-align:right;margin-top:-7px;font-size:11px;width:49%;clear: both;color:#6D6D6D;">signature of Department Officer</div>
+    </div>
+
+    <div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;">
+      <div style="display:inline-block;width:5%"></div>
+      <div style="display:inline-block;width:30%;">Items 2 to 11 (b) verified</div>
+      <div style="width:63%;display:inline-block;border-bottom:1px solid black;float: right;">&nbsp;<b>@ViewBag.Itemsverified</b></div>
+      <div style="margin-top:-3px;font-size:11px;width:99%;clear: both;color:#6D6D6D;float:right;text-align:right;">signature of Human Resource Officer</div>
+
+    </div>*@
+
+  <div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;">
+    <div style="display:inline-block;width:5%;">7.</div>
+    <div style="display:inline-block;width:14%;">Full Pension</div>
+    <div style="display:inline-block;margin-top:-8px;font-size:11px;width:32%;border-bottom:1px solid black;">Length of Pensionable service(@Model.LengthOfQualifyingServiceInMonthsTo31Dec2003)</div>
+    @*<div style="text-align:right;margin-top:1px;font-size:11px;width:20px;margin-left:175px">600</div>*@
+    <div style="display:inline-block;width:5%;text-align:center;">X</div>
+    <div style="display:inline-block;text-align:center;font-size:11px;width:21%;margin-top:5px;vertical-align: -webkit-baseline-middle;"><b>EC$ @Html.FormatSeparator(Model.SalaryAmount)</b><br /> Average Salary or Salary at the date of Retirement or Salary Plus responsibility/induced allowance</div>
+    <div style="width:19%;display:inline-block;border-bottom:1px solid black;float: right;margin-top:25px;vertical-align: -webkit-baseline-middle;"><b>EC$ @Html.FormatSeparator(Model.FullPension1)</b></div>
+    <div style="text-align:right;margin-top: -26px;font-size:11px;width: 37%;vertical-align: initial;">600</div>
+  </div>
+  <div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;">
+    <div style="display:inline-block;width:5%;">8.</div>
+    <div style="display:inline-block;width:14%;">Full Pension</div>
+    <div style="display:inline-block;margin-top:-8px;font-size:11px;width:32%;border-bottom:1px solid black;">Length of Pensionable service(@Model.LengthOfQualifyingServiceInMonthsFrom1Jan2014)</div>
+    <div style="display:inline-block;width:5%;text-align:center;">X</div>
+    <div style="display:inline-block;text-align:center;font-size:11px;width:21%;margin-top:0px;vertical-align: -webkit-baseline-middle;"><b>EC$ @Html.FormatSeparator(Model.SalaryAmount) </b><br /> Average Salary or Salary at the date of Retirement or Salary Plus responsibility/induced allowance</div>
+    <div style="width:19%;display:inline-block;border-bottom:1px solid black;float: right;margin-top:22px;vertical-align: -webkit-baseline-middle;"><b>EC$ @Html.FormatSeparator(Model.FullPension2)</b></div>
+    <div style="text-align:right;margin-top: -26px;font-size:11px;width: 37%;vertical-align: initial;">960</div>
+  </div>
+
+  <div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;">
+    <div style="display:inline-block;width:5%">9.</div>
+    <div style="display:inline-block;width:93%;">Total Full Pension (7 plus 8) <u><b>EC$ @Html.FormatSeparator(Model.FullPension)</b></u></div>
+    @*<div style="width:55%;display:inline-block;border-bottom:1px solid black;float: right;">EC$ @Model.TotalFullpension</div>*@
+  </div>
+
+  <div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;">
+    <div style="display:inline-block;width:5%">10.</div>
+    <div style="display:inline-block;width:93%;">Maximum Full Pension Allowed <u>EC$ @Html.FormatSeparator(Model.MaxPension)</u></div>
+    @*<div style="width:75%;display:inline-block;border-bottom:1px solid black;float: right;">EC$ @Model.MaxPension</div>*@
+  </div>
+  <div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;">
+    <div style="display:inline-block;width:5%">11.</div>
+    <div style="display:inline-block;width:93%;">Gratuity Reduced Pension Gratuity payable(1/4 x Pension Payable x 12.5) <u><b>EC$ @Html.FormatSeparator(Model.Gratuity)</b></u></div>
+    @*<div style="width:48%;display:inline-block;border-bottom:1px solid black;float: right;">EC$ @Model.Gratuity</div>*@
+  </div>
+  <div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;">
+    <div style="display:inline-block;width:25%">&nbsp;</div>
+    <div style="display:inline-block;width:72%;">Reduced Pension P.A(3/4 x Pension Payable) P.A <u><b>EC$ @Html.FormatSeparator(Model.ReducedPension)</b></u></div>
+    @*<div style="width:64%;display:inline-block;border-bottom:1px solid black;float: right;">EC$ @Model.ReducedPension</div>*@
+  </div>
+  @*<div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;margin-top: 115px;">
+    <div style="display:inline-block;width:5%;">&nbsp;</div>
+    <div style="display:inline-block;width:20%;margin-top:20px;">&nbsp;Signature</div>
+    <div style="display:inline-block;width:72%;">&nbsp;</b></u></div>
+    <div style="width:64%;display:inline-block;border-bottom:1px solid black;float: right;">EC$ @Model.ReducedPension</div>
+  </div>*@
+  @*<div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;">
+    <div style="display:inline-block;width:5%"></div>
+    <div style="display:inline-block;width:55%;">Items 14,15 and 16 Certified for Payment</div>
+    <div style="width:38%;display:inline-block;border-bottom:1px solid black;float: right;">&nbsp;<b>@ViewBag.ItemsPayment</b></div>
+    <div style="text-align:right;margin-top:-3px;font-size:11px;width:99%;clear: both;color:#6D6D6D;">signature of Accountant,JKPS</div>
+
+  </div>
+  <div style="word-wrap: break-word;margin:0px auto;margin-bottom: 15px;">
+    <div style="display:inline-block;width:5%"></div>
+    <div style="display:inline-block;;width:15%">Audited By</div>
+    <div style="width:76%;display:inline-block;border-bottom:1px solid black;float: right;">&nbsp;<b>@ViewBag.AuditedBy</b></div>
+    <div style="text-align:right;margin-top:-3px;font-size:11px;width:98%;clear: both;color:#6D6D6D;">signature of Internal Auditor/Treasury</div>
+  </div>*@ 
+     
+ <div style="padding-left: 0px;float: left;margin-left: 0px;margin-top:30px;font-size: smaller;">Note. The above information and figures are estimates of pension benefits and have not been verified. All information and figures will not become final until the actual date of retirement, resignation or termination.  Please take note and be governed accordingly.</div>
+  
+</body>
+
+</html>
+<script nonce="@ViewBag.StyleNonce">
+  if($("#Error").val()!="")
+  {
+    toasterInfoMessage("service Length should be greater than 10 years");
+  }
+</script>

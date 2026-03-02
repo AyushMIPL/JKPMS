@@ -1,0 +1,63 @@
+﻿@model App.Data.Entities.MasterPFRate
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Delete Details
+      <ul class="tool-bar">
+        
+      </ul>
+    </h4>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-sm-4">
+        <dl class="dl-horizontal">
+          <dt>
+            @Html.DisplayNameFor(model => model.Name)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.Name)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.PFRate)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.PFRate)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.EffectiveDate)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.EffectiveDate)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.IsActive)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.IsActive)
+          </dd>
+
+        </dl>
+      </div>
+
+    </div>
+  </div>
+  <div class="panel-footer">
+    @Html.ActionLink("Delete", "Delete", new { @id = Model.Id }, new { @class = "btn btn-success" })
+    @Html.ActionLink("Back to List", "Index", "PFRate", null, new { @class = "btn btn-primary" })
+  </div>
+</div>
+

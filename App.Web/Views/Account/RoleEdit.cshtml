@@ -1,0 +1,43 @@
+﻿@model App.Data.Entities.AppRole
+
+@{
+  ViewBag.Title = "Edit";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Update Role
+      
+      
+    </h4>
+  </div>
+  <div class="panel-body">
+    @using (Html.BeginForm("RoleEdit", "Account", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+      @Html.HiddenFor(model => model.Id)
+      <div class="row">
+        <div class="col-sm-5">
+          <div class="form-group">
+            @Html.LabelFor(model => model.Name,"Role Name", new { @class = "col-sm-4 control-label" })
+            <div class="col-sm-8">
+              @Html.TextBoxFor(m => m.Name, new { @class = "form-control input-sm", placeholder = "Enter Role" })
+            </div>
+          </div>
+
+          
+          @*<hr>*@
+          <div class="form-group">
+            <label class="col-sm-4 control-label"></label>
+            <div class="col-sm-8">
+              <button type="submit" class="btn btn-success"><i class="fa fa-save"> </i> Update</button>
+              <a href="/Account/RoleIndex" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+              @*@Html.ActionLink("Back to List", "RoleIndex", "Account", null, new { @class = "btn btn-primary" })*@
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

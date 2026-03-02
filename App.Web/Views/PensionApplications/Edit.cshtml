@@ -1,0 +1,272 @@
+﻿@model App.Data.Entities.PensionApplications
+@{
+    ViewBag.Title = "ApplicationApproved";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Pension Applications
+      @*<ul class="tool-bar">
+          
+        </ul>*@
+    </h4>
+  </div>
+  <div class="panel-body">
+    @using (Html.BeginForm("Edit", "PensionApplications", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+      <div class="row">
+        <div class="col-sm-8">
+          <div class="form-group">
+            @Html.LabelFor(model => model.EmployerID, "Employer", htmlAttributes: new { @class = "col-sm-4 control-label" })
+            <div class="col-sm-8">
+              @Html.DropDownList("EmployerID", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+            </div>
+          </div>
+          <div class="form-group">
+            @Html.LabelFor(model => model.PersonID, "Name of Officer", htmlAttributes: new { @class = "col-sm-4 control-label" })
+            <div class="col-sm-8">
+              @Html.DropDownList("PersonID", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+            </div>
+          </div>
+          <div class="form-group">
+            @Html.LabelFor(model => model.DesignationId, "Post", htmlAttributes: new { @class = "col-sm-4 control-label" })
+            <div class="col-sm-8">
+              <input id="DesignationName" name="DesignationName" class="form-control input-sm" readonly="readonly" value="@ViewBag.DesignationName"/>
+              @Html.HiddenFor(model => model.DesignationId)
+            </div>
+          </div>
+          <div class="form-group">
+            @Html.LabelFor(model => model.PensionableStatus, "Pensionable Status", htmlAttributes: new { @class = "col-sm-4 control-label" })
+            <div class="col-sm-8">
+              <div class="checkbox">
+                @Html.EditorFor(model => model.PensionableStatus)
+                @Html.ValidationMessageFor(model => model.PensionableStatus, "", new { @class = "text-danger" })
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            @Html.LabelFor(model => model.BenefitTypes, htmlAttributes: new { @class = "col-sm-4 control-label" })
+            <div class="col-sm-8">
+              @*@Html.DropDownList("BenefitTypes", new List<SelectListItem> {
+                  new SelectListItem{ Text = "Pension", Value="Pension"},
+                  new SelectListItem{ Text = "Gratiuty Reduced Pension", Value="Gratiuty Reduced Pension"},
+                  new SelectListItem{ Text = "Discounted Gratiuty Reduced Pension", Value="Discounted  Gratiuty Reduced Pension"},
+                }, "Select Benefit Types", htmlAttributes: new { @class = "form-control" })*@
+              @*@Html.EditorFor(model => model.BenefitType, new { htmlAttributes = new { @class = "form-control" } })*@
+              @*@Html.EnumDropDownListFor(model => model.BenefitTypes, htmlAttributes: new { @class = "form-control" })*@
+              @Html.DropDownList("BenefitTypes", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+              @Html.ValidationMessageFor(model => model.BenefitTypes, "", new { @class = "text-danger" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            @Html.LabelFor(model => model.LeaveDue, "Leave Due", htmlAttributes: new { @class = "col-sm-4 control-label" })
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.LeaveDue, new { @class = "form-control input-sm" })
+              @Html.ValidationMessageFor(model => model.LeaveDue, "", new { @class = "text-danger" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            @Html.LabelFor(model => model.RetirementOrResignationDate, "Date of Retirement/Resignation", htmlAttributes: new { @class = "col-sm-4 control-label" })
+            <div class="col-sm-8">
+              <div class="input-group date" id="Date">
+                @Html.EditorFor(model => model.RetirementOrResignationDate, new { })
+                <span class="input-group-addon">
+                  <i class="fa fa-calendar"></i>
+                </span>
+              </div>
+
+              @*@Html.EditorFor(model => model.RetirementOrResignationDate, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.RetirementOrResignationDate, "", new { @class = "text-danger" })*@
+            </div>
+          </div>
+
+          <div class="form-group">
+            @Html.LabelFor(model => model.DOB, "Date of Birth", htmlAttributes: new { @class = "col-sm-4 control-label" })
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.DOB, new { @class = "form-control input-sm", @readonly = "readonly" })
+              @*@Html.EditorFor(model => model.DOB, new { htmlAttributes = new { @class = "form-control" readonly="readonly" } })*@
+              @Html.ValidationMessageFor(model => model.DOB, "", new { @class = "text-danger" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            @Html.LabelFor(model => model.DateofAppointment1st, "Date of First Appointment", htmlAttributes: new { @class = "col-sm-4 control-label" })
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.DateofAppointment1st, new { @class = "form-control input-sm", @readonly = "readonly" })
+              @*@Html.EditorFor(model => model.DateofAppointment1st, new { htmlAttributes = new { @class = "form-control" } })*@
+              @Html.ValidationMessageFor(model => model.DateofAppointment1st, "", new { @class = "text-danger" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            @Html.LabelFor(model => model.DateofAppointmentLast, "Date of Last Appointment", htmlAttributes: new { @class = "col-sm-4 control-label" })
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.DateofAppointmentLast, new { @class = "form-control input-sm", @readonly = "readonly" })
+              @*@Html.EditorFor(model => model.DateofAppointmentLast, new { htmlAttributes = new { @class = "form-control" } })*@
+              @Html.ValidationMessageFor(model => model.DateofAppointmentLast, "", new { @class = "text-danger" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-4 TextRight">
+              @Html.LabelFor(model => model.LengthOfQualifyingServiceInMonthsTo31Dec2003, "Service Length(Upto Dec, 2003)", htmlAttributes: new { @class = "control-label" })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Length of Qualifying Service in Month(to Dec 31, 2003)"></i>
+            </div>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.LengthOfQualifyingServiceInMonthsTo31Dec2003, new { @class = "form-control input-sm", @readonly = "readonly" })
+              @*@Html.EditorFor(model => model.LengthOfQualifyingServiceInMonthsTo31Dec2003, new { htmlAttributes = new { @class = "form-control" } })*@
+              @Html.ValidationMessageFor(model => model.LengthOfQualifyingServiceInMonthsTo31Dec2003, "", new { @class = "text-danger" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-4 TextRight">
+              @Html.LabelFor(model => model.LengthOfQualifyingServiceInMonthsFrom1Jan2014, "Service Length(From Jan, 2004)", htmlAttributes: new { @class = "control-label" })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Length of Qualifying Service in Month(from Jan 1, 2004)"></i>
+            </div>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.LengthOfQualifyingServiceInMonthsFrom1Jan2014, new { @class = "form-control input-sm", @readonly = "readonly" })
+              @*@Html.EditorFor(model => model.LengthOfQualifyingServiceInMonthsFrom1Jan2014, new { htmlAttributes = new { @class = "form-control" } })*@
+              @Html.ValidationMessageFor(model => model.LengthOfQualifyingServiceInMonthsFrom1Jan2014, "", new { @class = "text-danger" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-4 TextRight">
+              @Html.LabelFor(model => model.LongerShorterReason, "Reason", htmlAttributes: new { @class = "control-label" })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="If Length of Qualifying Service is longer or shorter than peroid between date of first appointment and date of retirement, state Why"></i>
+            </div>
+            <div class="col-sm-8">
+              @Html.TextAreaFor(model => model.LongerShorterReason, 8, 8, new { @class = "form-control input-sm", placeholder = "Add Reasons" })
+              @*@Html.EditorFor(model => model.LongerShorterReason, new { htmlAttributes = new { @class = "form-control" } })*@
+              @Html.ValidationMessageFor(model => model.LongerShorterReason, "", new { @class = "text-danger" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-4 TextRight">
+              @Html.LabelFor(model => model.RetirementAnnualSalary1, "Salary P.A", htmlAttributes: new { @class = "control-label" })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Salary P.A./Salary P.A. plus responsibility/inducement allowance at date of retirement, if in post longer than 3 years"></i>
+            </div>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.RetirementAnnualSalary1, new { @class = "form-control input-sm", @readonly = "readonly" })
+              @*@Html.EditorFor(model => model.RetirementAnnualSalary1, new { htmlAttributes = new { @class = "form-control" } })*@
+              @Html.ValidationMessageFor(model => model.RetirementAnnualSalary1, "", new { @class = "text-danger" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-4 TextRight">
+              @Html.LabelFor(model => model.RetirementAnnualSalary2, "Average Salary P.A", htmlAttributes: new { @class = "control-label" })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Average Salary P.A./Salary P.A. plus responsibility/inducement allowance over past three (3) years at date of retirement, if in post less than (3) years"></i>
+            </div>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.RetirementAnnualSalary2, new { @class = "form-control input-sm", @readonly = "readonly" })
+              @*@Html.EditorFor(model => model.RetirementAnnualSalary2, new { htmlAttributes = new { @class = "form-control" } })*@
+              @Html.ValidationMessageFor(model => model.RetirementAnnualSalary2, "", new { @class = "text-danger" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            @Html.LabelFor(model => model.ApplicationSubmittedBy, "Application Submitted By", htmlAttributes: new { @class = "col-sm-4 control-label" })
+
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.ApplicationSubmittedBy, new { @class = "form-control input-sm", @readonly = "readonly" })
+              @*@Html.EditorFor(model => model.ApplicationSubmittedBy, new { htmlAttributes = new { @class = "form-control" } })*@
+              @Html.ValidationMessageFor(model => model.ApplicationSubmittedBy, "", new { @class = "text-danger" })
+            </div>
+          </div>
+
+          
+
+          <div class="form-group">
+            <div class="col-sm-4 TextRight">
+              @Html.LabelFor(model => model.FullpensionAmount1, "Pension(Upto Dec, 2003)", htmlAttributes: new { @class = "control-label" })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Full Pension = (Length of pensionable service)(Month))/600)*(Salary)"></i>
+            </div>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.FullpensionAmount1, new { @class = "form-control input-sm", @readonly = "readonly" })
+              @*@Html.EditorFor(model => model.FullpensionAmount1, new { htmlAttributes = new { @class = "form-control" } })*@
+              @Html.ValidationMessageFor(model => model.FullpensionAmount1, "", new { @class = "text-danger" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-4 TextRight">
+              @Html.LabelFor(model => model.FullpensionAmount2, "Pension(From Jan, 2004)", htmlAttributes: new { @class = "control-label" })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Full Pension = (Length of pensionable service)(Month))/960)*(Salary)"></i>
+            </div>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.FullpensionAmount2, new { @class = "form-control input-sm", @readonly = "readonly" })
+              @*@Html.EditorFor(model => model.FullpensionAmount2, new { htmlAttributes = new { @class = "form-control" } })*@
+              @Html.ValidationMessageFor(model => model.FullpensionAmount2, "", new { @class = "text-danger" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-4 TextRight">
+              &nbsp;@Html.LabelFor(model => model.TotalFullpension, "Total Pension", htmlAttributes: new { @class = "control-label" })
+              <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Total Full Pension which exceeds maximum allowed(12 plus 13)"></i>
+            </div>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.TotalFullpension, new { @class = "form-control input-sm", @readonly = "readonly" })
+              @*@Html.EditorFor(model => model.TotalFullpension, new { htmlAttributes = new { @class = "form-control" } })*@
+              @Html.ValidationMessageFor(model => model.TotalFullpension, "", new { @class = "text-danger" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-4 TextRight">
+              @Html.LabelFor(model => model.MaxPension, "Maximum Pension", htmlAttributes: new { @class = "control-label" })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Maximum Full Pension Allowed"></i>
+            </div>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.MaxPension, new { @class = "form-control input-sm", @readonly = "readonly" })
+              @*@Html.EditorFor(model => model.MaxPension, new { htmlAttributes = new { @class = "form-control" } })*@
+              @Html.ValidationMessageFor(model => model.MaxPension, "", new { @class = "text-danger" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-4 TextRight">
+              @Html.LabelFor(model => model.GratuityReducedPension, "Gratuity", htmlAttributes: new { @class = "control-label" })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Gratuity Reduced Pension Gratuity Payable(1/4 x Pension Payable at x 12.5)"></i>
+            </div>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.GratuityReducedPension, new { @class = "form-control input-sm", @readonly = "readonly" })
+              @*@Html.EditorFor(model => model.GratuityReducedPension, new { htmlAttributes = new { @class = "form-control" } })*@
+              @Html.ValidationMessageFor(model => model.GratuityReducedPension, "", new { @class = "text-danger" })
+            </div>
+          </div>
+
+
+          <div class="form-group">
+            <label for="IsActive" class="col-sm-4 control-label">Status:</label>
+            <div class="col-sm-8">
+              <div class="checkbox">
+                @Html.CheckBoxFor(model => model.IsActive, new { @class = "form-control input-sm", @checked = "checked" })
+              </div>
+            </div>
+          </div>
+
+
+          <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+              <input type="submit" value="Save" class="btn btn-success" />
+              @Html.ActionLink("Back to List", "Index", "PensionApplications", null, new { @class = "btn btn-primary" })
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+

@@ -1,0 +1,151 @@
+﻿@model IEnumerable<App.Data.Entities.RefundApplications>
+
+@{
+  ViewBag.Title = "Index";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Payment and Refund
+      
+      <ul class="tool-bar">
+        <li><a href="/PaymentAndRefund/AddRefundApplicationForm" data-toggle="tooltip" data-placement="bottom" title="Refund Application Form" data-original-title="Refund Applicatio nForm"><i class="fa fa-plus"></i></a></li>
+        
+      </ul>
+    </h4>
+  </div>
+  <div class="panel-body">
+    <table class="table dataTable" id="example">
+      <thead>
+        <tr>
+          <th>PersonID</th>
+          <th>Name</th>
+          <th>Employer Name</th>
+          <th>Post</th>
+          <th>Date of<br />Appointment</th>
+          <th>Date of <br />Retirement or<br />Resignation</th>
+          <th>Service<br /> Length<br />(in Months)</th>
+          <th>Employee<br />Contribution<br />to Pension Fund</th>
+          <th>Interest<br />Compound Annual</th>
+          <th>Employee Contribution<br />to Pension Fund<br />with Interest</th>
+          <th>Job Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @*@foreach (var item in this.Model)
+          {
+            <tr>
+              <td>@item.PersonID</td>
+              <td>@item.Name</td>
+              <td>@item.Employer.EmployerName</td>
+              <td></td>
+              <td>@item.Designation.Name</td>
+              <td>@item.FirstAppointmentDate</td>
+              <td>@item.RetirementOrResignationDate</td>
+              <td>@item.LengthOfServiceInMonths</td>
+              <td>@item.TotalEmployeeContribution</td>
+              <td>@item.AnnualInterest</td>
+              <td>@item.TotalEmployeeContributionWithInterest</td>
+              <td>@item.JobStausName.Name</td>
+              <td>
+                <a href="/PaymentAndRefund/RefundDetails/@item.Id" class="btn btn-info btn-xs" title="Details"><i class="fa fa-pencil"></i></a>
+
+                </td>
+            </tr>
+          }*@
+      </tbody>
+
+    </table>
+  </div>
+</div>
+<div class="modal fade in" id="formModal" aria-hidden="false" style="display: none;">
+  <div class="modal-dialog" style="width: 975px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="hidePension();">×</button>
+        <iframe id="reportData" style="border: 0px;height:700px;width:100%;"></iframe>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-sm btn-success" data-dismiss="modal" aria-hidden="true" onclick="hidePension();">Close</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+@section Scripts {
+  <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+  <script nonce="@ViewBag.StyleNonce">
+    $(function () {
+      var oTable = $('#example').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "sAjaxSource": "/PaymentAndRefund/RefundAjaxHandler",
+        "aoColumns": [
+
+            { "sName": "PersonID" },
+            { "sName": "Name" },
+            { "sName": "EmployerName" },
+            { "sName": "Designation" },
+            { "sName": "FirstAppointmentDate" },
+            { "sName": "RetirementOrResignationDate" },
+            { "sName": "LengthOfServiceInMonths" },
+            { "sName": "TotalEmployeeContribution" },
+            { "sName": "AnnualInterest" },
+            { "sName": "TotalEmployeeContributionWithInterest" },
+            {
+              "sName": "JobStausName",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                return '<span class="badge badge-success">' + oObj.aData[10] + '</span>';
+              }
+            },
+            {
+              "sName": "ID",
+              "bSearchable": false,
+              "sWidth": "80px",
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                var strString = '<a href="/PaymentAndRefund/RefundDetails/' + oObj.aData[11] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i> Edit</a>';
+                //strString += '&nbsp;<a href="javascript:showDivPension(' + oObj.aData[11] + ')" class="btn btn-danger btn-xs" title="Print"><i class="fa fa-print fa-lg"></i></a>';
+
+                return strString;
+              }
+            }
+        ]
+      }).rowGrouping({
+        bExpandableGrouping: false,
+        iGroupingColumnIndex: 2,
+        bHideGroupingColumn: true
+
+      });
+
+    })
+
+    function showDivPension(Id) {
+      var id = parseInt(Id);
+      $.ajax({
+        url: '@Url.Action("_RefundDetailsAjax", "PaymentAndRefund")?Id=' + id,
+        type: "GET",
+      }).done(function (result) {
+        var actionRes = result;
+        if (actionRes == "1") {
+          $('#reportData').attr('src', '/ReportForms/ContributionByEmployer.aspx');
+          $("#formModal").show();
+          return false;
+        }
+        else {
+          toasterErrorMessage("Result not found on this search criteria.");
+          return false;
+        }
+      });
+    }
+    function hidePension() {
+      $("#formModal").hide();
+    }
+  </script>
+}

@@ -1,0 +1,309 @@
+﻿@model App.Data.Entities.MasterContributorMarriageDetails
+
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/Shared/_LayoutProfile.cshtml";
+}
+
+@section profileContainer
+{
+
+    @Html.Hidden("CId")
+    @Html.Hidden("preMarriage")
+    @Html.Hidden("BeginDate")
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+                Contributor Marriage Details  : @string.Format("{0} ({1})", ViewBag.Name, ViewBag.PersonId)
+
+            </h4>
+        </div>
+        @using (Html.BeginForm("AddMarriageDetails", "ContributorPersonalDetails", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+    {       
+            @Html.Hidden("RequestFrom")
+            @Html.Hidden("id")
+            <div class="row">
+                <div class="panel-body">
+                    <div class="col-sm-12">
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary("", new { @class = "text-danger" })
+                        <div class="form-group">
+                            <div class="pull-right">
+                                <a href="javascript:Contributorslist();" class="btn btn-danger">Import Details From Existing Contributor List</a>
+                            </div>
+                        </div>
+                        <div class="modal fade in" id="formModal" aria-hidden="false" style="display: none;">
+                            <div class="modal-dialog" style="width:85%">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="Hide()">×</button>
+                                        <h4>Select Details</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div id="partialView"> @Html.Action("_ContributorListForMarriage", "ContributorPersonalDetails", new { id = ViewBag.CId })</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PersonId, htmlAttributes: new { @class = "control-label col-lg-2" })
+                            <div class="col-sm-6">
+                                @Html.TextBoxFor(m => m.PersonId, new { @class = "form-control", placeholder = "JKPS ID", @Value = ViewBag.PersonID, @readonly = "readonly" })
+                                @Html.ValidationMessageFor(model => model.PersonId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.SpouseFirstName, htmlAttributes: new { @class = "control-label col-lg-2" })
+                            <div class="col-sm-6">
+                                @Html.EditorFor(model => model.SpouseFirstName, new { htmlAttributes = new { @class = "form-control", placeholder = "First Name" } })
+                                @*@Html.ValidationMessageFor(model => model.SpouseFirstName, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.MidName, htmlAttributes: new { @class = "control-label col-lg-2" })
+                            <div class="col-sm-6">
+                                @Html.EditorFor(model => model.MidName, new { htmlAttributes = new { @class = "form-control", placeholder = "Middle Name" } })
+                                @*@Html.ValidationMessageFor(model => model.MidName, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LastName, htmlAttributes: new { @class = "control-label col-lg-2" })
+                            <div class="col-sm-6">
+                                @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control", placeholder = "Last Name" } })
+                                @*@Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.CountryID, "Country *", htmlAttributes: new { @class = "control-label col-lg-2" })
+                            <div class="col-sm-6">
+                                @Html.DropDownList("CountryID", null, htmlAttributes: new { @class = "form-control", placeholder = "Country", id = "country" })
+                                @*@Html.ValidationMessageFor(model => model.CountryID, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        @*<div class="form-group">
+                              @Html.LabelFor(model => model.DateOfBirth, htmlAttributes: new { @class = "control-label col-lg-2" })
+                              <div class="col-md-10" id="DOB">
+                                @Html.EditorFor(model => model.DateOfBirth, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.DateOfBirth, "", new { @class = "text-danger" })
+                              </div>
+                            </div>*@
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DateOfBirth, "Date Of Birth *", new { @class = "col-sm-2 control-label" })
+                            <div class="col-sm-6">
+                                <div class="input-group date" id="Date">
+                                    @Html.EditorFor(model => model.DateOfBirth, new { @placeholder = "Date Of Birth" })
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Phone, htmlAttributes: new { @class = "control-label col-lg-2" })
+                            <div class="col-sm-6">
+                                @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control", placeholder = "Phone" } })
+                                @*@Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PhoneOffice, htmlAttributes: new { @class = "control-label col-lg-2" })
+                            <div class="col-sm-6">
+                                @Html.EditorFor(model => model.PhoneOffice, new { htmlAttributes = new { @class = "form-control", placeholder = "Office Phone" } })
+                                @*@Html.ValidationMessageFor(model => model.PhoneOffice, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Mobile, htmlAttributes: new { @class = "control-label col-lg-2" })
+                            <div class="col-sm-6">
+                                @Html.EditorFor(model => model.Mobile, new { htmlAttributes = new { @class = "form-control", placeholder = "Mobile" } })
+                                @*@Html.ValidationMessageFor(model => model.Mobile, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-lg-2" })
+                            <div class="col-sm-6">
+                                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", placeholder = "Email" } })
+                                @*@Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.MarriageBeginDate, new { @class = "col-sm-2 control-label" })
+                            <div class="col-sm-6">
+                                <div class="input-group date" id="MarriageDate">
+                                    @Html.EditorFor(model => model.MarriageBeginDate, new { @placeholder = "Marriage Begin Date" })
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.MarriageEndDate, new { @class = "col-sm-2 control-label" })
+                            <div class="col-sm-6">
+                                <div class="input-group date" id="EndDate">
+                                    @Html.EditorFor(model => model.MarriageEndDate, new { @placeholder = "Marriage End Date" })
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.MaritalStatusId, "Marital Status *", htmlAttributes: new { @class = "control-label col-lg-2" })
+                            <div class="col-sm-6">
+                                @Html.DropDownList("MaritalStatusId", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+                                @*@Html.ValidationMessageFor(model => model.MaritalStatusId, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="IsActive" class="col-sm-2 control-label">Status:</label>
+                            <div class="col-sm-6">
+                                <div class="checkbox">
+                                    @Html.CheckBoxFor(m => m.IsActive, new { @class = "form-control input-sm" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+                                <button type="submit" class="btn btn-success"><i class="fa fa-save"> </i> Save</button>
+                                <a id="backtolist" href="/ContributorPersonalDetails/MarriageDetailsIndex/@ViewBag.CId" class="btn btn-primary"> <i class="fa fa-reply"> </i> Back to List</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+@section scripts{
+    @*<script src="~/Scripts/jquery.dataTables.min.js"></script>*@
+    <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+    <script src="~/Scripts/ContributorDetails.js"></script>
+    <script src="~/Scripts/Master.js"></script>
+    <script nonce="@ViewBag.StyleNonce">
+
+        $('.input-group.date').datepicker({
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+        $(document).ready(function () {
+            if ($("#RequestFrom").val() == "True") {
+                debugger
+                $("#backtolist").attr('href', '/ContributorPersonalDetails/errorsInContributorDetails');
+            }
+            $("#SaveDetails").click(function (evt) {
+                debugger
+                if ($("#preMarriage").val() != "") {
+                    toasterErrorMessage("Please Enter Marriage End Date of Last Marriage");
+                    evt.preventDefault();
+                }
+            });
+
+
+            var date = new Date();
+            var dob = (date.getMonth() + 1) + "/" + date.getDate() + "/" + (date.getFullYear());
+            var end = new Date($("#BeginDate").val());
+            $('#MarriageDate').datepicker('setEndDate', dob);
+            $('#MarriageDate').datepicker('setStartDate', end);
+            debugger
+
+            //$('#MarriageDate').datepicker({
+            //  endDate: dob,
+            //  startDate: end,
+            //  startView: 1,
+            //  format: "mm/dd/yyyy",
+            //  autoclose: true
+            //});
+
+            var id = $("#CId").val();
+            var oTable = $('#tbl').dataTable({
+                "bJQueryUI": true,
+                "sPaginationType": "full_numbers",
+                "bServerSide": true,
+                "bDestroy": true,
+                //"bProcessing": true,
+                "sAjaxSource": "/ContributorPersonalDetails/ContributorMarriageDetailsAjaxHandler/?Id=" + id,
+                "aoColumns": [
+                  { "sName": "PersonID" },
+                    { "sName": "OldPersonID" },
+                    { "sName": "Name" },
+                    { "sName": "EmployerName" },
+                    { "sName": "SocialSecurityNo" },
+                    {
+                        "sName": "Gender",
+                        "bSearchable": false,
+                        "bSortable": false,
+                        "fnRender": function (oObj) {
+                            if (oObj.aData[5] != "M")
+                                return '<span > Female </span>';
+                            else
+                                return '<span >Male</span>';
+                        }
+                    },
+                    { "sName": "DateOfBirth" },
+                    { "sName": "PostalAddress" },
+                { "sName": "Phone" },
+                { "sName": "PhoneOffice" },
+
+                    {
+                        "sName": "ID",
+                        "bSearchable": false,
+                        "bSortable": false,
+                        "fnRender": function (oObj) {
+                            var strString = '<a href="javascript:SelectDetails(' + oObj.aData[10] + ');" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i> Edit</a>';
+                            return strString;
+                        }
+                    }
+                ]
+            }).rowGrouping({
+                bExpandableGrouping: false,
+                iGroupingColumnIndex: 3,
+                bHideGroupingColumn: true
+
+            })
+        });
+
+        function Contributorslist() {
+            $('#formModal').show();
+        }
+
+        function Hide() {
+            $("#formModal").hide();
+            //$('input[type="search"]').val("");
+            debugger
+        }
+
+        function SelectDetails(Id) {
+            debugger
+            $.ajax({
+                type: "Get",
+                url: "@Url.Action("SelectDetailsAjax", "ContributorPersonalDetails")?id=" + Id,
+            }).done(function (result) {
+                debugger
+                $("#SpouseFirstName").val(result.FirstName); $("#MidName").val(result.MidName); $("#LastName").val(result.LastName); $("#DateOfBirth").val(result.DateOfBirth); $("#Phone").val(result.Phone);
+                $("#PhoneOffice").val(result.PhoneOffice); $("#Mobile").val(result.Mobile); $("#Email").val(result.Email);
+
+            })
+            Hide();
+
+        }
+
+
+    </script>
+}

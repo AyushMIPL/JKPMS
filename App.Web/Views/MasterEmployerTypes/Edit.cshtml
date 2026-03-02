@@ -1,0 +1,110 @@
+﻿@model App.Data.Entities.MasterEmployerType
+@{
+  ViewBag.Title = "Edit";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Update Details
+
+      @*<ul class="tool-bar">
+
+        </ul>*@
+    </h4>
+  </div>
+  <div class="panel-body">
+    @using (Html.BeginForm("Edit", "MasterEmployerTypes", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+      @Html.HiddenFor(model => model.Id)
+      <div class="row">
+        <div class="col-sm-8">
+          <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-3" })
+            <div class="col-md-5">
+              @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+              @*@Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })*@
+            </div>
+          </div>
+
+          <div class="form-group">
+            @Html.LabelFor(model => model.RetirementAge, htmlAttributes: new { @class = "control-label col-md-3" })
+            <div class="col-md-5">
+              @Html.TextBoxFor(m => m.RetirementAge, new { @class = "form-control input-sm", placeholder = "Retirement Age Before 2004" })
+
+              @*@Html.ValidationMessageFor(model => model.RetirementAge, "", new { @class = "text-danger" })*@
+            </div>
+          </div>
+          <div class="form-group">
+            @Html.LabelFor(model => model.RetirementAgeAfter2004, htmlAttributes: new { @class = "control-label col-md-3" })
+            <div class="col-md-5">
+              @Html.TextBoxFor(m => m.RetirementAgeAfter2004, new { @class = "form-control input-sm", placeholder = "Retirement Age After 2004" })
+
+              @*@Html.ValidationMessageFor(model => model.RetirementAge, "", new { @class = "text-danger" })*@
+            </div>
+          </div>
+          <div class="form-group">
+            @Html.LabelFor(model => model.MinimumHiringAge, htmlAttributes: new { @class = "control-label col-md-3" })
+            <div class="col-md-5">
+              @Html.TextBoxFor(m => m.MinimumHiringAge, new { @class = "form-control input-sm", placeholder = "Minimum Hiring Age" })
+
+              @*@Html.ValidationMessageFor(model => model.MinimumHiringAge, "", new { @class = "text-danger" })*@
+            </div>
+          </div>
+          <div class="form-group">
+            @Html.LabelFor(model => model.DependantTerminationAge, htmlAttributes: new { @class = "control-label col-md-3" })
+            <div class="col-md-5">
+              @Html.TextBoxFor(m => m.DependantTerminationAge, new { @class = "form-control input-sm", placeholder = "Dependant Termination Age" })
+              @*@Html.ValidationMessageFor(model => model.DependantTerminationAge, "", new { @class = "text-danger" })*@
+            </div>
+          </div>
+          @*<div class="form-group">
+              @Html.LabelFor(model => model.PFRate, htmlAttributes: new { @class = "control-label col-md-2" })
+              <div class="col-md-10">
+                @Html.EditorFor(model => model.PFRate, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.PFRate, "", new { @class = "text-danger" })
+              </div>
+            </div>*@
+
+          @*<div class="form-group">
+              @Html.LabelFor(model => model.IsActive, htmlAttributes: new { @class = "control-label col-md-3" })
+              <div class="col-md-5">
+                <div class="checkbox">
+                  @Html.EditorFor(model => model.IsActive)
+                  @Html.ValidationMessageFor(model => model.IsActive, "", new { @class = "text-danger" })
+                </div>
+              </div>
+            </div>*@
+          <div class="form-group">
+            <label class="col-sm-2 control-label"></label>
+            <div class="col-sm-8">
+              <button type="submit" class="btn btn-success"><i class="fa fa-save"> </i> Update</button>
+              <a href="/MasterEmployerTypes/Index" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+            </div>
+          </div>
+        </div>
+        @*<div class="col-sm-2">
+
+            <span class="field-validation-error text-danger" id="fileValidate"></span>
+
+          </div>*@
+      </div>
+    }
+  </div>
+</div>
+@section scripts{
+  <script nonce="@ViewBag.StyleNonce">
+
+    $('#RetirementAge').keypress(function (event) {
+      if ((event.which > 31 && (event.which < 48 || event.which > 57))) {
+        event.preventDefault();
+      }
+      if (($("#RetirementAge").val()).length > 1) {
+        event.preventDefault();
+      }
+    })
+  </script>
+}
+

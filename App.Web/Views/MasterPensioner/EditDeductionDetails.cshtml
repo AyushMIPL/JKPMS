@@ -1,0 +1,169 @@
+﻿@model App.Data.Entities.MasterEmployeeDeductions
+
+@{
+  ViewBag.Title = "AddDeductionDetails";
+  Layout = "~/Views/Shared/_LayoutPensioner.cshtml";
+}
+@section profilePensioner
+{
+  <div class="panel panel-default">
+    <div class="panel-heading clearfix">
+      <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+        Add Details:@string.Format("{0} ({1})", ViewBag.Name, ViewBag.PensionerID)
+        
+          @*<ul class="tool-bar">
+              
+            </ul>*@<ul class="tool-bar">
+  
+</ul>
+</h4>
+</div>
+<div class="panel-body">
+  @using (Html.BeginForm("EditDeductionDetails", "MasterPensioner", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+  {
+    @Html.Hidden("PensionerID")
+    @Html.HiddenFor(model => model.EmpDeductionID, new { @Value = ViewBag.Id })
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary("", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.EmployeeID)
+    @Html.HiddenFor(model => model.line_no)
+    @Html.HiddenFor(model => model.acct_no)
+    @Html.HiddenFor(model => model.department)
+    @Html.HiddenFor(model => model.ded_qtd1)
+    @Html.HiddenFor(model => model.ded_qtd2)
+    @Html.HiddenFor(model => model.ded_qtd3)
+    @Html.HiddenFor(model => model.ded_qtd4)
+    @Html.HiddenFor(model => model.ded_ytd)
+    @Html.HiddenFor(model => model.lo_ded_amt)
+    @Html.HiddenFor(model => model.hi_ded_amt)
+    @Html.HiddenFor(model => model.balanceamt)
+
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="form-group">
+          @Html.LabelFor(model => model.Empl_Code, "PensionerId", new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            @Html.TextBoxFor(m => m.Empl_Code, new { @class = "form-control input-sm", @Value = ViewBag.PensionerID, @readonly = "readonly", placeholder = "Pensioner ID" })
+          </div>
+        </div>
+
+        <div class="form-group">
+          @Html.LabelFor(model => model.Ded_Code, new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            @Html.DropDownList("Ded_Code", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm" })
+
+          </div>
+        </div>
+        <div class="form-group">
+          @Html.LabelFor(model => model.ded_rate, new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            @Html.TextBoxFor(m => m.ded_rate, new { @class = "form-control input-sm allownumericwithdecimal auto", placeholder = "Deduction Rate" })
+          </div>
+        </div>
+        <div class="form-group">
+          @Html.LabelFor(model => model.ded_limit, new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            @Html.TextBoxFor(m => m.ded_limit, new { @class = "form-control input-sm allownumericwithdecimal auto", placeholder = "Balance Amount" })
+          </div>
+        </div>
+        <div class="form-group">
+          @Html.LabelFor(model => model.pay_limit, new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            @Html.TextBoxFor(m => m.pay_limit, new { @class = "form-control input-sm allownumericwithdecimal auto", placeholder = "Pay Limit" })
+          </div>
+        </div>
+        <div class="form-group">
+          @Html.LabelFor(model => model.ded_date, new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            <div class="input-group date">
+              @Html.EditorFor(model => model.ded_date, new { @placeholder = "Deduction Date" })
+              <span class="input-group-addon">
+                <i class="fa fa-calendar"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          @Html.LabelFor(model => model.ded_apply, new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            @Html.DropDownList("ded_apply", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm" })
+            @*@Html.TextBoxFor(m => m.ded_apply, new { @class = "form-control input-sm", placeholder = "Pay Limit" })*@
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-4 control-label"></label>
+          <div class="col-sm-8">
+            <button type="submit" class="btn btn-success" id="SaveDetails"><i class="fa fa-save"> </i> Update</button>
+            <a href="/MasterPensioner/DeductionIndex/@ViewBag.CId" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+            @*<input type="submit" class="btn btn-success" id="SaveDetails" value="Save" />
+            @Html.ActionLink("Cancel", "DeductionIndex", "MasterPensioner", new { id = @ViewBag.CId }, new { @class = "btn btn-primary" })*@
+          </div>
+        </div>
+      </div>
+    </div>
+
+  }
+</div>
+
+</div>
+}
+@section scripts{
+  <script nonce="@ViewBag.StyleNonce">
+    $(function () {
+      $(".auto").autoNumeric({ aSep: ',', aDec: '.' });
+    })
+
+    $("#SaveDetails").click(function () {
+      $('.auto').each(function (i) {
+        var self = $(this);
+        var v = self.autoNumeric('get');
+        self.autoNumeric('destroy');
+        self.val(v);
+      });
+    })
+
+
+
+    $("#Ded_Code").on('change', function () {
+      if ($("#Ded_Code").val() != null) {
+        var value = $("#Ded_Code").val();
+        $.ajax({
+          url: "@Url.Action("DeductionDropDownBindAjax", "MasterPensioner")?Value=" + value,
+          type: "Get"
+        }).done(function (result) {
+          debugger
+          $("#ded_rate").val(result.dflt_rate);
+          $("#ded_limit").val(result.dflt_limit);
+          $("#pay_limit").val(result.dflt_pay_limit);
+        })
+      }
+      else {
+        $("#ded_rate").val("");
+        $("#ded_limit").val("");
+        $("#pay_limit").val("");
+      }
+    })
+
+    $("#ded_rate").keyup(function (event) {
+      var value = parseFloat($("#ded_rate").val()).toFixed(2);
+      if (isNaN(value)) {
+        value = (0.00).toFixed(2);
+        $("#ded_rate").val("");
+        $("#ded_limit").val("");
+        $("#pay_limit").val("");
+      }
+      else {
+        $("#ded_limit").val((value * 12).toFixed(2));
+        $("#pay_limit").val(value);
+      }
+    });
+
+    $("#ded_rate").onblur(function (event) {
+      var value = parseFloat($("#ded_rate").val()).toFixed(2);
+      if (!isNaN(value)) {
+        $("#ded_rate").val(value);
+      }
+    });
+
+  </script>
+}

@@ -1,0 +1,580 @@
+﻿@model IEnumerable<App.Data.Entities.MailSettings>
+
+@{
+  ViewBag.Title = "Mail Settings";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+  table.dataTable thead th, table.dataTable tfoot th, table.dataTable tbody td {
+    text-align: left !important;
+  }
+</style>
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline headlineMonthlyPensionSummary">
+      Mail Settings
+
+      <ul class="tool-bar">
+        <li>
+          <a id="AddButton_MailSetting" class="btn btn_table progressbtn"
+             data-placement="bottom"
+             title="Add details"
+             data-original-title="Add Details">
+            <i class="fa fa-plus"></i>
+          </a>
+        </li>
+      </ul>
+    </h4>
+  </div>
+  <div class="panel-body">
+    <div class="table-responsive height">
+      <table class="table dataTable" id="MailSettingstbl">
+        <thead>
+          <tr>
+            <th>Process Name</th>
+            <th>Mail To</th>
+            @*<th>CC</th>
+              <th>BCC</th>*@
+            <th>Subject</th>
+            <th>Contents</th>
+            <th>Is Send Notification Alert</th>
+            <th>Process Will Start At</th>
+            @* <th>Process Will Start AtStr</th>*@
+            <th>Delay Time</th>
+            <th>Is Instant Mail</th>
+            <th class="MailSettingstbl-thclass">Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="custom-popup confirmClass confirmClass-MailSetting p-0" data-keyboard="false" data-backdrop="static" id="modal-formPopUp">
+  <div>
+    <h3 class="m-top-none py-3 text-white MHeader-MailSetting" id="MHeader">
+      <i class="fa fa-check-circle"></i> Mail Settings
+      <button id="model_formPopUp_MailSetting" type="button" class="close close-Mheader-MailSetting MPSClose" title="Close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    </h3>
+    <!-- Header Section -->
+    <div class="row formPopUpDiv-MailSetting">
+      <div id="formPopUpDiv"></div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <div class="col-md-12 text-right" id="btn_submit">
+      <button id="MasterbankForm-submit" title="Save" class="btn btn-success"><i class="fa fa-save"></i> Save</button>
+      <a id="model_formPopUp_MailSetting1" class="btn btn-danger" title="Cancel"><i class="fa fa-remove"></i>&nbsp; Cancel</a>
+    </div>
+    <div class="col-md-12 text-right display-none" id="btn_loading">
+      <button type="button" class="btn btn_table animated" title="Please Wait While We Process Your Request"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+    </div>
+  </div>
+</div>
+@*<div class="modal" id="modal-formPopUp" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title"><i class="fa fa-check-circle"></i> Mail Settings</h4>
+          <button type="button" class="close" title="Close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div id="formPopUpDiv"></div>
+      </div>
+    </div>
+  </div>*@
+
+
+
+<div class="custom-popup width-100 confirmClass" id="modal-Approve">
+  <div class="padding-md">
+    @Html.Hidden("ApproveId")
+    <h4 class="m-top-none" id="Layout_Header"> Do you want to change status? </h4>
+  </div>
+  <div class="text-center">
+    <a class="btn btn-success m-right-sm" href="#" id="ChangeStatus">Ok</a>
+    <a class="btn btn-danger confirmDelete_close">Cancel</a>
+  </div>
+</div>
+
+
+
+<!--<div class="modal" id="modal-Approve" tabindex="-1">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title"><i class="fa fa-check-circle"></i> Confirm</h4>-->
+@*<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>*@
+
+<!--</div>
+      <div class="modal-body">
+        <div class="box-body">
+          @Html.Hidden("ApproveId")
+          <h4 class="m-top-none" id="Layout_Header"> Do you want to change status? </h4>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="box-body">
+          <a class="btn btn-success m-right-sm" href="#" onclick="ChangeStatus()" data-dismiss="modal">Ok</a>
+          <a class="btn btn-danger" data-dismiss="modal">Cancel</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>-->
+
+@section Scripts {
+  @Scripts.Render("~/bundles/jqueryval")
+  <script nonce="@ViewBag.StyleNonce">
+      function ClosePopupWindow() {
+        $("#modal-formPopUp").popup("hide");
+      }
+    $(function () {
+      doBindData();
+    });
+
+      document.getElementById("model_formPopUp_MailSetting").addEventListener("click", ClosePopupWindow);
+      document.getElementById("model_formPopUp_MailSetting1").addEventListener("click", ClosePopupWindow);
+
+      document.getElementById("AddButton_MailSetting").addEventListener("click", AddForm);
+
+
+      var MailSettingTableId = [];
+
+    function doBindData() {
+      var oTable = $('#MailSettingstbl').dataTable({
+    "bJQueryUI": true,
+    "sPaginationType": "full_numbers",
+    "bServerSide": true,
+    "bDestroy": true,
+    "bAutoWidth": false,
+        "sAjaxSource": "@Url.Action("MailSettingListAjax", "MailSettings")",
+
+        "fnDrawCallback": function (setting) {
+          debugger;
+
+          MailSettingTableId.forEach(function (item, index) {
+            debugger
+            var id = item.split('~')[0];
+            var status = item.split('~')[1];
+
+            if (document.getElementById("EditFormBtn_" + item) != null || document.getElementById("EditFormBtn_" + item) != undefined) {
+              document.getElementById("EditFormBtn_" + item).addEventListener("click", function () {
+                EditForm(id);
+              });
+            }
+            if (status == "True") {
+              if (document.getElementById("ChangeMailConfirmBtn_" + item) != null || document.getElementById("ChangeMailConfirmBtn_" + item) != undefined) {
+                document.getElementById("ChangeMailConfirmBtn_" + item).addEventListener("click", function () {
+                  ChangeConfirm(id);
+                });
+              }
+            }
+            else {
+              if (document.getElementById("ChangeConfirmBtn_" + item) != null || document.getElementById("ChangeConfirmBtn_" + item) != undefined) {
+                document.getElementById("ChangeConfirmBtn_" + item).addEventListener("click", function () {
+                  ChangeConfirm(id);
+                });
+              }
+            }
+          });
+
+        },
+
+    "aoColumns": [
+
+          { "sName": "ProcessName" },
+          //{ "sName": "MailTo" },
+          //{ "sName": "CC" },
+          //{ "sName": "BCC" },
+          {
+            "sName": "MailTo",
+            "bSearchable": false,
+            "bSortable": false,
+            "mRender": function (data, type, full, meta) {
+              var strString = '';
+              strString += 'TO <i class="fa fa-envelope" aria-hidden="true"></i> : ' + full[1].split(",").join("<br/>");
+
+              if (full[2] == null || full[2] == '') strString += full[2];
+              else strString += '<br/>CC <i class="fa fa-envelope" aria-hidden="true"></i> : ' + full[2].split(",").join("<br/>");
+
+              if (full[3] == null || full[3] == '') strString += full[3];
+              else strString += '<br/>BCC <i class="fa fa-envelope" aria-hidden="true"></i> : ' + full[3].split(",").join("<br/>");
+              return strString;
+            }
+          },
+          //{
+          //  "sName": "CC",
+          //  "bSearchable": false,
+          //  "bSortable": false,
+          //  "render": function (data, type, full, meta) {
+          //    var strString = '';
+          //    if (full[2] == null || full[2] == '') strString += full[2];
+          //    else strString += '<br/>CC: <i class="fa fa-envelope" aria-hidden="true"></i>' + full[2].split(",").join("\n");
+          //    return strString;
+          //  }
+          //},
+          //{
+          //  "sName": "BCC",
+          //  "bSearchable": false,
+          //  "bSortable": false,
+          //  "render": function (data, type, full, meta) {
+          //    var strString = '';
+          //    if (full[3] == null || full[3] == '') strString += full[3];
+          //    else strString += '<br/>BCC: <i class="fa fa-envelope" aria-hidden="true"></i>' + full[3].split(",").join("\n");
+          //    return strString;
+          //  }
+          //},
+          {
+            "sName": "Subject",
+            "bSearchable": false,
+            "bSortable": false,
+            "mRender": function (data, type, full, meta) {
+              var strString = '';
+              strString += full[4];
+              return strString;
+            }
+          },
+          {
+            "sName": "Contents",
+            "bSearchable": false,
+            "bSortable": false,
+            "mRender": function (data, type, full, meta) {
+              var strString = '';
+              strString += full[5];
+              return strString;
+            }
+          },
+          //{ "sName": "IsSendNotificationAlert" },
+          {
+            "sName": "IsSendNotificationAlert",
+            "bSearchable": false,
+            "bSortable": false,
+            "mRender": function (data, type, full, meta) {
+
+              var strString = '';
+              if (full[6] == 'True') strString += '<i class="fa fa-check text-success" aria-hidden="true"></i>' //+ full[6];
+              else strString += '<i class="fa fa-times-circle text-danger"></i>' //+ full[6];
+              return strString;
+            }
+          },
+          {
+            "sName": "ProcessWillStartAt",
+            "bSearchable": false,
+            "bSortable": false,
+            "mRender": function (data, type, full, meta) {
+              var strString = '';
+              strString += full[7];
+              return strString;
+            }
+          },
+          {
+            "sName": "DelayTime",
+            "bSearchable": false,
+            "bSortable": false,
+            "mRender": function (data, type, full, meta) {
+              var strString = '';
+              strString += full[8];
+              return strString;
+            }
+          },
+          {
+            "sName": "Instant Mail",
+            "bSearchable": false,
+            "bSortable": false,
+            "mRender": function (data, type, full, meta) {
+              var strString = '';
+              if (full[11] == 'True')
+                strString += '<i class="fa fa-check text-success" aria-hidden="true"></i>'; //'<input type="checkbox" onclick="return this.checked = !this.checked;" checked/>';
+              else
+                strString += '<i class="fa fa-times-circle text-danger"></i>'; //'<input type="checkbox" onclick="return this.checked = !this.checked;"/>'
+              return strString;
+            }
+          },
+          {
+            "sName": "Action",
+            "bSearchable": false,
+            "bSortable": false,
+            "mRender": function (data, type, full, meta) {
+              var strString = '';
+              var msg = '';
+              var d = full[10] + "~" + full[9];
+              strString += '<a  id="EditFormBtn_' + d + '" class="btn btn-info btn-xs progressbtn" title="Edit" ><i class="fa fa-pencil"></i> Edit </a>';
+              if (full[9] == "True") {
+                msg = "Do you want to de-activate this record..?";
+                strString += '&nbsp;<a id="ChangeMailConfirmBtn_' + d+'"  class="btn btn-xs btn-success" title="Active">Active</a>';
+              }
+              else {
+                msg = "Do you want to activate this record..?";
+                strString += '&nbsp;<a id="ChangeConfirmBtn_' + d + '"  class="btn btn-xs btn-danger" title="Active">In Active</a>';
+              }
+              MailSettingTableId.push(d);
+
+              return strString;
+            }
+          },
+        ]
+  });
+}
+
+  document.getElementById("ChangeStatus").addEventListener("click", function () {
+      ChangeStatus();
+    })
+    function ChangeStatus() {
+      var id = $("#ApproveId").val();
+      $.ajax({
+        url: "@Url.Action("DeleteAjax", "MailSettings")?Id=" + id,
+        success: function (result) {
+          //if (result == "1") {
+          //  toasterSuccessMessage("Status Changed Successfully");
+          //  $("#MailSettingstbl").dataTable().fnDraw();
+          //}
+          //else {
+          //  toasterErrorMessage("No Data Found");
+          //}
+          $('.confirmClass').popup('hide');
+          toasterSuccessMessage("Status Changed Successfully");
+          $("#MailSettingstbl").dataTable().fnDraw();
+        }
+      });
+    }
+    function EditForm(id) {
+      $("#formPopUpDiv").html('');
+      $.ajax({
+        url: "@Url.Action("EditAjax", "MailSettings")?Id=" + id,
+        success: function (result) {
+          $("#formPopUpDiv").html(result);
+          $("#modal-formPopUp").popup("show");
+        }
+      });
+    }
+    function AddForm() {
+      $("#formPopUpDiv").html('');
+      $.ajax({
+        url: "@Url.Action("CreateAjax", "MailSettings")",
+        success: function (result) {
+          $("#formPopUpDiv").html(result);
+          $("#modal-formPopUp").popup("show");
+        }
+      });
+    }
+
+    function ChangeConfirm(Id, msg) {
+      $("#ApproveId").val(Id);
+      $("#Layout_Header").html(msg);
+      $("#modal-Approve").popup("show");
+    }
+
+
+ document.getElementById("MasterbankForm-submit").addEventListener("click", Sendmail);
+ function Sendmail () {
+       debugger 
+   var form = $('#MasterBankForm');
+   //$.validator.unobtrusive.parse(form);
+   if (!form.valid()) {
+      return;
+    }
+    var formData = form.serialize();
+    $("#btn_submit").hide();
+    $("#btn_loading").show();
+    var modelID = $("#modelid").val();
+
+    if (modelID == 0)
+    {
+      $.ajax({
+        url: "@Url.Action("CreateAjax", "MailSettings")",
+        type: 'POST',
+        data: formData,//JSON.stringify(formData),
+        //dataType: 'json',
+        //contentType: 'Application/json',
+        //processData: false,
+        success: function (res) {
+          debugger
+          $("#btn_submit").show();
+          $("#btn_loading").hide();
+          if (res.status) {
+            toasterSuccessMessage(res.msg);
+            $("#modal-formPopUp").popup("hide");
+            $("#MailSettingstbl").dataTable().fnDraw();
+          }
+          else {
+            toasterErrorMessage(res.msg);
+          }
+        }
+      });
+    }
+    else{
+      $.ajax({
+        url: "@Url.Action("Edit", "MailSettings")",
+        type: 'POST',
+        data: formData,//JSON.stringify(formData),
+        //dataType: 'json',
+        //contentType: 'Application/json',
+        //processData: false,
+        success: function (res) {
+          $("#btn_submit").show();
+          $("#btn_loading").hide();
+          if (res.status) {
+            toasterSuccessMessage(res.msg);
+            $("#modal-formPopUp").popup("hide");
+            $("#MailSettingstbl").dataTable().fnDraw();
+          }
+          else {
+            toasterErrorMessage(res.msg);
+          }
+        }
+      });
+    }
+    }
+
+
+ @*$("#MasterbankForm-submit").click(function (e) {
+    debugger
+    $(this).off(e);
+    e.preventDefault();
+    var form = $('#MasterBankForm');
+    //$.validator.unobtrusive.parse(form);
+    if (!form.valid()) {
+      return;
+    }
+    var formData = form.serialize();
+    $("#btn_submit").hide();
+    $("#btn_loading").show();
+    var modelID = $("#modelid").val();
+
+    if (modelID == 0)
+    {
+      $.ajax({
+        url: "@Url.Action("CreateAjax", "MailSettings")",
+        type: 'POST',
+        data: formData,//JSON.stringify(formData),
+        //dataType: 'json',
+        //contentType: 'Application/json',
+        //processData: false,
+        success: function (res) {
+          debugger
+          $("#btn_submit").show();
+          $("#btn_loading").hide();
+          if (res.status) {
+            toasterSuccessMessage(res.msg);
+            $("#modal-formPopUp").popup("hide");
+            $("#MailSettingstbl").dataTable().fnDraw();
+          }
+          else {
+            toasterErrorMessage(res.msg);
+          }
+        }
+      });
+    }
+    else{
+      $.ajax({
+        url: "@Url.Action("Edit", "MailSettings")",
+        type: 'POST',
+        data: formData,//JSON.stringify(formData),
+        //dataType: 'json',
+        //contentType: 'Application/json',
+        //processData: false,
+        success: function (res) {
+          $("#btn_submit").show();
+          $("#btn_loading").hide();
+          if (res.status) {
+            toasterSuccessMessage(res.msg);
+            $("#modal-formPopUp").popup("hide");
+            $("#MailSettingstbl").dataTable().fnDraw();
+          }
+          else {
+            toasterErrorMessage(res.msg);
+          }
+        }
+      });
+    }
+  });*@
+  </script>
+}
+
+
+
+
+
+@*<table class="table">
+    <tr>
+      <th>
+        @Html.DisplayNameFor(model => model.ProcessName)
+      </th>
+      <th>
+        @Html.DisplayNameFor(model => model.MailTo)
+      </th>
+      <th>
+        @Html.DisplayNameFor(model => model.CC)
+      </th>
+      <th>
+        @Html.DisplayNameFor(model => model.BCC)
+      </th>
+      <th>
+        @Html.DisplayNameFor(model => model.Subject)
+      </th>
+      <th>
+        @Html.DisplayNameFor(model => model.Contents)
+      </th>
+      <th>
+        @Html.DisplayNameFor(model => model.IsSendNotificationAlert)
+      </th>
+      <th>
+        @Html.DisplayNameFor(model => model.ProcessWillStartAt)
+      </th>
+      <th>
+        @Html.DisplayNameFor(model => model.DelayTime)
+      </th>
+      <th>
+        @Html.DisplayNameFor(model => model.IsActive)
+      </th>
+      <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+      <tr>
+        <td>
+          @Html.DisplayFor(modelItem => item.ProcessName)
+        </td>
+        <td>
+          @Html.DisplayFor(modelItem => item.MailTo)
+        </td>
+        <td>
+          @Html.DisplayFor(modelItem => item.CC)
+        </td>
+        <td>
+          @Html.DisplayFor(modelItem => item.BCC)
+        </td>
+        <td>
+          @Html.DisplayFor(modelItem => item.Subject)
+        </td>
+        <td>
+          @Html.DisplayFor(modelItem => item.Contents)
+        </td>
+        <td>
+          @Html.DisplayFor(modelItem => item.IsSendNotificationAlert)
+        </td>
+        <td>
+          @Html.DisplayFor(modelItem => item.ProcessWillStartAt)
+        </td>
+        <td>
+          @Html.DisplayFor(modelItem => item.DelayTime)
+        </td>
+        <td>
+          @Html.DisplayFor(modelItem => item.IsActive)
+        </td>
+        <td>
+          @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+          @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+          @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+        </td>
+      </tr>
+    }
+
+  </table>
+  </div>*@

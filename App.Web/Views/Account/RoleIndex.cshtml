@@ -1,0 +1,64 @@
+﻿@model IEnumerable<App.Data.Entities.MasterState>
+
+@{
+  ViewBag.Title = "Index";
+}
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Roles
+      
+      <ul class="tool-bar">
+        <li><a href="/Account/RoleAdd" data-toggle="tooltip" data-placement="bottom" title="Add details" data-original-title="Add Details"><i class="fa fa-plus"></i></a></li>
+        
+      </ul>
+    </h4>
+  </div>
+  <div class="panel-body">
+    <table class="table dataTable" id="tbl">
+      <thead>
+        <tr>
+
+          <th>Role Id</th>
+          <th>Role Name</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+@section Scripts {
+  <script src="~/Content/endless/js/jquery.dataTables.min.js"></script>
+  <script nonce="@ViewBag.StyleNonce">
+    $(function () {
+      doBindData();
+    });
+    function doBindData() {
+			var oTable = $('#tbl').dataTable({
+				"bJQueryUI": true,
+				"sPaginationType": "full_numbers",
+				"bServerSide": true,
+				"bDestroy": true,
+				"sAjaxSource": "/Account/AddRoleAjaxHandler",
+				"aoColumns": [
+
+						{ "sName": "RoleId" },
+            { "sName": "RoleName" },						
+						{
+							"sName": "ID",
+							"bSearchable": false,
+							"bSortable": false,
+							"fnRender": function (oObj) {
+							  var strString = '<a href="/Account/RoleEdit/' + oObj.aData[0] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i> Edit</a>';
+							  return strString;
+							}
+						}
+				]
+			});
+		}
+		
+
+  </script>
+}

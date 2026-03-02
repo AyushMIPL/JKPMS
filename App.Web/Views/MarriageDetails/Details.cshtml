@@ -1,0 +1,131 @@
+﻿@model App.Data.Entities.MasterContributorMarriageDetails
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>MarriageDetails</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Country.CountryCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Country.CountryCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MaritalStatus.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MaritalStatus.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PersonId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PersonId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SpouseFirstName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SpouseFirstName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MidName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MidName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateOfBirth)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateOfBirth)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Phone)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Phone)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PhoneOffice)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PhoneOffice)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Mobile)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Mobile)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MarriageBeginDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MarriageBeginDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MarriageEndDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MarriageEndDate)
+        </dd>
+
+      <dt>@Html.DisplayNameFor(model => model.IsActive)</dt>
+
+      <dd>
+        @if (Model.IsActive)
+        { <span class='badge badge-success'>Active</span> }
+      </dd>
+
+
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

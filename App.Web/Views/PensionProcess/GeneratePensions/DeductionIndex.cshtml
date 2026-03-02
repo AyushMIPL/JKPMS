@@ -1,0 +1,260 @@
+﻿@model List<JKPS.COMMON.DVOPayrollstypaydd>
+@{
+  Layout = "~/Views/Shared/_LayoutUpdatePayroll.cshtml";
+}
+@section profileUpdatePayroll
+{
+  @Html.Hidden("PensionerID")
+
+  <div class="panel panel-default">
+    <div class="panel-heading clearfix">
+      <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+        Deduction Details:@string.Format("{0} ({1})", ViewBag.Name, ViewBag.PensionerID)
+        <ul class="tool-bar">
+          <li>
+          <li><a href="javascript:AddDeduction();" data-toggle="tooltip" data-placement="bottom" title="Add Deduction" data-original-title="Add Deduction"><i class="fa fa-plus"></i></a></li>
+
+        </ul>
+      </h4>
+    </div>
+    <div class="panel-body">
+      @using (Html.BeginForm("DeductionIndex", "PensionProcess", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "form1" }))
+      {
+        @Html.Hidden("CId")
+        @*@Html.Hidden("DocNo", ViewBag.DocNo)*@
+        <table class="table dataTable" id="tbl">
+          <thead>
+            <tr>
+              <th style="display:none"></th>
+              <th>Deduction Code</th>
+              <th>Rate</th>
+              <th>Amount</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (Model != null)
+            {
+              for (int i = 0; i < Model.ToArray().Count(); i++)
+              {
+                var btnSave = "btnSave" + i;
+                var btmEdit = "btnEdit" + i;
+                <tr>
+                  <td style="display:none">
+                    @Html.HiddenFor(m => Model[i].RowID)
+                    @Html.HiddenFor(m => Model[i].Doc_no)
+                    @Html.HiddenFor(m => Model[i].line_no)
+                    @Html.HiddenFor(m => Model[i].accountTypeId)
+                    @Html.HiddenFor(m => Model[i].acct_no)
+                    @Html.HiddenFor(m => Model[i].acctAccoutType)
+                    @Html.HiddenFor(m => Model[i].acctKeyvalue)
+                    @Html.HiddenFor(m => Model[i].add_code)
+                    @Html.HiddenFor(m => Model[i].ded_limit)
+                    @Html.HiddenFor(m => Model[i].ded_taxred)
+                    @Html.HiddenFor(m => Model[i].ded_type)
+                    @Html.HiddenFor(m => Model[i].ded_ytd)
+                    @Html.HiddenFor(m => Model[i].dedflag)
+                    @Html.HiddenFor(m => Model[i].Department)
+                    @Html.HiddenFor(m => Model[i].description_MasterIncCodes)
+                    @Html.HiddenFor(m => Model[i].hi_ded_amt)
+                    @Html.HiddenFor(m => Model[i].hi_ded_amt_null)
+                    @Html.HiddenFor(m => Model[i].lo_ded_amt)
+                    @Html.HiddenFor(m => Model[i].lo_ded_amt_null)
+                    @Html.HiddenFor(m => Model[i].mod_flag)
+                    @Html.HiddenFor(m => Model[i].pay_date)
+                    @Html.HiddenFor(m => Model[i].pay_limit)
+                    @Html.HiddenFor(m => Model[i].tax_code)
+                    @Html.HiddenFor(m => Model[i].yearrollover)
+                  </td>
+                  <td>
+                    @Html.DropDownListFor(m => Model[i].ded_code, new SelectList(ViewBag.Ded_Code, "Value", "Text", Model[i].ded_code), htmlAttributes: new { @class = "form-control input-sm disable" })
+                    @*<td>@Html.TextBoxFor(m => Model[i].ded_code, new { @class = "form-control input-sm allownumericwithdecimal" })</td>*@
+                  <td>@Html.TextBoxFor(m => Model[i].ded_rate, new { @class = "form-control input-sm disable" })</td>
+                  <td>@Html.TextBoxFor(m => Model[i].amount, new { @class = "form-control input-sm disable" })</td>
+
+                  <td><button type="button" id="@btnSave" onclick="DoSave(@i);" class="btn btn-xs btn-success SaveRow" title="Save"><i class="fa fa-save fa-lg"></i></button>&nbsp;<button type="button" id="@btmEdit" onclick="doedit(@i);" class="btn btn-xs btn-primary" title="Edit"><i class="fa fa-pencil fa-lg"></i></button>&nbsp;<button type="button" onclick="deleterow(@i);" class="btn btn-xs btn-danger deleterow" <i class="fa fa-trash-o fa-lg"></i></button></td>
+
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+        <div class="form-group">
+          <label class="col-sm-4 control-label"></label>
+          <div class="col-sm-8">
+            <input type="button" class="btn btn-success" id="next" value="Next" />
+            @Html.ActionLink("Cancel", "DeductionIndex", "PensionProcess", new { id = @ViewBag.PensionerID }, new { @class = "btn btn-primary" })
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="modal fade in" id="simpleModal1" aria-hidden="false" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" onclick="hidemodal();" aria-hidden="true">×</button>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-sm-11">
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Deduction Code</label>
+                <div class="col-sm-8">
+                  @Html.DropDownList("Ded_Code", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm" })
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Deduction Rate</label>
+                <div class="col-sm-8">
+                  @Html.TextBox("Deduction Rate", "", new { @class = "form-control input-sm", placeholder = "Deduction Rate" })
+
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Amount</label>
+                <div class="col-sm-8">
+                  @Html.TextBox("Amount", "", new { @class = "form-control input-sm", placeholder = "Amount" })
+
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-3 control-label"></label>
+                <div class="col-sm-8">
+                  <input type="button" class="btn btn-success" value="Add Details" onclick="AddDeductionDetails();" />
+                  <input type="button" class="btn btn-primary" value="Cancel" onclick="hidemodal();" />
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div>
+  <style>
+    .select2-container {
+      width: 100% !important;
+    }
+  </style>
+
+}
+@section Scripts {
+  <script src="~/Content/endless/js/jquery.dataTables.min.js"></script>
+
+  <script nonce="@ViewBag.StyleNonce">
+    $(function () {
+      DisableContrls();
+    })
+    function DisableContrls() {
+      $(".disable").each(function () {
+        $(this).prop("disabled", "disabled");
+      });
+      $(".SaveRow").each(function () {
+        $(this).css("display", "none");
+      });
+      return false;
+    }
+    $("#next").on('click', function () {
+      $(".disable").each(function () {
+        $(this).prop("disabled", false);
+      });
+      $('#form1').submit();
+    })
+    function doedit(x) {
+      debugger
+      $("#btnEdit"+x).css("display", "none");
+      $("#btnSave"+x).css("display", "");
+      $('[name="['+x+'].ded_rate"]').prop("disabled", false);
+      $('[name="['+x+'].amount"]').prop("disabled", false);
+      $('[name="['+x+'].ded_code"]').prop("disabled", false);
+      return false;
+    }
+    function DoSave(x) {
+      $("#btnEdit"+x).css("display", "");
+      $("#btnSave"+x).css("display", "none");
+      $('[name="['+x+'].ded_rate"]').prop("disabled", "disabled");
+      $('[name="['+x+'].amount"]').prop("disabled", "disabled");
+      $('[name="['+x+'].ded_code"]').prop("disabled", "disabled");
+      return false;
+    }
+    //$(function () {
+    //  var pensionerID = $("#PensionerID").val();
+    //  var oTable = $('#tbl').dataTable({
+    //    "bJQueryUI": true,
+    //    "sPaginationType": "full_numbers",
+    //    "bServerSide": true,
+    //    "bDestroy": true,
+    //    "sAjaxSource": "/PensionProcess/DeductionAjaxHandlerNotinUse/?PensionerID=" + pensionerID,
+    //    "aoColumns": [
+
+    //					{ "sName": "DeductionCode" },
+    //					{ "sName": "Rate" },
+    //        { "sName": "Amount" },
+    //        {
+    //          "sName": "ID",
+    //          "bSearchable": false,
+    //          "bSortable": false,
+    //          "fnRender": function (oObj) {
+    //            var strString = '<a href="/PensionProcess/EditDeductionDetails/' + oObj.aData[3] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i></a>';
+
+    //            return strString;
+    //          }
+    //        }
+    //    ]
+    //  });
+    //})
+
+    //$('.del').click(function () {
+    //  var column_num = parseInt($(this).index()) + 1;
+    //  var row_num = parseInt($(this).parent().index()) + 1;
+    //  var bid = this.id; // button ID
+    //  var trid = $(this).closest('tr').attr('RowID'); // table row ID
+    //  alert(bid + " " + trid + "" + column_num + "" + row_num);
+    //});
+    function AddDeduction() {
+      $("#simpleModal1").show();
+    }
+    function hidemodal() {
+      $("#simpleModal1").hide();
+    }
+    function AddDeductionDetails() {
+      var count = $("#tbl > tbody > tr").length;
+      var ded_Code = $("#Ded_Code").val();
+      var deduction_Rate = $("#Deduction_Rate").val();
+      var amount = $("#Amount").val();
+      if (ded_Code != "" && deduction_Rate != "" && amount != "") {
+        $("#tbl").append('<tr><td ><select class="form-control input-sm disable" name="[' + count + '].ded_code" ><option value="AC">Advance Caribbean</option><option value="ADB">Anguilla Development Board</option><option value="ADF">JKPS Administration Fee</option><option value="AIS">Alliance Insurance Services</option><option value="AMC">Anguilla Mortgage Company</option><option value="ATU">Anguilla teachers Union</option><option value="FLI">Fairplay Life Insurance </option><option value="FMI">FairPlay Medical Insurance</option><option value="GOA">Government of Anguilla</option><option value="MASA">Medical Air Services Association</option><option value="NCI">National caribbean Insurance </option><option value="NEL">Nagico EC Life</option><option value="NMI">Nagico Medical Insurance</option><option value="BA">SAGICOR</option></select></td><td >  <input type="text" class="form-control input-sm disable" name="[' + count + '].ded_rate" value="' + deduction_Rate + '"/></td><td >  <input type="text" class="form-control input-sm disable" name="[' + count + '].amount" value="' + amount + '"/></td><td><button type="button"  id="btnSave' + count + '" onclick="javascript: return DoSave(' + count + ');" class="btn btn-xs btn-success SaveRow" title="Save"><i class="fa fa-save fa-lg"></i></button>&nbsp;<button type="button" id="btnEdit' + count + '" onclick="javascript: return doedit(' + count + ');" class="btn btn-xs btn-primary" title="Edit"><i class="fa fa-pencil fa-lg"></i></button>&nbsp;<button type="button" class="btn btn-xs btn-danger deleterow" onclick="deleterow(' + count + ');" <i class="fa fa-trash-o fa-lg"></i></button></td></tr>');
+        $('[name="[' + count + '].ded_code"]').val(ded_Code);
+        $('select').select2({
+          placeholder: "---Select---",
+          allowClear: true
+        });
+        DisableContrls();
+        hidemodal();
+        clearPopupValues();
+        toasterSuccessMessage("Details Added Successfully.");
+      }
+      else {
+        toasterErrorMessage("Fill All Details to Add Deduction.");
+      }
+
+    }
+
+    function clearPopupValues() {
+      $("#Ded_Code").select2("val", "");
+      $("#Deduction_Rate").val('');
+      $("#Amount").val('');
+    }
+
+    function deleterow(x) {
+      $(".deleterow").on('click', function () {
+        $(this).closest('tr').hide();
+        $('[name="[' + x + '].description_MasterIncCodes"]').val("deleted");
+      })
+    }
+
+  </script>
+}

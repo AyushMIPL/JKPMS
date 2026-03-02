@@ -1,0 +1,208 @@
+﻿@model App.Data.Entities.ContributorSalaryHistory
+
+@{
+  ViewBag.Title = "SalaryHistory";
+  Layout = "~/Views/Shared/_LayoutProfile.cshtml";
+}
+@section profileContainer
+{
+  @Html.Hidden("PersonID")
+  @Html.Hidden("CId")
+  @Html.Hidden("ActiveContributor")
+  <div class="panel panel-default">
+    <div class="panel-heading clearfix">
+      <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+        Salary History:: @string.Format("{0} ({1})", ViewBag.Name, ViewBag.PersonId)
+
+
+        <ul class="tool-bar">
+          <li><a href="javascript:Salary();" data-toggle="tooltip" data-placement="bottom" title="Add Salary" data-original-title="Add Salary"><i class="fa fa-plus"></i></a></li>
+
+
+        </ul>
+      </h4>
+    </div>
+
+    <div class="row" id="divSalary">
+      <div class="col-sm-10">
+        <div class="form-group">
+          @Html.LabelFor(model => model.SalaryAmount, new { @class = "col-sm-2 control-label" })
+          <div class="col-sm-6">
+            @Html.TextBoxFor(m => m.SalaryAmount, new { @class = "form-control input-sm allownumericwithdecimal auto", placeholder = "Enter Salary" })
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-4 control-label"></label>
+          <div class="col-sm-10">
+            <button type="button" class="btn btn-success" onclick="AddSalary()"><i class="fa fa-save"> </i> Add</button>
+            <button type="button" class="btn btn-primary" onclick="dobind()"><i class="fa fa-reply"> </i> Back to List</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="panel-body">
+      <table class="table dataTable" id="tbl">
+        <thead>
+          <tr>
+            <th>Salary</th>
+            <th>Active</th>
+            <th>Default</th>
+            <th>Date</th>
+
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+}
+@section Scripts {
+
+  <script src="~/Content/endless/js/jquery.dataTables.min.js"></script>
+  <style>
+    .form-group {
+      margin-bottom: 30px;
+    }
+  </style>
+  <script nonce="@ViewBag.StyleNonce">
+
+    function Salary() {
+      $("#divSalary").show();
+    }
+    $(function () {
+      if ($("#ActiveContributor").val() == "No") {
+        $(".tool-bar").hide();
+      }
+      dobind()
+    });
+    //$('#SalaryAmount').keypress(function (event) {
+    //  if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+    //    event.preventDefault();
+    //  }
+    //});
+
+    function dobind() {
+      $("#divSalary").hide();
+      $("#Salary").val("");
+      var personID = $("#PersonID").val();
+      var oTable = $('#tbl').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "sAjaxSource": "/ContributorPersonalDetails/SalaryAjaxHandler/?PersonID=" + personID,
+        "aoColumns": [
+
+						{ "sName": "Salary" },
+            {
+              "sName": "Active",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                if (oObj.aData[1] == "False")
+                  return '<input type="checkbox" onclick="checkSalary(' + oObj.aData[4] + ')"/>';
+                else
+                  return '<input type="checkbox"  checked="checked" onclick="return false;"/>';
+              }
+            },
+            {
+              "sName": "Default",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                if (oObj.aData[2] == "False")
+                  return '<input type="checkbox" onclick="checkDefault(' + oObj.aData[4] + ')"/>';
+                else
+                  return '<input type="checkbox" checked="checked" onclick="return false;"/>';
+              }
+            },
+            { "sName": "Date" }
+
+        ]
+      });
+    }
+    function checkSalary(Id) {
+      $("#hdDocumentId").val(Id);
+      $('#confirmActivated').popup("show");
+    }
+    function checkDefault(Id) {
+      $("#hdDocumentId").val(Id);
+      $('#confirmDefault').popup("show");
+    }
+    function onActivatedConfirm() {
+      var id = $("#hdDocumentId").val();
+      var personID = $("#PersonID").val();
+      debugger
+      $.ajax({
+        url: "@Url.Action("CheckSalaryAjax", "ContributorPersonalDetails")?PersonID=" + personID + "&Id=" + id,
+        type: "Get"
+      }).done(function (result) {
+        if (result > 0) {
+          toasterSuccessMessage("Salary Activated Successfully");
+          dobind()
+          $('#confirmActivated').popup("hide");
+        }
+        else {
+          toasterErrorMessage("Try Again Later..")
+          $('#confirmActivated').popup("hide");
+        }
+      })
+    }
+    function onDefaultConfirm() {
+      var id = $("#hdDocumentId").val();
+      var personID = $("#PersonID").val();
+      $.ajax({
+        url: "@Url.Action("CheckDefaultAjax", "ContributorPersonalDetails")?PersonID=" + personID + "&Id=" + id,
+        type: "Get"
+      }).done(function (result) {
+        if (result > 0) {
+          toasterSuccessMessage("Salary Set to Default Successfully");
+          $('#confirmDefault').popup("hide");
+          dobind()
+        }
+        else {
+          toasterErrorMessage("Try Again Later..")
+          $('#confirmDefault').popup("hide");
+        }
+      })
+    }
+    function oncancelactivated() { $('#confirmActivated').popup("hide"); dobind() }
+    function oncanceldefault() { $('#confirmDefault').popup("hide"); dobind() }
+
+    function AddSalary() {
+      var personId = $("#PersonID").val();
+      var salary = $("#SalaryAmount").val();
+      if (salary == "") {
+        toasterErrorMessage("Please Enter Salary First..")
+      }
+      else {
+        debugger
+        $.ajax({
+          url: "@Url.Action("AddSalary", "ContributorPersonalDetails")?PersonID=" + personId + "&Salary=" + salary,
+          type: "Get"
+        }).done(function (result) {
+          if (result == "1") {
+            toasterSuccessMessage("Salary Added Sucessfully.");
+          }
+          else if (result == "error") {
+            toasterErrorMessage("This Salary Already Added for this Contributor")
+
+          }
+          else if (result == "joberror") {
+            toasterErrorMessage("Add Job Details first")
+
+          }
+
+          else {
+            toasterErrorMessage("Try Again Later..")
+          }
+        })
+        debugger
+        dobind();
+
+      }
+    }
+  </script>
+}

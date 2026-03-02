@@ -1,0 +1,123 @@
+﻿@model List<App.Data.ViewModels.EmployerSummaryViewModel>
+@using App.Web.Helper
+@{
+  Layout = null;
+}
+<div class="panel panel-default" id="employerSummaryStatistics">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      <button type="button" class="btn btn-info" onclick="showEmployerGraph();" style="float: right; display: none;" data-dismiss="modal" aria-hidden="true">Graph</button>
+      Beneficiaries Summary
+
+    </h4>
+  </div>
+
+  <ul class="list-group collapse in" id="EmployerSummary" @*style="background-color:lightgray"*@>
+    <li class="list-group-item clearfix">
+      <table style="width:100%;margin:5px;">
+        <tr>
+          <th style="width:50%;">Scheme</th>
+          <th style="width:25%;">Beneficiary</th>
+          <th style="width:25%">Details</th>
+        </tr>
+      </table>
+    </li>
+    @foreach (var item in Model)
+    {
+      <li class="list-group-item clearfix">
+        <table style="width:100%;margin:5px;">
+          <tr>
+            <td style="width:50%;">@item.EmployerName</td>
+            <td style="width:25%;">@item.Count</td>
+            <td style="width:25%;"><a href='/MasterPensioner/Index?BeneficiariesType=@item.EmployerId' class=" btn btn-xs btn-primary" title="Detail"><i class="fa fa-list"></i></a></td>
+
+          </tr>
+        </table>
+      </li>
+    }
+
+  </ul>
+
+</div>
+
+<div class="panel panel-default" id="employerGraph" style="display:none">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      <button type="button" class="btn btn-info" onclick="showEmployerStatistics();" style="float: right; display: none;">Statistics</button>
+      Employers Summary
+
+    </h4>
+  </div>
+  <canvas id="employerSummary" style="height:500px;width:500px;"></canvas>  
+
+</div>
+
+
+
+@*<div class="panel panel-default" id="employerSummaryStatistics">
+  <div class="clearfix widget-green">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      <span class="pull-left">
+        <i class="fa fa-user"></i>
+        Employers Summary
+      </span>
+    </h4>
+    <ul class="tool-bar">
+      <li><a href="#" class="refresh-widget" data-toggle="tooltip" data-placement="bottom" title="Refresh" onclick="empSummary();" data-original-title="Refresh"><i class="fa fa-refresh"></i></a></li>
+      <li><a href="#" class="refresh-widget" data-toggle="tooltip" data-placement="bottom" title="Graph" onclick="showEmployerGraph();" data-original-title="Graph" style="display:none"><i class="fa fa-bar-chart-o fa-lg"></i></a></li>
+      <li><a href="#EmployerWidget" data-toggle="collapse"><i class="fa fa-minus-circle"></i></a></li>
+    </ul>
+  </div>
+  <div class="panel-body no-padding collapse in widget-content" id="EmployerWidget">
+    <ul class="list-group task-list no-margin collapse in" id="EmployerSummary">
+      <li class="list-group-item clearfix">
+        <table style="width:100%;margin:5px;">
+          <tr>
+            <th style="width:50%;">Employer Name</th>
+            <th style="width:25%;">Contributors</th>
+            <th style="width:25%">Details</th>
+          </tr>
+        </table>
+      </li>
+      @foreach (var item in Model)
+      {
+        <li class="list-group-item clearfix">
+          <table style="width:100%;margin:5px;">
+            <tr>
+              <th style="width:50%;">@item.EmployerName</th>
+              <th style="width:25%;"><span class="badge badge-success">@item.Count</span></th>
+              <th style="width:25%;"><a href='/ContributorPersonalDetails/Index/@item.EmployerId' class=" btn btn-xs btn-primary" title="Detail"><i class="fa fa-list"></i></a></th>
+
+            </tr>
+          </table>
+        </li>
+      }
+
+    </ul>
+  </div>
+  
+</div>
+
+
+<div class="panel panel-default" id="employerGraph" style="display:none">
+  <div class="panel-heading clearfix" style="background-color: #3498db;">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      <span class="pull-left">
+        Employers Summary
+      </span>
+    </h4>
+    <ul class="tool-bar">
+      <li><a href="#" class="refresh-widget" data-toggle="tooltip" data-placement="bottom" title="Statistics" onclick="showEmployerStatistics();" data-original-title="Statistics"><i class="fa fa-tasks fa-lg"></i></a></li>
+      <li><a href="#EmployerWidget" data-toggle="collapse"><i class="fa fa-minus-circle"></i></a></li>
+    </ul>
+  </div>
+  <div class="panel-body no-padding collapse in" id="EmployerWidget">
+    <ul class="list-group task-list no-margin collapse in" id="EmployerSummary">
+      <li class="list-group-item clearfix">
+        <canvas id="employerSummary" style="height:500px;width:500px;"></canvas>
+      </li>
+
+    </ul>
+  </div>
+
+</div>*@

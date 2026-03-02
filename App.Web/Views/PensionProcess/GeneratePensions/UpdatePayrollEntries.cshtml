@@ -1,0 +1,390 @@
+﻿@model JKPS.COMMON.DVOPayrollProcess_PayEmployee
+
+@{
+  ViewBag.Title = "UpdatePayrollEntries";
+  Layout = "~/Views/Shared/_LayoutUpdatePayroll.cshtml";
+}
+@section profileUpdatePayroll
+{
+  <div class="panel panel-default">
+    <div class="panel-heading clearfix">
+      <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+        Add Details:@string.Format("{0} ({1})", ViewBag.Name, ViewBag.PensionerID)
+        <ul class="tool-bar"></ul>
+      </h4>
+    </div>
+    <div class="panel-body">
+      @using (Html.BeginForm("UpdatePayrollEntries", "PensionProcess", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+      {
+        @Html.HiddenFor(x => x.doc_date)
+        @Html.HiddenFor(x => x.ded_code)
+        @Html.HiddenFor(x => x.Department)
+        @Html.HiddenFor(x => x.doc_date)
+        @Html.HiddenFor(x => x.EMail)
+        @Html.HiddenFor(x => x.empflexdeptaccttype)
+        @Html.HiddenFor(x => x.EmplCode)
+        @Html.HiddenFor(x => x.EmplSSN)
+        @Html.HiddenFor(x => x.eop_date)
+        @Html.HiddenFor(x => x.FirstName)
+        @Html.HiddenFor(x => x.keyvalue)
+        @Html.HiddenFor(x => x.LastName)
+        @Html.HiddenFor(x => x.LastPay)
+        @Html.HiddenFor(x => x.MiddleName)
+        @Html.HiddenFor(x => x.ok_to_post)
+        @Html.HiddenFor(x => x.pay_date)
+        @Html.HiddenFor(x => x.PayPeriod)
+        @Html.HiddenFor(x => x.RowID)
+        @Html.HiddenFor(x => x.start_date)
+        @Html.HiddenFor(x => x.stataxcode)
+        @Html.HiddenFor(x => x.StateTaxCode)
+        @Html.HiddenFor(x => x.TypeCode)
+
+        <div class="row">
+          <div class="panel-body">
+            <div class="pull-left">
+              @Html.AntiForgeryToken()
+              @Html.ValidationSummary("", new { @class = "text-danger" })
+              <div class="form-group">
+                <label for="Employer" class="col-sm-2 control-label">Employer</label>
+                <div class="col-sm-6">
+                  @Html.DropDownList("EmployerId", null, "---Select---", new { @class = "form-control select-sm" })
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="Pensioner" class="col-sm-2 control-label">Pensioner</label>
+                <div class="col-sm-6">
+                  @Html.DropDownList("EmployeeId", null, "---Select---", new { @class = "form-control select-sm" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.EmplCode, "Employee Code", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.TextBoxFor(m => m.EmplCode, new { @class = "form-control", placeholder = "Pensioner ID", @readonly = "readonly" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.pay_date, "Terminated Date", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  <div class="input-group date">
+                    @Html.EditorFor(m => m.pay_date, new { @class = "form-control txtEdit", placeholder = "Pay Date" })
+                    <span class="input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.LastPay, "Last Pay", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  <div class="input-group date">
+                    @Html.TextBoxFor(m => m.LastPay, new { @class = "form-control txtEdit", placeholder = "Last Pay Date" })
+                    <span class="input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.ok_to_post, "Ok To Post", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.DropDownListFor(model => model.ok_to_post, ViewBag.OkToPost as SelectList, Model.ok_to_post, new { @class = "form-control input-sm" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.eop_date, "Ending Date", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  <div class="input-group date">
+                    @Html.EditorFor(m => m.eop_date, new { @class = "form-control txtEdit", placeholder = "Ending Date" })
+                    <span class="input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.PayPeriod, "Period", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.DropDownListFor(model => model.PayPeriod, ViewBag.Frequency as SelectList, Model.PayPeriod, new { @class = "form-control input-sm" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.Doc_no, "Doc No.", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.TextBoxFor(m => m.Doc_no, new { @class = "form-control txtEdit", placeholder = "Doc No." })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.Cash_acct_no, "Cash Account", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.TextBoxFor(m => m.Cash_acct_no, new { @class = "form-control txtEdit", placeholder = "Cash Account" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.print_check, "Print Check", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.DropDownListFor(model => model.print_check, ViewBag.YesNo as SelectList, Model.print_check, new { @class = "form-control input-sm" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.check_no, "Check No", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.TextBoxFor(m => m.check_no, new { @class = "form-control input-sm txtEdit", placeholder = "Check No" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.cash_amount, "Check Amount", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.TextBoxFor(m => m.cash_amount, new { @class = "form-control input-sm txtEdit", placeholder = "Check Amount" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.deposit, "Dir Deposit", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.DropDownListFor(model => model.deposit, ViewBag.YesNo as SelectList, Model.deposit, new { @class = "form-control input-sm" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.inc_gross, "Gross Wages", htmlAttributes: new { @class = "col-sm-2 control-label" })
+                <div class="col-md-6">
+                  @Html.EditorFor(model => model.inc_gross, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.inc_gross, "", new { @class = "text-danger" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.inc_taxable, "Taxable Wages", htmlAttributes: new { @class = "col-sm-2 control-label" })
+                <div class="col-md-6">
+                  @Html.EditorFor(model => model.inc_taxable, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.inc_gross, "", new { @class = "text-danger" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.ded_fica, "Employee FICA", htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-md-6">
+                  @Html.TextBoxFor(m => m.ded_fica, new { @class = "form-control txtEdit", placeholder = "Employee FICA", @readonly = "readonly" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.ded_medicare, "Employee Medicare", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.TextBoxFor(m => m.ded_medicare, new { @class = "form-control input-sm txtEdit", placeholder = "Employee Medicare" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.ded_fedtax, "Federal Income Tax", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.TextBoxFor(m => m.ded_fedtax, new { @class = "form-control input-sm txtEdit", placeholder = "Federal Income Tax" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.ded_statax, "State Income Tax", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.TextBoxFor(m => m.ded_statax, new { @class = "form-control input-sm txtEdit", placeholder = "State Income Tax" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.ded_loctax, "Local Tax", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.TextBoxFor(m => m.ded_loctax, new { @class = "form-control input-sm txtEdit", placeholder = "Local Tax" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.ded_other, "Other Deduction", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.TextBoxFor(m => m.ded_other, new { @class = "form-control input-sm txtEdit", placeholder = "Other Deduction" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.obl_futa, "FUTA Liabilities", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.TextBoxFor(m => m.obl_futa, new { @class = "form-control input-sm txtEdit", placeholder = "FUTA Liabilities" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.obl_fica, "FICA Liabilities", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.TextBoxFor(m => m.obl_fica, new { @class = "form-control input-sm txtEdit", placeholder = "FICA Liabilities" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.obl_medicare, "Medicare Liabilities", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.TextBoxFor(m => m.obl_medicare, new { @class = "form-control input-sm txtEdit", placeholder = "Medicare Liabilities" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.obl_other, "Other Liabilities", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-6">
+                  @Html.TextBoxFor(m => m.obl_other, new { @class = "form-control input-sm txtEdit", placeholder = "Other Liabilities" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.obl_total, "Total Liabilities", new { @class = "col-sm-2 control-label" })
+                <div class="col-md-6">
+                  @Html.TextBoxFor(m => m.obl_total, new { @class = "form-control txtEdit", placeholder = "Total Liabilities", @readonly = "readonly" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.inc_net, "Net Wages", htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-sm-6">
+                  @Html.TextBoxFor(m => m.inc_net, new { @class = "form-control txtEdit", placeholder = "Net Wages", @readonly = "readonly" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.inc_expense, "Exp./Advn.", htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-sm-6">
+                  @Html.TextBoxFor(m => m.inc_expense, new { @class = "form-control txtEdit", placeholder = "Exp./Advn.", @readonly = "readonly" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.total_hours, "Worked Hours", htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-sm-6">
+                  @Html.TextBoxFor(m => m.total_hours, new { @class = "form-control txtEdit", placeholder = "Worked Hours", @readonly = "readonly" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                @Html.LabelFor(model => model.accrue_sick, "Accure Sick", htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-sm-6">
+                  @Html.DropDownListFor(model => model.accrue_sick, ViewBag.YesNo as SelectList, Model.accrue_sick, new { @class = "form-control input-sm" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.accrue_vac, "Accure Vacation", htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-sm-6">
+                  @Html.DropDownListFor(model => model.accrue_vac, ViewBag.YesNo as SelectList, Model.accrue_vac, new { @class = "form-control input-sm" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.bonus, "Bonus Checque", htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-sm-6">
+                  @Html.DropDownListFor(model => model.bonus, ViewBag.YesNo as SelectList, Model.bonus, new { @class = "form-control input-sm" })
+                </div>
+              </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.deposit, "Deposit", htmlAttributes: new { @class = "control-label col-lg-2" })
+                <div class="col-sm-6">
+                  @Html.DropDownListFor(model => model.deposit, ViewBag.YesNo as SelectList, Model.deposit, new { @class = "form-control input-sm" })
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                  <button type="button" class="btn btn-success" id="btnEditInfo" onclick="javascript: return DoEdit();">Edit</button>
+                  <input type="submit" value="Next" class="btn btn-success" id="btnSaveInfo" />
+                  @Html.ActionLink("Cancel", "UpdatePayrollEntries", "PensionProcess", null, new { @class = "btn btn-primary" })
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}
+@section scripts{
+  <script nonce="@ViewBag.StyleNonce">
+    $(function () {
+      DisableContrls();
+    })
+    function DisableContrls() {
+      //$("#deposit").prop("disabled", "disabled");
+      //$("#bonus").prop("disabled", "disabled");
+      //$("#PFRateID").prop("disabled", "disabled");
+      //$("#eop_date").prop("disabled", "disabled");
+      //$("#pay_date").prop("disabled", "disabled");
+      //$("#EmployerTypeID").prop("disabled", "disabled");
+      $("#btnSaveInfo").css("display", "none");
+      $("#btnEditInfo").css("display", "");
+
+      $(".form-control").each(function () {
+        $(this).prop("disabled", "disabled");
+      });
+      $("#EmployerId").prop("disabled", false);
+      $("#EmployeeId").prop("disabled", false);
+      return false;
+    }
+    function DoEdit() {
+      //$("#eop_date").prop("disabled", false);
+      //$("#pay_date").prop("disabled", false);
+      $("#btnSaveInfo").css("display", "");
+      $("#btnEditInfo").css("display", "none");
+      //$("#CountryID").prop("disabled", false);
+      //$("#CityID").prop("disabled", false);
+      //$("#PFRateID").prop("disabled", false);
+      //$("#EmployerTypeID").prop("disabled", false);
+      $(".form-control").each(function () {
+        $(this).prop("disabled", false);
+      });
+      $("#EmployerId").prop("disabled", false);
+      $("#EmployeeId").prop("disabled", false);
+      return false;
+
+    }
+
+    $("#EmployerId").on('change', function () {
+      $("#EmployeeId").empty();
+      $('#EmployeeId').append($('<option/>').attr("value", "").text("---Select---"));
+      if ($(this).val() != "") {
+        var eid = $(this).val();
+        $.ajax({
+          url: "@Url.Action("PensionerSearchAjax", "Reports")?EId=" + eid,
+          type: "GET",
+          async: true,
+        }).done(function (result) {
+          $.each(result, function (i, contributor) {
+            $('#EmployeeId').append($('<option/>').attr("value", contributor.Id).text(contributor.Name));
+          });
+        })
+      }
+    });
+
+    @*$("#EmployeeId").on('change', function () {
+      if ($(this).val() != "") {
+        var eid = $(this).val();
+        $.ajax({
+          url: "@Url.Action("ProcessAjax", "PensionProcess")?PId=" + eid,
+          type: "GET",
+        async: true,
+        }).done(function (result) {
+          $("#EmplCode").val(result.EmplCode);
+          $("#pay_date").val(result.pay_date);
+          $("#LastPay").val(result.LastPay);
+          $("#ok_to_post").val(result.ok_to_post);
+          $("#eop_date").val(result.eop_date);
+          $("#PayPeriod").val(result.PayPeriod);
+          $("#Doc_no").val(result.Doc_no);
+          $("#Cash_acct_no").val(result.Cash_acct_no);
+          $("#print_check").val(result.print_check);
+          $("#check_no").val(result.check_no);
+          $("#cash_amount").val(result.cash_amount);
+          $("#deposit").val(result.deposit);
+          $("#inc_gross").val(result.inc_gross);
+          $("#inc_taxable").val(result.inc_taxable);
+          $("#ded_fica").val(result.ded_fica);
+          $("#ded_medicare").val(result.ded_medicare);
+          $("#ded_fedtax").val(result.ded_fedtax);
+          $("#ded_statax").val(result.ded_statax);
+          $("#ded_loctax").val(result.ded_loctax);
+          $("#ded_other").val(result.ded_other);
+          $("#obl_futa").val(result.obl_futa);
+          $("#obl_fica").val(result.obl_fica);
+          $("#obl_medicare").val(result.obl_medicare);
+          $("#obl_other").val(result.obl_other);
+          $("#obl_total").val(result.obl_total);
+          $("#inc_net").val(result.inc_net);
+          $("#inc_expense").val(result.inc_expense);
+          $("#total_hours").val(result.total_hours);
+          $("#accrue_sick").val(result.accrue_sick);
+          $("#accrue_vac").val(result.accrue_vac);
+          $("#bonus").val(result.bonus);
+          $("#deposit").val(result.deposit);
+        })
+    }
+    });*@
+
+    $("#EmployeeId").on('change', function () {
+      var id = $(this).val();
+      window.location.href = '/PensionProcess/UpdatePayrollEntries?Id=' + id;
+    })
+  </script>
+}

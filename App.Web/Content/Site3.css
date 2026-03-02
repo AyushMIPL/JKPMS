@@ -1,0 +1,295 @@
+﻿/**/
+.districtMonthlyPensionSummary {
+    display: block;
+}
+
+.FinancialYearDropdownMonthlyPensionSummary {
+    width: 100%;
+}
+
+.FinancialMonthDropdownMonthlyPensionSummary {
+    width: 100%;
+}
+
+.btn_loadingMonthlyPensionSummary {
+    display: none;
+}
+
+.headlineMonthlyPensionSummary {
+    margin: 0px;
+    padding: 0px;
+    border: none;
+}
+
+.alert-warningMonthlyPensionSummary {
+    display: none;
+}
+
+.reportDataAction1MonthlyPensionSummary {
+    border: 0px;
+    height: 700px;
+    width: 100%;
+}
+
+/*Layout styles*/
+
+.theme-setting-icon-Layout {
+    display: none;
+}
+
+.theme-setting-Layout {
+    display: none;
+    top: 40%;
+}
+
+.theme-color1-Layout {
+    background: #323447;
+}
+
+.theme-color2-Layout {
+    background: #efefef;
+}
+
+.theme-color3-Layout {
+    background: #a93922;
+}
+
+.theme-color4-Layout {
+    background: #3e6b96;
+}
+
+.theme-color5-Layout {
+    background: #635247;
+}
+
+.theme-color6-Layout {
+    background: #3a3a3a;
+}
+
+.theme-color7-Layout {
+    background: #495B6C;
+}
+
+.jkbanklogoLayout {
+    max-width: 185px;
+}
+
+.progress-bar1-Layout {
+}
+
+.progress-bar2-Layout {
+}
+
+.detail-Layout {
+    max-width: 205px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    float: right;
+    cursor: pointer;
+}
+
+.skin-6-Layout {
+    top: 3px;
+}
+
+.shortcut-wrapper-Layout {
+    display: none;
+}
+
+.confirmClass-Layout {
+    display: none;
+}
+
+/*Layout styles*/
+
+/*PaymentHistory page*/
+
+.display-none {
+    display: none;
+}
+
+.text-align-left {
+    text-align: left;
+}
+
+.text-align-right {
+    text-align: right;
+}
+
+.PopUpPaymentStatusPaymentHistoty {
+    display: none;
+    width: 900px !important;
+}
+
+.updatepaymenthistoryPaymentHistoty {
+    background: #95c8d7;
+}
+
+.enterYourNamePaymentHistoty {
+    border-radius: 20px;
+}
+
+.paymentStatusPaymentHistoty {
+    border-radius: 20px;
+}
+
+.error-message-PaymentHistoty {
+    color: red;
+}
+
+.btn_PaymentStatus_loading_PaymentHistoty {
+    display: none;
+    float: right;
+}
+
+.font-weight-bold {
+    font-weight: Bold;
+}
+
+.width-100 {
+    width: 100%;
+}
+
+/*PaymentHistory page*/
+
+
+/*Payment Summary*/
+
+.btn_Beneficiary_loadingPaymentSummary {
+    display: none;
+    margin-top: 26px;
+}
+
+.searchBtn-PaymentSummary {
+    margin-top: 26px;
+}
+
+.btn_downloadExcel_loadingMonthlyPensionSummary {
+    display: none;
+    float: right;
+}
+
+.float-right-element {
+    float: right;
+}
+
+.exampleMonthlyPensionSummary {
+    padding-right: 200px;
+}
+
+.error-message-MonthlyPensionSummary {
+    color: red;
+    display: none;
+}
+
+.btn_HoldPayment_loading_MonthlyPensionSummary {
+    display: none;
+    float: right;
+}
+
+.PopUpShowLargeMessage-MonthlyPensionSummary {
+    display: none;
+    width: 750px !important;
+    min-height: 500px;
+}
+
+.MHeader-MonthlyPensionSummary {
+    background: #95c8d7;
+}
+
+.MessageText-MonthlyPensionSummary {
+    text-align: left;
+    margin-left: 15px;
+    overflow-y: scroll;
+    height: 350px;
+}
+
+.close-MHeader-MonthlyPensionSummary {
+    font-size: 50px;
+    margin-top: -10px;
+    margin-right: 10px;
+}
+
+/*Payment Summary*/
+
+/**/
+
+.PopUpShowLargeMessages-ExceptionLog {
+    display: none;
+    width: 1150px !important;
+    height: 550px;
+}
+
+.MHeaders-ExceptionLog {
+    background: #95c8d7;
+}
+
+.MessageTexts-ExceptionLog {
+    text-align: left;
+    margin-left: 15px;
+    overflow-y: scroll;
+    height: 483px;
+}
+
+.OpenMessagePopup-ExceptionLog {
+    cursor: pointer;
+}
+
+.close-MHeaders-ExceptionLog {
+    font-size: 50px;
+    margin-top: -10px;
+    margin-right: 10px;
+}
+
+/**/
+
+.display-none-important {
+    display: none !important;
+}
+
+.display-table-important {
+    display: table !important;
+}
+
+.font-weight-bolder {
+    font-weight: bolder;
+}
+
+.display-block{
+    display:block;
+}
+
+.cancel-payroll-btn {
+    margin-top: 5px;
+}
+
+.MailSettingstbl-thclass {
+    width: 223px;
+}
+
+.confirmClass-MailSetting {
+    display: none;
+    width: 55% !important;
+}
+
+.MHeader-MailSetting {
+    background: #95c8d7;
+}
+
+.close-Mheader-MailSetting {
+    font-size: 50px;
+    margin-top: -10px;
+    margin-right: 10px;
+}
+
+.formPopUpDiv-MailSetting {
+    overflow-y: scroll;
+    height: 450px;
+}
+
+.tblTehsilIndex {
+    width: 223px;
+}
+

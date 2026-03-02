@@ -1,0 +1,341 @@
+﻿@model App.Data.ViewModels.PensionProcessViewModel
+@using App.Web.Helper
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .btn-success.disabled {
+        color: gray;
+        pointer-events: none;
+        opacity: .8;
+    }
+
+    .validation-summary-valid ul li {
+        display: none !important;
+    }
+
+    div#processDetail {
+        width: 100% !important;
+    }
+    button.btn.btn-success {
+        height: 31px!important;
+    }
+</style>
+<div class="panel panel-default">
+
+    <div class="panel-body">
+        @*@using (Html.BeginForm("CancelBatchProcess", "PensionProcess", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+            {*@
+        @Html.HiddenFor(model => model.pybatchid, new { @Value = Model.pybatchid })
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary("", new { @class = "text-danger" })
+        <div class="row border">
+            <div class="row">
+                <div class="col-sm-8">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Title, "Payroll Process", new { @class = "col-sm-3 control-label" })
+                        <div class="col-sm-7">
+                            <button type="submit" id="Btn" class="btn btn-success @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")"><i class="fa fa-times fa-lg"></i> Cancel Batch Process</button>
+                            @*<input type="submit" id="Btn" class="btn btn-success" value="Cancel Batch Process" />*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div id="processDetail" class="row border">
+            <div class="px-4">
+                <ul class="list-group">
+                    <li class="list-group-item clearfix">
+                        <div class="pull-left m-left-sm">
+                            @if (Model.pybatchid > 0)
+                            {
+                                <span><b class="font-weight-bolder">Batch Id:- </b></span>@Html.DisplayFor(model => model.pybatchid, new { @class = "control-label" })<br>
+                            }
+                            else
+                            {
+                                <span><b class="font-weight-bolder">Batch Id:- </b></span>
+                            }
+                        </div>
+                        <div class="pull-right">
+                            <span><b class="font-weight-bolder">Process Started On:-</b></span>@Html.FormatDate(Model.processstartedon)<br>
+                        </div>
+                    </li>
+
+                    <li class="list-group-item clearfix">
+                        <div class="pull-left m-left-sm">
+                            <span><b class="font-weight-bolder">Start By:-</b></span>@Html.DisplayFor(model => model.insertbyName, new { @class = "control-label" })
+                        </div>
+                    </li>
+                    <li class="list-group-item clearfix">
+                        <div class="pull-left m-left-sm">
+                            <span><b class="font-weight-bolder">Status:- </b></span>
+                            @if (Model != null)
+                            {
+                                @Html.FormatProcess(Model.status)<br>
+                            }
+                        </div>
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+        @*<div id="processDetail" class="row border">
+              <div class="panel panel-default">
+                <ul class="list-group">
+                  <li class="list-group-item clearfix">
+                    <div class="pull-left m-left-sm">
+                      <span>Batch Id:-</span>@Html.DisplayFor(model => model.pybatchid, new { @class = "control-label" })<br>
+                    </div>
+                    <div class="pull-right">
+                      <span>Process Started On:-</span>@Html.DisplayFor(model => model.processstartedon, new { @class = "control-label" })<br>
+                    </div>
+                  </li>
+
+                  <li class="list-group-item clearfix">
+                    <div class="pull-left m-left-sm">
+                      <span>Start By:-</span>@Html.DisplayFor(model => model.processstartedon, new { @class = "control-label" })
+                    </div>
+                  </li>
+                  <li class="list-group-item clearfix">
+                    <div class="pull-left m-left-sm">
+                      <span>Status:-</span>@Html.DisplayFor(model => model.status, new { @class = "control-label" })<br>
+                    </div>
+                  </li>
+
+                </ul>
+              </div>
+            </div>*@
+
+        @*}*@
+    </div>
+</div>
+
+
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline headlineMonthlyPensionSummary">
+            Payroll Process - Cancel Batch Process
+            @*<ul class="tool-bar">
+
+                </ul>*@
+        </h4>
+    </div>
+    <div class="panel-body">
+        <table id="tbl" class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Process</th>
+                    <th>Start On</th>
+                    <th>End On</th>
+                    <th>Searched</th>
+                    <th>Processed</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <table id="tblDGVCheck" class="table">
+            <thead>
+                <tr>
+                    <th>Doc No.</th>
+                    <th>Cheque No.</th>
+                    <th>Pay Date</th>
+                    <th>Employee</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="custom-popup width-100 display-none" id="Ok_To_Cancel_Data">
+    <div class="padding-md">
+        <h4 class="m-top-none" id="statusRecord">Are you sure want to cancel active batch of pension process? </h4>
+    </div>
+    <div class="text-center">
+        <a type="button" class="btn btn-success px-5 height display-none" title="Please Wait While We Process Your Request" id="btn_Cancel_loading"><i class="fa fa-spinner fa-spin"></i> Processing</a>
+        <a class="btn btn-success m-right-sm" id="CancelBatchId">Confirm <i id="spinner" class="fa fa-spinner fa-spin display-none"></i></a>
+        <a class="btn btn-danger logoutConfirm_close" id="onCancelClick">Cancel</a>
+    </div>
+</div>
+
+<div class="custom-popup width-100 display-none" id="Ok_To_Post_Y_N_not_Found">
+    <div class="padding-md">
+        <h4 class="m-top-none" id="statusRecord">You are unable to cancel active batch of pension process.</h4>
+    </div>
+    <div class="text-center">
+        <p></p><p></p>
+        <a class="btn btn-danger logoutConfirm_close" id="onCancelClick1">Cancel</a>
+    </div>
+</div>
+
+
+
+
+@section scripts{
+    <script nonce="@ViewBag.StyleNonce">
+
+    $(function () {
+      if ($("#pybatchid").val() != 0) {
+        $('input[type="text"]').each(function () {
+          $(this).attr("disabled", true);
+        });
+        var pybatchid = $("#pybatchid").val();
+        //$("#Btn").val("Batch:" + pybatchid + " is Active for Pension Process")
+          $.ajax({
+
+          //@*url: "@Url.Action("DisplayAjax", "PensionProcessHeaders")?Pybatchid=" + pybatchid,*@
+          url: "@Url.Action("DisplayAjax", "PensionProcess")?Pybatchid=" + pybatchid,
+          type: "GET",
+        }).done(function (result) {
+          var trHTML = '';
+          $('#tbl> tbody > tr').empty();
+          $.each(result, function (index, item) {
+            debugger
+            trHTML += '<tr><td>' + item.pybatchid + '</td><td>' + item.processname + '</td><td>' + item.processstartedon + '</td><td>' + item.processendedon + '</td><td>' + item.recordssearched + '</td><td>' + item.recordsprocessed + '</td><td>' + item.errormessage + '</td></tr>';
+          })
+          $('#tbl').append(trHTML);
+          debugger;
+        });
+
+        $.ajax({
+          url: "@Url.Action("DGVCheckAjax", "PensionProcess")?Pybatchid=" + pybatchid,
+          type: "GET",
+        }).done(function (result) {
+          var trHTML = '';
+          $('#tblDGVCheck> tbody > tr').empty();
+          $.each(result, function (index, item) {
+            debugger
+            trHTML += '<tr><td>' + item.DocNo + '</td><td>' + item.CheckNo + '</td><td>' + item.PayDate + '</td><td>' + item.Employee + '</td><td>' + item.Amount + '</td></tr>';
+          })
+          $('#tblDGVCheck').append(trHTML);
+          debugger;
+        });
+
+      }
+      else {
+        $('#Btn').attr('disabled', 'disabled');
+        $("#Btn").removeClass("btn btn-success").addClass("btn btn-primary")
+      }
+    })
+
+
+    @*$('form').submit(function () {
+      var obj = {
+        pybatchid: $('#pybatchid').val()
+      };
+      $.ajax({
+        type: "POST",
+        url: '@Url.Action("CancelBatchProcessAjax", "PensionProcess")',
+        dataType: "json",
+        data: JSON.stringify(obj),
+        contentType: "application/json; charset=utf-8",
+
+      }).done(function (result) {
+        debugger
+        //alert(item.pybatchid);
+        //var trHTML = '';
+        //$('#tbl> tbody > tr').empty();
+        //$.each(result, function (index, item) {
+        //  debugger
+        //  trHTML += '<tr><td>' + item.pybatchid + '</td><td>' + item.processname + '</td><td>' + item.processstartedon + '</td><td>' + item.processendedon + '</td><td>' + item.recordssearched + '</td><td>' + item.recordsprocessed + '</td><td>' + item.errormessage + '</td></tr>';
+        //})
+        //$('#tbl').append(trHTML);
+        //debugger;
+      })
+
+    });*@
+
+
+        $(document).ready(function () {
+      debugger
+          $('#CancelBatchId').click(function () {
+            debugger
+            $('#spinner').show();
+              var obj = { pybatchid: $('#pybatchid').val() };
+              $('#btn_Cancel_loading').show();
+              $('#CancelBatchId').hide();
+    $.ajax({
+      type: "POST",
+      url: '@Url.Action("CancelBatchProcessAjax", "PensionProcess")',
+      dataType: "json",
+      data: JSON.stringify(obj),
+      contentType: "application/json; charset=utf-8",
+    }).done(function (result) {
+        $('#CancelBatchId').show();
+        $('#btn_Cancel_loading').hide();
+      debugger
+      $('#spinner').hide();
+      $('#Ok_To_Cancel_Data').popup("hide");
+      if (result) {
+        debugger
+        toastr.success(result);
+        location.reload();
+      }
+      // Handle the result of your action here
+    });
+  });
+});
+
+    </script>
+
+
+
+    <script nonce="@ViewBag.StyleNonce">
+    $(document).ready(function () {
+      debugger
+
+      $('#Btn').click(function () {
+        $.ajax({
+          type: 'get',
+           url: '@Url.Action("CheckOKToCancelStatusAjax", "PensionProcess")',
+          dataType: 'json',
+          success: function (data) {
+            debugger
+            if (data.data === 1) {
+              debugger
+              $('#Ok_To_Cancel_Data').popup("show");
+            }
+            else {
+              toastr.error("Active Batch of Pension Process has been already Cancelled.");
+              //$('#Ok_To_Post_Y_N_not_Found').popup("show");
+            }
+           // $('#Ok_To_Cancel_Data').popup("show");
+          },
+          error: function (error) {
+            // Handle any errors here
+            console.error('AJAX request failed:', error);
+          }
+        });
+      });
+    });
+
+    $("#onCancelClick").click(function () {
+      debugger
+      $('#Ok_To_Cancel_Data').popup("hide");
+      $('#Ok_To_Post_Y_N_not_Found').popup("hide");
+      })
+
+
+    $("#onCancelClick1").click(function () {
+      debugger
+      $('#Ok_To_Post_Y_N_not_Found').popup("hide");
+    })
+
+    //function onCancelClick() {
+    //  $('#Ok_To_Cancel_Data').popup("hide");
+    //  $('#Ok_To_Post_Y_N_not_Found').popup("hide");
+    //}
+    </script>
+}
+
+
+
+

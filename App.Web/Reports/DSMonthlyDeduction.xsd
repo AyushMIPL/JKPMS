@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="DSMonthlyDeduction" targetNamespace="http://tempuri.org/DSMonthlyDeduction.xsd" xmlns:mstns="http://tempuri.org/DSMonthlyDeduction.xsd" xmlns="http://tempuri.org/DSMonthlyDeduction.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="DSMonthlyDeduction" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="DSMonthlyDeduction" msprop:Generator_UserDSName="DSMonthlyDeduction">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Table" msprop:Generator_TableClassName="TableDataTable" msprop:Generator_TableVarName="tableTable" msprop:Generator_TablePropName="Table" msprop:Generator_RowDeletingName="TableRowDeleting" msprop:Generator_RowChangingName="TableRowChanging" msprop:Generator_RowEvHandlerName="TableRowChangeEventHandler" msprop:Generator_RowDeletedName="TableRowDeleted" msprop:Generator_UserTableName="Table" msprop:Generator_RowChangedName="TableRowChanged" msprop:Generator_RowEvArgName="TableRowChangeEvent" msprop:Generator_RowClassName="TableRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="v_emplcode" msprop:Generator_ColumnVarNameInTable="columnv_emplcode" msprop:Generator_ColumnPropNameInRow="v_emplcode" msprop:Generator_ColumnPropNameInTable="v_emplcodeColumn" msprop:Generator_UserColumnName="v_emplcode" type="xs:string" minOccurs="0" />
+              <xs:element name="v_firstname" msprop:Generator_ColumnVarNameInTable="columnv_firstname" msprop:Generator_ColumnPropNameInRow="v_firstname" msprop:Generator_ColumnPropNameInTable="v_firstnameColumn" msprop:Generator_UserColumnName="v_firstname" type="xs:string" minOccurs="0" />
+              <xs:element name="v_lastname" msprop:Generator_ColumnVarNameInTable="columnv_lastname" msprop:Generator_ColumnPropNameInRow="v_lastname" msprop:Generator_ColumnPropNameInTable="v_lastnameColumn" msprop:Generator_UserColumnName="v_lastname" type="xs:string" minOccurs="0" />
+              <xs:element name="v_address1" msprop:Generator_ColumnVarNameInTable="columnv_address1" msprop:Generator_ColumnPropNameInRow="v_address1" msprop:Generator_ColumnPropNameInTable="v_address1Column" msprop:Generator_UserColumnName="v_address1" type="xs:string" minOccurs="0" />
+              <xs:element name="v_address2" msprop:Generator_ColumnVarNameInTable="columnv_address2" msprop:Generator_ColumnPropNameInRow="v_address2" msprop:Generator_ColumnPropNameInTable="v_address2Column" msprop:Generator_UserColumnName="v_address2" type="xs:string" minOccurs="0" />
+              <xs:element name="v_appointdate" msprop:Generator_ColumnVarNameInTable="columnv_appointdate" msprop:Generator_ColumnPropNameInRow="v_appointdate" msprop:Generator_ColumnPropNameInTable="v_appointdateColumn" msprop:Generator_UserColumnName="v_appointdate" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="v_pay_date" msprop:Generator_ColumnVarNameInTable="columnv_pay_date" msprop:Generator_ColumnPropNameInRow="v_pay_date" msprop:Generator_ColumnPropNameInTable="v_pay_dateColumn" msprop:Generator_UserColumnName="v_pay_date" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="v_dedcode" msprop:Generator_ColumnVarNameInTable="columnv_dedcode" msprop:Generator_ColumnPropNameInRow="v_dedcode" msprop:Generator_ColumnPropNameInTable="v_dedcodeColumn" msprop:Generator_UserColumnName="v_dedcode" type="xs:string" minOccurs="0" />
+              <xs:element name="v_dedrate" msprop:Generator_ColumnVarNameInTable="columnv_dedrate" msprop:Generator_ColumnPropNameInRow="v_dedrate" msprop:Generator_ColumnPropNameInTable="v_dedrateColumn" msprop:Generator_UserColumnName="v_dedrate" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_amount" msprop:Generator_ColumnVarNameInTable="columnv_amount" msprop:Generator_ColumnPropNameInRow="v_amount" msprop:Generator_ColumnPropNameInTable="v_amountColumn" msprop:Generator_UserColumnName="v_amount" type="xs:decimal" minOccurs="0" />
+              <xs:element name="v_num_rows" msprop:Generator_ColumnVarNameInTable="columnv_num_rows" msprop:Generator_ColumnPropNameInRow="v_num_rows" msprop:Generator_ColumnPropNameInTable="v_num_rowsColumn" msprop:Generator_UserColumnName="v_num_rows" type="xs:string" minOccurs="0" />
+              <xs:element name="v_month_of" msprop:Generator_ColumnVarNameInTable="columnv_month_of" msprop:Generator_ColumnPropNameInRow="v_month_of" msprop:Generator_ColumnPropNameInTable="v_month_ofColumn" msprop:Generator_UserColumnName="v_month_of" type="xs:string" minOccurs="0" />
+              <xs:element name="v_week1_amt" msprop:Generator_ColumnVarNameInTable="columnv_week1_amt" msprop:Generator_ColumnPropNameInRow="v_week1_amt" msprop:Generator_ColumnPropNameInTable="v_week1_amtColumn" msprop:Generator_UserColumnName="v_week1_amt" type="xs:string" minOccurs="0" />
+              <xs:element name="v_week2_amt" msprop:Generator_ColumnVarNameInTable="columnv_week2_amt" msprop:Generator_ColumnPropNameInRow="v_week2_amt" msprop:Generator_ColumnPropNameInTable="v_week2_amtColumn" msprop:Generator_UserColumnName="v_week2_amt" type="xs:string" minOccurs="0" />
+              <xs:element name="v_week3_amt" msprop:Generator_ColumnVarNameInTable="columnv_week3_amt" msprop:Generator_ColumnPropNameInRow="v_week3_amt" msprop:Generator_ColumnPropNameInTable="v_week3_amtColumn" msprop:Generator_UserColumnName="v_week3_amt" type="xs:string" minOccurs="0" />
+              <xs:element name="v_week4_amt" msprop:Generator_ColumnVarNameInTable="columnv_week4_amt" msprop:Generator_ColumnPropNameInRow="v_week4_amt" msprop:Generator_ColumnPropNameInTable="v_week4_amtColumn" msprop:Generator_UserColumnName="v_week4_amt" type="xs:string" minOccurs="0" />
+              <xs:element name="v_week5_amt" msprop:Generator_ColumnVarNameInTable="columnv_week5_amt" msprop:Generator_ColumnPropNameInRow="v_week5_amt" msprop:Generator_ColumnPropNameInTable="v_week5_amtColumn" msprop:Generator_UserColumnName="v_week5_amt" type="xs:string" minOccurs="0" />
+              <xs:element name="v_weeks_worked" msprop:Generator_ColumnVarNameInTable="columnv_weeks_worked" msprop:Generator_ColumnPropNameInRow="v_weeks_worked" msprop:Generator_ColumnPropNameInTable="v_weeks_workedColumn" msprop:Generator_UserColumnName="v_weeks_worked" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

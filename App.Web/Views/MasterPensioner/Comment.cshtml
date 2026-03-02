@@ -1,0 +1,89 @@
+﻿@model App.Data.Entities.PensionerComments
+@{
+  ViewBag.Title = "Index";
+}
+@Html.Hidden("PensionerID")
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Pensioner
+      
+      <ul class="tool-bar">
+        <li><a href="javascript:comment();" data-toggle="tooltip" data-placement="bottom" title="Add Comment" data-original-title="Add Comment"><i class="fa fa-plus"></i></a></li>
+        
+      </ul>
+    </h4>
+  </div>
+  <div id="divcomment">
+  <div class="form-group">
+    @Html.LabelFor(model => model.Comments, new { @class = "col-sm-1 control-label" })
+    <div class="col-sm-6">
+      @*@Html.EditorFor(m => m.Comments,  new { @class = "form-control input-sm", placeholder = "Add Comments" })*@
+      @Html.TextAreaFor(model => model.Comments, 8, 8, new { @class = "form-control input-sm", placeholder = "Add Comments" })
+    </div>
+    <div class="col-sm-2">
+      <input type="button" class="btn btn-success" value="Add Comment" onclick="AddComment()" />
+    </div>
+  </div>
+</div>
+  <div class="panel-body">
+    <table class="table dataTable" id="tbl">
+      <thead>
+        <tr>
+          <th>Comment</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+@section Scripts {
+<script src="~/Content/endless/js/jquery.dataTables.min.js"></script>
+  <script nonce="@ViewBag.StyleNonce">
+    function comment()
+    {
+      $("#divcomment").show();
+    }
+    $(function () {
+      dobind()
+    });
+    function dobind() {
+      $("#divcomment").hide();
+      var oTable = $('#tbl').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "sAjaxSource": "/MasterPensioner/CommentAjaxHandler",
+        "aoColumns": [
+
+						{ "sName": "Comment" },
+            { "sName": "Date" }
+
+        ]
+      });
+    }
+    function AddComment() {
+      var pensionerID = $("#PensionerID").val();
+      var comments = $("#Comments").val();
+      if (comments == "") {
+        toasterErrorMessage("Pls Enter Comment First..")
+      }
+      else {
+        $.ajax({
+          url: "@Url.Action("AddComments","MasterPensioner")?PensionerID=" + pensionerID + "&Comments=" + comments,
+          type: "Get"
+        }).done(function (result) {
+          if(result>0)
+          {
+            toasterSuccessMessage("Comment Added Sucessfully.");
+          }
+        })
+        debugger
+        dobind();
+        $("#Comments").val("");
+      }
+    }
+  </script>
+}

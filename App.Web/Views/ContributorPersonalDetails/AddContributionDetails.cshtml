@@ -1,0 +1,526 @@
+﻿@model App.Data.ViewModels.ExcelFileViewModel
+@{
+  ViewBag.Title = "AddEmployerDetails";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Add Details
+      @*<ul class="tool-bar">
+
+        </ul>*@
+    </h4>
+  </div>
+  <div class="panel-body">
+    @using (Html.BeginForm("AddContributionDetails", "ContributorPersonalDetails", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+      @Html.Hidden("epfrateid")
+      @Html.Hidden("cpfrateid")
+      <input type="text" hidden id="hiredate" />
+      <div class="row">
+        <div class="col-sm-5">
+          <div class="form-group">
+            <label for="EmployerId" class="col-sm-4 control-label">Employer *:</label>
+            <div class="col-sm-8">
+              @Html.DropDownList("EmployerId", null, "---Select---", new { @class = "form-control select-sm" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="PersonID" class="col-sm-4 control-label">Person *:</label>
+            <div class="col-sm-8">
+              @Html.DropDownList("PersonID", null, "---Select---", new { @class = "form-control select-sm" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="PersonID" class="col-sm-4 control-label">Source *:</label>
+            <div class="col-sm-8">
+              @Html.DropDownList("Source", null, "---Select---", new { @class = "form-control select-sm" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="Salary" class="col-sm-4 control-label">System Salary:</label>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(m => m.SystemSalaryAmount, new { @class = "form-control input-sm", placeholder = "Salary", @readonly = "readonly" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="Salary" class="col-sm-4 control-label">Salary:</label>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(m => m.SalaryAmount, new { @class = "form-control input-sm", placeholder = "Salary", onblur = "SalaryChange()" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="Salary" class="col-sm-4 control-label">System Employee’s Contribution:</label>
+            <div class="col-sm-8" style="display:-webkit-inline-box">
+              @Html.TextBoxFor(m => m.SystemContributorContribution, new { @class = "form-control input-sm", placeholder = "Salary", @readonly = "readonly" })
+              <label id="span_System_ContributorPfRate" style="margin-left:3px;"></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="ContributorContribution" class="col-sm-4 control-label">Employee’s Contribution:</label>
+            <div class="col-sm-8" style="display:-webkit-inline-box">
+              @Html.TextBoxFor(m => m.ContributorContribution, new { @class = "form-control input-sm", placeholder = "Employee’s Contribution", @readonly = "readonly" })
+              <label id="span_ContributorPfRate" style="margin-left:3px;"></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="Salary" class="col-sm-4 control-label">System Employer Contribution:</label>
+            <div class="col-sm-8" style="display:-webkit-inline-box">
+              @Html.TextBoxFor(m => m.SystemEmployerContribution, new { @class = "form-control input-sm", placeholder = "Salary", @readonly = "readonly" })
+              <label id="span_System_EmployerPfRate" style="margin-left:3px;"></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="EmployerContribution" class="col-sm-4 control-label">Employer Contribution:</label>
+            <div class="col-sm-8" style="display:-webkit-inline-box">
+              @Html.TextBoxFor(m => m.EmployerContribution, new { @class = "form-control input-sm", placeholder = "Employer Contribution", @readonly = "readonly" })
+              <label id="span_EmployerPfRate" style="margin-left:3px;"></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="Month" class="col-sm-4 control-label">Month *:</label>
+            <div class="col-sm-8">
+              @Html.DropDownList("Month", null, "---Select---", new { @class = "form-control select-sm" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="Year" class="col-sm-4 control-label">Year *:</label>
+            <div class="col-sm-8">
+              @Html.DropDownList("Year", null, "---Select---", new { @class = "form-control select-sm" })
+            </div>
+          </div>
+          @*<div class="form-group">
+              <label for="IsActive" class="col-sm-4 control-label">Status:</label>
+              <div class="col-sm-8">
+                <div class="checkbox">
+                  @Html.CheckBoxFor(m => m.IsActive, new { @class = "form-control input-sm", @checked = "checked" })
+                </div>
+              </div>
+            </div>*@
+          <div class="form-group">
+            <label class="col-sm-4 control-label"></label>
+            <div class="col-sm-8">
+              <button type="button" class="btn btn-success" onclick="Check()"><i class="fa fa-save"> </i> Add</button>
+              <a href="/ContributorPersonalDetails/ContributonDetailsList" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    }
+  </div>
+</div>
+@section Scripts{
+  <script src="~/Scripts/Master.js"></script>
+  <script nonce="@ViewBag.StyleNonce">
+    //it is for active checkbox
+    $(function () {
+      var date = new Date();
+      var monthNames = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"];
+      $("#Year").val(date.getFullYear())
+      $("#Month").val(monthNames[date.getMonth()]);
+    })
+    //it check whether duplicate record exist or not if not save details else popup
+    function CheckOverwrite() {
+      var employerId = $("#EmployerId").val();
+      var personId = $("#PersonID").val();
+      var salary = $("#SalaryAmount").val().replace(/,/g, "");;
+      var employerContribution = $("#EmployerContribution").val().replace(/,/g, "");;
+      var contributorContribution = $("#ContributorContribution").val().replace(/,/g, "");;
+      var year = $("#Year").val();
+      var month = $("#Month").val();
+      var source = $("#Source").val();
+      if ($("#hiredate").val() != "") {
+        var firstdate = new Date($("#hiredate").val());
+        var joindate = (firstdate.getMonth() + 1) + "/01/" + firstdate.getFullYear();
+        var joining = new Date(joindate);
+        var monthNo = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"].indexOf(month);
+        var entryMonth = ((parseInt(monthNo) + 1) + "/28/" + year);
+        var todayEntry = new Date(entryMonth);
+        debugger
+        if ((firstdate != '' && entryMonth != '' && joining <= todayEntry)) {
+
+          if (employerId != "" && personId != "" && salary != "" && employerContribution != "" && contributorContribution != "" && year != "" && month != "" && source != "") {
+            var data =
+                    [employerId, personId, salary, employerContribution, contributorContribution, month, year, source]
+
+            $.ajax({
+              url: "@Url.Action("SaveAddContributionDetails", "ContributorPersonalDetails")?data=" + data,
+              type: "GET",
+              async: false,
+            }).done(function (result) {
+              if (result == 1) {
+                window.location.href = "@Url.Action("ContributonDetailsList", "ContributorPersonalDetails")?Month=" + month + "&Year=" + parseInt(year) + "&EmpId=" + parseInt(employerId);
+              }
+              else {
+                toasterErrorMessage("Please Try Again Later");
+                $('#confirmCancel').popup("hide");
+              }
+
+            });
+          }
+          else {
+            toasterErrorMessage("All Fields Are Required to Add details.");
+          }
+        }
+        else {
+          toasterErrorMessage("Details Only Added From Joining Date to Current Month");
+        }
+      }
+      else { toasterErrorMessage("Please Complete Job Details First"); }
+    }
+    function onConfirmSelect() {
+      CheckOverwrite();
+    }
+    const onConfirmSelect_ClassBtn = document.querySelectorAll('.onConfirmSelect_Class');
+    onConfirmSelect_ClassBtn.forEach(button => {
+      button.addEventListener('click', onConfirmSelect);
+    });
+
+    //when confirm button clicked on popup
+    function Check() {
+      var employerId = $("#EmployerId").val();
+      var personId = $("#PersonID").val();
+      var salary = $("#SalaryAmount").val().replace(/,/g, "");;
+      var employerContribution = $("#EmployerContribution").val().replace(/,/g, "");;
+      var contributorContribution = $("#ContributorContribution").val().replace(/,/g, "");;
+      var year = $("#Year").val();
+      var month = $("#Month").val();
+      var source = $("#Source").val();
+      var epfrateid = $("#epfrateid").val();
+      var cpfrateid = $("#cpfrateid").val();
+
+      if ($("#hiredate").val() != "") {
+        var firstdate = new Date($("#hiredate").val());
+        var joindate = (firstdate.getMonth() + 1) + "/01/" + firstdate.getFullYear();
+        var joining = new Date(joindate);
+        var monthNo = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"].indexOf(month);
+        var entryMonth = ((parseInt(monthNo) + 1) + "/01/" + year);
+        var todayEntry = new Date(entryMonth);
+        var todayDate = new Date();
+        debugger
+        if ((firstdate != '' && entryMonth != '' && joining <= todayEntry && todayEntry <= todayDate)) {
+
+          if (employerId != "" && personId != "" && salary != "" && employerContribution != "" && contributorContribution != "" && year != "" && month != "" && source != "") {
+            var data =
+                    [employerId, personId, salary, employerContribution, contributorContribution, month, year, source, epfrateid, cpfrateid]
+
+            $.ajax({
+              url: "@Url.Action("OverwritedetailsAjax", "ContributorPersonalDetails")?data=" + data,
+              type: "GET",
+            })
+  .done(function (result) {
+    var actionRes = result;
+    if (actionRes == "0") {
+      $('#confirmCancel').popup("show");
+    }
+    else if (actionRes == "1") {
+      window.location.href = "@Url.Action("ContributonDetailsList", "ContributorPersonalDetails")?Month=" + month + "&Year=" + parseInt(year) + "&EmpId=" + parseInt(employerId);
+      //$('#confirmCancel').popup("hide");
+      //Check();
+    }
+    else if (actionRes == "4") {
+      toasterErrorMessage("Contribution only added for Active Contributor or Beneficiary.");
+    }
+    else {
+      toasterErrorMessage("Record Already Finalized.");
+    }
+  });
+          }
+          else {
+            toasterErrorMessage("All Fields Are Required to Add details.");
+          }
+        }
+        else {
+          toasterErrorMessage("Details Only Added From Joining Date to Current Month");
+        }
+      }
+      else { toasterErrorMessage("Please Complete Job Details First"); }
+    }
+    //when cancelled button clicked of popup
+    function onCancel() {
+      $('#confirmCancel').popup("hide");
+    }
+
+    //this bind employee with contributor
+    $("#EmployerId").on('change', function () {
+
+      $("#span_System_ContributorPfRate").text('');//contributor pf rate
+      $("#span_ContributorPfRate").text('');//contributor pf rate 
+      $("#span_System_EmployerPfRate").text('');//employer pf rate
+      $("#span_EmployerPfRate").text('');//employer pf rate
+
+      var empId = $("#EmployerId").val();
+      if (empId != "") {
+        $.ajax({
+          url: "@Url.Action("GetContributorAjax", "ContributorPersonalDetails")?EmpId=" + empId,
+          type: "GET",
+        }).done(function (result) {
+          $("#PersonID").select2("val", "");
+          $("#PersonID").empty();
+          $('#PersonID').append($('<option/>').attr("value", "").text("---Select---"));
+          debugger
+          $.each(result, function (i, Contributor) {
+            $('#PersonID').append($('<option/>').attr("value", Contributor.Id).text(Contributor.Name));
+
+          })
+          $("#SystemSalaryAmount").val("");
+          $("#SystemContributorContribution").val("");
+          $("#SystemEmployerContribution").val("");
+          $("#SalaryAmount").val("");
+          $("#ContributorContribution").val("");
+          $("#EmployerContribution").val("");
+        })
+      }
+      else {
+        toasterErrorMessage("Please Select Employee First.");
+        $("#PersonID").select2("val", "");
+        $("#PersonID").empty();
+        $('#PersonID').append($('<option/>').attr("value", "").text("---Select---"));
+        $("#SystemSalaryAmount").val("");
+        $("#SystemContributorContribution").val("");
+        $("#SystemEmployerContribution").val("");
+        $("#SalaryAmount").val("");
+        $("#ContributorContribution").val("");
+        $("#EmployerContribution").val("");
+      }
+
+    })
+    //it works when person dropdown change
+    $("#PersonID").on('change', function () {
+      if ($("#PersonID").val() == "" || $("#Month").val() == "" || $("#Year").val() == "") {
+        $("#SystemSalaryAmount").val("");
+        $("#SystemContributorContribution").val("");
+        $("#SystemEmployerContribution").val("");
+        $("#SalaryAmount").val("");
+        $("#ContributorContribution").val("");
+        $("#EmployerContribution").val("");
+        if ($("#Month").val() == "" || $("#Year").val() == "") {
+          toasterErrorMessage("Please select Month and Year.");
+        }
+      }
+      else {
+        var cId = $('#PersonID').val();
+        var eId = $("#EmployerId").val();
+        var month = $("#Month").val();
+        var year = $("#Year").val();
+        debugger
+        $.ajax({
+          url: "@Url.Action("GetContributorDetailsAjax", "ContributorPersonalDetails")?CId=" + cId + "&EId=" + eId + "&month=" + month + "&year1=" + year + "",
+          type: "GET",
+        }).done(function (result) {
+          if (result.status) {
+            debugger
+            var sal = result.salary;//(result.sal / 12);
+            var sysCon = result.cpf;//(sal / 100) * result.cpf;
+            var sysEmp = result.epf;//(sal / 100) * result.epf;
+            $("#hiredate").val(result.date);
+            $("#SystemSalaryAmount").val(sal);//.val(sal.toFixed(2));
+            $("#SystemContributorContribution").val(sysCon);//.val(sysCon.toFixed(2));
+            $("#SystemEmployerContribution").val(sysEmp);//.val(sysEmp.toFixed(2));
+            $("#SalaryAmount").val(sal);//.val(sal.toFixed(2));
+            $("#ContributorContribution").val(sysCon);//.val(sysCon.toFixed(2));
+            $("#EmployerContribution").val(sysEmp);//.val(sysEmp.toFixed(2));
+            $("#epfrateid").val(result.epfrateid);//employer pf rate id
+            $("#cpfrateid").val(result.cpfrateid);//contributor pf rate id
+
+            $("#span_System_ContributorPfRate").text('@@ ' + result.CpfRate + '.00%');//contributor pf rate
+            $("#span_ContributorPfRate").text('@@ ' + result.CpfRate + '.00%');//contributor pf rate 
+            $("#span_System_EmployerPfRate").text('@@ ' + result.EpfRate + '.00%');//employer pf rate
+            $("#span_EmployerPfRate").text('@@ ' + result.EpfRate + '.00%');//employer pf rate
+          }
+          else {
+            $("#SystemSalaryAmount").val("");
+            $("#SystemContributorContribution").val("");
+            $("#SystemEmployerContribution").val("");
+            $("#SalaryAmount").val("");
+            $("#ContributorContribution").val("");
+            $("#EmployerContribution").val("");
+
+            $("#span_System_ContributorPfRate").text('');//contributor pf rate
+            $("#span_ContributorPfRate").text('');//contributor pf rate 
+            $("#span_System_EmployerPfRate").text('');//employer pf rate
+            $("#span_EmployerPfRate").text('');//employer pf rate
+            toasterErrorMessage(result.message);
+          }
+        })
+      }
+    })
+
+    //it works when Month dropdown change
+    $("#Month").on('change', function () {
+      if ($("#PersonID").val() == "" || $("#Month").val() == "" || $("#Year").val() == "") {
+        $("#SystemSalaryAmount").val("");
+        $("#SystemContributorContribution").val("");
+        $("#SystemEmployerContribution").val("");
+        $("#SalaryAmount").val("");
+        $("#ContributorContribution").val("");
+        $("#EmployerContribution").val("");
+        if ($("#EmployerId").val() == "") {
+          toasterErrorMessage("Please select Employer.");
+        }
+        if ($("#PersonID").val() == "") {
+          toasterErrorMessage("Please select Contributor/Person.");
+        }
+        if ($("#Month").val() == "") {
+          toasterErrorMessage("Please select Month.");
+        }
+        if ($("#Year").val() == "") {
+          toasterErrorMessage("Please select Year.");
+        }
+      }
+      else {
+        var cId = $('#PersonID').val();
+        var eId = $("#EmployerId").val();
+        var month = $("#Month").val();
+        var year = $("#Year").val();
+        debugger
+        $.ajax({
+          url: "@Url.Action("GetContributorDetailsAjax", "ContributorPersonalDetails")?CId=" + cId + "&EId=" + eId + "&month=" + month + "&year1=" + year + "",
+          type: "GET",
+        }).done(function (result) {
+          if (result.status) {
+            var sal = result.salary;//(result.sal / 12);
+            var sysCon = result.cpf;//(sal / 100) * result.cpf;
+            var sysEmp = result.epf;//(sal / 100) * result.epf;
+            $("#hiredate").val(result.date);
+            $("#SystemSalaryAmount").val(sal);//.val(sal.toFixed(2));
+            $("#SystemContributorContribution").val(sysCon);//.val(sysCon.toFixed(2));
+            $("#SystemEmployerContribution").val(sysEmp);//.val(sysEmp.toFixed(2));
+            $("#SalaryAmount").val(sal);//.val(sal.toFixed(2));
+            $("#ContributorContribution").val(sysCon);//.val(sysCon.toFixed(2));
+            $("#EmployerContribution").val(sysEmp);//.val(sysEmp.toFixed(2));
+            $("#epfrateid").val(result.epfrateid);//employer pf rate id
+            $("#cpfrateid").val(result.cpfrateid);//contributor pf rate id
+
+            $("#span_System_ContributorPfRate").text('@@ ' + result.CpfRate + '.00%');//contributor pf rate
+            $("#span_ContributorPfRate").text('@@ ' + result.CpfRate + '.00%');//contributor pf rate 
+            $("#span_System_EmployerPfRate").text('@@ ' + result.EpfRate + '.00%');//employer pf rate
+            $("#span_EmployerPfRate").text('@@ ' + result.EpfRate + '.00%');//employer pf rate
+          }
+          else {
+            $("#SystemSalaryAmount").val("");
+            $("#SystemContributorContribution").val("");
+            $("#SystemEmployerContribution").val("");
+            $("#SalaryAmount").val("");
+            $("#ContributorContribution").val("");
+            $("#EmployerContribution").val("");
+
+            $("#span_System_ContributorPfRate").text('');//contributor pf rate
+            $("#span_ContributorPfRate").text('');//contributor pf rate 
+            $("#span_System_EmployerPfRate").text('');//employer pf rate
+            $("#span_EmployerPfRate").text('');//employer pf rate
+
+            toasterErrorMessage(result.message);
+          }
+        })
+      }
+    })
+
+    //it works when Year dropdown change
+    $("#Year").on('change', function () {
+      if ($("#PersonID").val() == "" || $("#Month").val() == "" || $("#Year").val() == "") {
+        $("#SystemSalaryAmount").val("");
+        $("#SystemContributorContribution").val("");
+        $("#SystemEmployerContribution").val("");
+        $("#SalaryAmount").val("");
+        $("#ContributorContribution").val("");
+        $("#EmployerContribution").val("");
+        if ($("#EmployerId").val() == "") {
+          toasterErrorMessage("Please select Employer.");
+        }
+        if ($("#PersonID").val() == "") {
+          toasterErrorMessage("Please select Contributor/Person.");
+        }
+        if ($("#Month").val() == "") {
+          toasterErrorMessage("Please select Month.");
+        }
+        if ($("#Year").val() == "") {
+          toasterErrorMessage("Please select Year.");
+        }
+      }
+      else {
+        var cId = $('#PersonID').val();
+        var eId = $("#EmployerId").val();
+        var month = $("#Month").val();
+        var year = $("#Year").val();
+        debugger
+        $.ajax({
+          url: "@Url.Action("GetContributorDetailsAjax", "ContributorPersonalDetails")?CId=" + cId + "&EId=" + eId + "&month=" + month + "&year1=" + year + "",
+          type: "GET",
+        }).done(function (result) {
+          debugger
+          if (result.status) {
+            var sal = result.salary;//(result.sal / 12);
+            var sysCon = result.cpf;//(sal / 100) * result.cpf;
+            var sysEmp = result.epf;//(sal / 100) * result.epf;
+            $("#hiredate").val(result.date);
+            $("#SystemSalaryAmount").val(sal);//.val(sal.toFixed(2));
+            $("#SystemContributorContribution").val(sysCon);//.val(sysCon.toFixed(2));
+            $("#SystemEmployerContribution").val(sysEmp);//.val(sysEmp.toFixed(2));
+            $("#SalaryAmount").val(sal);//.val(sal.toFixed(2));
+            $("#ContributorContribution").val(sysCon);//.val(sysCon.toFixed(2));
+            $("#EmployerContribution").val(sysEmp);//.val(sysEmp.toFixed(2));
+            $("#epfrateid").val(result.epfrateid);//employer pf rate id
+            $("#cpfrateid").val(result.cpfrateid);//contributor pf rate id
+
+            $("#span_System_ContributorPfRate").text('@@ ' + result.CpfRate + '.00%');//contributor pf rate
+            $("#span_ContributorPfRate").text('@@ ' + result.CpfRate + '.00%');//contributor pf rate 
+            $("#span_System_EmployerPfRate").text('@@ ' + result.EpfRate + '.00%');//employer pf rate
+            $("#span_EmployerPfRate").text('@@ ' + result.EpfRate + '.00%');//employer pf rate
+          }
+          else {
+            $("#SystemSalaryAmount").val("");
+            $("#SystemContributorContribution").val("");
+            $("#SystemEmployerContribution").val("");
+            $("#SalaryAmount").val("");
+            $("#ContributorContribution").val("");
+            $("#EmployerContribution").val("");
+
+            $("#span_System_ContributorPfRate").text('');//contributor pf rate
+            $("#span_ContributorPfRate").text('');//contributor pf rate 
+            $("#span_System_EmployerPfRate").text('');//employer pf rate
+            $("#span_EmployerPfRate").text('');//employer pf rate
+
+            toasterErrorMessage(result.message);
+          }
+        })
+      }
+    })
+
+    //work when text change in salary Textbox
+    function SalaryChange() {
+      debugger
+      var cId = $('#PersonID').val();
+      var eId = $("#EmployerId").val();
+      var month = $("#Month").val();
+      var year = $("#Year").val();
+      if (cId == "" || eId == "" || month == "" || year == "") {
+
+        toasterErrorMessage("Please Select Employee, person, month and year details First.");
+      }
+      else {
+        $.ajax({
+          url: "@Url.Action("GetContributorDetailsAfterSalaryAjax", "ContributorPersonalDetails")?CId=" + cId + "&EId=" + eId + "&salary=" + $("#SalaryAmount").val().toString() + "&month=" + month + "&year1=" + year + "",
+          type: "GET",
+        }).done(function (result) {
+          if (result.status) {
+            debugger
+            var Con = result.cpf//(sal / 100) * result.cpf;
+            var Emp = result.epf//(sal / 100) * result.epf;
+            $("#ContributorContribution").val(Con);//.val(Con.toFixed(2));
+            $("#EmployerContribution").val(Emp);//.val(Emp.toFixed(2));
+          }
+          else {
+            toasterErrorMessage(result.message);
+          }
+        })
+      }
+    }
+  </script>
+}

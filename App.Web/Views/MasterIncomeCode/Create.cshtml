@@ -1,0 +1,172 @@
+﻿@model App.Data.Entities.MasterIncCodes
+
+@{
+  ViewBag.Title = "Create";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline headline-masterincomecreate" >
+      Add Details
+    </h4>
+  </div>
+  <div class="panel-body">
+    @using (Html.BeginForm("Create", "MasterIncomeCode", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id= "IdMasterIncomeCode_Create" }))
+    {
+      @Html.AntiForgeryToken()
+      @*@Html.ValidationSummary("", new { @class = "text-danger" })*@
+      @Html.HiddenFor(model => model.non_qual)
+      <div class="row">
+        <div class="row">
+          <div class="col-sm-5">
+            <div class="form-group">
+              @Html.LabelFor(model => model.inc_code, new { @class = "col-sm-4 control Color-Red-asterisk" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.inc_code, new { @class = "form-control input-sm", placeholder = "Income Code" })
+                @Html.ValidationMessageFor(model => model.inc_code, "", new { @class = "text-danger" })
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.inc_type, new { @class = "col-sm-4 control Color-Red-asterisk" })
+              <div class="col-sm-8">
+                @Html.DropDownListFor(m => m.inc_type, null, "---Select---", new { @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(model => model.inc_type, "", new { @class = "text-danger" })
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.dflt_rate, new { @class = "col-sm-4 control" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.dflt_rate, new { @class = "form-control input-sm", placeholder = "Default Rate" })
+
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.dflt_hours, new { @class = "col-sm-4 control" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.dflt_hours, new { @class = "form-control input-sm", placeholder = "Default Hours" })
+
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.dflt_lo_inc_amt, new { @class = "col-sm-4 control" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.dflt_lo_inc_amt, new { @class = "form-control input-sm", placeholder = "Low Amount" })
+
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.dflt_acct, new { @class = "col-sm-4 control" })
+              <div class="col-sm-8">
+                @Html.DropDownList("GLAccount", null, "---Select---", new { @class = "form-control input-sm" })
+
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-5">
+            <div class="form-group">
+              @Html.LabelFor(model => model.description, new { @class = "col-sm-4 control Color-Red-asterisk" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.description, new { @class = "form-control input-sm", placeholder = "Description" })
+                @Html.ValidationMessageFor(model => model.description, "", new { @class = "text-danger" })
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.non_qual, new { @class = "col-sm-4 control" })
+              <div class="col-sm-8">
+                <input type="checkbox" id="nonQualStatus" />
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.dflt_num, new { @class = "col-sm-4 control" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.dflt_num, new { @class = "form-control input-sm", placeholder = "Default Number" })
+
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-8">
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.dflt_hi_inc_amt, new { @class = "col-sm-4 control" })
+              <div class="col-sm-8">
+                @Html.TextBoxFor(m => m.dflt_hi_inc_amt, new { @class = "form-control input-sm", placeholder = "High Amount" })
+
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.Label("GL Account", new { @class = "col-sm-4 control" })
+              <div class="col-sm-8">
+                @Html.DropDownList("dflt_acct", null, "---Select---", new { @class = "form-control input-sm" })
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-5">
+          <div class="form-group">
+            <label class="col-sm-4 control-label"></label>
+            <div class="col-sm-8">
+                <button type="submit" id="IdMasterIncomeCodeCreate" class="btn btn-success"><i class="fa fa-save"> </i> Create </button>
+                <button type="button" class="btn btn-success px-5 height button-masterincomeloader"  title="Please Wait While We Process Your Request" id="btn_MasterIncomeCode_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                @Html.ActionLink("Back to List", "Index", "MasterIncomeCode", null, new { @class = "btn btn-primary" })
+            </div>
+          </div>
+        </div>
+      </div>
+
+    }
+  </div>
+</div>
+@section scripts{
+    <script nonce="@ViewBag.StyleNonce">
+    $("#dflt_acct").on('change', function () {
+      var account = $("#dflt_acct").val();
+      var id = 0;
+      $.ajax({
+        url: "@Url.Action("checkAccountExist", "MasterDeductionCode")?id=" + id + "&account=" + account,
+        type: "GET",
+      })
+		.done(function (result) {
+		  if (result != 0) {
+		    toasterErrorMessage("This Account is Already Linked with another Income Code.");
+		    $("#dflt_acct").select2("val", "");
+		  }
+		})
+    })
+
+    $("#nonQualStatus").on("click", function () {
+      if (!this.checked) {
+        $("#non_qual").val("N");
+      }
+      else {
+        $("#non_qual").val("Y");
+      }
+    })
+      $("#IdCreate6").on('click', function () {
+          $("i.fa-spinner").show();
+          setTimeout(function () {
+              $("i.fa-spinner").hide();
+          }, 1000);
+      });
+
+      $(document).ready(function () {
+      $('form').submit(function () {
+          $('#IdMasterIncomeCodeCreate').hide();
+          $('#btn_MasterIncomeCode_loading').show();
+          var form = $("#IdMasterIncomeCode_Create");
+          if (!form.valid()) {
+              $('#IdMasterIncomeCodeCreate').show();
+              $('#btn_MasterIncomeCode_loading').hide();
+              return false;
+          }
+      });
+        var error = '@TempData["error"]';
+        if (error && error.length > 0) {
+            $('#IdMasterIncomeCodeCreate').show();
+            $('#btn_MasterIncomeCode_loading').hide();
+        }
+          $('#btn_MasterIncomeCode_loading').hide();
+    });
+    </script>
+}
+

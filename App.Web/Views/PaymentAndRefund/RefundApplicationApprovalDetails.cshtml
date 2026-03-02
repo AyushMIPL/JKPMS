@@ -1,0 +1,257 @@
+﻿@model App.Data.Entities.RefundApplications
+@{
+  ViewBag.Title = "RefundApplicationApprovalDetails";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline" style="margin: 0px; padding: 0px; border: none;">Refund Application Form
+      @*<ul class="tool-bar">
+      </ul>
+            *@
+        </h4>
+    </div>
+    <div class="panel-body">
+        @using (Html.BeginForm("RefundApplicationApprovalDetails", "PaymentAndRefund", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+      @Html.HiddenFor(model => model.Id)
+      @Html.Hidden("Max")
+      <div class="row">
+          <div class="col-sm-8">
+              <div class="form-group">
+                  @Html.LabelFor(model => model.EmployerID, "Employer", htmlAttributes: new { @class = "control-label col-md-4" })
+            <div class="col-sm-8">
+                @Html.DropDownList("EmployerID", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+            </div>
+              </div>
+              <div class="form-group">
+                  @Html.LabelFor(model => model.PersonID, "Name of Officer", htmlAttributes: new { @class = "control-label col-md-4" })
+            <div class="col-sm-8">
+                @Html.DropDownList("PersonID", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+            </div>
+              </div>
+              <div class="form-group">
+                  @Html.LabelFor(model => model.DesignationId, "Post", htmlAttributes: new { @class = "control-label col-md-4" })
+            <div class="col-sm-8">
+                @*@Html.TextBoxFor(model => model.DesignationId, new { @class = "form-control input-sm", placeholder = "Post", @readonly = "readonly" })*@
+              @Html.DropDownList("DesignationId", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+            </div>
+              </div>
+              <div class="form-group">
+                  @Html.LabelFor(model => model.FirstAppointmentDate, "Date of Appointment", htmlAttributes: new { @class = "control-label col-md-4" })
+            <div class="col-sm-8">
+                @{ string firstAppointmentDate = Convert.ToDateTime(Model.FirstAppointmentDate).ToString("MM/dd/yyyy"); @Html.TextBoxFor(m => m.FirstAppointmentDate, new { @class = "form-control", placeholder = "First Appointment Date", @Value = @firstAppointmentDate, @readonly = "readonly" })  }
+              @*@Html.TextBoxFor(model => model.FirstAppointmentDate, new { @class = "form-control input-sm", @readonly = "readonly" })*@
+              @*@Html.EditorFor(model => model.FirstAppointmentDate, new { shtmlAttributes = new { @class = "form-control" } })*@
+            </div>
+              </div>
+
+              <div class="form-group">
+                  <div class="col-sm-4 TextRight">
+                      @Html.LabelFor(model => model.RetirementOrResignationDate, "Action Date", htmlAttributes: new { @class = "control-label" })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Date of Retirement/Resignation/ Termination "></i>
+                  </div>
+                  <div class="col-sm-8">
+                      <div class="input-group date" id="retire">
+                          @Html.EditorFor(model => model.RetirementOrResignationDate, new { htmlAttributes = new { @class = "form-control" } })
+
+                <span class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                </span>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="form-group">
+                  @Html.LabelFor(model => model.JobStatus, "Job Status", htmlAttributes: new { @class = "control-label col-md-4" })
+            <div class="col-sm-8">
+                @Html.DropDownList("JobStatus", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+            </div>
+              </div>
+
+              <div class="form-group">
+                  <div class="col-sm-4 TextRight">
+                      @Html.LabelFor(model => model.LengthOfServiceInMonths, "Service Length(From Jan, 2004)", htmlAttributes: new { @class = "control-label" })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Length of Service in Months(From 1 Jan, 2004)"></i>
+                  </div>
+                  <div class="col-sm-8">
+                      @Html.TextBoxFor(model => model.LengthOfServiceInMonths, new { @class = "form-control input-sm", @readonly = "readonly" })
+                  </div>
+              </div>
+
+              <div class="form-group">
+                  <div class="col-sm-4 TextRight">
+                      @Html.LabelFor(model => model.TotalEmployeeContribution, "Emp. Contribution", htmlAttributes: new { @class = "control-label" })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Total Employee Contribution to Pension Fund"></i>
+                  </div>
+                  <div class="col-sm-8">
+                      @Html.TextBoxFor(model => model.TotalEmployeeContribution, new { @class = "form-control input-sm", @readonly = "readonly" })
+                  </div>
+              </div>
+
+              <div class="form-group">
+                  <div class="col-sm-4 TextRight">
+                      @Html.LabelFor(model => model.AnnualInterest, "Compound Interest (Annual)", htmlAttributes: new { @class = "control-label " })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Total Interest compounded annually at 3%"></i>
+                  </div>
+                  <div class="col-sm-8">
+                      @Html.TextBoxFor(model => model.AnnualInterest, new { @class = "form-control input-sm", @readonly = "readonly" })
+                  </div>
+              </div>
+
+              <div class="form-group">
+                  <div class="col-sm-4 TextRight">
+                      @Html.LabelFor(model => model.TotalEmployeeContributionWithInterest, "Contribution(with interest)", htmlAttributes: new { @class = "control-label" })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Total Employee Contribution to Pension Fund with interest compounded annually"></i>
+                  </div>
+                  <div class="col-sm-8">
+                      @Html.TextBoxFor(model => model.TotalEmployeeContributionWithInterest, new { @class = "form-control input-sm", @readonly = "readonly" })
+                  </div>
+              </div>
+
+              <div class="form-group">
+                  <label class="col-sm-4 control-label">Note:</label>
+                  <div class="col-sm-8">
+                      <textarea cols="78" columns="4" id="Notes" name="Notes" rows="4"></textarea>
+                  </div>
+              </div>
+              <div class="panel panel-default" style="display: none" id="details">
+                  <div class="panel-heading">
+                      Enter Refund Details Before Approval
+                  </div>
+
+
+                  <table class="table table-striped">
+                      <tr>
+                          <td>Paid Status</td>
+                          <td>
+                              <select id="PaidStatus" class="form-control" style="width: 100%;">
+                                  <option value="U">Unpaid</option>
+                                  <option value="P">Paid</option>
+                              </select>
+                          </td>
+                      </tr>
+                      <tr id="payment">
+                          <td>Payment Method</td>
+                          <td>
+                              <select id="PaymentMethod" class="form-control" style="width: 100%;">
+                                  <option value="Cash">Cash</option>
+                                  <option value="Cheque">Cheque</option>
+                              </select>
+                          </td>
+                      </tr>
+                      <tr id="checkno">
+                          <td>Check Number</td>
+
+                          <td>
+                              <input type="text" id="CheckNumber" placeholder="Enter Check Number" class="form-control input-group" />
+                          </td>
+                      </tr>
+                  </table>
+              </div>
+              <div class="form-group">
+                  <label class="col-sm-4 control-label"></label>
+                  <div class="col-sm-8">
+                      <button type="button" class="btn btn-success btndisable" onclick="Result('A')"><i class="fa fa-check fa-lg"></i>Approved</button>
+                      <button type="button" class="btn btn-danger btndisable" onclick="Result('R')"><i class="fa fa-times fa-lg"></i>Rejected</button>
+                      <a href="/PaymentAndRefund/RefundApplicationApprovalIndex" class="btn btn-primary btndisable"><i class="fa fa-reply"></i>Back to List</a>
+                      @*<input type="button" class="btn btn-success" value="Approved" onclick="Result('A')" />
+                      <input type="button" class="btn btn-danger" value="Rejected" onclick="Result('R')" />
+                      @Html.ActionLink("Back to List", "RefundApplicationApprovalIndex", "PaymentAndRefund", null, new { @class = "btn btn-primary" })*@
+                  </div>
+              </div>
+          </div>
+      </div>
+
+
+
+        }
+    </div>
+</div>
+@section Scripts{
+  
+  <script nonce="@ViewBag.StyleNonce">
+      $('#retire').datepicker({
+          endDate: new Date($("#RetirementOrResignationDate").val()),
+          startDate: new Date($("#RetirementOrResignationDate").val()),
+          startView: 1,
+          format: "mm/dd/yyyy",
+          autoclose: true
+      });
+    
+      $(document).ajaxStart(function () {
+          $(".btndisable").prop('disabled', true);
+      }).ajaxStop(function () {
+          $(".btndisable").prop('disabled',false);
+      });
+      $(function () {      
+          $("#RetirementOrResignationDate").prop("disabled", true);
+          $("#EmployerID").prop("disabled", true);
+          $("#PersonID").prop("disabled", true);
+          $("#DesignationId").prop("disabled", true);
+          $("#JobStatus").prop("disabled", true);
+          debugger
+          if ($("#Max").val() != "") {
+              $("#details").show();
+          }
+
+          $("#payment").hide();
+          $("#checkno").hide();
+
+      })
+      function Result(Rs) {
+          var id = $("#Id").val();
+          var notes = $("#Notes").val();
+          var psatus = $("#PaidStatus").val();
+          var pmethod = $("#PaymentMethod").val();
+          var cno = $("#CheckNumber").val();
+          var refAmount = $("#TotalEmployeeContributionWithInterest").val();
+      
+          if (notes != "") {
+              var data = [Rs, id, notes, psatus, pmethod, cno, refAmount];
+              $.ajax({
+                  url: "@Url.Action("AcceptedAjax", "PaymentAndRefund")?Data=" + data,
+                  type: "GET",
+                  }).done(function (result) {
+                      if (result == 1) {
+                          window.location.href = '/PaymentAndRefund/RefundApplicationApprovalIndex';
+                      }
+                      else {
+                          toasterErrorMessage("Please Try Again...");
+                      }
+                  })
+      }
+      else {
+        toasterErrorMessage("Please Enter Notes");
+      }
+      }
+      $("#PaidStatus").on('change', function () {
+          var status = $(this).val();
+          if (status == "P") {
+              $("#payment").show();
+              $("#checkno").hide();
+              $("#CheckNumber").val("");
+          }
+          else {
+              $("#payment").hide();
+              $("#checkno").hide();
+              $("#CheckNumber").val("");
+          }
+      })
+
+      $("#PaymentMethod").on('change', function () {
+          var status = $(this).val();
+          if (status == "Cash") {
+              $("#checkno").hide();
+              $("#CheckNumber").val("");
+          }
+          else {
+              $("#checkno").show();
+          }
+      })
+    
+
+  </script>
+}

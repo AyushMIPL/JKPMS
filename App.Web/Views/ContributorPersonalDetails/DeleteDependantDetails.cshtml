@@ -1,0 +1,121 @@
+﻿@model App.Data.Entities.MasterDependantDetails
+
+@{
+  ViewBag.Title = "Delete Dependant Details";
+  Layout = "~/Views/Shared/_LayoutProfile.cshtml";
+}
+
+@section profileContainer
+{
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+        Contributor Dependant Details
+        
+      </h4>
+    </div>
+    <dl class="dl-horizontal">
+      <dt>
+        @Html.DisplayNameFor(model => model.Relationship.Name)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.Relationship.Name)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.PersonID)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.PersonID)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.FirstName)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.FirstName)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.MidName)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.MidName)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.LastName)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.LastName)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.Gender)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.Gender)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.DateOfBirth)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.DateOfBirth)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.TerminationDate)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.TerminationDate)
+      </dd>
+
+      <dt>
+        @Html.DisplayNameFor(model => model.IsActive)
+      </dt>
+
+      <dd>
+        @Html.DisplayFor(model => model.IsActive)
+      </dd>
+
+    </dl>
+    @using (Html.BeginForm("DeleteDependantDetails", "ContributorPersonalDetails", new { ID = Model.Id }, FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+    {
+      <div class="row">
+        <div class="panel-body">
+          <div class="col-sm-12">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+              <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Delete" class="btn btn-sm btn-success" />
+                <button type="submit" class="btn btn-success btn-sm" id="btnCancelInfo" onclick="javascript: return RefreshView();">Cancel</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+@section Scripts {
+
+  <script type="text/javascript">
+  function RefreshView() {
+    /*window.location.reload();*/
+    window.location.href = "ContributorPersonalDetails/DependantDetailsList/"+@ViewBag.PersonId;
+    return false;
+  }
+  </script>
+
+}

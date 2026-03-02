@@ -1,0 +1,327 @@
+﻿
+@{
+  ViewBag.Title = "Mail Settings";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Mail Settings
+      <ul class="tool-bar">
+        <li>
+          <a class="btn btn_table progressbtn" title="Create New" onclick=AddForm()
+             data-placement="bottom"
+             data-original-title="Add Details">
+            <i class="fa fa-plus"></i>
+          </a>
+        </li>
+
+      </ul>
+    </h4>
+  </div>
+  <div class="panel-body">
+    <div class="table-responsive">
+      <table class="table table_respons" id="MailSettingstbl">
+        <thead>
+          <tr>
+            <th>Process Name</th>
+            <th>Mail To</th>
+            @*<th>CC</th>
+            <th>BCC</th>*@
+            <th>Subject</th>
+            <th>Contents</th>
+            <th>Is Send Notification Alert</th>
+            <th>Process Will Start At</th>
+            @* <th>Process Will Start AtStr</th>*@
+            <th>Delay Time</th>
+            <th>Is Instant Mail</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal" id="modal-formPopUp" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title"><i class="fa fa-check-circle"></i> Mail Settings</h4>
+        <button type="button" class="close" title="Close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div id="formPopUpDiv"></div>
+    </div>
+  </div>
+</div>
+@section Scripts {
+  <script nonce="@ViewBag.StyleNonce">
+    var table = $('#MailSettingstbl').dataTable({
+      "bJQueryUI": true,
+      "sPaginationType": "full_numbers",
+      "sScrollY": $(document).height() - 350,
+      //"sScrollXInner": "100%",
+      "sScrollX": "100%",
+      "bSortable": true,
+      "bSort": true,
+      "destroy": true,
+      "bDestroy": true,
+      "bInfo": true,
+      "bServerSide": true,
+      lengthMenu: [
+              [10, 25, 50, 100, 200, -1],
+              ['10', '25', '50', '100', '200', 'All']
+      ],
+      "sAjaxSource": "@Url.Action("MailSettingListAjax", "Dashboard")",
+      'bProcessing': true,
+      oLanguage: { sProcessing: "<div id='DataTable-loader'></div>" },
+      "dom": 'Blfrtip',
+      "buttons": [
+  'copy', 'csv', 'excel', 'pdf', 'print'
+      ],
+
+      "buttons": [
+       {
+         "extend": 'copy',
+         "title": 'Mail Settings',
+         "exportOptions": {
+           "columns": [0, 1, 2, 3, 4, 5, 6, 7]
+         }
+       },
+   {
+     extend: 'csv',
+     title: 'Mail Settings',
+     exportOptions: {
+       "columns": [0, 1, 2, 3, 4, 5, 6, 7]
+     }
+   },
+   {
+     extend: 'excel',
+     title: 'Mail Settings',
+     exportOptions: {
+       "columns": [0, 1, 2, 3, 4, 5, 6, 7]
+     }
+   }, {
+     extend: 'pdf',
+     title: 'Mail Settings',
+     orientation: 'landscape',
+     pageSize: 'A4',
+     exportOptions: {
+       "columns": [0, 1, 2, 3, 4, 5, 6, 7]
+     }
+   },
+     {
+       extend: 'print',
+       title: 'Mail Settings',
+       orientation: 'landscape',
+       //  pageSize: 'LEGAL',
+       exportOptions: {
+         columns: [0, 1, 2, 3, 4, 5, 6, 7]
+       },
+       customize: function (win) {
+         $(win.document.body)
+         $(win.document.body).find('h1').css('font-size', '10pt');
+         $(win.document.body).find('table')
+             .addClass('compact')
+             .css('font-size', '10px');
+
+         var last = null;
+         var current = null;
+         var bod = [];
+
+         var css = '@@page { size: landscape; }',
+             head = win.document.head || win.document.getElementsByTagName('head')[0],
+             style = win.document.createElement('style');
+
+         style.type = 'text/css';
+         style.media = 'print';
+
+         if (style.styleSheet) {
+           style.styleSheet.cssText = css;
+         }
+         else {
+           style.appendChild(win.document.createTextNode(css));
+         }
+
+         head.appendChild(style);
+       }
+     },
+      ],
+      "aoColumns": [
+          { "sName": "ProcessName" },
+          //{ "sName": "MailTo" },
+          //{ "sName": "CC" },
+          //{ "sName": "BCC" },
+          {
+            "sName": "MailTo",
+            "bSearchable": false,
+            "bSortable": false,
+            "mRender": function (data, type, full) {
+              var strString = '';
+              strString += '<br/>TO <i class="fa fa-envelope" aria-hidden="true"></i> : ' + full[1].split(",").join("<br/>");
+
+              if (full[2] == null || full[2] == '') strString += full[2];
+              else strString += '<br/>CC <i class="fa fa-envelope" aria-hidden="true"></i> : ' + full[2].split(",").join("<br/>");
+
+              if (full[3] == null || full[3] == '') strString += full[3];
+              else strString += '<br/>BCC <i class="fa fa-envelope" aria-hidden="true"></i> : ' + full[3].split(",").join("<br/>");
+              return strString;
+            }
+          },
+          //{
+          //  "sName": "CC",
+          //  "bSearchable": false,
+          //  "bSortable": false,
+          //  "render": function (data, type, full, meta) {
+          //    var strString = '';
+          //    if (full[2] == null || full[2] == '') strString += full[2];
+          //    else strString += '<br/>CC: <i class="fa fa-envelope" aria-hidden="true"></i>' + full[2].split(",").join("\n");
+          //    return strString;
+          //  }
+          //},
+          //{
+          //  "sName": "BCC",
+          //  "bSearchable": false,
+          //  "bSortable": false,
+          //  "render": function (data, type, full, meta) {
+          //    var strString = '';
+          //    if (full[3] == null || full[3] == '') strString += full[3];
+          //    else strString += '<br/>BCC: <i class="fa fa-envelope" aria-hidden="true"></i>' + full[3].split(",").join("\n");
+          //    return strString;
+          //  }
+          //},
+          {
+            "sName": "Subject",
+            "bSearchable": false,
+            "bSortable": false,
+            "mRender": function (data, type, full) {
+              debugger;
+              var strString = '';
+              strString += full[4];
+              return strString;
+            }
+          },
+          {
+            "sName": "Contents",
+            "bSearchable": false,
+            "bSortable": false,
+            "mRender": function (data, type, full) {
+              var strString = '';
+              strString += full[5];
+              return strString;
+            }
+          },
+          //{ "sName": "IsSendNotificationAlert" },
+          {
+            "sName": "IsSendNotificationAlert",
+            "bSearchable": false,
+            "bSortable": false,
+            "mRender": function (data, type, full) {
+
+              var strString = '';
+              if (full[6] == 'True') strString += '<i class="fa fa-check text-success" aria-hidden="true"></i>' //+ full[6];
+              else strString += '<i class="far fa-times-circle text-danger"></i>' //+ full[6];
+              return strString;
+            }
+          },
+          {
+            "sName": "ProcessWillStartAt",
+            "bSearchable": false,
+            "bSortable": false,
+            "mRender": function (data, type, full) {
+              var strString = '';
+              strString += full[7];
+              return strString;
+            }
+          },
+          {
+            "sName": "DelayTime",
+            "bSearchable": false,
+            "bSortable": false,
+            "mRender": function (data, type, full) {
+              var strString = '';
+              strString += full[8];
+              return strString;
+            }
+          },
+          {
+            "sName": "Instant Mail",
+            "bSearchable": false,
+            "bSortable": false,
+            "mRender": function (data, type, full) {
+              var strString = '';
+              if (full[11] == 'True')
+                strString += '<i class="fa fa-check text-success" aria-hidden="true"></i>'; //'<input type="checkbox" onclick="return this.checked = !this.checked;" checked/>';
+              else
+                strString += '<i class="far fa-times-circle text-danger"></i>'; //'<input type="checkbox" onclick="return this.checked = !this.checked;"/>'
+              return strString;
+            }
+          },
+          {
+            "sName": "Action",
+            "bSearchable": false,
+            "bSortable": false,
+            "mRender": function (data, type, full) {
+              var strString = '';
+              var msg = '';
+              var d = full[10];
+              strString += '<a onclick=EditForm("' + d + '") class="btn btn-primary btn-xs progressbtn" title="Edit" ><i class="fa fa-pencil"></i> </a>';
+              if (full[9] == "True") {
+                msg = "Do you want to de-activate this record..?";
+                strString += '&nbsp;<a onclick="ChangeConfirm(\'' + d + '\',\'' + msg + '\')" class="btn btn-xs btn-success" title="Active">Active</a>';
+              }
+              else {
+                msg = "Do you want to activate this record..?";
+                strString += '&nbsp;<a onclick="ChangeConfirm(\'' + d + '\',\'' + msg + '\')" class="btn btn-xs btn-danger" title="Active">In Active</a>';
+              }
+              return strString;
+            }
+          },
+      ],
+
+    })
+
+    ;
+
+    function ChangeStatus() {
+      var id = $("#ApproveId").val();
+      $.ajax({
+        url: "@Url.Action("Delete", "MailSettings")?Id=" + id,
+        success: function (result) {
+          if (result == "1") {
+            toasterSuccessMessage("Status Changed Successfully");
+            $("#MailSettingstbl").dataTable().fnDraw();
+          }
+          else {
+            toasterErrorMessage("No Data Found");
+          }
+        }
+      });
+    }
+    function EditForm(id) {
+      $("#formPopUpDiv").html('');
+      $.ajax({
+        url: "@Url.Action("EditAjax", "Dashboard")?Id=" + id,
+        success: function (result) {
+          $("#formPopUpDiv").html(result);
+          $("#modal-formPopUp").modal("show");
+        }
+      });
+    }
+    function AddForm() {
+      $("#formPopUpDiv").html('');
+      $.ajax({
+        url: "@Url.Action("CreateAjax", "Dashboard")",
+        success: function (result) {
+          $("#formPopUpDiv").html(result);
+          $("#modal-formPopUp").modal("show");
+        }
+      });
+    }
+  </script>
+}
+

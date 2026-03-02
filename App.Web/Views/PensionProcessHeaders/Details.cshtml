@@ -1,0 +1,139 @@
+﻿@model App.Data.Entities.PensionProcessHeader
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>PensionProcessHeader</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.pybatchid)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.pybatchid)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.startedon)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.startedon)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.endedon)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.endedon)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.searchcriteria)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.searchcriteria)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.recordssearched)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.recordssearched)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.recordcound)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.recordcound)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.status)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.status)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.errormessage)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.errormessage)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.insertby)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.insertby)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.insertdate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.insertdate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.insertmachineinfo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.insertmachineinfo)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.updateby)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.updateby)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.updatedate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.updatedate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.updatemachineinfo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.updatemachineinfo)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IsActive)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IsActive)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

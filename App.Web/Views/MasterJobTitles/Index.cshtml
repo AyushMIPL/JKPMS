@@ -1,0 +1,108 @@
+﻿@model IEnumerable<App.Data.Entities.MasterJobTitle>
+
+@{
+  ViewBag.Title = "Index";
+}
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Job Title
+      
+      <ul class="tool-bar">
+        <li><a href="/MasterJobTitles/Create" data-toggle="tooltip" data-placement="bottom" title="Add details" data-original-title="Add Details"><i class="fa fa-plus"></i></a></li>
+        
+      </ul>
+    </h4>
+  </div>
+  <div class="panel-body">
+    <table class="table dataTable" id="tbl">
+      <thead>
+        <tr>
+
+          <th>Name</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+@section Scripts {
+
+  <script nonce="@ViewBag.StyleNonce">
+    $(function () {
+      doBindData();
+    });
+    function doBindData() {
+      var oTable = $('#tbl').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "sAjaxSource": "/MasterJobTitles/AjaxHandler",
+        "aoColumns": [
+
+						{ "sName": "Name" },
+						{
+						  "sName": "ActiveStatus",
+						  "bSearchable": false,
+						  "bSortable": false,
+						  "fnRender": function (oObj) {
+						    if (oObj.aData[1] == "False")
+						      return '<span class="badge badge-danger">inactive</span>';
+						    else
+						      return '<span class="badge badge-success">active</span>';
+						  }
+						},
+						{
+						  "sName": "ID",
+						  "bSearchable": false,
+						  "bSortable": false,
+						  "fnRender": function (oObj) {
+						    var strString = '<a href="/MasterJobTitles/Edit/' + oObj.aData[2] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i> Edit</a>';
+						    strString += '&nbsp;<a href="/MasterJobTitles/Details/' + oObj.aData[2] + '\" class="btn btn-xs btn-primary" title="Detail"><i class="fa fa-list"></i> Details</a>';
+						    strString += '&nbsp;<a href="javascript:;"  onclick="javascript:del(' + oObj.aData[2] + ');" class="btn btn-xs btn-danger" title="Delete"><i class="fa fa-trash-o fa-lg"></i> Delete</a>';
+
+						    return strString;
+						  }
+						}
+        ]
+      });
+    }
+
+    function del(ctrlId) {
+      $("#hdDocumentId").val(ctrlId);
+      $('#confirmDelete').popup("show");
+    }
+    const Confirm_Delete_ClassBtn = document.querySelectorAll('.Confirm_Delete_Class');
+    debugger
+    Confirm_Delete_ClassBtn.forEach(button => {
+      button.addEventListener('click', onDeleteConfirm);
+    });
+    function onDeleteConfirm() {
+      var id = $("#hdDocumentId").val();
+      var name = "JobTitleID";
+      $.ajax({
+        url: "@Url.Action("Remove", "MasterJobTitles")?Id=" + id + "&name=" + name,
+        type: "GET",
+      })
+		.done(function (result) {
+		  var actionRes = result;
+		  if (actionRes == "0") {
+		    toasterErrorMessage("There is some error, please try again.");
+		    return actionRes;
+		  }
+		  else if (actionRes == "1") {
+		    toasterSuccessMessage("Status changed sucessfully.");
+		    $('#confirmDelete').popup("hide");
+		    doBindData();
+		  } else {
+		    toasterErrorMessage("Already in Use.");
+		    $('#confirmDelete').popup("hide");
+		  }
+		});
+    }
+  </script>
+}

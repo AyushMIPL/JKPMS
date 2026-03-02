@@ -1,0 +1,91 @@
+﻿@model App.Data.Entities.PensionApplications
+@using App.Web.Helper
+@{
+  ViewBag.Title = "Details";
+  Layout = null;
+}
+@Html.HiddenFor(m => m.BenefitTypes)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <title>Html</title>
+</head>
+<body style="max-width:615px;max-height:960px;font-size:11px;">
+  <div class="panel-body">
+    <table>
+      <tbody>
+        <tr>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;">Name of Officer</td>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;"><b>@ViewBag.Name</b></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;">Post</td>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;"><b>@Model.Designation.Name</b></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;">Date of Retirement/Resignation</td>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;"><b>@Html.FormatDate(Model.RetirementOrResignationDate)</b></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;">Date of Birth</td>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;"><b>@Html.FormatDate(Model.DOB)</b></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;">Date of first Appointment</td>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;"><b>@Html.FormatDate(Model.DateofAppointment1st)</b> </td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;">Date of Last Appointment</td>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;"><b>@Html.FormatDate(Model.RetirementOrResignationDate)</b></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;">Length Of Qualifying Service in Months(to Dec 31,2003)</td>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;"><b>@Model.LengthOfQualifyingServiceInMonthsTo31Dec2003</b></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;">Length Of Qualifying Service in Months(from Jan 1,2004)</td>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;"><b>@Model.LengthOfQualifyingServiceInMonthsFrom1Jan2014</b></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;">Salary P.A/Salary P.A plus resposibility/inducement allowance at date of retirement,if in post longer than 3 Years</td>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;"><b>EC$ @Html.FormatSeparator(Model.RetirementAnnualSalary1)</b></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;">Average Salary P.A/Salary P.A plus resposibility/inducement allowance over past three (3) years at date of retirement,if in post less than three (3) Years</td>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;"><b>EC$ @Html.FormatSeparator(Model.RetirementAnnualSalary2)</b></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;">Full Pension</td>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;"><b>EC$ @Model.FullpensionAmount1</b></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;">Full Pension</td>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;"><b>EC$ @Model.FullpensionAmount2</b></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;">Total Full Pension</td>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;"><b>EC$ @Html.FormatSeparator(Model.TotalFullpension)</b></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;">Maximum Full Pension Allowed</td>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;"><b>EC$ @Model.MaxPension</b></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;">Gratuity Reduced Pension</td>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;"><b>EC$ @Html.FormatSeparator(Convert.ToDecimal(Model.Gratuity))</b></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;">Reduced Pension</td>
+          <td style="border: 1px solid black!important;width: 80%;font-size: 16px;"><b>EC$ @Html.FormatSeparator(Convert.ToDecimal(Model.ReducedPension))</b></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+</body>
+</html>
+
+

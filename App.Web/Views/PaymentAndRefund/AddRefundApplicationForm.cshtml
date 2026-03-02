@@ -1,0 +1,255 @@
+﻿﻿@model App.Data.Entities.RefundApplications
+
+@{
+  ViewBag.Title = "RefundApplicationForm";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Refund Application Form
+
+    </h4>
+  </div>
+  <div class="panel-body">
+    @using (Html.BeginForm("AddRefundApplicationForm", "PaymentAndRefund", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "form1" }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+      @Html.Hidden("InitialApproved");
+      @Html.Hidden("RightForApproval")
+      <div class="row">
+        <div class="col-sm-8">
+          <div class="form-group">
+            @Html.LabelFor(model => model.EmployerID, "Employer *", htmlAttributes: new { @class = "control-label col-md-4" })
+            <div class="col-sm-8">
+              @Html.DropDownList("EmployerID", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+            </div>
+          </div>
+          <div class="form-group">
+            @Html.LabelFor(model => model.PersonID, "Name of Officer *", htmlAttributes: new { @class = "control-label col-md-4" })
+            <div class="col-sm-8">
+              @Html.DropDownList("PersonID", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+            </div>
+          </div>
+          <div class="form-group">
+            @Html.LabelFor(model => model.DesignationId, "Post", htmlAttributes: new { @class = "control-label col-md-4" })
+            <div class="col-sm-8">
+              @Html.DropDownList("DesignationId", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+            </div>
+          </div>
+          <div class="form-group">
+            @Html.LabelFor(model => model.FirstAppointmentDate, "Date of Appointment", htmlAttributes: new { @class = "control-label col-md-4" })
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.FirstAppointmentDate, new { @class = "form-control input-sm", @readonly = "readonly" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-4 TextRight">
+              @Html.LabelFor(model => model.RetirementOrResignationDate, "Action Date *", htmlAttributes: new { @class = "control-label" })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Date of Retirement/Resignation/ Termination "></i>
+            </div>
+            <div class="col-sm-8">
+              <div class="input-group date" id="Retire">
+                @Html.EditorFor(model => model.RetirementOrResignationDate, new { htmlAttributes = new { @class = "form-control" } })
+
+                <span class="input-group-addon">
+                  <i class="fa fa-calendar"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            @Html.LabelFor(model => model.JobStatus, "Job Status *", htmlAttributes: new { @class = "control-label col-md-4" })
+            <div class="col-sm-8">
+              @Html.DropDownList("JobStatus", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-4 TextRight">
+              @Html.LabelFor(model => model.LengthOfServiceInMonths, "Service Length(From Jan, 2004)", htmlAttributes: new { @class = "control-label" })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Length of Service in Months(From 1 Jan, 2004)"></i>
+            </div>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.LengthOfServiceInMonths, new { @class = "form-control input-sm", @readonly = "readonly" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-4 TextRight">
+              @Html.LabelFor(model => model.TotalEmployeeContribution, "Emp. Contribution", htmlAttributes: new { @class = "control-label" })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Total Employee Contribution to Pension Fund"></i>
+            </div>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.TotalEmployeeContribution, new { @class = "form-control input-sm", @readonly = "readonly" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-4 TextRight">
+              @Html.LabelFor(model => model.AnnualInterest, "Compound Interest (Annual)", htmlAttributes: new { @class = "control-label " })
+              &nbsp;<i id="InterestRate" class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Interest Rate will be shown once you will select Action Date"></i>
+            </div>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.AnnualInterest, new { @class = "form-control input-sm", @readonly = "readonly" })
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-4 TextRight">
+              @Html.LabelFor(model => model.TotalEmployeeContributionWithInterest, "Contribution(with interest)", htmlAttributes: new { @class = "control-label" })
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Total Employee Contribution to Pension Fund with interest compounded annually"></i>
+            </div>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(model => model.TotalEmployeeContributionWithInterest, new { @class = "form-control input-sm", @readonly = "readonly" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-4 control-label">
+              Note:
+              &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Mandatory If Save And Approved at First Level"></i>
+            </label>
+            <div class="col-sm-8">
+              <textarea cols="78" columns="4" id="Notes" name="Notes" rows="4"></textarea>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-4 control-label"></label>
+            <div class="col-sm-8">
+              <button type="submit" class="btn btn-success"><i class="fa fa-save"> </i> Save</button>
+              <button type="button" class="btn btn-info" id="Approval"><i class="fa fa-check"> </i> Save & Approved at Initial Level</button>
+              <a href="/PaymentAndRefund/Index" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+              @*@Html.ActionLink("Back to List", "Index", "PaymentAndRefund", null, new { @class = "btn btn-primary" })*@
+            </div>
+          </div>
+        </div>
+
+      </div>
+    }
+  </div>
+</div>
+
+
+@section scripts{
+  <script nonce="@ViewBag.StyleNonce">
+
+    if ($("#RightForApproval").val() == "No") {
+      $("#Approval").hide();
+    }
+    $("#Approval").click(function () {
+      if ($("#Notes").val() == "") {
+        toasterErrorMessage("Please enter Notes");
+      }
+      else {
+        $("#InitialApproved").val(true);
+        $("#form1").submit();
+      }
+
+    })
+    $("#EmployerID").change(function () {
+      $("#PersonID").select2("val", "");
+      $("#PersonID").empty();
+      $('#PersonID').append($('<option/>').attr("value", "").text("---Select---"));
+      clearall();
+      debugger
+      var eid = $(this).val();
+      if (eid != "") {
+        $.ajax({
+          type: 'Get',
+          url: '/PaymentAndRefund/GetContributorAjax?EmpId=' + eid,
+          dataType: 'json'
+        }).done(function (result) {
+          debugger
+          $.each(result, function (i, names) {
+            $('#PersonID').append($('<option/>').attr("value", names.Value).text(names.Text));
+          });
+
+        });
+      }
+    })
+
+    $("#PersonID").change(function () {
+      clearall();
+      var id = $(this).val();
+      if (id != "") {
+        $.ajax({
+          url: "@Url.Action("GetAppointmentDateAjax", "PaymentAndRefund")?Id=" + id,
+          type: 'Get',
+          dataType: 'json'
+        }).done(function (result) {
+          if (result.indexOf("...") >= 0) {
+            toasterErrorMessage(result + "");
+          }
+          else {
+              debugger
+            $("#FirstAppointmentDate").val(result[0].DateofApp);
+            $("#DesignationId").select2("val", result[0].DesignnationId);
+            $('#Retire').datepicker('setStartDate', result[0].DateofApp);
+            var date = new Date();
+            var cdate = (date.getMonth() + 4) > 11 ? ((date.getMonth() - 11) + "/" + date.getDate() + "/" + (date.getFullYear() + 1)) : ((date.getMonth() + 4) + "/" + date.getDate() + "/" + (date.getFullYear()));
+            var eDate = new Date(cdate);
+            var bdate = new Date(result[0].expDate);
+            if (bdate < eDate) {
+              $('#Retire').datepicker('setEndDate', result.expDate);
+            }
+            else {
+              $('#Retire').datepicker('setEndDate', eDate);
+            }
+          }
+
+        });
+      }
+    })
+
+    $("#Retire").on('changeDate', function () {
+      debugger
+      var dateReg = $("#RetirementOrResignationDate").val();
+      var dateApp = $("#FirstAppointmentDate").val();
+      $("#LengthOfServiceInMonths").val("");
+      $("#TotalEmployeeContribution").val("");
+      $("#AnnualInterest").val("");
+      $("#TotalEmployeeContributionWithInterest").val("");
+      var pid = $("#PersonID").val();
+      if (pid != "" && dateApp != "" && dateReg != "") {
+        $.ajax({
+          url: "@Url.Action("GetRefundNewAjax", "PaymentAndRefund")?PersonID=" + pid + "&StartDate=" + dateApp + "&EndDate=" + dateReg,
+          type: 'Get',
+          dataType: 'json'
+        }).done(function (getPension) {
+          debugger
+          if (getPension.error != "" && getPension.error != null) {
+            toasterErrorMessage(getPension.error);
+          }
+          else {
+            $('#InterestRate').attr("data-original-title", "Total Interest compounded annually at " + getPension.interestRate.toString().replace(".00", "") + "%");
+            $("#LengthOfServiceInMonths").val(getPension.ServiceLength);
+            $("#TotalEmployeeContribution").val(parseFloat(getPension.TotalContributionPerYear).toFixed(2));
+            $("#AnnualInterest").val(parseFloat(getPension.TotalInterestPerYear).toFixed(2));
+            $("#TotalEmployeeContributionWithInterest").val(parseFloat(getPension.TotalRefundAmountPerYear).toFixed(2));
+          }
+        });
+      }
+    })
+    function clearall() {
+      $("#LengthOfServiceInMonths").val("");
+      $("#TotalEmployeeContribution").val("");
+      $("#AnnualInterest").val("");
+      $("#TotalEmployeeContributionWithInterest").val("");
+      $("#FirstAppointmentDate").val("");
+      $("#RetirementOrResignationDate").val("");
+      $("#DesignationId").select2("val", "");
+    }
+    $(function () {
+      var date = new Date();
+      $('#Retire').datepicker({
+        endDate: date,
+        startView: 1,
+        format: "mm/dd/yyyy",
+        autoclose: true
+      });
+    })
+  </script>
+}

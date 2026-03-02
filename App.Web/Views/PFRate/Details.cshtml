@@ -1,0 +1,88 @@
+﻿@model App.Data.Entities.MasterPFRate
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      PFPercentage Details
+      @*<ul class="tool-bar">
+        
+      </ul>*@
+    </h4>
+  </div>
+	
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-sm-4">
+        <dl class="dl-horizontal">
+
+          <dt>
+            @Html.DisplayNameFor(model => model.PfType)
+          </dt>
+
+          <dd>
+            @if (Model.PfType == "C")
+            {
+            <span>Contributor</span>
+            }
+            else
+            {
+              <span>Employer</span>
+            }
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.Name)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.Name)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.PFRate)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.PFRate)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.EffectiveDate)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.EffectiveDate)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.EffectiveEndDate)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.EffectiveEndDate)
+          </dd>
+
+          <dt>@Html.DisplayNameFor(model => model.IsActive)</dt>
+
+          <dd>
+            @if (Model.IsActive)
+            { <span class='badge badge-success'>Active</span> }
+          </dd>
+
+        </dl>
+      </div>
+
+    </div>
+  </div>
+  <div class="panel-footer">
+    <a href="/PFRate/Edit/@Model.Id" class="btn btn-info"><i class="fa fa-pencil"> </i> Edit</a>
+    <a href="/PFRate/Index" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+    
+  </div>
+</div>
+

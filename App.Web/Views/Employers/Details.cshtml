@@ -1,0 +1,109 @@
+﻿@model App.Data.Entities.MasterEmployer
+
+@{
+    ViewBag.Title = "Details";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Employers Details
+      <ul class="tool-bar">
+        
+      </ul>
+    </h4>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-sm-4">
+        <dl class="dl-horizontal">
+          <dt>
+            @Html.DisplayNameFor(model => model.City.Name)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.City.Name)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.MasterPFRate.Name)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.MasterPFRate.Name)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.EmployerName)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.EmployerName)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.EmployerAddress)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.EmployerAddress)
+          </dd>
+
+          @*<dt>
+            @Html.DisplayNameFor(model => model.ZipCode)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.ZipCode)
+          </dd>*@
+
+          <dt>
+            @Html.DisplayNameFor(model => model.POBoxNo)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.POBoxNo)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.ContactPerson)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.ContactPerson)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.Mobile)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.Mobile)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.PFRate)
+          </dt>
+
+          <dd>
+            @Html.DisplayFor(model => model.PFRate)
+          </dd>
+
+          <dt>
+            @Html.DisplayNameFor(model => model.IsActive)
+          </dt>
+
+          <dd>
+            @if (Model.IsActive)
+            { <span class='badge badge-success'>Active</span> }
+          </dd>
+
+        </dl>
+      </div>
+
+    </div>
+  </div>
+  <div class="panel-footer">
+    @Html.ActionLink("Edit", "Edit", new { @id = Model.Id }, new { @class = "btn btn-success" })
+    @Html.ActionLink("Back to List", "Index", "Employers", null, new { @class = "btn btn-primary" })
+  </div>
+</div>

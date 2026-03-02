@@ -1,0 +1,113 @@
+﻿@model JKPS.COMMON.DVOMasterEmployee
+@using JKPS.COMMON
+@{
+  ViewBag.Title = "Login_log";
+}
+<style>
+    table.dataTable thead th, table.dataTable tfoot th, table.dataTable tbody td{
+        text-align:left!important;
+    }
+  div#tbLogin_loglList_filter {
+    width: auto;
+  }
+</style>
+
+<div class="panel panel-default">
+  @using (Html.BeginForm())
+  {
+    
+  }
+</div>
+
+
+<div class="panel panel-default">
+  
+
+  <div class="panel-body">
+
+    <div class="row">
+
+      <div class="col-md-4"><h4>Login And  Summary</h4></div>
+
+      <div class="col-md-8">
+        <button type="button" class="btn btn-success px-5 height btn_PaymentStatus_loading_PaymentHistoty" title="Please Wait While We Process Your Request" id="btn_downloadExcelExceptionlList_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+
+      </div>
+
+
+
+
+    </div>
+
+    <table class="table dataTable" id="tbLogin_loglList">
+      <thead>
+        <tr>
+          <th>User Name</th>
+          <th>Region Name</th>
+          <th>Login Time</th>
+          <th>Logout Time</th>
+
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+
+
+
+@section Scripts {
+  @*<script src="~/Content/endless/js/jquery.dataTables.min.js"></script>*@
+  <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+  <script src="~/Content/endless/LatestJS/jquery.dataTables.min.js"></script>
+
+  <script nonce="@ViewBag.StyleNonce">
+
+    $(document).ready(function () {
+      ShowExceptionList();
+    });
+
+    function ShowExceptionList() {
+      debugger
+      var sName = $('#tbLogin_loglList').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+            "bAutoWidth": true,
+        "sAjaxSource": "@Url.Action("Login_logAjax", "Reports")",
+         "order":[],  
+        "aoColumns": [
+
+          { "sName": "UserName" },
+          { "sName": "RegionName" },
+          { "sName": "LoginTime" },
+          { "sName": "LogoutTime" }
+
+        ]
+      });
+        }
+
+        // Generate a unique number
+        function generateUniqueNumber() {
+            // Get current timestamp
+            var timestamp = new Date().getTime();
+
+            // Generate a random number
+            var randomNumber = Math.floor(Math.random() * 1000000);
+
+            // Combine timestamp and random number to create a unique number
+            var uniqueNumber = timestamp + randomNumber;
+
+            return uniqueNumber;
+        }
+        $('#FromDate, #toDate').datepicker({
+            format: 'dd/mm/yyyy',
+            autoclose: true,
+            clearBtn: true,
+            enableOnReadonly: false // For disabling date picker
+        });
+
+  </script>
+}

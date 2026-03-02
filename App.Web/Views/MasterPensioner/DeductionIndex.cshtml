@@ -1,0 +1,94 @@
+﻿@model App.Data.Entities.MasterEmployeeDeductions
+
+@{
+  Layout = "~/Views/Shared/_LayoutPensioner.cshtml";
+}
+@section profilePensioner
+{@Html.Hidden("PensionerID")
+@Html.Hidden("CId")
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Deduction Details:@string.Format("{0} ({1})", ViewBag.Name, ViewBag.PensionerID)
+      
+      <ul class="tool-bar">
+        <li><a href="/MasterPensioner/AddDeductionDetails/@ViewBag.CId" data-toggle="tooltip" data-placement="bottom" title="Add details" data-original-title="Add Details"><i class="fa fa-plus"></i></a></li>
+        
+      </ul>
+    </h4>
+  </div>
+  <div class="panel-body">
+    <table class="table dataTable" id="tbl">
+      <thead>
+        <tr>
+          <th>Deduction Code</th>
+          <th>Rate</th>
+          <th>Annual Limit</th>
+          <th>Pay Limit</th>
+          <th>Applied Date</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+}
+@section Scripts {
+  <script src="~/Content/endless/js/jquery.dataTables.min.js"></script>
+  <script nonce="@ViewBag.StyleNonce">
+    $(function () {
+      var pensionerID = $("#PensionerID").val();
+      var oTable = $('#tbl').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "sAjaxSource": "/MasterPensioner/DeductionAjaxHandler/?PensionerID=" + pensionerID,
+        "aoColumns": [
+
+						{ "sName": "DeductionCode" },
+            {
+              "sName": "Rate",
+              "fnRender": function (oObj) {
+                return '<span class="auto">'+oObj.aData[1]+'</span>';
+              }
+            },
+            {
+              "sName": "AnnualLimit",
+              "fnRender": function (oObj) {
+                return '<span class="auto">' + oObj.aData[2] + '</span>';
+              }
+            },
+            {
+              "sName": "PayLimit",
+              "fnRender": function (oObj) {
+                return '<span class="auto">' + oObj.aData[3] + '</span>';
+              }
+            },
+            { "sName": "AppliedDate" },
+            {
+              "sName": "ID",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                var strString = '<a href="/MasterPensioner/EditDeductionDetails/' + oObj.aData[5] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i> Edit</a>';
+
+                return strString;
+              }
+            }
+        ]
+      });
+      
+    })
+    $(document).ajaxStop(function () {
+      $(".auto").autoNumeric({ aSep: ',', aDec: '.' });
+      });
+    
+    
+  </script>
+}
+
+
+

@@ -1,0 +1,66 @@
+﻿@{
+
+  //Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div id="divContainer">
+  @Html.Partial("_PartialAddPersonalDetails")
+</div>
+
+@section Scripts {
+  @*<script type="text/javascript" src="~/Scripts/ContributorDetails.js"></script>
+  <script nonce="@ViewBag.StyleNonce">*@
+
+    @*$('#DateOfBirth').datepicker("setDate", new Date(1997, 01, 01));
+    
+    $(".input-group.date").on("changeDate", function (ev) {
+      var date = new Date($("#DateOfBirth").val());;
+      var today = new Date();
+      var todayDate = today.getFullYear();
+      var selectedDate = (date.getFullYear() + 18);
+      if (selectedDate > todayDate) {
+        toasterErrorMessage("You Should be 18 year old to register");
+        $("#DateOfBirth").val("");
+      }
+      
+    });
+
+    $("#IsActive").on("click", function () {
+      toasterErrorMessage("If you Uncheck This field..Then this Record is treated as Inactive Record");
+    })*@
+    
+
+
+    @*$("#LastDate").on("changeDate", function (ev) {
+      debugger
+      var Edate = new Date($("#LastAppointmentDate").val());;
+      var Sdate = new Date($("#FirstAppointmentDate").val());;
+      if ($("#FirstAppointmentDate").val() != "") {
+        var mBegin = parseInt(Sdate.getFullYear() + "" + Sdate.getMonth() + "" + Sdate.getDate() + "");
+        var mEnd = parseInt(Edate.getFullYear() + "" + Edate.getMonth() + "" + Edate.getDate() + "");
+        debugger;
+        if (mBegin > mEnd) {
+
+          toasterErrorMessage("Last Appointment Date is Invalid");
+          $("#LastAppointmentDate").val("");
+
+        }
+      }
+      else {
+        $("#LastAppointmentDate").val("")
+        toasterErrorMessage("Please Select First Appointment Date First");
+      }
+
+    });
+    $("#Expected").prop("disabled", "disabled");
+    $(function () {      
+      $.ajax({
+        url: "@Url.Action("PersonID", "ContributorPersonalDetails")",
+        type: 'Get',
+        dataType: 'json'
+      }).done(function (result) {
+        var id = "C0000" + (result+1);
+        $("#PersonID").val(id);
+        debugger;
+      });})
+  </script>*@
+}

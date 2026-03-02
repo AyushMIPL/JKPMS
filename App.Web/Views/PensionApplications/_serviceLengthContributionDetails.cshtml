@@ -1,0 +1,102 @@
+﻿
+@{
+  
+  Layout = null;
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h5 class="headline" style="margin:0px;padding:0px;border:none;">
+    Contribution List
+      
+      @*<ul class="tool-bar">
+
+          
+        </ul>*@
+    </h5>
+  </div>
+  <div class="panel-body">
+    <table class="table" id="exampless">
+      <thead>
+        <tr>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th colspan="3" style="border:inherit; text-align:center">System Defined</th>
+          <th colspan="3" style="border:inherit; text-align:center">Get Amount From Employer</th>
+        </tr>
+        <tr>
+          <th>JKPS ID</th>
+          <th>Month</th>
+          <th>Year</th>
+          <th style="text-align:center">Salary</th>
+          <th style="text-align:center">Employee’s <br /> Contribution</th>
+          <th style="text-align:center">Employer <br />Contribution</th>
+          <th style="text-align:center">Salary</th>
+          <th style="text-align:center">Employee’s <br /> Contribution</th>
+          <th style="text-align:center">Employer <br />Contribution</th>
+        </tr>
+      </thead>
+      <tbody>
+        @*@foreach (var items in Model)
+        {
+          <tr>
+            <td>@items.ContributorName</td>
+            <td>@items.Year</td>
+            <td>@items.Month</td>
+            <td>@items.SalaryAmount</td>
+            <td>@items.ContributorContribution</td>
+            <td>@items.EmployerContribution</td>
+            <td>@items.SalaryAmount</td>
+            <td>@items.ContributorContribution</td>
+            <td>@items.EmployerContribution</td>
+          </tr>
+        }*@
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div><!-- /panel -->
+<script nonce="@ViewBag.StyleNonce">  
+
+  //$(function () {
+
+  //  var ootable = $('#exampless').DataTable({
+  //    "columnDefs": [
+  //        { "visible": false, "targets": 2 }
+  //    ],
+  //    "order": [[2, 'asc']],
+  //    //"displayLength": 25,
+  //    "drawCallback": function (settings) {
+  //      var api = this.api();
+  //      var rows = api.rows({ page: 'current' }).nodes();
+  //      var last = null;
+
+  //      api.column(2, { page: 'current' }).data().each(function (group, i) {
+  //        if (last !== group) {
+  //          $(rows).eq(i).before(
+  //              '<tr class="group"><td colspan="4">' + group + '</td></tr>'
+  //          );
+
+  //          last = group;
+  //        }
+  //      });
+  //    }
+  //  });
+
+  //  // Order by the grouping
+  //  $('#exampless tbody').on('click', 'tr.group', function () {
+  //    var currentOrder = ootable.order()[0];
+  //    if (currentOrder[0] === 2 && currentOrder[1] === 'asc') {
+  //      ootable.order([2, 'desc']).draw();
+  //    }
+  //    else {
+  //      ootable.order([2, 'asc']).draw();
+  //    }
+  //  });
+
+
+  //})
+</script>
+

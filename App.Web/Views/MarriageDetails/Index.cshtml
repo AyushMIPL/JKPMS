@@ -1,0 +1,99 @@
+﻿@model IEnumerable<App.Data.Entities.MasterContributorMarriageDetails>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Marriage Details</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.PersonId)
+        </th>
+        <th>
+            @Html.LabelFor(model => model.First().SpouseFirstName, "Spouse Name")
+        </th>
+        <th>
+          @Html.DisplayNameFor(model => model.Country.CountryCode)
+        </th>
+        <th>
+          @Html.DisplayNameFor(model => model.MaritalStatus.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DateOfBirth)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Phone)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PhoneOffice)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Mobile)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Email)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.MarriageBeginDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.MarriageEndDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IsActive)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.PersonId)
+        </td>
+        <td>
+           @(String.Format("{0} {1} {2}", @Html.DisplayFor(modelItem => item.SpouseFirstName),@Html.DisplayFor(modelItem => item.MidName),@Html.DisplayFor(modelItem => item.LastName)))
+        </td>
+        <td>
+          @Html.DisplayFor(modelItem => item.Country.CountryCode)
+        </td>
+        <td>
+          @Html.DisplayFor(modelItem => item.MaritalStatus.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DateOfBirth)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Phone)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PhoneOffice)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Mobile)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Email)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.MarriageBeginDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.MarriageEndDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsActive)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+        </td>
+    </tr>
+}
+
+</table>

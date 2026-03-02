@@ -1,0 +1,426 @@
+﻿@model IEnumerable<JKPS.COMMON.DVOMasterEmployeeIncomes>
+
+@{
+  Layout = "~/Views/Shared/_LayoutPensioner.cshtml";
+}
+
+<link href="~/Content/endless/LatestJS/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="~/Content/endless/LatestJS/buttons.dataTables.min.css" rel="stylesheet" />
+
+<style>
+  .dataTables_wrapper .dt-buttons {
+    float: none;
+    text-align: right;
+  }
+
+  /*.my-sky-blu {
+    background-color: #95c8d7;
+  }*/
+</style>
+@section profilePensioner
+{@Html.Hidden("PensionerID")
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="form-group">
+          <div class="col-sm-6">
+            <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+              Payment History:@string.Format("{0} ({1})", ViewBag.Name, ViewBag.ApplicationReferenceNo)
+            </h4>
+
+          </div>
+          <div class="col-sm-6">
+            <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+              Scheme Type:@string.Format("({0})", ViewBag.TypeCode)
+            </h4>
+          </div>
+          <button type="button" class="btn btn-success px-5 height" style="display: none; float:right" title="Please Wait While We Process Your Request" id="btn_downloadExcelHistroy_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+          <button class="btn btn-success" id="IddownloadExcelHistory" style="float: right; text-align: right;" onclick="downloadExcel(event)">Download Excel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    @*<table id="reportData" class="display nowrap" cellspacing="0" width="100%">*@
+    <table class="table dataTable" id="tbl">
+      <thead>
+        <tr>
+          <th>Account No</th>
+          <th>Bank Name</th>
+          <th>IFSC Code</th>
+          <th>Paid On</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Reason</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+@*This is for the payment status Edit Model*@
+
+<div class="custom-popup confirmClass" id="PopUpPaymentStatus" style="display: none; width: 900px !important;">
+  <div class="padding-md">
+
+    <!-- Update Payment Section -->
+    <h3 class="m-top-none py-3 text-white" style="background: #95c8d7">Update Payment History Details.</h3>
+    <!-- Header Section -->
+    <div class="row">
+      <div class="col-sm-6">
+        <label for="APPLICATION_REFERENCE_NO">Application Reference No:</label>
+        <div class="form-group">
+          <input type="text" id="APPLICATION_REFERENCE_NO" class="form-control" placeholder="Enter Your Application Reference No." disabled />
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <label for="Name">Name:</label>
+        <div class="form-group">
+          <input type="text" id="Name" class="form-control" placeholder="Enter Your Name" disabled />
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Payment Status -->
+    <div class="row">
+      <div class="col-sm-6">
+        <label for="paymentStatus">Payment Status:</label>
+        <div class="form-group">
+          <select class="form-control" id="paymentStatus1" style="border-radius:20px;">
+            <option value="0">--select--</option>
+            <option value="Fail">Fail</option>
+            <option value="Ok">Ok</option>
+          </select>
+          <div id="error-paymentStatus1" class="error-message" style="color:red;"></div>
+
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <label for="Date">Date:</label>
+        <div class="form-group">
+          <input type="text" id="TransactionDate" class="form-control" placeholder="Search for TransactionDate No." />
+        </div>
+      </div>
+    </div>
+
+    <!-- Date -->
+    <!-- Remark -->
+    <div class="row">
+      <div class="col-sm-12">
+        <label for="RemarksId">Remark:</label>
+        <div class="form-group">
+          <textarea type="text" id="RemarksId" class="form-control" placeholder="Enter Your Remark"></textarea>
+          <div id="error-RemarksId" style="color: red;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buttons (Update and Cancel) -->
+    <div class="text-center">
+      <button type="button" class="btn btn-success px-5 height" style="display: none; float:right" title="Please Wait While We Process Your Request" id="btn_PaymentStatus_loading">
+        <i class="fa fa-spinner fa-spin"></i> Processing
+      </button>
+      <a class="btn btn-success m-right-sm " id="IdPaymentStatus" onclick="onclickPaymentStatus()">Update</a>
+      <a class="btn btn-danger" onclick="oncancelPayment()">Cancel</a>
+
+      @*@(ViewBag.EditPermission == true ? "" : "disabled")"*@
+    </div>
+  </div>
+</div>
+
+<input type="text" id="PaymentStatusEmplcode" hidden />
+<input type="text" id="PaymentStatusAccountNo" hidden />
+
+
+}
+
+
+
+@section Scripts {
+  @*script for excle download button*@
+  <!--<link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet" />
+  <link href="https://cdn.datatables.net/buttons/1.5.1/css/buttons.dataTables.min.css" rel="stylesheet" />
+
+  <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.2.2/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+  <script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"></script>
+  <script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.2.2/js/buttons.html5.min.js"></script>-->
+
+
+
+  <script src="~/Content/endless/LatestJS/jquery.dataTables.min.js"></script>
+  <script src="~/Content/endless/LatestJS/dataTables.buttons.min.js"></script>
+  <script src="~/Content/endless/LatestJS/jszip.min.js"></script>
+  <script src="~/Content/endless/LatestJS/pdfmake.min.js"></script>
+  <script src="~/Content/endless/LatestJS/vfs_fonts.js"></script>
+  <script src="~/Content/endless/LatestJS/buttons.html5.min.js"></script>
+
+
+  <script src="~/Content/endless/js/jquery.dataTables.min.js"></script>
+  <script nonce="@ViewBag.StyleNonce">
+
+
+    $(function () {
+      var pensionerID = $("#PensionerID").val();
+      var oTable = $('#tbl').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+          "sAjaxSource": "/MasterPensioner/_PaymentHistoryHandlerAjax/?PensionerID=" + pensionerID,
+        "aoColumns": [
+
+          { "sName": "Account No" },
+          {
+            "sName": "Bank Name",
+            "fnRender": function (oObj) {
+              //debugger
+
+              return '<span class="auto">' + oObj.aData[1] + '</span>';
+
+            }
+          },
+          {
+            "sName": "IFSC Code",
+            "fnRender": function (oObj) {
+              return '<span class="auto">' + oObj.aData[2] + '</span>';
+            }
+          },
+          {
+            "sName": "Paid On",
+            "fnRender": function (oObj) {
+              return '<span class="auto">' + oObj.aData[3] + '</span>';
+            }
+          },
+          {
+            "sName": "Amount",
+            "fnRender": function (oObj) {
+              return '<span class="auto">' + oObj.aData[4] + '</span>';
+            }
+          },
+          {
+            "sName": "Status",
+            "fnRender": function (oObj) {
+              return '<span class="auto">' + oObj.aData[5] + '</span>';
+            }
+          },
+          {
+            "sName": "Reason",
+            "fnRender": function (oObj) {
+              return '<span class="auto">' + oObj.aData[6] + '</span>';
+            }
+          },
+
+          {
+            "sname": "EmplCode",
+            "bsearchable": false,
+            "bsortable": false,
+            "fnRender": function (oObj) {
+              var emplCode = oObj.aData[7];
+              var payDocNo = oObj.aData[13];
+              debugger;
+              return '<div>' +
+                '<button class="btn btn-secondary dropdown-toggle" style="color: honeydew;background:#95c7e5;"  type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="showPaymentStatusPopup(\'' + emplCode + '\', \'' + payDocNo + '\')">' +
+                'Edit' +
+                '</button>' +
+                '</div>';
+            }
+          }
+
+
+        ]@*,
+        dom:  'Bflrtip',
+        buttons: [
+          {
+          //  extend: 'excelHtml5',
+          //  title: 'Excel',
+          //  text: 'Export to excel'
+          //},
+
+             text: 'Download Excel',
+             autoFilter: true,
+             action: function (e, dt, node, config) {
+                 try {
+                     $.ajax({
+                         type: "POST",
+                       data: { param: dt.ajax.params(), PensionerID: $("#PensionerID").val(),isDownload: true },
+                       url: '@Url.Action("_PaymentHistoryAjaxHandler", "MasterPensioner")',
+                         cache: false,
+                         success: function (result) {
+                             if (result != null) {
+                                 var bytes = new Uint8Array(result.FileContents);
+                                 var blob = new Blob([bytes], { type: '@System.Net.Mime.MediaTypeNames.Application.Octet' });
+                                 if (window.navigator.msSaveOrOpenBlob) {
+                                     // IE11
+                                     window.navigator.msSaveOrOpenBlob(blob, result.FileDownloadName);
+                                 } else {
+                                     // Google chome, Firefox, ....
+                                     var link = document.createElement('a');
+                                     link.href = window.URL.createObjectURL(blob);
+                                     link.download = result.FileDownloadName;
+                                     link.click();
+                                 }
+                             }
+                             else {
+
+                             }
+                         },
+                         error: function (xhr, status, error) {
+                         }
+                     });
+
+                 } catch (e) {
+                 }
+             }
+          },
+
+
+
+
+        ]*@
+
+      });
+
+    })
+
+    $(document).ajaxStop(function () {
+      $(".auto").autoNumeric({ aSep: ',', aDec: '.' });
+    });
+
+      function downloadExcel(evt) {
+        debugger;
+          $(evt.target).find("i.fa-spinner").show();
+          $('#btn_downloadExcelHistroy_loading').show();
+          $('#IddownloadExcelHistory').hide();
+             $.ajax({
+                 type: "POST",
+               data: { PensionerID: $("#PensionerID").val(),isDownload: true },
+               url: '@Url.Action("_PaymentHistoryHandlerAjax", "MasterPensioner")',
+                 cache: false,
+                 success: function (result) {
+                     $('#IddownloadExcelHistory').show();
+                     $('#btn_downloadExcelHistroy_loading').hide();
+                     if (result != null) {
+                         var bytes = new Uint8Array(result.FileContents);
+                         var blob = new Blob([bytes], { type: '@System.Net.Mime.MediaTypeNames.Application.Octet' });
+                         if (window.navigator.msSaveOrOpenBlob) {
+                             // IE11
+                             window.navigator.msSaveOrOpenBlob(blob, result.FileDownloadName);
+                         } else {
+                             // Google chome, Firefox, ....
+                             var link = document.createElement('a');
+                             link.href = window.URL.createObjectURL(blob);
+                             link.download = result.FileDownloadName;
+                             link.click();
+                             $(evt.target).find("i.fa-spinner").hide();
+                         }
+                     }
+                     else {
+
+                     }
+                 },
+                 error: function (xhr, status, error) {
+                 }
+             });
+
+
+
+    }
+
+    ////Showing Payment Model
+    function showPaymentStatusPopup(detailsLink,payDocNo) {
+      debugger
+        $.ajax({
+          url: "/MasterPensioner/GetPaymentdetailsAjax?EmplCode=" + detailsLink + "&PayDocNo=" + payDocNo,
+          method: "GET",
+          success: function (data) {
+            debugger
+            if (data && data.length > 0) {
+              var firstRecord = data[0];
+              $('#PaymentStatusAccountNo').val(accountNo);
+              $("#PaymentStatusEmplcode").val(detailsLink);
+              $("#APPLICATION_REFERENCE_NO").val(firstRecord.ApplicationReferenceNo);
+              $("#Name").val(firstRecord.FullName);
+              $("#PopUpPaymentStatus").popup('show');
+            } else {
+              console.error("No data returned from the server.");
+            }
+          },
+          error: function (xhr, textStatus, errorThrown) {
+            debugger
+            console.log("AJAX Request Failed", textStatus, errorThrown);
+          }
+      });
+    }
+
+    function oncancelPayment() {
+      debugger
+      $('#error-message').hide();
+      $('#PopUpPaymentStatus').popup("hide");;
+    }
+
+
+    function onclickPaymentStatus()
+    {
+      debugger
+      var emplcode = $("#PaymentStatusEmplcode").val();
+      var Remark = $("#RemarksId").val();
+      var TransactionDate = $("#TransactionDate").val();
+      var paymentStatus = $("#paymentStatus").val();
+      var TransactionreferenceNo = $("#APPLICATION_REFERENCE_NO").val();
+      var accountno = $('#PaymentStatusAccountNo').val();
+      if (!Remark) {
+        debugger
+        $('#error-RemarksId').text('Remark is required.');
+        return;
+      }
+      if (paymentStatus==0) {
+        debugger
+        $('#error-paymentStatus1').text('Payment Status is required.');
+        return;
+      }
+      $.ajax({
+        type: "POST",
+        url: "/MasterPensioner/UpdatePaymentStatusAjax",
+        data: {
+          emplcodes: emplcode,
+          Remarks: Remark,
+          TransactionDates: TransactionDate,
+          paymentStatuses: paymentStatus,
+          TransactionReferenceNos: TransactionreferenceNo,
+          accountNos: accountno
+
+        },
+        success: function (result) {
+          debugger
+          if (result.Status == true)
+          {
+            toasterSuccessMessage(result.Message);
+          }
+            location.reload();
+        },
+        error: function (xhr, status, error) {
+          debugger
+          console.error("Ajax request failed", error);
+          $('#btn_HoldPayment_loading').hide();
+          $('#IdHoldPayment').show();
+        }
+      });
+      $('#PopUpHoldPayment').hide();
+    }
+
+    $("#TransactionDate").datepicker({
+      dateFormat: 'dd-mm-yy',
+      changeMonth: true,
+      changeYear: true,
+    });
+
+  </script>
+}

@@ -1,0 +1,156 @@
+﻿@{
+  ViewBag.Title = "RetirementApproved";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Retirement Approved
+      
+      @*<ul class="tool-bar">
+        
+      </ul>*@
+    </h4>
+  </div>
+  @using (Html.BeginForm())
+  {
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <div class="col-sm-3">
+              @Html.DropDownList("EmployeeId", null, "---Select---", new { @class = "form-control select-sm", @id = "EmployeeId" })
+            </div>
+            <div class="col-sm-3">
+              @Html.DropDownList("ContributorId", null, "---Select---", new { @class = "form-control select-sm", @id = "ContributorId" })
+            </div>
+            <div class="col-sm-2">
+              <div class="input-group date" id="validateFrom">
+                @Html.TextBox("SelectFrom ", "", new { @class = "form-control", @placeholder = "Select Start Date", @id = "From" })
+                <span class="input-group-addon">
+                  <i class="fa fa-calendar"></i>
+                </span>
+              </div>
+            </div>
+            <div class="col-sm-2">
+              <div class="input-group date" id="validateTo">
+                @Html.TextBox("SelectTo ", "", new { @class = "form-control", @placeholder = "Select End Date", @id = "to" })
+                <span class="input-group-addon">
+                  <i class="fa fa-calendar"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col-sm-2">
+              <button type="button" class="btn btn-success btn-group-sm" onclick="javascript:return ShowReport()"><i class="fa fa-search"></i> Search</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> 
+  }
+</div>
+   
+    <div class="panel panel-default">
+      <div class="panel-heading clearfix">
+        <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+          Retirement Approved
+
+          @*<ul class="tool-bar">
+
+        </ul>*@
+        </h4>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          @*<div class="col-sm-2">
+        </div>*@
+          <div class="col-sm-12">
+
+            <div class="alert alert-warning">
+              <h4 class="mb-0"> There is no Record Found</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>@section Scripts {
+  <script nonce="@ViewBag.StyleNonce">
+    $(function () {
+      debugger
+      //var Date1 = $("#From").val();
+      //var Date2 = $("#to").val();
+      //if (Date1 == "" && Date2 == "") {
+      //  var date = new Date();
+      //  var LastDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+      //  var Date1 = (LastDate.getMonth() + 1) + "/" + 01 + "/" + (LastDate.getFullYear());
+      //  var Date2 = (LastDate.getMonth() + 1) + "/" + LastDate.getDate() + "/" + (LastDate.getFullYear());
+      //  $("#From").val(Date1);
+      //  $('#validateTo').datepicker('setStartDate', Date1);
+      //  $("#to").val(Date2);
+      //  $('#validateFrom').datepicker('setEndDate', Date2);
+      //}
+      ShowReport();
+      $("#EmployeeId").on('change', function () {
+        $("#ContributorId").select2("val", "");
+        $("#ContributorId").empty();
+        $('#ContributorId').append($('<option/>').attr("value", "").text("---Select---"));
+        if ($(this).val() != "") {
+          var eid = $(this).val();
+          $.ajax({
+            url: "@Url.Action("ContributiorSearchAjax", "Reports")?EId=" + eid,
+            type: "GET",
+          async: true,
+          }).done(function (result) {          
+            $.each(result, function (i, contributor) {
+              $('#ContributorId').append($('<option/>').attr("value", contributor.Id).text(contributor.Name));
+            });
+          })
+      }
+      });
+      @*$("#EmployeeId").on('change', function () {
+        if ($(this).val() != "") {
+          var eid = $(this).val();
+         
+          $.ajax({
+            url: "@Url.Action("ContributiorSearchAjax", "Reports")?EId=" + eid,
+            type: "GET",
+            async: true,
+          }).done(function (result) {
+            $("#ContributorId").empty();
+            $('#ContributorId').append($('<option/>').attr("value", "").text("---Select---"));
+            $.each(result, function (i, contributor) {
+              $('#ContributorId').append($('<option/>').attr("value", contributor.Id).text(contributor.Name));
+            });
+          })
+        }
+        else {
+          $("#ContributorId").empty();
+          $('#ContributorId').append($('<option/>').attr("value", "").text("---Select---"));
+        }
+      });*@
+    })
+
+    function ShowReport() {
+      debugger;
+      var Date1 = $("#From").val();
+      var Date2 = $("#to").val();
+      var Contributorid = $("#ContributorId").val();
+      var EmplrId = $("#EmployeeId").val();
+      $.ajax({
+        url: "@Url.Action("RetirementsApprovedAjax", "Reports")?emplrId=" + EmplrId + "&contributorid=" + Contributorid + "&date1=" + Date1 + "&date2=" + Date2,
+        type: "GET",
+      }).done(function (result) {
+        var actionRes = result;
+        if (actionRes == "1") {
+          $('#reportData').attr('src', '/ReportForms/ContributionByEmployer.aspx');
+          return false;
+        }
+        else {
+          toasterInfoMessage("Result not found on this search criteria.");
+          return false;
+        }
+      });
+    }
+
+  </script>
+}

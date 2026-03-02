@@ -1,0 +1,167 @@
+﻿@model App.Data.ViewModels.ExcelFileViewModel
+@{
+  ViewBag.Title = "Edit Details";
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Edit Details
+
+    </h4>
+  </div>
+  <div class="panel-body">
+    @using (Html.BeginForm("EditContributorFinalizedDetails1", "ContributorPersonalDetails", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+      @Html.HiddenFor(x => x.Id)
+      @Html.HiddenFor(x => x.EmployerID)
+      @Html.HiddenFor(x => x.ContributorID)
+      @Html.HiddenFor(x=>x.SourceID)
+      <div class="row">
+        <div class="col-sm-5">
+          <div class="form-group">
+            <label for="EmployerId" class="col-sm-4 control-label">Employer:</label>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(m => m.EmployerName, new { @class = "form-control input-sm", placeholder = "Employer Name", @readonly = "readonly" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="PersonID" class="col-sm-4 control-label">Person:</label>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(m => m.ContributorName, new { @class = "form-control input-sm", placeholder = "Contributor Name", @readonly = "readonly" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="PersonID" class="col-sm-4 control-label">Source :</label>
+            <div class="col-sm-8">
+              @Html.DropDownList("Source", null, "---Select---", new { @class = "form-control select-sm" })
+            </div>
+          </div>   
+          <div class="form-group">
+            <label for="Salary" class="col-sm-4 control-label">System Salary:</label>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(m => m.SystemSalaryAmount, new { @class = "form-control input-sm auto", placeholder = "Salary", @readonly = "readonly" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="Salary" class="col-sm-4 control-label">Salary:</label>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(m => m.SalaryAmount, new { @class = "form-control input-sm auto", placeholder = "Salary", onblur = "SalaryChange()" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="Salary" class="col-sm-4 control-label">System Employee’s Contribution:</label>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(m => m.SystemContributorContribution, new { @class = "form-control input-sm auto", placeholder = "Salary", @readonly = "readonly" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="ContributorContribution" class="col-sm-4 control-label">Employee’s Contribution:</label>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(m => m.ContributorContribution, new { @class = "form-control input-sm allownumericwithdecimal auto", placeholder = "Employee’s Contribution", @readonly = "readonly" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="Salary" class="col-sm-4 control-label">System Employer Contribution:</label>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(m => m.SystemEmployerContribution, new { @class = "form-control input-sm auto", placeholder = "Salary", @readonly = "readonly" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="EmployerContribution" class="col-sm-4 control-label">Employer Contribution:</label>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(m => m.EmployerContribution, new { @class = "form-control input-sm allownumericwithdecimal auto", placeholder = "Employer Contribution", @readonly = "readonly" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="Month" class="col-sm-4 control-label">Month:</label>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(m => m.Month, new { @class = "form-control input-sm", placeholder = "Month", @readonly = "readonly" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="Year" class="col-sm-4 control-label">Year:</label>
+            <div class="col-sm-8">
+              @Html.TextBoxFor(m => m.Year, new { @class = "form-control input-sm", placeholder = "Year", @readonly = "readonly" })
+            </div>
+          </div>
+          @*<div class="form-group">
+            <label for="IsActive" class="col-sm-4 control-label">Status:</label>
+            <div class="col-sm-8">
+              <div class="checkbox">
+                @Html.CheckBoxFor(m => m.IsActive, new { @class = "form-control input-sm", @checked = "checked" })
+              </div>
+            </div>
+          </div>*@
+          <div class="form-group">
+            <label class="col-sm-4 control-label"></label>
+            <div class="col-sm-8">
+              <button type="submit" class="btn btn-success" id="SaveContDetails"><i class="fa fa-save"> </i> Save</button>
+              <a href="/ContributorPersonalDetails/FinalizedContributionErrorsDetails" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+              @*<input type="submit" class="btn btn-success" value="Edit" id="SaveContDetails" />
+              @Html.ActionLink("Back to List", "FinalizedContributionErrorsDetails", "ContributorPersonalDetails", null, new { @class = "btn btn-primary" })*@
+            </div>
+          </div>
+        </div>
+      </div>
+
+    }
+  </div>
+</div>
+@section Scripts{
+  <script src="~/Scripts/Master.js"></script>
+  <script nonce="@ViewBag.StyleNonce">
+  //it is for active checkbox
+  //$(function () {
+  //  var date = new Date();
+  //  var monthNames = ["January", "February", "March", "April", "May", "June",
+  //"July", "August", "September", "October", "November", "December"];
+  //  $("#Year").val(date.getFullYear())
+  //  $("#Month").val(monthNames[date.getMonth()]);
+  //})
+    $("#SaveContDetails").click(function () {
+      $("#Source").prop("disabled", false);
+      $('.auto').each(function (i) {
+        var self = $(this);
+        var v = self.autoNumeric('get');
+        self.autoNumeric('destroy');
+        self.val(v);
+      });
+    })
+
+
+  //work when text change in salary Textbox
+  function SalaryChange()
+  {
+    var cId = $('#ContributorID').val();
+    var eId = $("#EmployerID").val();
+    debugger
+    if (cId == "" || eId == "") {
+
+      toasterErrorMessage("Please Select Employee & person details First.");
+    }
+    else
+    {
+      $.ajax({
+        url: "@Url.Action("GetContributorDetailsAfterSalaryAjax", "ContributorPersonalDetails")?CId=" + cId + "&EId=" + eId + "&salary=" + $("#SalaryAmount").val().toString() + "",
+        type: "GET",
+      }).done(function (result) {
+        var self = $('#SalaryAmount');
+        var sal = self.autoNumeric('get');
+        //var sal = $("#SalaryAmount").val();
+        var Con = result.cpf;//(sal / 100) * result.cpf;
+        var Emp = result.epf;//(sal / 100) * result.epf;
+        $("#ContributorContribution").val(Con);//.val(Con.toFixed(2));
+        $("#EmployerContribution").val(Emp);//.val(Emp.toFixed(2));
+      })
+    }
+  }
+    $(function () {
+      $("#Source").prop("disabled", "disabled");
+      $(".auto").autoNumeric({ aSep: ',', aDec: '.' });
+    })
+    
+  </script>
+
+}

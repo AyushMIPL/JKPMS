@@ -1,0 +1,231 @@
+﻿@{
+    ViewBag.Title = "errorsInContributorDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+      <h4 class="headline headline-contributionerr" >
+        Beneficiary Details Errors
+      </h4>
+        <ul class="tool-bar inline headline-errtop" >
+            <li class="lebelerr">@Html.DropDownList("EmployerName", null, "---All---", htmlAttributes: new { @class = "form-control input-sm" })</li>
+            <li class="lebererrlast">@Html.DropDownList("JobStatusID", null, "---All---", htmlAttributes: new { @class = "form-control input-sm" })</li>
+        </ul>
+    </div>
+    <div class="panel-body">
+        <table class="table dataTable" id="tbl">
+            <thead>
+                <tr>
+                    <th>JKPS ID</th>
+                    <th>Beneficiary Name</th>
+                    <th>Personal Details</th>
+                    <th>Job Details</th>
+                    <th>Marriage Details</th>
+                    <th>Dependent Details</th>
+                    <th>Employer Name</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+    <script nonce="@ViewBag.StyleNonce">
+        $(function () {
+            doBindData();
+        });
+        function doBindData() {
+            var Id = $("#EmployerName").val();
+            var JobStatusId = $("#JobStatusID").val();
+            var oTable = $('#tbl').dataTable({
+                "bJQueryUI": true,
+                "sPaginationType": "full_numbers",
+                "bServerSide": true,
+                "bDestroy": true,
+                "bAutoWidth": false,
+                "sAjaxSource": "/ContributorPersonalDetails/contributorDetailsErrorAjaxHandler?Id=" + Id + "&JobStatusId=" + JobStatusId,
+                "aoColumns": [
+                    { "sName": "JKPSID" },
+						{ "sName": "ContributorName" },
+                {
+                    "sName": "PersonalDetails",
+                    "bSearchable": false,
+                    "bSortable": false,
+                    "fnRender": function (oObj) {
+                        debugger
+                        var str = "";
+                        if (oObj.aData[2].indexOf('CE') != -1 && oObj.aData[2].indexOf('CS') != -1 && oObj.aData[2].indexOf('CF') != -1 && oObj.aData[2].indexOf('CL') != -1 && oObj.aData[2].indexOf('CD') != -1 && oObj.aData[2].indexOf('CX') != -1 && oObj.aData[2].indexOf('CC') != -1 && oObj.aData[2].indexOf('CP') != -1 && oObj.aData[2].indexOf('CA') != -1 && oObj.aData[2].indexOf('CR') != -1) {
+                            str += '<span >Details Not Available</span><br/>';
+                            if (oObj.aData[2].split('#')[2] == "2" || oObj.aData[2].split('#')[2] == "3" || oObj.aData[2].split('#')[2] == "4")
+                                str += '<a href="/ContributorPersonalDetails/AddPersonalDetails" class="btn btn-success btn-xs" title="Add" disabled="disabled"><i class="fa fa-plus"></i> Add</a>';
+                            else
+                                str += '<a href="/ContributorPersonalDetails/AddPersonalDetails" class="btn btn-success btn-xs" title="Add"><i class="fa fa-plus"></i> Add</a>';
+                        }
+
+                        else {
+                            if (oObj.aData[2].indexOf('CE') != -1)
+                                str += '<span >Employer Name</span><br/>';
+                            if (oObj.aData[2].indexOf('CS') != -1)
+                                str += '<span >Social Security Number</span><br/>';
+                            if (oObj.aData[2].indexOf('CF') != -1)
+                                str += '<span >First Name</span><br/>';
+                            if (oObj.aData[2].indexOf('CL') != -1)
+                                str += '<span >Last Name</span><br/>';
+                            if (oObj.aData[2].indexOf('CD') != -1)
+                                str += '<span >Date Of Birth</span><br/>';
+                            else if ((new Date(oObj.aData[2].split('#')[3]) <= new Date("01/01/1900")))
+                                str += '<span >Wrong Date of Birth</span><br/>';
+                            if (oObj.aData[2].indexOf('CX') != -1)
+                                str += '<span >Expected Retirement Date</span><br/>';
+                            if (oObj.aData[2].indexOf('CC') != -1)
+                                str += '<span >Country</span><br/>';
+                            if (oObj.aData[2].indexOf('CP') != -1)
+                                str += '<span >City</span><br/>';
+                            if (oObj.aData[2].indexOf('CA') != -1)
+                                str += '<span >First Appointment Date</span><br/>';
+                            if (oObj.aData[2].indexOf('CR') != -1)
+                                str += '<span >PF Rate</span><br/>';
+                            if (oObj.aData[2].indexOf('CE') != -1 || oObj.aData[2].indexOf('CS') != -1 || oObj.aData[2].indexOf('CF') != -1 || oObj.aData[2].indexOf('CL') != -1 || oObj.aData[2].indexOf('CD') != -1 || oObj.aData[2].indexOf('CX') != -1 || oObj.aData[2].indexOf('CC') != -1 || oObj.aData[2].indexOf('CP') != -1 || oObj.aData[2].indexOf('CA') != -1 || oObj.aData[2].indexOf('CR') != -1 || ((new Date(oObj.aData[2].split('#')[3]) <= new Date("01/01/1900"))))
+                                if (oObj.aData[2].split('#')[2] == "2")
+                                    str += '<a href="/ContributorPersonalDetails/Edit/' + oObj.aData[2].split('#')[0] + '\" class="btn btn-info btn-xs" title="Edit" disabled="disabled"><i class="fa fa-pencil"></i> Edit</a>';
+                                else if (((new Date(oObj.aData[2].split('#')[3]) <= new Date("01/01/1900"))))
+                                    str += '<a href="/ContributorPersonalDetails/Edit/' + oObj.aData[2].split('#')[0] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i> Edit</a>';
+                                else
+                                    str += '<a href="/ContributorPersonalDetails/Edit/' + oObj.aData[2].split('#')[0] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i> Edit</a>';
+                        }
+                        return str;
+                    }
+                },
+                {
+                    "sName": "JobDetails",
+                    "bSearchable": false,
+                    "bSortable": false,
+                    "fnRender": function (oObj) {
+                        var str = "";
+                        if (oObj.aData[3].indexOf('JD') != -1 && oObj.aData[3].indexOf('JDD') != -1 && oObj.aData[3].indexOf('JJ') != -1 && oObj.aData[3].indexOf('JP') != -1 && oObj.aData[3].indexOf('JH') != -1) {
+                            str += '<span >Details Not Available</span><br/>';
+                            if (oObj.aData[3].split('#')[3] == "2" || oObj.aData[3].split('#')[3] == "3" || oObj.aData[3].split('#')[3] == "4")
+                                str += '<a href="/ContributorPersonalDetails/AddJobDetails/' + oObj.aData[3].split('#')[1] + '\" class="btn btn-success btn-xs" title="Add" disabled="disabled"><i class="fa fa-plus"></i> Add</a>';
+                            else
+                                str += '<a href="/ContributorPersonalDetails/AddJobDetails/' + oObj.aData[3].split('#')[1] + '\" class="btn btn-success btn-xs" title="Add"><i class="fa fa-plus"></i> Add</a>';
+                        }
+                        else {
+                            if (oObj.aData[3].indexOf('JD') != -1)
+                                str += '<span >Department</span><br/>';
+                            if (oObj.aData[3].indexOf('JDD') != -1)
+                                str += '<span >Designation</span><br/>';
+                            if (oObj.aData[3].indexOf('JJ') != -1)
+                                str += '<span >Joining Date</span><br/>';
+                            if (oObj.aData[3].indexOf('JP') != -1)
+                                str += '<span >Present Salary</span><br/>';
+                            if (oObj.aData[3].indexOf('JH') != -1)
+                                str += '<span >Hire Date</span><br/>';
+                            if (oObj.aData[3].indexOf('JD') != -1 || oObj.aData[3].indexOf('JDD') != -1 || oObj.aData[3].indexOf('JJ') != -1 || oObj.aData[3].indexOf('JP') != -1 || oObj.aData[3].indexOf('JH') != -1)
+                                if (oObj.aData[3].split('#')[3] == "2" || oObj.aData[3].split('#')[3] == "3" || oObj.aData[3].split('#')[3] == "4")
+                                    str += '<a href="/ContributorPersonalDetails/AddJobDetails/' + oObj.aData[3].split('#')[1] + '\" class="btn btn-info btn-xs" title="Edit" disabled="disabled"><i class="fa fa-pencil"></i> Edit</a>';
+                                else
+                                    str += '<a href="/ContributorPersonalDetails/AddJobDetails/' + oObj.aData[3].split('#')[1] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i> Edit</a>';
+                        }
+                        return str;
+                    }
+                },
+						{
+						    "sName": "MarriageDetails",
+						    "bSearchable": false,
+						    "bSortable": false,
+						    "fnRender": function (oObj) {
+						        var str = "";
+						        if (oObj.aData[4].indexOf('MS') != -1 && oObj.aData[4].indexOf('ML') != -1 && oObj.aData[4].indexOf('MC') != -1 && oObj.aData[4].indexOf('MD') != -1 && oObj.aData[4].indexOf('MM') != -1 && oObj.aData[4].indexOf('MBD') != -1 && oObj.aData[4].indexOf('MMS') != -1 && oObj.aData[4].indexOf('MP') != -1) {
+						            str += '<span >Details Not Available</span><br/>';
+						            if (oObj.aData[4].split('#')[3] == "2" || oObj.aData[4].split('#')[3] == "3" || oObj.aData[4].split('#')[3] == "4")
+						                str += '<a href="/ContributorPersonalDetails/AddMarriageDetails/' + oObj.aData[4].split('#')[1] + '\" class="btn btn-success btn-xs" title="Add" disabled="disabled"><i class="fa fa-plus"></i> Add</a>';
+						            else
+						                str += '<a href="/ContributorPersonalDetails/AddMarriageDetails/' + oObj.aData[4].split('#')[1] + '\" class="btn btn-success btn-xs" title="Add"><i class="fa fa-plus"></i> Add</a>';
+						        }
+						        else {
+						            if (oObj.aData[4].indexOf('MS') != -1)
+						                str += '<span >Spouse First Name</span><br/>';
+						            if (oObj.aData[4].indexOf('ML') != -1)
+						                str += '<span >Spouse Last Name</span><br/>';
+						            if (oObj.aData[4].indexOf('MC') != -1)
+						                str += '<span >Country</span><br/>';
+						            if (oObj.aData[4].indexOf('MD') != -1)
+						                str += '<span >Date Of Birth</span><br/>';
+						            if (oObj.aData[4].indexOf('MM') != -1)
+						                str += '<span >Mobile</span><br/>';
+						            if (oObj.aData[4].indexOf('MBD') != -1)
+						                str += '<span >Marriage Begin Date</span><br/>';
+						            if (oObj.aData[4].indexOf('MMS') != -1)
+						                str += '<span >Maritial Status</span><br/>';
+						            if (oObj.aData[4].indexOf('MP') != -1)
+						                str += '<span >Phone</span><br/>';
+						            if (oObj.aData[4].indexOf('MS') != -1 || oObj.aData[4].indexOf('ML') != -1 || oObj.aData[4].indexOf('MC') != -1 || oObj.aData[4].indexOf('MD') != -1 || oObj.aData[4].indexOf('MM') != -1 || oObj.aData[4].indexOf('MBD') != -1 || oObj.aData[4].indexOf('MMS') != -1 || oObj.aData[4].indexOf('MP') != -1)
+						                if (oObj.aData[4].split('#')[3] == "2" || oObj.aData[4].split('#')[3] == "3" || oObj.aData[4].split('#')[3] == "4")
+						                    str += '<a href="/ContributorPersonalDetails/EditMarriageDetails/' + oObj.aData[4].split('#')[0] + '\" class="btn btn-info btn-xs" title="Edit" disabled="disabled"><i class="fa fa-pencil"></i> Edit</a>';
+						                else
+						                    str += '<a href="/ContributorPersonalDetails/EditMarriageDetails/' + oObj.aData[4].split('#')[0] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i> Edit</a>';
+						        }
+						        return str;
+						    }
+						},
+
+						{
+						    "sName": "DependentDetails",
+						    "bSearchable": false,
+						    "bSortable": false,
+						    "fnRender": function (oObj) {
+						        var str = "";
+						        if (oObj.aData[5].indexOf('DF') != -1 && oObj.aData[5].indexOf('DL') != -1 && oObj.aData[5].indexOf('DD') != -1 && oObj.aData[5].indexOf('DR') != -1 && oObj.aData[5].indexOf('DT') != -1) {
+						            str += '<span >Details Not Available</span><br/>';
+						            if (oObj.aData[5].split('#')[3] == "2" || oObj.aData[5].split('#')[3] == "3" || oObj.aData[5].split('#')[3] == "4")
+						                str += '<a href="/ContributorPersonalDetails/AddDependantDetails/' + oObj.aData[5].split('#')[1] + '\" class="btn btn-success btn-xs" title="Add" disabled="disabled"><i class="fa fa-plus"></i> Add</a>';
+						            else
+						                str += '<a href="/ContributorPersonalDetails/AddDependantDetails/' + oObj.aData[5].split('#')[1] + '\" class="btn btn-success btn-xs" title="Add"><i class="fa fa-plus"></i> Add</a>';
+						        }
+						        else {
+						            if (oObj.aData[5].indexOf('DF') != -1)
+						                str += '<span >First Name</span><br/>';
+						            if (oObj.aData[5].indexOf('DL') != -1)
+						                str += '<span >Last Name</span><br/>';
+						            if (oObj.aData[5].indexOf('DD') != -1)
+						                str += '<span >Date Of Birth</span><br/>';
+						            if (oObj.aData[5].indexOf('DR') != -1)
+						                str += '<span >Relationship</span><br/>';
+						            if (oObj.aData[5].indexOf('DT') != -1)
+						                str += '<span >Termination Date</span><br/>';
+						            if (oObj.aData[5].indexOf('DF') != -1 || oObj.aData[5].indexOf('DL') != -1 || oObj.aData[5].indexOf('DD') != -1 || oObj.aData[5].indexOf('DR') != -1 || oObj.aData[5].indexOf('DT') != -1) {
+						                if (oObj.aData[5].split('#')[3] == "2" || oObj.aData[5].split('#')[3] == "3" || oObj.aData[5].split('#')[3] == "4")
+						                    str += '<a href="/ContributorPersonalDetails/EditDependantDetails/' + oObj.aData[5].split('#')[0] + '\" class="btn btn-info btn-xs" title="Edit" disabled="disabled"><i class="fa fa-pencil"></i> Edit</a>';
+						                else
+						                    str += '<a href="/ContributorPersonalDetails/EditDependantDetails/' + oObj.aData[5].split('#')[0] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i> Edit</a>';
+						            }
+						        }
+						        return str;
+						    }
+						},
+                        { "sName": "EmployerName" }
+                ]
+            }).rowGrouping({
+                bExpandableGrouping: true,
+                iGroupingColumnIndex: 6,
+                bHideGroupingColumn: true
+
+            });;
+        }
+
+        $("#EmployerName").on('change', function () {
+            var Id = $("#EmployerName").val();
+            if (Id != "") {
+                doBindData();
+            }
+        })
+        $("#JobStatusID").on('change', function () {
+            var JobStatusId = $("#JobStatusID").val();
+            if (JobStatusId != "") {
+                doBindData();
+            }
+        })
+    </script>
+}

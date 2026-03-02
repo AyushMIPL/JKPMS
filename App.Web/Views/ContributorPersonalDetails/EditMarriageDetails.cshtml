@@ -1,0 +1,194 @@
+﻿@model App.Data.Entities.MasterContributorMarriageDetails
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_LayoutProfile.cshtml";
+}
+
+@section profileContainer
+{
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+                Contributor Marriage Details  : @string.Format("{0} ({1})", ViewBag.Name, ViewBag.PersonId)
+
+            </h4>
+        </div>
+        @using (Html.BeginForm("EditMarriageDetails", "ContributorPersonalDetails", new { ID = Model.Id }, FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+    {
+            @Html.Hidden("RequestFrom")
+            <div class="row">
+                <div class="panel-body">
+                    <div class="col-sm-12">
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        @Html.HiddenFor(model => model.Id)
+                        @Html.Hidden("ActiveContributor")
+                        @Html.Hidden("BeginDate")
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PersonId, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-sm-6">
+                                @Html.TextBoxFor(m => m.PersonId, new { @class = "form-control", placeholder = "JKPS ID", @Value = ViewBag.PersonID, @readonly = "readonly" })
+                                @Html.ValidationMessageFor(model => model.PersonId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.SpouseFirstName, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-sm-6">
+                                @Html.EditorFor(model => model.SpouseFirstName, new { htmlAttributes = new { @class = "form-control", placeholder = "First Name" } })
+                                @*@Html.ValidationMessageFor(model => model.SpouseFirstName, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.MidName, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-sm-6">
+                                @Html.EditorFor(model => model.MidName, new { htmlAttributes = new { @class = "form-control", placeholder = "Middle Name" } })
+                                @*@Html.ValidationMessageFor(model => model.MidName, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LastName, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-sm-6">
+                                @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control", placeholder = "Last Name" } })
+                                @*@Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.CountryID, "Country *", htmlAttributes: new { @class = "control-label col-md-2" })
+                            @*<div class="col-sm-9">
+                                    @Html.DropDownList("CountryID", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+                                </div>*@
+                            <div class="col-sm-6">
+                                @Html.DropDownList("CountryID", null, htmlAttributes: new { @class = "form-control", placeholder = "Country", id = "country" })
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DateOfBirth, "Date Of Birth *", new { @class = "col-sm-2 control-label" })
+                            <div class="col-sm-6">
+                                <div class="input-group date" id="Date">
+                                    @Html.EditorFor(m => m.DateOfBirth, new { @class = "form-control", placeholder = "DateOfBirth" })
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Phone, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-sm-6">
+                                @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control", placeholder = "Phone" } })
+                                @*@Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PhoneOffice, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-sm-6">
+                                @Html.EditorFor(model => model.PhoneOffice, new { htmlAttributes = new { @class = "form-control", placeholder = "Office Phone" } })
+                                @*@Html.ValidationMessageFor(model => model.PhoneOffice, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Mobile, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-sm-6">
+                                @Html.EditorFor(model => model.Mobile, new { htmlAttributes = new { @class = "form-control", placeholder = "Mobile" } })
+                                @*@Html.ValidationMessageFor(model => model.Mobile, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-sm-6">
+                                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", placeholder = "Email" } })
+                                @*@Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.MarriageBeginDate, new { @class = "col-sm-2 control-label" })
+                            <div class="col-sm-6">
+                                <div class="input-group date" id="MarriageDate">
+                                    @Html.EditorFor(m => m.MarriageBeginDate, new { @class = "form-control", placeholder = "MarriageBeginDate" })
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.MarriageEndDate, new { @class = "col-sm-2 control-label" })
+                            <div class="col-sm-6">
+                                <div class="input-group date" id="EndDate">
+                                    @Html.EditorFor(m => m.MarriageEndDate, new { @class = "form-control", placeholder = "MarriageEndDate" })
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.MaritalStatusId, "Marital Status *", htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-sm-6">
+                                @Html.DropDownList("MaritalStatusId", null, htmlAttributes: new { @class = "form-control" })
+                                @*@Html.ValidationMessageFor(model => model.MaritalStatusId, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.IsActive, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-sm-6">
+                                <div class="checkbox">
+                                    @Html.EditorFor(model => model.IsActive)
+                                    @Html.ValidationMessageFor(model => model.IsActive, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+                                <button type="submit" class="btn btn-success"><i class="fa fa-save"> </i> Save</button>
+                                <a id="backtolist" href="/ContributorPersonalDetails/MarriageDetailsIndex/@ViewBag.CId" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+@section scripts{
+
+    <script src="~/Scripts/ContributorDetails.js"></script>
+    <script nonce="@ViewBag.StyleNonce">
+        $('.input-group.date').datepicker({
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+        $(function () {
+            if ($("#RequestFrom").val() == "True") {
+                debugger
+                $("#backtolist").attr('href', '/ContributorPersonalDetails/errorsInContributorDetails');
+            }
+            if ($("#ActiveContributor").val() == "No") {
+                $(".form-control").each(function () {
+                    $(this).prop("disabled", "disabled");
+                });
+                $(".checkbox").each(function () {
+                    $(this).prop("disabled", "disabled");
+                });
+                $(".btn-success").prop("disabled", "disabled");
+            }
+        })
+        var end = new Date($("#BeginDate").val());
+        $('#MarriageDate').datepicker('setStartDate', end);
+    </script>
+}

@@ -1,0 +1,789 @@
+@model App.Data.ViewModels.GeneratePensionProcessModel
+@using JKPS.COMMON
+@{
+  ViewBag.Title = "PrintBankListing";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+  var currentMonthBatchDetail = ViewBag.CurrentMonthBatch;
+  var pybatchid = ViewBag.pybatchid;
+  var responseok = ViewBag.responseok;
+  var ispensiongenerated = ViewBag.ispensiongenerated;
+  var Group = @Html.Raw(Json.Encode(ViewBag.Group));
+}
+@{
+  int FinancialYear = DateTime.Now.Year;
+  if (Session["FinancialYear"] != null)
+  {
+    FinancialYear = Convert.ToInt32(Session["FinancialYear"]);
+  }
+  bool IsGeneratePensionWithoutSftp = ViewBag.IsGeneratePensionWithoutSftp;
+}
+
+<style>
+  table.dataTable thead th, table.dataTable tfoot th, table.dataTable tbody td {
+    text-align: left !important;
+  }
+
+  .width-190 {
+    width: 210px;
+  }
+
+  label.error {
+    color: red; /* Error message in red */
+    font-size: 15px; /* Adjust font size */
+    margin-top: 5px; /* Add spacing */
+  }
+
+  .error-field {
+    border: 2px solid red; /* Red border for invalid input fields */
+  }
+  label#PayDate-error {
+    position: absolute;
+    left: 0px;
+    bottom: -33px;
+  }
+</style>
+
+
+<div class="panel panel-default">
+
+  <div class="panel-body pt-2 pb-5">
+    @using (Html.BeginForm("PrintBankListing", "PensionProcess", FormMethod.Post, new
+    {
+      enctype = "multipart/form-data",
+      @class = "form-horizontal",
+      role = "form",
+      id = "generateBankListing"@*onsubmit = "return generateBankListing();"*@ }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+      <div class="">
+        <div class="row">
+          <div class="col-sm-8">
+            <label>District</label>
+            @Html.TextBoxFor(x => x.RegionNames, "", new { @class = "form-control", @autocomplete = "off", @placeholder = " Regions" })
+          </div>
+          <div class="col-sm-4" hidden>
+            @Html.LabelFor(model => model.EmployeeType, new { @class = "control-label" })
+            @Html.DropDownList("EmpType", ViewBag.EmployeeType as SelectList, new { @class = "form-control input-sm" })
+          </div>
+          <div class="col-sm-4" hidden>
+            @Html.LabelFor(model => model.DepositDate, new { @class = "control-label" })
+            <div class="input-group date">
+              @Html.EditorFor(model => model.DepositDate, new { @class = "form-control input-sm" })
+              <span class="input-group-addon">
+                <i class="fa fa-calendar"></i>
+              </span>
+            </div>
+          </div>
+          @*<div class="col-sm-4">
+                @Html.LabelFor(model => model.PayDate, new { @class = "control-label" })
+                <div class="">
+                    @Html.TextBoxFor(model => model.PayDate ,"{0:yyyy-MM-dd}" ,new { @class = "form-control input-sm", @type = "date" })
+                  </div>
+            </div>*@
+
+          <div class="col-sm-4">
+            @Html.LabelFor(model => model.PayDate, new { @class = "control" })
+            <div class="input-group date">
+              @Html.EditorFor(model => model.PayDate, new { @class = "form-control input-sm" })
+              <span class="input-group-addon">
+                <i class="fa fa-calendar"></i>
+              </span>
+            </div>
+          </div>
+          <div class="col-sm-4 hidden">
+            @Html.LabelFor(model => model.BanckCode, new { @class = "control-label" })
+            @Html.DropDownListFor(model => model.BanckCode, ViewBag.accounttype as SelectList, new { @class = "form-control input-sm" })
+          </div>
+          <div class="mt-4 text-left padding-md">
+            @*<button type="submit" id="Btn" class="btn btn-success height px-5 mt-5 @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")" style="color:#fff;"><i class="fa fa-print"></i> Generate Pension <i id="spinner" class="fa fa-spinner fa-spin" style="display:none;"></i></button>*@
+            <button type="submit" id="Btn" class="btn btn-success height px-5 mt-5 btnfffcolor @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled") @(ViewBag.ispensiongenerated == true ? "disabled" : "")"><i class="fa fa-print"></i> Generate Pension <i id="spinner" class="fa fa-spinner fa-spin  display_none"></i></button>
+            @*<button type="submit" id="Btn" class="btn btn-success height px-5 mt-5 @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled") @(ViewBag.ispensiongenerated == true ? "disabled" : "")" style="color:#fff;"><i class="fa fa-print"></i> Generate Pension <i id="spinner" class="fa fa-spinner fa-spin" style="display:none;"></i></button>*@
+            @*<input type="submit" id="Btn" class="btn btn-success" value="Print Bank Listing" />*@
+          </div>
+        </div>
+      </div>
+      <div>
+        @*<iframe id="RptIframe" width="100%" height="500" frameborder="0"></iframe>*@
+      </div>
+    }
+  </div>
+</div>
+
+@if (currentMonthBatchDetail != null)
+{
+  <div class="panel panel-default">
+    <div class="panel-heading clearfix">
+      <h4 class="headline Dash_contributorSummary">
+        <b><span id="monthNameForHeader"></span></b>&nbsp;Month Processed Payroll
+      </h4>
+    </div>
+    <div class="panel-body">
+      <div id="processDetail" class="border">
+        <div class="panel panel-default">
+          <ul class="list-group">
+            <li class="list-group-item clearfix">
+              <div class="pull-left m-left-sm">
+                <span><b class="font-weight_bolder">Process Id:- </b></span><label class="control-label">@currentMonthBatchDetail["pybatchid"]</label><br>
+              </div>
+              <div class="pull-right">
+                <span><b class="font-weight_bolder">Process Started On:-</b></span><label class="control-label">@currentMonthBatchDetail["insertDate"]</label><br>
+              </div>
+            </li>
+
+            <li class="list-group-item clearfix">
+              <div class="pull-left m-left-sm">
+                <span><b class="font-weight_bolder">Start By:-</b></span><label class="control-label">@currentMonthBatchDetail["BatchCreatedBy"]</label>
+              </div>
+
+              @*<div id="totalDiv" class="pull-right">
+                  <span><b style="font-weight:bolder">Record Processed:- </b><label class="control-label"> @currentMonthBatchDetail["recordsprocessed"] </label></span>
+                </div>*@
+
+              <div class="pull-right">
+                <span><b class="font-weight_bolder">Record Processed:- </b></span><label class="control-label"><span id="recordtotal"></span></label><br>
+              </div>
+
+            </li>
+            <li class="list-group-item clearfix">
+              <div class="pull-left m-left-sm">
+                <span><b class="font-weight_bolder">Status:- </b><label class="control-label"> Processed </label></span>
+              </div>
+              @*<div class="pull-right">
+                  <span><b style="font-weight:bolder">Amount:- </b><label class="control-label"> @currentMonthBatchDetail["totalAmount"]  </label></span>
+                </div>*@
+              <div class="pull-right">
+                <span><b class="font-weight_bolder">Amount:- </b></span><label class="control-label"><span id="totalamount"></span></label><br>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+}
+
+<div class="custom-popup width-100 confirmClass display_none" id="SFTPfileSend">
+  <div class="padding-md">
+    <input type="hidden" id="District_value" />
+    <h4 class="m-top-none"> Are you sure you want to send the file?</h4>
+  </div>
+  <div class="text-center">
+    <a type="button" class="btn btn-success px-5 height display_none" title="Please Wait While We Process Your Request" id="btn_Confirm_loading"><i class="fa fa-spinner fa-spin"></i> Processing</a>
+    <a class="btn btn-success m-right-sm" id="BtnFinelize">Confirm</a>
+    <a class="btn btn-danger logoutConfirm_close" id="closeDendDispursementPopup">Cancel</a>
+  </div>
+</div>
+
+@if (currentMonthBatchDetail != null)
+{
+  <div class="panel panel-default">
+    <div class="panel-heading clearfix">
+      <div>
+        <div class="row">
+          <div class="col-md-4">
+            <h4 id="tableHeadLine" class="m-top-none leftclass">Beneficiary Payment Details</h4>
+          </div>
+          <div class="col-md-2">
+            <span><b class="font-weight_bolder">Batch:- </b></span><label class="control-label">@pybatchid</label><br>
+          </div>
+          <div class="col-md-3">
+            <span><b class="font-weight_bolder">Payroll Date:- </b></span><label class="control-label"><span id="paydate"></span></label><br>
+          </div>
+          <div class="col-md-3">
+
+            <button type="button" class="btn btn-success px-5 height dash_float_rigt display_none" title="Please Wait While We Process Your Request" id="btn_downloadExcel_PrintBankList"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+
+            <button class="btn btn-success dash_float_rigt" id="IddownloadExcel">Download Excel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="loader display-none" id="loader"></div>
+      <table id="tbl_Summary">
+        <thead>
+          <tr>
+            <th>Region</th>
+            <th>District</th>
+            <th colspan="5" class="text-center">No.of Beneficiary</th>
+            <th colspan="2" class="text-center">Amount</th>
+            <th class="thwithclass"></th>
+          </tr>
+          <tr>
+            <th></th>
+            <th></th>
+            <th>PCP</th>
+            <th>OAP</th>
+            <th>WID</th>
+            <th>TGR</th>
+            <th>Total</th>
+            <th class="leftclass">Basic</th>
+            <th class="leftclass">Arrear</th>
+            <th class="width-190"></th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th></th>
+            <th>Grand Total:</th>
+            <th><span id="totalValueOfPCP"></span></th>
+            <th><span id="totalValueOfOAP"></span></th>
+            <th><span id="totalValueOfWID"></span></th>
+            <th><span id="totalValueOfTGR"></span></th>
+            <th><span id="totalValueOfBeneficiaries"></span></th>
+            <th><span id="totalValueOfAmount"></span></th>
+            <th><span id="totalValueOfArrear"></span></th>
+            <th></th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+}
+@section scripts{
+  @*<script src="~/Content/endless/LatestJS/jquery.dataTables.min.js"></script>*@
+<script nonce="@ViewBag.StyleNonce">
+
+        if (document.getElementById("IddownloadExcel") != null && document.getElementById("IddownloadExcel") != undefined) {
+            document.getElementById("IddownloadExcel").addEventListener("click", downloadExcel);
+        }
+        if (document.getElementById("closeDendDispursementPopup") != null && document.getElementById("closeDendDispursementPopup") != undefined) {
+            document.getElementById("closeDendDispursementPopup").addEventListener("click", onCancel);
+        }
+        if (document.getElementById("BtnFinelize") != null && document.getElementById("BtnFinelize") != undefined) {
+            document.getElementById('BtnFinelize').addEventListener("click", function () {
+                SFTPfiledata(this);
+            });
+        }
+
+    $("#PrintBankListingId").hide();
+
+        $(document).ready(function () {
+
+
+            var financialYear = '@FinancialYear';
+if (financialYear == '' || financialYear == null || financialYear == undefined) {
+    financialYear = new Date().getFullYear();
+}
+var startDate = new Date(parseInt(financialYear),3,1);
+            var endDate = new Date(parseInt(financialYear) + 1, 2, 31);
+
+            $('.input-group.date').datepicker("destroy");
+
+            $('.input-group.date').datepicker({
+                format: 'dd/mm/yyyy',
+                autoclose: true,
+                todayHighlight: true,
+                startDate: startDate,
+                endDate: endDate,
+            });
+
+        if ('@ViewBag.RptLoad' == 'rptDirectDepositeListing.rpt') {
+            $("#PrintBankListingId").show();
+            $("#DivRptIframe").removeClass("hidden");
+            document.getElementById('RptIframe').src = "/ReportForms/ContributionByEmployer.aspx";
+        }
+        else {
+            $("#DivRecordFound").removeClass("hidden");
+        }
+
+      ShowBeneficiaryPaymentDetails();
+    });
+     jQuery(document).ready(function ($) {
+      comboTree = $('#RegionNames').comboTree({
+        source: @Group,
+        isMultiple: true,
+        cascadeSelect: true,
+        collapse: false
+      });
+     });
+     
+
+
+  var financialYear = '@FinancialYear';
+        if (financialYear == '' || financialYear == null || financialYear == undefined) {
+            financialYear = new Date().getFullYear();
+        }
+        var startDate = new Date(parseInt(financialYear),3,1);
+          var endDate = new Date(parseInt(financialYear) + 1, 2, 31);
+
+          $("#generateBankListing").validate({
+            rules: {
+              PayDate: {
+                required: true,
+                validFinancialYear: true 
+              }
+            },
+            messages: {
+              PayDate: {
+                required: "Pay Date is required.",
+                validFinancialYear: "Please select a valid Financial Year."
+              }
+            },
+            errorPlacement: function (error, element) {
+              error.css("color", "red"); 
+              error.insertAfter(element);
+            },
+            highlight: function (element) {
+              $(element).addClass("error-field"); 
+            },
+            unhighlight: function (element) {
+              $(element).removeClass("error-field"); 
+              $(element).next("label.error").remove();
+            },
+            submitHandler: function (form) {
+              //$('#spinner').show();
+              document.getElementById("spinner").classList.remove("display_none");
+              $('#Btn').prop('disabled', true);
+              form.submit();
+            },
+            onfocusout: function (element) {
+              $(element).valid();
+            }
+          });
+
+
+      $.validator.addMethod("validFinancialYear", function (value, element) {
+        debugger
+        if (value) {
+              var finecialyear = convertToDate(value);
+               var finecialDate = new Date(finecialyear); // Parse the PayDate
+              var start = new Date(startDate);
+              var end = new Date(endDate);
+              return finecialDate >= start && finecialDate <= end; // Ensure PayDate is within the range
+            }
+            return false;
+          }, "The date is outside the financial year."); // Default error message
+    
+      function convertToDate(dateString) {
+        var parts = dateString.split('/'); // Split by '/'
+        // parts[0] is the day, parts[1] is the month, parts[2] is the year
+        return new Date(parts[2], parts[1] - 1, parts[0]); // Year, Month (0-based), Day
+      }
+        //document.getElementById("generateBankListing").addEventListener("submit", function () {
+        //  generateBankListing();
+        //});
+        //function generateBankListing() {
+          // $('#spinner').show();
+          //document.getElementById("spinner").classList.remove("display_none");
+          //$('#Btn').prop('disabled', true);
+        //  return true;
+        //}
+
+        function downloadExcel(evt) {
+
+      try {
+          $(evt.target).find("i.fa-spinner").show();
+          $('#btn_downloadExcel_PrintBankList').show();
+          $('#IddownloadExcel').hide();
+
+        $.ajax({
+          type: "POST",
+          data: {  isDownload: true },
+          url: '@Url.Action("BeneficiaryPaymentDetailsAjaxHandler", "PensionProcess")',
+          cache: false,
+            success: function (result) {
+                $('#IddownloadExcel').show();
+                $('#btn_downloadExcel_PrintBankList').hide();
+            if (result != null) {
+              var bytes = new Uint8Array(result.FileContents);
+              var blob = new Blob([bytes], { type: '@System.Net.Mime.MediaTypeNames.Application.Octet' });
+              if (window.navigator.msSaveOrOpenBlob) {
+                // IE11
+                window.navigator.msSaveOrOpenBlob(blob, result.FileDownloadName);
+              } else {
+                // Google chome, Firefox, ....
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = result.FileDownloadName;
+                link.click();
+                $(evt.target).find("i.fa-spinner").hide();
+              }
+            }
+            else {
+
+            }
+          },
+          error: function (xhr, status, error) {
+          }
+        });
+
+      }
+      catch (e) {
+      }
+    }
+
+        var DirectGenerateBankMediaDistricts = [];
+
+    function ShowBeneficiaryPaymentDetails() {
+      if (document.getElementById("loader")) {
+      document.getElementById("loader").style.display = "block";
+        }
+        var oTable = $("#tbl_Summary").dataTable({
+          "bJQueryUI": true,
+          "paging": false,
+          "sPaginationType": "full_numbers",
+          "bServerSide": true,
+          "bDestroy": true,
+          "sAjaxSource": "/PensionProcess/BeneficiaryPaymentDetailsAjaxHandler",
+          "fnDrawCallback": function (setting) {
+            if (document.getElementById("loader")) {
+              document.getElementById("loader").style.display = "none";
+            }
+            DirectGenerateBankMediaDistricts.forEach(function (item, index) {
+
+              if (document.getElementById(item) != null && document.getElementById(item) != undefined) {
+                document.getElementById(item).addEventListener("click", function () {
+                  DirectGenerateBankMedia(this, item);
+                });
+              }
+
+              if (document.getElementById("Download_" + item) != null && document.getElementById("Download_" + item) != undefined) {
+                document.getElementById("Download_" + item).addEventListener("click", function () {
+                  DispersementExcelDownload(this, item);
+                });
+              }
+            });
+
+
+            GroupDataTable2(setting, 0, 9);
+          },
+          "fnInitComplete": function (oSettings, json) {
+            ShowFooterValue(oSettings.aoData);
+          },
+          //"columnDefs": [
+          //  {
+          //    "targets": [0], // Index of the column to hide
+          //    "visible": false // Set visibility to false
+          //  }
+          //],
+          //columns: [
+          //  { visible: false }, // Hide the first column
+          //  null, // Other columns remain as-is
+          //  null
+          //],
+          "aoColumns": [
+            { "sName": "Region" },
+            { "sName": "District" },
+            { "sName": "PCPCount" },
+            { "sName": "OAPCount" },
+            { "sName": "WIDCount" },
+            { "sName": "TGRCount" },
+            { "sName": "BeneficiariesCount" },
+            {
+              "sName": "TotalMonthAmount",
+              "bSearchable": false,
+              "bSortable": false,
+              "render": function (oObj, el, aData) {
+                var Region = aData[0];
+                var District = aData[1];
+                var DataCount = aData[3];
+                if (oObj != "0")
+                  return '<span class="badge badge-danger tableTdTextCenter" onclick="GetPaymentList(this,\'fail\',\'' + District + '\',\'' + Region + '\')">' + DataCount + '</span>';
+                else
+                  return '<span class="badge badge-danger tableTdTextCenter">' + DataCount + '</span>';
+              }
+            },
+            {
+              "sName": "TotalArreaMonthAmount",
+              "bSearchable": false,
+              "bSortable": false,
+              "render": function (oObj, el, aData) {
+                var Region = aData[0];
+                var District = aData[1];
+                var ADataCount = aData[8];
+                if (oObj != "0")
+                  return '<span class="badge badge-danger tableTdTextCenter" onclick="GetPaymentList(this,\'fail\',\'' + District + '\',\'' + Region + '\')">' + ADataCount + '</span>';
+                else
+                  return '<span class="badge badge-danger tableTdTextCenter">' + ADataCount + '</span>';
+              }
+            },
+
+
+            {
+              "sName": "",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                ;
+                var District = oObj.aData[1];
+                ;
+                buttonHtml = '';
+                var buttonHtml1 = oObj.aData[11];
+                //buttonHtml = buttonHtml + '<button href="#" disable class="btn btn-info btn-xs" id="' + District + '">Send Disbursement <i class="fa fa-cloud-upload" aria-hidden="true"></i></button> &nbsp;';
+                //buttonHtml = buttonHtml + '<button href="#" disable class="btn btn-info btn-xs" title="Download File" id="Download_' + District + '"> <i class="fa fa-arrow-down" aria-hidden="true"></i></button>';
+                if (buttonHtml1 == "True") {
+                  if ('@IsGeneratePensionWithoutSftp' == "False") {
+                    buttonHtml = buttonHtml + '<button href="#" disable class="btn btn-info btn-xs" id="' + District + '">Send Disbursement <i class="fa fa-cloud-upload" aria-hidden="true"></i></button> &nbsp;';
+                  }
+                  if ('@IsGeneratePensionWithoutSftp' == "True") {
+                    buttonHtml = buttonHtml + '<button href="#" disable class="btn btn-info btn-xs" title="Download File" id="Download_' + District + '">Download Disbursement File <i class="fa fa-arrow-down" aria-hidden="true"></i></button>';
+                  }
+                }
+                else {
+                  if ('@IsGeneratePensionWithoutSftp' == "False") {
+                    buttonHtml = buttonHtml + '<button href="#" disable class="btn btn-info btn-xs disabled" id="' + District + '" >Send Disbursement <i class="fa fa-cloud-upload" aria-hidden="true"></i></button> &nbsp;';
+                  }
+                  if ('@IsGeneratePensionWithoutSftp' == "True") {
+                    buttonHtml = buttonHtml + '<button href="#" disable class="btn btn-info btn-xs" title="Download File" id="Download_' + District + '">Download Disbursement File <i class="fa fa-arrow-down" aria-hidden="true"></i></button>';
+                  }
+                }
+
+                DirectGenerateBankMediaDistricts.push(District);
+
+                return buttonHtml;
+              }
+
+            }
+
+          ]
+        });
+      //  .rowGrouping({
+      //  bExpandableGrouping: true,
+      //  iGroupingColumnIndex: 0,
+      //  bHideGroupingColumn: true
+        //});
+
+        debugger
+        // hide groped column index
+        oTable.fnSetColumnVis(0, false, false);
+      }
+
+    function ShowFooterValue(data) {
+
+      var totalValueOfAmount = 0;
+      var totalValueOfArrear = 0;
+      var totalValueOfPCP = 0;
+      var totalValueOfOAP = 0;
+      var totalValueOfWID = 0;
+      var totalValueOfTGR = 0;
+      var totalValueOfBeneficiaries = 0;
+      var batch = 0;
+      var paydatevalue = "";
+      data.forEach(function (item) {
+        totalValueOfAmount = totalValueOfAmount + parseFloat(item._aData[7]);
+        totalValueOfArrear = totalValueOfArrear + parseFloat(item._aData[8]);
+
+        totalValueOfPCP = totalValueOfPCP + parseFloat(item._aData[2]);
+        totalValueOfOAP = totalValueOfOAP + parseFloat(item._aData[3]);
+        totalValueOfWID = totalValueOfWID + parseFloat(item._aData[4]);
+        totalValueOfTGR = totalValueOfTGR + parseFloat(item._aData[5]);
+        totalValueOfBeneficiaries = totalValueOfBeneficiaries + parseFloat(item._aData[6]);
+        batch = item._aData[9];
+        paydatevalue = extractDateFromDateStr(item._aData[10]);
+      });
+      totalValueOfAmount = totalValueOfAmount.toFixed(2);
+      totalValueOfArrear = totalValueOfArrear.toFixed(2);
+
+      $("#totalValueOfAmount").text(totalValueOfAmount);
+      $("#totalValueOfArrear").text(totalValueOfArrear);
+      $("#totalValueOfPCP").text(totalValueOfPCP);
+      $("#totalValueOfOAP").text(totalValueOfOAP);
+      $("#totalValueOfWID").text(totalValueOfWID);
+      $("#totalValueOfTGR").text(totalValueOfTGR);
+      $("#totalValueOfBeneficiaries").text(totalValueOfBeneficiaries);
+      $("#batchid").text(batch);
+      $("#paydate").text(paydatevalue);
+      $("#monthNameForHeader").text(getMonthNameFromDate(paydatevalue));
+
+        var totalAmount = parseFloat(totalValueOfAmount) + parseFloat(totalValueOfArrear);
+        $("#totalamount").text(totalAmount.toFixed(2));
+        $("#recordtotal").text(totalValueOfBeneficiaries);
+
+
+
+    }
+    function getMonthNameFromDate(dateString) {
+      ;
+      var months = [
+        "January", "February", "March",
+        "April", "May", "June",
+        "July", "August", "September",
+        "October", "November", "December"
+      ];
+
+      // Split the date string into day, month, and year components
+      var dateComponents = dateString.split('/');
+
+      // Rearrange the components to form a standard format "MM/DD/YYYY"
+      var rearrangedDateString = dateComponents[1] + '/' + dateComponents[0] + '/' + dateComponents[2];
+
+      // Create a Date object using the rearranged date string
+      var date = new Date(rearrangedDateString);
+
+      //var date = new Date(dateString);
+      var monthIndex = date.getMonth();
+
+      return months[monthIndex];
+    }
+    function getMonthName(monthNumber) {
+      var monthNames = [
+        "January", "February", "March",
+        "April", "May", "June",
+        "July", "August", "September",
+        "October", "November", "December"
+      ];
+
+      // Check if the provided monthNumber is valid
+      if (monthNumber >= 1 && monthNumber <= 12) {
+        return monthNames[monthNumber - 1];
+      } else {
+        return "Invalid Month Number";
+      }
+    }
+
+    function extractDateFromDateStr(dateStr) {
+
+      // Assuming dateStr is in the format "YYYY-MM-DD"
+      const dateParts = dateStr.split(' ');
+      const extractedDate = `${dateParts[0]}`;
+      return extractedDate;
+    }
+
+        // new code   SFTP file send
+      function DirectGenerateBankMedia(button, District) {
+
+        $('#SFTPfileSend').popup("show");
+        $("#District_value").val( District);
+
+      }
+      const onCancel_ClassBtn = document.querySelectorAll('.onCancel_class');
+      onCancel_ClassBtn.forEach(button => {
+        button.addEventListener('click', onCancel);
+      });
+        function onCancel() {
+
+        $('#SFTPfileSend').popup("hide");
+      }
+        function SFTPfiledata(button) {
+       ;
+        var District = $("#District_value").val();
+        $('#btn_Confirm_loading').show();
+        $('#BtnFinelize').hide();
+      var pybatchid1 = @pybatchid;
+      var pybatchid_value;
+      if (pybatchid1 === null) {
+        pybatchid_value = 0;
+      }
+      else {
+        pybatchid_value = @pybatchid;
+          }
+          var Region_value = District;
+
+      $.ajax({
+      type: "POST",
+          url: "@Url.Action("SFTPfileSendAjax", "PensionProcess")",
+          data: { batch_value: pybatchid_value, distict_value: Region_value },
+        success: function (response) {
+          ;
+          $('#BtnFinelize').show();
+          $('#btn_Confirm_loading').hide();
+            $('#SFTPfileSend').popup("hide");
+            if (response == "Already uploaded.") {
+                toasterErrorMessage("Disbursement is already sent or you dont have permission to send the disbursement.");
+            }
+            else {
+                toasterSuccessMessage("File has been successfully saved.");
+            }
+        },
+        error: function (xhr, status, error) {
+          ;
+          toasterErrorMessage("There is no record to create media.");
+          /*button.setAttribute('disabled', 'disabled');*/
+        }
+      });
+    }
+
+    function DispersementExcelDownload(evnt, District) {
+      debugger
+
+            var ButtonHtml = $("#Download_" + District).html();
+            if (!$("#Download_" + District).html().includes('<i class="fa fa-spinner fa-spin" aria-hidden="true">')) {
+                $("#Download_" + District).html('<i class="fa fa-spinner fa-spin" aria-hidden="true"></i> ' + ButtonHtml);
+            }
+
+                var pybatchid1 = @pybatchid;
+                var pybatchid_value;
+                if (pybatchid1 === null) {
+                  pybatchid_value = 0;
+                }
+                else {
+                  pybatchid_value = @pybatchid;
+                    }
+      var Region_value = District;
+
+      var Disabledid = "Download_" + District;
+      $("#" + Disabledid).attr("disabled", true);
+
+            var xhr = new XMLHttpRequest();
+             xhr.open('POST', '@Url.Action("DownLoadBankDisbursementFileAjax", "PensionProcess")', true);
+            xhr.responseType = 'arraybuffer';
+            xhr.onload = function () {
+                ;
+                if (xhr.status === 200) {
+                    if (xhr.response.byteLength > 0) {
+                        let fileName = "downloaded_file";
+                        const contentDisposition = xhr.getResponseHeader("Content-Disposition");
+                        if (contentDisposition && contentDisposition.indexOf("filename=") !== -1) {
+                            fileName = contentDisposition.split("filename=")[1].replace(/"/g, "");
+                        }
+                        // Success: Convert arraybuffer to blob and initiate download
+                        var blob = new Blob([xhr.response], { type: 'application/octet-stream' });
+                        var url = window.URL.createObjectURL(blob);
+                        var a = document.createElement('a');
+                        a.href = url;
+                        a.download = fileName; // Default filename
+
+                        // Check Content-Disposition header for filename if available
+                        var disposition = xhr.getResponseHeader('Content-Disposition');
+                        if (disposition) {
+                            var matches = /filename="([^"]*)"/.exec(disposition);
+                            if (matches != null && matches[1]) {
+                                a.download = matches[1];
+                            }
+                        }
+
+                        // Append the anchor to the document body and trigger the download
+                        document.body.appendChild(a);
+                        a.click();
+
+                        // Clean up
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                    }
+                    else {
+                        toasterErrorMessage("File not found.");
+                    }
+                    if ($("#Download_" + District).html().includes('<i class="fa fa-spinner fa-spin" aria-hidden="true">')) {
+                        $("#Download_" + District).html(ButtonHtml);
+                    }
+                } else {
+                    toasterErrorMessage('Request failed with status:', xhr.status);
+                    if ($("#Download_" + District).html().includes('<i class="fa fa-spinner fa-spin" aria-hidden="true">')) {
+                        $("#Download_" + District).html(ButtonHtml);
+                    }
+                }
+            };
+
+            xhr.onerror = function () {
+                toasterErrorMessage('Request error');
+                if ($("#Download_" + District).html().includes('<i class="fa fa-spinner fa-spin" aria-hidden="true">')) {
+                    $("#Download_" + District).html(ButtonHtml);
+                }
+            };
+
+            // Prepare form data and send
+            var formData = new FormData();
+            formData.append('batch_value', pybatchid_value);
+            formData.append('distict_value', Region_value);
+
+            xhr.send(formData);
+
+        }
+
+</script>
+}

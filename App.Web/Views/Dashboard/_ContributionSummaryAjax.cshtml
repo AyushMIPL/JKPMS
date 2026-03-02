@@ -1,0 +1,87 @@
+﻿@{
+    Layout = null;
+    var year = DateTime.Now.Year + "-" + DateTime.Now.AddYears(1).Year;
+}
+
+<div class="panel panel-default" id="contributorSummaryStatistics">
+    <div class="panel-heading clearfix">
+        <div class="headline  Dash_contributorSummary">
+            <button type="button" onclick="showContributionGraph();" class="btn btn-info dash_button"  data-dismiss="modal" aria-hidden="true">Graph</button>
+            @*<div style="display:flex;">
+                  <h4>Beneficiaries Payment Summary</h4>
+                  &nbsp;&nbsp;<select class="form-control" id="FinancialYearDropdown" style="width:20%;" onchange="ReBindDashboardPaymentSummary()"></select>
+                  <div style="margin-left:50%; margin-top:5px;">
+                    <button type="button" class="btn btn-success px-5 height" style="display: none; float:right" title="Please Wait While We Process Your Request" id="btn_downloadExcel_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                    <button type="button" class="btn btn-success" id="IddownloadExcel" style="float:right" onclick="downloadExcelDashboard(event)">Download Excel</button>
+                  </div>
+                </div>*@
+            <div class="row">
+                <div class="col-md-4"><h4>Beneficiaries Payment Summary</h4></div>
+                <div class="col-md-3">@*<select class="form-control" id="FinancialYearDropdown" onchange="ReBindDashboardPaymentSummary()"></select>*@</div>
+                <div class="col-md-5">
+                    <button type="button" class="btn btn-success px-5 height dash_button"" title="Please Wait While We Process Your Request" id="btn_downloadExcel_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                    <button type="button" class="btn btn-success dash_button_right download_Excel" id="IddownloadExcel"  @*onclick="downloadExcelDashboard(event)"*@>Download Excel</button>
+                </div>
+            </div>
+            @*<div class="row padding_100 pb-5">
+                  <div class="col-lg-3 col-md-3">
+                    <h4>Beneficiaries Payment Summary</h4>
+                  </div>
+                  <div class="col-lg-4 col-md-4">
+                    <select class="form-control" id="FinancialYearDropdown" onchange="ReBindDashboardPaymentSummary()"></select>
+                  </div>
+                  <div class="col-lg-3 col-md-2"></div>
+                  <div class="col-lg-3 col-md-1">
+                    <button type="button" class="btn btn-success px-5 height" style="display: none; float:right" title="Please Wait While We Process Your Request" id="btn_downloadExcel_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                    <button type="button" class="btn btn-success" id="IddownloadExcel" style="float:right" onclick="downloadExcelDashboard(event)">Download Excel</button>
+                  </div>
+                </div>*@
+
+
+        </div>
+    </div>
+    <div class="DashDiv_padding">
+        <table id="tblPaymentCounts">
+            <thead>
+                <tr>
+                    <th class="text-center">Region</th>
+                    <th class="text-center">District</th>
+                    <th class="text-center">Success</th>
+                    <th class="text-center">Failed</th>
+                    <th class="text-center">Status Not Updated</th>
+                    <th class="text-center"><span>Total</span><br /><span>(Success, Failed, <br /> Status Not Updated)</span></th>
+                    <th class="text-center"><span>Month Amount&nbsp;</span><br /><span id="LastPayMonthInYear" class="MonthAmount" ></span></th>
+                    <th class="text-center"><span>Year Amount&nbsp;</span><br /><span id="PayMonthInYear" class="MonthAmount"></span></th>
+
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th></th>
+                    <th>Grand Total:</th>
+                    <th><span id="totalValueOfSuccess"></span></th>
+                    <th><span id="totalValueOfFailed"></span></th>
+                    <th><span id="totalValueOfStatusNotUpdated"></span></th>
+                    <th><span id="totalValueOfBeneficiaries" class="tableTdTextCenter"></span></th>
+                    <th><span id="totalValueOfMonthAmount"></span></th>
+                    <th><span id="totalValueOfYearAmount"></span></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<div class="panel panel-default dash_displaynone" id="contributorGraph">
+    <div class="panel-heading clearfix">
+        <h4 class="headline s"">
+            <button type="button" onclick="showContributionStatistics();" class="btn btn-info dash_button" data-dismiss="modal" aria-hidden="true">Statistics</button>
+            Contribution Summary
+        </h4>
+        <ul class="Dash_ul_tage">
+            <li class="Dash_li_tage" ><span class="fa fa-square"></span> Employer Contribution</li>
+            <li class="Dash_li_tage_li" ><span class="fa fa-square"></span> Employee’s Contribution</li>
+        </ul>
+    </div>
+    <canvas id="contributorSummary" class="Canvass_Summary"></canvas>
+</div>

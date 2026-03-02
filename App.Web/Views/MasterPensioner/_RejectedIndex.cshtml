@@ -1,0 +1,45 @@
+﻿
+@{
+  Layout = null;
+}
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h5 class="headline" style="margin:0px;padding:0px;border:none;">
+      Rejected Applications Details
+
+    </h5>
+  </div>
+  <div class="panel-body">
+    <table class="table dataTable" id="tblRejected">
+      <thead>
+        <tr>
+          <th>Applicant Name</th>
+          <th>Reason</th>
+          <th>Employer Name</th>
+          <th>Applied Date</th>
+          <th>Rejected Date</th>
+          <th>Request Rejected By</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+
+      </thead>
+      <tbody>
+        @*@foreach (var item in Model)
+          {
+            <tr>
+              <td>@item.contributor.FullName</td>
+              <td>@item.Notes</td>
+              <td>@item.contributor.Employer.EmployerName</td>
+              <td>@Html.FormatDate(item.AppliedDate)</td>
+              <td>@Html.FormatDate(item.RejectedDate)</td>
+              <td>@item.user.FullName</td>
+              <td><span class="badge badge-danger">Rejected</span></td>
+
+              <td><a href="javascript:showDivPension(@item.ApplicationId)" class="btn btn-info btn-xs" title="Details"><i class="fa fa-pencil"></i></a>							</td>
+            </tr>
+          }*@
+      </tbody>
+    </table>
+  </div>
+</div>

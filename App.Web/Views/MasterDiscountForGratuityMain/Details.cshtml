@@ -1,0 +1,104 @@
+﻿@model App.Data.Entities.MasterDiscountForGratuityMain
+@using App.Web.Helper
+
+@{
+  Layout = null;
+}
+@Html.HiddenFor(m => m.DiscountFactorPercent)
+@Html.HiddenFor(m => m.MaxYearsToNormalRetirement)
+
+
+@*<div class="panel panel-default">*@
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Discount Rate
+    </h4>
+
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-sm-4">
+          <dl class="dl-horizontal">
+            <dt>
+              @Html.DisplayNameFor(model => model.DiscountFactorPercent)
+            </dt>
+
+            <dd>
+              @Html.DisplayFor(model => model.DiscountFactorPercent)
+            </dd>
+            <dt>
+              @Html.DisplayNameFor(model => model.MaxYearsToNormalRetirement)
+            </dt>
+
+            <dd>
+              @Html.DisplayFor(model => model.MaxYearsToNormalRetirement)
+            </dd>
+          </dl>
+        </div>
+        <div class="col-sm-6">
+          <dl class="dl-horizontal">
+            <dt>
+              <label>Date Range</label>
+            </dt>
+            <dd>
+              @Html.FormatDateRange(Model.DateFrom, Model.DateTo)
+            </dd>
+
+            <dt>@Html.DisplayNameFor(model => model.EmployerTypeID)</dt>
+
+            <dd>
+              @Html.DisplayFor(model => model.employerType.Name)
+            </dd>
+
+          </dl>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+  <div class="panel-body" style="overflow-y:scroll;height:300px;">
+    <table class="table" id="tblDiscount">
+      <thead>
+        <tr>
+          @*<th>Date From - Date To</th>
+          <th>Public/Police</th>*@
+          <th>Years to<br />Normal Retirement</th>
+          @*<th>Discount Factor (%)</th>*@
+          <th>Formulae</th>
+          <th>Discount Factor</th>
+
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+@*</div>*@
+
+<script nonce="@ViewBag.StyleNonce">
+  $(function () {
+    $("#DateFrom").hide();
+    $("#DateTo").hide();
+
+    doBind();
+  })
+  function doBind() {
+    var discountfactor = $("#DiscountFactorPercent").val();
+    var maxYear = $("#MaxYearsToNormalRetirement").val();
+
+    $.ajax({
+      type: 'Get',
+      url: '/MasterDiscountForGratuityMain/AjaxDiscountedTable?discountfactor=' + discountfactor + "&maxYear=" + maxYear,
+      dataType: 'json'
+    }).done(function (result) {
+      $("#tblDiscount tbody").empty();
+      debugger
+      var discountFactor = $("#DiscountFactorPercent").val();      
+      $.each(result, function (i, item) {
+        var formulae = "1 / (" + (1 + (parseInt(discountFactor) / 100)) + " ^ " + item.YearsToNormalRetirement + ")";
+        $("#tblDiscount tbody").append("<tr><td>" + item.YearsToNormalRetirement + "</td><td>"+formulae+"</td><td>" + parseFloat(item.DiscountFactor).toFixed(9) + "</td></tr>");
+
+      });
+
+    })
+  }
+</script>

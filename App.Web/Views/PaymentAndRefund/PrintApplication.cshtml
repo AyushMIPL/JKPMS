@@ -1,0 +1,142 @@
+﻿@{
+    ViewBag.Title = "PrintApplication";
+}
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row py-4">
+
+            <div class="col-sm-3">
+                @Html.DropDownList("EmployerID", null, "---Select---", new { @class = "form-control select-sm" })
+            </div>
+            <div class="col-sm-3">
+                @Html.DropDownList("PersonID", null, "---Select---", new { @class = "form-control select-sm" })
+            </div>
+            <div class="col-sm-3">
+                @Html.DropDownList("ApplicationType", null, "---Select---", new { @class = "form-control select-sm" })
+            </div>
+            <div class="col-sm-3">
+                <div class="input-group date" id="Date">
+                    @Html.TextBox("RetirementDate", "", new { @class = "form-control", @placeholder = "Retirement Date", @id = "RetirementOrResignationDate" })
+                    <span class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+            <div class="row">
+                <div class="col-sm-12 text-right mt-4">
+                    <button type="button" class="btn btn-success height px-5" onclick="javascript:return ShowDivPension()"><i class="fa fa-calculator"></i> Calculate</button>
+                </div>
+            </div>
+        </div>
+        </div>
+
+<iframe id="reportData" style="border: 0px;height:700px;width:100%;margin-left:100px"></iframe>
+
+@section scripts{
+    <script nonce="@ViewBag.StyleNonce">
+    $(document).ajaxStop(function () { Pace.stop(); });
+    $("#EmployerID").change(function () {
+      $("#PersonID").select2("val", "");
+      $("#PersonID").empty();
+      $('#PersonID').append($('<option/>').attr("value", "").text("---Select---"));
+      //clearall();
+      var eid = $(this).val();
+      if (eid != "") {
+        $.ajax({
+          type: 'Get',
+          url: '/PaymentAndRefund/GetContributorAjax?EmpId=' + eid,
+          dataType: 'json'
+        }).done(function (result) {
+          $.each(result, function (i, names) {
+            $('#PersonID').append($('<option/>').attr("value", names.Value).text(names.Text));
+          });
+        });
+      }
+    })
+
+    Pace.ignore(function () {
+      ShowDivPension();
+    });
+
+    function ShowDivPension() {
+      var persionId = $("#PersonID").val();
+      var empId = $("#EmployerID").val();
+      var retDate = $("#RetirementOrResignationDate").val();
+      var ApplicationType = $("#ApplicationType").val();
+      if (persionId != "" && empId != "" && retDate != "" && ApplicationType != "") {
+        if (ApplicationType == "Pension") {
+          $.ajax({
+            url: '@Url.Action("_PrintApplicationAjax", "PaymentAndRefund")?Id=' + persionId + "&retDate=" + retDate,
+            type: "GET",
+          }).done(function (result) {
+            var actionRes = result;
+            if (actionRes == "DateShort") {
+              toasterErrorMessage("Service Length Should be Greater Than 10 Years for public and 2 Year for Police");
+            }
+            else if (actionRes == "jobDetails") {
+              toasterErrorMessage("Job Details Not Available");
+            } else if (actionRes == "discountedGratuity") {
+              toasterErrorMessage("Discount factor not defined for that period");
+            }
+            else if (actionRes == "1") {
+              $('#reportData').attr('src', '/ReportForms/ContributionByEmployer.aspx');
+              return false;
+            }
+            else {
+              toasterErrorMessage("Result not found on this search criteria.");
+              return false;
+            }
+          });
+        }
+        else {
+          $.ajax({
+            url: '@Url.Action("_PrintApplicationsAjax", "PaymentAndRefund")?Id=' + persionId + "&retDate=" + retDate,
+            type: "GET",
+          }).done(function (result) {
+            var actionRes = result;
+            if (actionRes == "police") {
+              toasterErrorMessage("Service Length Should be Less Than 2 years");
+            }
+            else if (actionRes == "notEligible") {
+              toasterErrorMessage("Joining Date should be after 2004");
+            } else if (actionRes == "InterestRate") {
+              toasterErrorMessage("Interest Rate not defined for that period");
+            }
+            else if (actionRes == "public") {
+              toasterErrorMessage("Service Length Should be Less Than 10 years");
+            }
+            else if (actionRes == "jobDetails") {
+              toasterErrorMessage("Job Details Not Available");
+            }
+            else if (actionRes == "1") {
+              $('#reportData').attr('src', '/ReportForms/ContributionByEmployer.aspx');
+              return false;
+            }
+            else {
+              toasterErrorMessage("Result not found on this search criteria.");
+              return false;
+            }
+
+          });
+        }
+      }
+      else {
+        toasterErrorMessage("Fill All Details To Calculate.");
+      }
+    }
+
+    function hidePension() {
+      $("#formModal").hide();
+    }
+    function printdiv() {
+      var divToPrint = document.getElementById('partialDiv');
+      var popupWin = window.open('', '', 'fullscreen=yes');
+      popupWin.document.open();
+      popupWin.document.write('<html><body onload="window.print()">' + divToPrint.innerHTML + '</html>');
+      popupWin.document.close();
+    }
+    </script>
+}
+

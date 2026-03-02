@@ -1,0 +1,67 @@
+﻿@model App.Data.Entities.MasterContributor
+
+  <div class="panel panel-default">
+    <form class="form-horizontal no-margin form-border" id="formWizard1">
+      <div class="panel-heading">
+        Contributor Personal Details
+      </div>
+      <div class="panel-tab">
+        <ul class="wizard-steps wizard-demo" id="wizardDemo1">
+          <li class="active">
+            @Html.ActionLink("Contributor Personal Details", "Create", "ContributorPersonalDetails")
+            @*<a href="#wizardContent1" data-toggle="tab">Contributor Personal Details</a>*@
+          </li>
+          <li class="">
+            @Html.ActionLink("Marriage Details", "Create", "MarriageDetails")
+            @*<a href="#wizardContent2" data-toggle="tab">Marriage Details</a>*@
+          </li>
+          <li>
+            @Html.ActionLink("Dependants Details", "Create", "DependantDetails")
+            @*<a href="#wizardContent3" data-toggle="tab">Dependants Details</a>*@
+          </li>
+          <li>
+            @Html.ActionLink("Job Details", "Create", "JobDetails")
+            @*<a href="#wizardContent4" data-toggle="tab">Job Details</a>*@
+          </li>
+        </ul>
+      </div>
+
+      <div class="panel-body">
+        <div class="tab-content">
+          <div class="tab-pane fade active in" id="wizardContent1">
+            <div id="divContainer112">
+              @Html.Partial("_PartialContributorPersonalDetails")
+            </div>
+          </div>
+          <div class="tab-pane fade padding-md" id="wizardContent2">
+          </div>
+          <div class="tab-pane fade padding-md" id="wizardContent3">
+          </div>
+          <div class="tab-pane fade padding-md" id="wizardContent4">
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer clearfix">
+        @*<div class="pull-left">
+          <button class="btn btn-success btn-sm" id="prevStep1">Previous</button>
+          <button type="submit" class="btn btn-sm btn-success" id="nextStep1">Next</button>
+        </div>*@
+
+        <div class="pull-right" style="width:30%">
+          <div class="progress progress-striped active m-top-sm m-bottom-none">
+            <div class="progress-bar progress-bar-success" id="wizardProgress" style="width: 25%;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+
+<div>
+  @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+  @*@Scripts.Render("~/bundles/jqueryval");*@
+}

@@ -1,0 +1,424 @@
+﻿@model App.Data.Entities.MasterContributorJobDetails
+
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/Shared/_LayoutProfile.cshtml";
+}
+
+@section profileContainer
+{
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+                Contributor Job Details : @string.Format("{0} ({1})", ViewBag.Name, ViewBag.PersonId)
+
+            </h4>
+        </div>
+        @using (Html.BeginForm("AddJobDetails", "ContributorPersonalDetails", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+    {
+            @Html.Hidden("RequestFrom")
+            @Html.Hidden("DateOfBirth")
+            @Html.Hidden("FirstAppointmentDated")
+            @Html.Hidden("LastAppointmentDated")
+            @Html.Hidden("MinimumHiringAge")
+            @Html.Hidden("EmployerID")
+            @Html.Hidden("Rejoinee")
+            @Html.Hidden("ActiveContributor")
+            <div class="row">
+                <div class="panel-body">
+                    <div class="col-sm-12">
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary("", new { @class = "text-danger" })
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PersonID, htmlAttributes: new { @class = "control-label col-lg-2" })
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(m => m.PersonID, new { @class = "form-control", placeholder = "JKPS ID", @Value = ViewBag.PersonID, @readonly = "readonly" })
+                                @Html.ValidationMessageFor(model => model.PersonID, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.EmployerID, "Employer", htmlAttributes: new { @class = "control-label col-lg-2" })
+                            <div class="col-md-6">
+                                <input type="text" value="@ViewBag.EmployerName" class="form-control input-sm" readonly />
+                                @*@Html.DropDownList("EmployerID", null, "---Select---", htmlAttributes: new { @class = "form-control" })*@
+                                @*@Html.TextBox("EmployerName", new { @class = "form-control input-sm", @readonly = "readonly" })*@
+                                @*@Html.ValidationMessageFor(model => model.EmployerID, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.EmployerType, new { @class = "col-sm-2 control-label" })
+                            <div class="col-sm-6">
+                                @Html.DropDownList("EmployerType", null, "---Select---", new { @class = "form-control select-sm txtEdit" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DepartmentId, "Department *", htmlAttributes: new { @class = "control-label col-lg-2" })
+                            <div class="col-md-6">
+                                @Html.DropDownList("DepartmentId", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+                                @*@Html.ValidationMessageFor(model => model.DepartmentId, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DesignationId, "Job Title *", htmlAttributes: new { @class = "control-label col-lg-2" })
+                            <div class="col-md-6">
+                                @Html.DropDownList("DesignationId", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+
+                            </div>
+                        </div>
+
+                        @*<div class="form-group">
+                              @Html.LabelFor(model => model.JobTitleID, "Job Title *", htmlAttributes: new { @class = "control-label col-lg-2" })
+                              <div class="col-md-6">
+                                @Html.DropDownList("JobTitleID", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.JobTitleID, "", new { @class = "text-danger" })
+                              </div>
+                            </div>*@
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.GradeId, "Grade", htmlAttributes: new { @class = "control-label col-lg-2" })
+                            <div class="col-md-6">
+                                @Html.DropDownList("GradeId", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+                                @*@Html.ValidationMessageFor(model => model.GradeId, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.HireDate, "Hire Date *", new { @class = "col-sm-2 control-label" })
+                            <div class="col-sm-6">
+                                <div class="input-group date" id="Hire">
+                                    @Html.EditorFor(m => m.HireDate, new { @class = "form-control", placeholder = "Hire Date" })
+
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Expected Retirement Date:</label>
+                            @*@Html.LabelFor(model => model.Contributor.ExpectedRetirementDate, new { @class = "col-sm-2 control-label" })*@
+                            <div class="col-sm-6">
+                                <input type="text" id="ExpectedRetirementDate" name="ExpectedRetirementDate" readonly="readonly" , required data-val="true" data-val-required="Select Expected Retirement Date" class="form-control">
+                                @*@Html.TextBoxFor(m => m.Contributor.ExpectedRetirementDate, new { id = "ExpectedRetirementDate", @class = "form-control", placeholder = "Expected RetirementDate", @readonly = "readonly" })*@
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.JoiningDate, "Joining Date *", new { @class = "col-sm-2 control-label" })
+                            <div class="col-sm-6">
+                                <div class="input-group date" id="join" onclick="loadDate();">
+                                    @Html.EditorFor(m => m.JoiningDate, new { @class = "form-control", placeholder = "Joining Date" })
+
+
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ContributionStartDate, "Contribution Start Date", new { @class = "col-sm-2 control-label" })
+                            <div class="col-sm-6">
+                                <div class="input-group date" id="conStart" >
+                                    @Html.EditorFor(m => m.ContributionStartDate, new { @class = "form-control", placeholder = "Contribution Start Date" })
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="form-group">
+                              <label class="col-sm-2 control-label">First Appointment Date:</label>
+                              @Html.LabelFor(model => model.Contributor.FirstAppointmentDate, "1st Appointment Date", new { @class = "col-sm-2 control-label" })
+                              <div class="col-sm-6">
+                                <div class="input-group date" id="First">
+                                  @Html.EditorFor(model => model.Contributor.FirstAppointmentDate, new { id = "FirstAppointmentDate", @placeholder = "First Appointment Date" })
+                                  <input type="text" id="FirstAppointmentDate" name="FirstAppointmentDate" , required data-val="true" data-val-required="Select First Appointment Date" class="form-control"><span class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                  </span>
+                                </div>
+                              </div>
+                            </div>*@
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Last Appointment Date:</label>
+                            <div class="col-sm-6">
+                                <div class="input-group date" id="LastDate">
+                                    @*@Html.EditorFor(model => model.Contributor.LastAppointmentDate, new { id = "LastAppointmentDate", @placeholder = "Last Appointment Date"})*@
+                                    <input type="text" id="LastAppointmentDate" name="LastAppointmentDate" class="form-control">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        @*<div class="form-group">
+                              @Html.LabelFor(model => model.HireDate, new { @class = "col-sm-2 control-label" })
+                              <div class="col-sm-6">
+                                <div class="input-group date">
+                                  @Html.EditorFor(model => model.HireDate, new { @placeholder = "HireDate" })
+                                  <span class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                  </span>
+                                </div>
+                              </div>
+                            </div>*@
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PresentSalary, "Present Salary(Annual) *", htmlAttributes: new { @class = "control-label col-lg-2" })
+                            <div class="col-md-6">
+                                @Html.EditorFor(model => model.PresentSalary, new { htmlAttributes = new { @class = "form-control allownumericwithdecimal auto" } })
+                                @*@Html.ValidationMessageFor(model => model.PresentSalary, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        @*<div class="form-group">
+                              @Html.LabelFor(model => model.Contributor.MonthlySalary, new { @class = "col-sm-2 control-label" })
+                              <div class="col-sm-6">
+                                @Html.TextBoxFor(m => m.Contributor.MonthlySalary, new { @class = "form-control input-sm", placeholder = "Monthly Salary", @readonly = "readonly" })
+                              </div>
+                            </div>*@
+                        <div class="form-group">
+                            @Html.Label("EmployerContribution", "Employer's Contribution(Monthly)", new { id = "EmployerContribution", @class = "col-sm-2 control-label" })
+                            <div class="col-sm-6">
+                                @Html.TextBox("EmployerContributionAmount", "0.000", new { id = "EmployerContributionAmount", name = "EmployerContribution", @class = "form-control input-sm auto", @readonly = "readonly" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.Label("ContributorContribution", "Contributor's Contribution(Monthly)", new { id = "ContributorContribution", @class = "col-sm-2 control-label" })
+                            <div class="col-sm-6">
+                                @Html.TextBox("ContributorContributionAmount", "0.000", new { id = "ContributorContributionAmount", name = "ContributorContributionAmount", @class = "form-control input-sm auto", @readonly = "readonly" })
+                            </div>
+                        </div>
+
+                        @*<div class="form-group">
+                              @Html.LabelFor(model => model.JobDescription, htmlAttributes: new { @class = "control-label col-lg-2" })
+                              <div class="col-md-6">
+                                @Html.EditorFor(model => model.JobDescription, new { htmlAttributes = new { @class = "form-control" } })
+
+                              </div>
+                            </div>*@
+
+                        @*<div class="form-group">
+                              <label for="IsActive" class="col-sm-2 control-label">Status:</label>
+                              <div class="col-md-6">
+                                <div class="checkbox">
+                                  @Html.CheckBoxFor(m => m.IsActive, new { @class = "form-control input-sm" })
+                                </div>
+                              </div>
+                            </div>*@
+
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+                                <button type="submit" class="btn btn-success" id="SaveContDetails"><i class="fa fa-save"> </i> Save</button>
+                                <a id="backtolist" href="/ContributorPersonalDetails/Index" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+@section scripts{
+
+    <script src="~/Scripts/Master.js"></script>
+    <script nonce="@ViewBag.StyleNonce">
+        
+
+        $("#SaveContDetails").click(function () {
+            $('.auto').each(function (i) {
+                var self = $(this);
+                var v = self.autoNumeric('get');
+                self.autoNumeric('destroy');
+                self.val(v);
+            });
+        })
+
+       
+
+        //$("#EmployerID").prop("disabled", true);
+        $('#PresentSalary').keypress(function (event) {
+            if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+                event.preventDefault();
+            }
+        });
+        function salcalculate() {
+            var personID = $("#PersonID").val();
+            var sal = $("#PresentSalary").val();
+            if (sal != null && sal.length > 0) {
+                $.ajax({
+                    url: '/ContributorPersonalDetails/CalculateContributionAjax?PersonID=' + personID + '&SalaryAmount=' + sal,
+                    type: 'Get',
+                    dataType: 'json'
+                }).done(function (result) {
+                    debugger
+                    var string1 = result.contributionContribution.toFixed(2);
+                    var string2 = result.employerContribution.toFixed(2);
+                    $("#ContributorContributionAmount").val(string1);
+                    $("#EmployerContributionAmount").val(string2);
+                    $("#Contributor_MonthlySalary").val(result.monthSalary);
+                });
+            }
+        }
+        function loadDate() {
+            $("#join").on('changeDate', function (selected) {
+                $("#ContributionStartDate").val($("#JoiningDate").val());
+                var startDate = new Date(selected.date.valueOf());
+                $('#conStart').datepicker('setStartDate', startDate);
+                $('#conStart').focus();
+            }).on('clearDate', function (selected) {
+                $('#conStart').datepicker('setStartDate', null);
+            });
+        }
+        $(function () {
+            
+
+            if ($("#RequestFrom").val() == "True") {
+                debugger
+                $("#backtolist").attr('href', '/ContributorPersonalDetails/errorsInContributorDetails');
+            }
+            if ($("#ActiveContributor").val() == "No") {
+                $(".form-control").each(function () {
+                    $(this).prop("disabled", "disabled");
+                });
+                $(".checkbox").each(function () {
+                    $(this).prop("disabled", "disabled");
+                });
+                $(".btn-success").prop("disabled", "disabled");
+            }
+
+
+            salcalculate();
+            valueFormat();
+            debugger
+            $("#PresentSalary").change(function () {
+                salcalculate();
+                valueFormat();
+            })
+
+
+            var dep = $("#MinimumHiringAge").val();
+            var date = new Date();
+            var bdate = new Date($("#DateOfBirth").val());
+            var dob = (bdate.getMonth() + 1) + "/" + bdate.getDate() + "/" + (bdate.getFullYear() + parseInt(dep));
+            if ($("#Rejoinee").val() != "") {
+                dob = new Date($("#Rejoinee").val());
+            }
+            $('#Hire').datepicker({
+                startDate: dob,
+                endDate: date,
+                startView: 1,
+                format: "mm/dd/yyyy",
+                autoclose: true
+            });
+            var Jdate = $("#JoiningDate").val();
+            $('#conStart').datepicker({
+                startDate: Jdate,
+                startView: 1,
+                format: "mm/dd/yyyy",
+                autoclose: true
+            });
+            
+
+
+
+            var lastAppointmentDated = $("#LastAppointmentDated").val();
+            if (lastAppointmentDated != "") {
+                var ldate = new Date($("#LastAppointmentDated").val());
+                var last = (ldate.getMonth() + 1) + "/" + ldate.getDate() + "/" + (ldate.getFullYear());
+                $("#LastAppointmentDate").val(last);
+            }
+            //var date = new Date($("#DateOfBirth").val());
+            //debugger
+            //if (!isNaN(date.getTime())) {
+            //  var c = date.getMonth() == 0 ? 12 : date.getMonth();
+            //  var d = c + "/" + date.getDate() + "/" + (date.getFullYear() + 55);
+            //  $("#ExpectedRetirementDate").val(d);
+
+            //}
+            //var dob = date.getMonth() + "/" + date.getDate() + "/" + (date.getFullYear() + 18);
+            //debugger
+            //$('#Hire').datepicker({
+            //  //endDate: dob,
+            //  startDate: dob,
+            //  format: "mm/dd/yyyy",
+            //  autoclose: true
+            //});
+            //var firstAppointmentDated = $("#FirstAppointmentDated").val();
+            //var lastAppointmentDated = $("#LastAppointmentDated").val();
+            //if(firstAppointmentDated!="" && lastAppointmentDated!="")
+            //{
+            //  $("#FirstAppointmentDate").val(firstAppointmentDated);
+            //  $("#LastAppointmentDate").val(lastAppointmentDated);
+            //}
+            var hdate = $("#HireDate").val();
+            var etype = $("#EmployerID").val();
+            var bdate = $("#DateOfBirth").val();
+            if (hdate != "") {
+                debugger
+                $.ajax({
+                    url: '/ContributorPersonalDetails/ExpectedAjax?hireDate=' + hdate + "&empType=" + etype + "&dob=" + bdate,
+                    type: 'Get',
+                    dataType: 'json'
+                }).done(function (result) {
+                    debugger
+                    if (result == "0") {
+                        toasterErrorMessage("There is some error, please try again.");
+                        $("#ExpectedRetirementDate").val("");
+                    }
+                    else {
+                        $("#ExpectedRetirementDate").val(result);
+                    }
+
+                })
+            }
+            else {
+                $("#ExpectedRetirementDate").val("");
+            }
+        })
+
+
+        $("#Hire").on('change', function () {
+            var hdate = $("#HireDate").val();
+            var etype = $("#EmployerID").val();
+            var bdate = $("#DateOfBirth").val();
+            if (hdate != "") {
+                $('#join').datepicker('setStartDate', hdate);
+                $('#LastDate').datepicker('setStartDate', hdate);
+
+
+                debugger
+                $.ajax({
+                    url: '/ContributorPersonalDetails/ExpectedAjax?hireDate=' + hdate + "&empType=" + etype + "&dob=" + bdate,
+                    type: 'Get',
+                    dataType: 'json'
+                }).done(function (result) {
+                    debugger
+                    if (result == "0") {
+                        toasterErrorMessage("There is some error, please try again.");
+                        $("#ExpectedRetirementDate").val("");
+                    }
+                    else {
+                        $("#ExpectedRetirementDate").val(result);
+                    }
+
+                })
+            }
+            else {
+                $("#ExpectedRetirementDate").val("");
+            }
+        })
+
+        function valueFormat() {
+            $(".auto").autoNumeric({ aSep: ',', aDec: '.' });
+        }
+
+
+    </script>
+}
+

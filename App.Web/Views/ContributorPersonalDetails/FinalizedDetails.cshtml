@@ -1,0 +1,619 @@
+﻿@model List<App.Data.ViewModels.ExcelFileViewModel>
+@{
+  ViewBag.Title = "ContributionDetailsUpload";
+
+}
+
+<div class="panel panel-default hidden">
+  <div class="panel-body">
+    <div class="row">
+
+      @*<div class="col-sm-3">
+          @Html.DropDownList("EmployerId", null, "---Select---", new { @class = "form-control select-sm" })
+        </div>
+        <div class="col-sm-3">
+          @Html.DropDownList("Month", null, "---Select---", new { @class = "form-control select-sm" })
+        </div>*@
+      <div class="col-sm-3">
+        FinalizeTotalContribution
+        <label>
+          Years
+        </label>FinalizeTotalContribution
+        @Html.DropDownList("Year", null, "---Select---", new { @class = "form-control select-sm" })
+      </div>
+      <div class="col-sm-3">
+        <button type="button" class="btn btn-success px-5 height display_none mmargin-top" title="Please Wait While We Process Your Request" id="btn_Finalized_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+        <button type="button" id="IddetailSearch" class="btn btn-success height w-100 mmargin-top"><i class="fa fa-search"></i> Search </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline finelizempb">
+      Finalized Details
+
+      <ul class="tool-bar mt-0">
+        <li><a href="" title="Refresh" data-original-title="Refresh"><i class="fa fa-refresh"></i></a></li>
+      </ul>
+    </h4>
+  </div>
+  <div class="panel-body">
+    @using (Html.BeginForm("FinalizedDetails", "ContributorPersonalDetails", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+
+      <!--<div class="form-group">
+        <div class="pull-right">
+          <button type="button" id="finalButton" class="btn btn-success btn-xs" onclick="finalize()" disabled>Finalize</button>
+          <button type="button" id="tempbtn" class="btn btn-success btn-xs" disabled style="display:none">Finalize</button>-->
+      @*<a href="" class="btn btn-primary btn-xs">Cancel</a>*@
+      <!--</div>
+      </div>-->
+
+      <table class="table dataTable" id="tblList">
+        <thead>
+          <tr class="th-color">
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+          <tr>
+            <th>File Name</th>
+            <th>Total Record</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+
+    }
+  </div>
+</div>
+<div class="modal fade in display_none " id="reCalculationPopUp" aria-hidden="false">
+  <div class="modal-dialog">
+    <div class="modal-content fielize_modal">
+      <div class="modal-header">
+        <button type="button" id="reCalculatebtn" class="btn btn-danger">ReCalculate</button>
+        <button type="button" id="savereCalculatebtn" class="btn btn-success">Save</button>
+        <button type="button" id="cancelRecalculation" class="btn btn-primary">Cancel</button>
+        <button type="button" class="close hidePopUp" aria-hidden="true">×</button>
+      </div>
+      <table class="table" id="tblPension">
+        <thead>
+          <tr>
+            <th><input type="checkbox" checked="checked" class="checkboxMain filelize-input-mt" /></th>
+            <th>PersonId</th>
+            <th>Name</th>
+            <th>Refund/Pension</th>
+            <th>Old Pension/Refund Amount</th>
+            <th>ReCalculated <br />Pension/Refund Amount</th>
+          </tr>
+
+        </thead>
+        <tbody></tbody>
+      </table>
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
+
+<div class="custom-popup width-100 confirmClass display_none" id="FinelizedviewModalid">
+  <div class="padding-md">
+    <input type="hidden" id="finelizedId" />
+    <h4 class="m-top-none" id="statusRecord">Do you want to finalized these records?</h4>
+  </div>
+  <div class="text-center">
+    <a type="button" class="btn btn-success px-5 height display_none" title="Please Wait While We Process Your Request" id="btn_Confirm_loading"><i class="fa fa-spinner fa-spin"></i> Processing</a>
+
+    <a class="btn btn-success m-right-sm " id="BtnFinelize">Confirm</a>
+    <a class="btn btn-danger logoutConfirm_close" >Cancel</a>
+  </div>
+</div>
+
+
+@section scripts{
+  <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+
+  <script nonce="@ViewBag.StyleNonce">
+      $(document).ajaxStart(function () {
+          $("#tempbtn").css('display', '');
+          $("#finalButton").css('display', 'none');
+      }).ajaxStop(function () {
+          $("#tempbtn").css('display', 'none');
+          $("#finalButton").css('display', '');
+      });
+
+
+    var FinalizeTotalContributionTableId = [];
+
+    function dobind() {
+      $("#finalButton").prop("disabled", "disabled");
+      empId = $("#EmployerId").val();
+      month = $("#Month").val();
+      year = $("#Year").val();
+      bindTotalContribution(empId, month, year);
+      var oTable = $('#tblList').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "sAjaxSource": "@Url.Action("DetailSearchAjax", "ContributorPersonalDetails")?Month=" + month + "&Year=" + year + "&EmployeeId=" + empId + "",
+
+        "fnDrawCallback": function (setting) {
+          debugger;
+
+          FinalizeTotalContributionTableId.forEach(function (item, index) {
+            debugger
+            document.getElementById("AddFinalizeTotalContributionBtn_" + item).addEventListener("click", function () {
+              FinalizeTotalContribution(item);
+            });
+
+          });
+
+        },
+
+        "aoColumns": [
+
+          { "sName": "FilePath" },
+          { "sName": "Finalized" },
+          {
+            "sName": "IsProcessed",
+            "bSearchable": false,
+            "bSortable": false,
+              "fnRender": function (oObj) {
+                  $("#IddetailSearch").show();
+                  $("#btn_Finalized_loading").hide();
+              if (oObj.aData[2] == "true") {
+                return "Un-Finalized";
+              }
+              else {
+                FinalizeTotalContributionTableId.push(oObj.aData[3]);
+                return '<button id="AddFinalizeTotalContributionBtn_' + oObj.aData[3] +'" type="button" class="btn btn-success @(ViewBag.AddPermission == true ? "" : "disabled")" >Finalize</button>';
+
+              }
+            }
+          }
+          //,
+          //{
+          //  "sName": "Id",
+          //  "bSearchable": false,
+          //  "bSortable": false,
+          //  "fnRender": function (oObj) {
+          //    var strString = '<a href="/ContributorPersonalDetails/EditContributorFinalizedDetails/' + oObj.aData[10] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i></a>';
+          //    strString += '&nbsp;<a href="javascript:;"  onclick="javascript:del(' + oObj.aData[10] + ');" class="btn btn-xs btn-danger" title="Delete"><i class="fa fa-trash-o fa-lg"></i></a>';
+          //    return strString;
+          //  }
+          //}
+        ]
+      });
+          $("#IddetailSearch").show();
+          $("#btn_Finalized_loading").hide();
+    }
+
+    function bindTotalContribution(eid,m,y) {
+      empId1 = eid;
+      month1 = m;
+      year1 = y;
+      $.ajax({
+        url: "@Url.Action("getFinalizeTotalContribution", "ContributorPersonalDetails")?empId=" + empId + "&month="+ month + "&year=" + year,
+        type: "GET",
+      async: false,
+      })
+    .done(function (result) {
+      if (result != "" && result != null) {
+        var data = result.split('#');
+        $("#EmployerTotalContribution").text(data[0]);
+        $("#ContributorTotalContribution").text(data[1]);
+
+        $("#SystemEmployerTotalContribution").text(data[2]);
+        $("#SystemContributorTotalContribution").text(data[3]);
+      }
+    });
+    }
+
+    function del(ctrlId) {
+      $("#hdDocumentId").val(ctrlId);
+      $('#confirmDelete').popup("show");
+    }
+    function onDeleteConfirm() {
+      var id = $("#hdDocumentId").val();
+      $.ajax({
+        url: "@Url.Action("RemoveAjaxFinalize", "ContributorPersonalDetails")?Id=" + id + "",
+        type: "GET",
+      }).done(function (result) {
+        var actionRes = result;
+        if (actionRes == "0") {
+          toasterErrorMessage("There is some error, please try again.");
+          return actionRes;
+        }
+        else {
+          toasterSuccessMessage("Status changed sucessfully.");
+          $('#confirmDelete').popup("hide");
+          doBindData();
+        }
+      });
+    }
+    //function hide() {
+    //  $("#finaldiv").hide();
+    //}
+    function finalize() {
+      var month = $("#Month").val();
+      var employeeId = $("#EmployerId").val();
+      var year = $("#Year").val()
+
+      $.ajax({
+        url: "@Url.Action("AddFinalize", "ContributorPersonalDetails")?Month=" + month + "&Year=" + year + "&EmpId=" + parseInt(employeeId),
+        type: "GET",
+      })
+        .done(function (result) {
+          debugger
+          if (result != "1" && result != "0") {
+            toasterSuccessMessage("Finalized sucessfully.");
+            $("#reCalculationPopUp").show();
+            //pensionRecalculateBind();
+            $("#reCalculatebtn").css("display", "");
+            $("#savereCalculatebtn").css("display", "none");
+            $("#cancelRecalculation").css("display", "none");
+            $.each(result, function (i, list) {
+              if (list.ApplicationType == "P") {
+                $("#tblPension").append('<tr><td><input type="checkbox" checked="checked" id=' + i + ' class="checkbox"  /></td><td>' + list.contributorId + '</td><td>' + list.Name + '</td><td><span class="badge badge-danger">Pension</span></td><td>' + list.OldAmount + '</td><td></td></tr>');
+              }
+              else if (list.ApplicationType == "PA") {
+                $("#tblPension").append('<tr><td><input type="checkbox" checked="checked" id=' + i + ' class="checkbox"  /></td><td>' + list.contributorId + '</td><td>' + list.Name + '</td><td><span class="badge badge-danger">PensionApplication</span></td><td>' + list.OldAmount + '</td><td></td></tr>');
+              }
+              else {
+                $("#tblPension").append('<tr><td><input type="checkbox" checked="checked" id=' + i + ' class="checkbox"  /></td><td>' + list.contributorId + '</td><td>' + list.Name + '</td><td><span class="badge badge-success">Refund</span></td><td>' + list.OldAmount + '</td><td></td></tr>');
+              }
+
+            })
+
+          }
+          else if (result == 1) {
+            window.location.href = "/ContributorPersonalDetails/FinalizedDetails?Month=" + month + "&Year=" + year + "&EmpId=" + parseInt(employeeId);
+          }
+
+          else {
+            toasterErrorMessage("Please Try Again.");
+
+          }
+        });
+    }
+    $(".checkboxMain").click(function () {
+      if (this.checked) {
+        $(".checkbox").each(function () {
+          $(this).prop("checked", true);
+        })
+      }
+      else {
+        $(".checkbox").each(function () {
+          $(this).prop("checked", false);
+        })
+      }
+    })
+    function checkboxChecked() {
+      var i = 0;
+      $(".checkbox").each(function () {
+        if (this.checked) {
+          i++;
+        }
+      })
+      $("#hdDocumentId").val(i);
+    }
+
+    document.getElementById("reCalculatebtn").addEventListener("click", function () {
+      reCalculateAmount();
+    });
+    function reCalculateAmount() {
+      checkboxChecked();
+      var count = $("#hdDocumentId").val();
+      if (count > 0) {
+        var chkBoxId = new Array();
+        $(".checkbox").each(function () {
+          if (this.checked) {
+            chkBoxId.push($(this).prop('id'));
+          }
+        })
+        debugger
+        var data = new Array();
+        $('#tblPension> tbody > tr').each(function (row, tr) {
+          for (var i = 0; i < chkBoxId.length; i++) {
+            if (chkBoxId[i] == row) {
+              data.push($(tr).find('td:eq(1)').text() + "_" + $(tr).find('td:eq(3)').text());
+            }
+          }
+
+        })
+        $.ajax({
+          type: "POST",
+          url: "@Url.Action("checkCalculationAjax", "ContributorPersonalDetails")",
+          dataType: 'json',
+          contentType: 'application/json; charset=UTF-8',
+          data: JSON.stringify(data),
+          success: function (result) {
+            $.each(result, function (i, newValue) {
+              var j = chkBoxId[i];
+              $('#tblPension> tbody > tr:eq(' + j + ')').find('td:eq(5)').text(newValue);
+            })
+            disableCheckBox();
+            toasterSuccessMessage("ReCalculated Successfully.");
+            $("#reCalculatebtn").css("display", "none");
+            $("#savereCalculatebtn").css("display", "");
+            $("#cancelRecalculation").css("display", "");
+          }
+        })
+      }
+      else {
+        toasterErrorMessage("Select Contributor First.");
+      }
+
+    }
+
+    document.getElementById("cancelRecalculation").addEventListener("click", function () {
+      reCalculateCancelled();
+    });
+
+
+    function reCalculateCancelled() {
+      $('#tblPension> tbody > tr').each(function (row, tr) {
+        $(tr).find('td:eq(5)').text("");
+      })
+      $("#reCalculatebtn").css("display", "");
+      $("#savereCalculatebtn").css("display", "none");
+      $("#cancelRecalculation").css("display", "none");
+      enableCheckBox();
+    }
+
+    document.getElementById("savereCalculatebtn").addEventListener("click", function () {
+      SavereCalculateAmount();
+    });
+
+
+    function SavereCalculateAmount() {
+      checkboxChecked();
+      var count = $("#hdDocumentId").val();
+      if (count > 0) {
+        var chkBoxId = new Array();
+        $(".checkbox").each(function () {
+          if (this.checked) {
+            chkBoxId.push($(this).prop('id'));
+          }
+        })
+        debugger
+        var data = new Array();
+        $('#tblPension> tbody > tr').each(function (row, tr) {
+          for (var i = 0; i < chkBoxId.length; i++) {
+            if (chkBoxId[i] == row) {
+              data.push($(tr).find('td:eq(1)').text() + "_" + $(tr).find('td:eq(3)').text() + "_" + $(tr).find('td:eq(4)').text() + "_" + $(tr).find('td:eq(5)').text());
+            }
+          }
+
+        })
+        $.ajax({
+          type: "POST",
+          url: "@Url.Action("saveCalculationAjax", "ContributorPersonalDetails")",
+          dataType: 'json',
+          contentType: 'application/json; charset=UTF-8',
+          data: JSON.stringify(data),
+          success: function (result) {
+            if (result != "0") {
+                toasterSuccessMessage("Calculation Saved Successfully.");
+                $(evt.target).find("i.fa-spinner").hide();
+              hidePopUp();
+            }
+          }
+        })
+      }
+      else {
+        toasterErrorMessage("Select Contributor First.");
+      }
+    }
+    
+    document.getElementById("IddetailSearch").addEventListener("click", function () {
+      detailSearch();
+    });
+
+      function detailSearch(evt) {
+          debugger;
+         /* $(evt.target).find("i.fa-spinner").show();*/
+          $("#btn_Finalized_loading").show();
+          $("#IddetailSearch").hide();
+
+      var empId = $("#EmployerId").val();
+      var month = $('#Month').val();
+      var year = $("#Year").val();
+      if (empId == "" || month == "" || year == "") {
+          toasterErrorMessage("Please fill all the required fields")
+          $("#IddetailSearch").show();
+          $("#btn_Finalized_loading").hide();
+         /* $(evt.target).find("i.fa-spinner").hide();*/
+      }
+      else {
+        dobind();
+      }
+    }
+
+
+    $(function () {
+      var date = new Date();
+      var month = new Array();
+      month[0] = "January";
+      month[1] = "February";
+      month[2] = "March";
+      month[3] = "April";
+      month[4] = "May";
+      month[5] = "June";
+      month[6] = "July";
+      month[7] = "August";
+      month[8] = "September";
+      month[9] = "October";
+      month[10] = "November";
+      month[11] = "December";
+
+      if ($("#EmployerId").val() == "") {
+        $("#Month").val(month[date.getMonth()]);
+        $("#Year").val(date.getFullYear());
+        $("#EmployerId").val(2)
+      } dobind();
+
+
+
+
+      $('#EmployerId').on('change', function () {
+        var empId = $("#EmployerId").val();
+        if (empId != "") {
+          $.ajax({
+            url: "@Url.Action("MonthSearchAjax", "ContributorPersonalDetails")?EmpId=" + parseInt(empId),
+            type: "GET",
+          }).done(function (result) {
+            $("#Month").select2("val", "");
+            $("#Month").empty();
+            $("#Year").select2("val", "");
+            $("#Year").empty();
+            $('#Month').append($('<option/>').attr("value", "").text("---Select---"));
+            $('#Year').append($('<option/>').attr("value", "").text("---Select---"));
+            $.each(result, function (i, Month) {
+              $('#Month').append($('<option/>').attr("value", Month).text(Month));
+              debugger
+            })
+          })
+        }
+        else {
+          $("#Month").select2("val", "");
+          $("#Month").empty();
+          $("#Year").select2("val", "");
+          $("#Year").empty();
+          $('#Month').append($('<option/>').attr("value", "").text("---Select---"));
+          $('#Year').append($('<option/>').attr("value", "").text("---Select---"));
+        }
+      })
+      $('#Month').on('change', function () {
+        var month = $("#Month").val();
+        var empId = $("#EmployerId").val();
+        if (month != "") {
+          $.ajax({
+            url: "@Url.Action("MonthSearchAjax", "ContributorPersonalDetails")?EmpId=" + parseInt(empId) + "&Month=" + month + "",
+            type: "GET",
+          }).done(function (result) {
+            $("#Year").select2("val", "");
+            $("#Year").empty();
+            $('#Year').append($('<option/>').attr("value", "").text("---Select---"));
+            $.each(result, function (i, Year) {
+              $('#Year').append($('<option/>').attr("value", Year).text(Year));
+              debugger
+            })
+          })
+        }
+        else {
+          $("#Year").select2("val", "");
+          $("#Year").empty();
+          $('#Year').append($('<option/>').attr("value", "").text("---Select---"));
+        }
+      })
+    })
+
+    function disableCheckBox() {
+      $(".checkboxMain").prop("disabled", true);
+      $(".checkbox").each(function () {
+        $(this).prop("disabled", true);
+      })
+    }
+    function enableCheckBox() {
+      $(".checkboxMain").prop("disabled", false);
+      $(".checkbox").each(function () {
+        $(this).prop("disabled", false);
+      })
+    } 
+
+    const hidePopUp_ClassBtn = document.querySelectorAll('.hidePopUp');
+    hidePopUp_ClassBtn.forEach(button => {
+      button.addEventListener('click', hidePopUp);
+    });
+
+    function hidePopUp() {
+      var month = $("#Month").val();
+      var employeeId = $("#EmployerId").val();
+      var year = $("#Year").val();
+      $("#reCalculationPopUp").hide();
+      window.location.href = "/ContributorPersonalDetails/FinalizedDetails?Month=" + month + "&Year=" + year + "&EmpId=" + parseInt(employeeId);
+    }
+    function pensionRecalculateBind() {
+      var month = $("#Month").val();
+      var employeeId = $("#EmployerId").val();
+      var year = $("#Year").val();
+      $.ajax({
+        url: "@Url.Action("PensionAndRefundAjaxHandler", "ContributorPersonalDetails")?empId=" + employeeId + "&month=" + month + "&year=" + year,
+        type: "GET",
+      }).done(function (result) {
+        $.each(result, function (i, list) {
+          if (list.ApplicationType == "P") {
+            $("#tblPension").append('<tr><td><input type="checkbox" checked="checked" id=' + i + ' class="checkbox"  /></td><td>' + list.contributorId + '</td><td>' + list.Name + '</td><td><span class="badge badge-danger">Pension</span></td><td>' + list.OldAmount + '</td><td></td></tr>');
+          }
+          else if (list.ApplicationType == "PA") {
+            $("#tblPension").append('<tr><td><input type="checkbox" checked="checked" id=' + i + ' class="checkbox"  /></td><td>' + list.contributorId + '</td><td>' + list.Name + '</td><td><span class="badge badge-danger">PensionApplication</span></td><td>' + list.OldAmount + '</td><td></td></tr>');
+          }
+          else {
+            $("#tblPension").append('<tr><td><input type="checkbox" checked="checked" id=' + i + ' class="checkbox"  /></td><td>' + list.contributorId + '</td><td>' + list.Name + '</td><td><span class="badge badge-success">Refund</span></td><td>' + list.OldAmount + '</td><td></td></tr>');
+          }
+
+        })
+      })
+
+    }
+    function FinalizeTotalContribution(id) {
+      $('#FinelizedviewModalid').popup("show");
+      $("#finelizedId").val(id);
+
+    }
+    
+    const logoutConfirm_close_ClassBtn = document.querySelectorAll('.logoutConfirm_close');
+    logoutConfirm_close_ClassBtn.forEach(button => {
+      button.addEventListener('click', onCancel);
+    });
+
+    const onCancel_ClassBtn = document.querySelectorAll('.onCancel_class');
+    onCancel_ClassBtn.forEach(button => {
+      button.addEventListener('click', onCancel);
+    });
+    function onCancel() {
+      $('#FinelizedviewModalid').popup("hide");
+    }
+
+    document.getElementById("BtnFinelize").addEventListener("click", function () {
+      debugger;
+      FinelizeSavedata();
+    });
+
+    function FinelizeSavedata() {    
+      var id = $("#finelizedId").val();
+      $('#btn_Confirm_loading').show();
+      $('#BtnFinelize').hide();
+        $.ajax({
+            url: "@Url.Action("FinalizeTotalContributionAjax", "ContributorPersonalDetails")?Id=" + id + "",
+            type: "GET",
+          })
+          .done(function (result) {
+            $('#BtnFinelize').hide();
+            $('#BtnFinelize').show();
+            $('#btn_Confirm_loading').hide();
+            debugger;
+            if (result == "Finalized") {
+              $('#FinelizedviewModalid').popup("hide");
+              toasterSuccessMessage(result);
+              //dobind();
+            } else {
+              toasterErrorMessage(result);
+            }
+            window.location.reload();
+            //dobind();
+        });
+    }
+
+  </script>
+}
+

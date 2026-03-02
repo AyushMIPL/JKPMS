@@ -1,0 +1,144 @@
+﻿@model JKPS.COMMON.DVOMasterEmployee
+@{
+  ViewBag.Title = "PensionPayment";
+}
+<div class="panel panel-default">
+
+  @using (Html.BeginForm())
+  {
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <div class="col-sm-3">
+              <label>Scheme Type</label>
+              @Html.DropDownList("EmplCode", null, "---Select---", new { @class = "form-control select-sm", @id = "EmplCode" })
+            </div>
+            <div class="col-sm-3">
+              <label>Beneficiary</label>
+              @Html.DropDownList("EmployeeId", null, new { @class = "form-control select-sm", @id = "EmployeeId", @multiple = "multiple" })
+            </div>
+            <div class="col-sm-3">
+              <label>Date From</label>
+              <div class="input-group date" id="validateFrom">
+                @Html.TextBox("SelectFrom ", "", new { @class = "form-control", @placeholder = "Select Start Date", @id = "From" })
+                <span class="input-group-addon">
+                  <i class="fa fa-calendar"></i>
+                </span>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <label>To</label>
+              <div class="input-group date" id="validateTo">
+                @Html.TextBox("SelectTo ", "", new { @class = "form-control", @placeholder = "Select End Date", @id = "to" })
+                <span class="input-group-addon">
+                  <i class="fa fa-calendar"></i>
+                </span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="control-label mb-2 mt-3" for="Name"> &nbsp; </div>
+              </div>
+              <div class="col-sm-6 text-right">
+                  <button type="button" class="btn btn-success px-5 height" style="display: none;" title="Please Wait While We Process Your Request" id="btn_totalPension_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                  <button type="button" id="IdTotalPension" class="btn btn-success height px-5" style="text-align: right;" onclick="javascript: return ShowReportData(event)">
+                      <i class="fa fa-search"></i> Search
+                  </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Total Pension Payment
+    </h4>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="alert alert-warning" style="display:none;">
+          <h4 class="mb-0"> There is no Record Found</h4>
+        </div>
+        <iframe id="reportData" style="border: 0px;height:700px;width:100%;"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+@section Scripts {
+  <script nonce="@ViewBag.StyleNonce">
+    $(function () {
+        $(".alert-warning").hide();
+    })
+      function ShowReportData(evt) {
+        debugger;
+        $(evt.target).find("i.fa-spinner").show();
+      var Date1 = $("#From").val();
+      var Date2 = $("#to").val();
+      var BeneficiariesId = $("#EmployeeId option:selected").map(function (ind, _el) {
+          return $(_el).val();
+          $(evt.target).find("i.fa-spinner").hide();
+      });
+          var SchemeType = $("#EmplCode").val();
+          $('#btn_totalPension_loading').show();
+          $('#IdTotalPension').hide();
+      $.ajax({
+        url: "@Url.Action("TotalPensionPaymentsAjax", "Reports")?emplrId=" + SchemeType + "&empl_code=" + $.makeArray(BeneficiariesId) + "&date1=" + Date1 + "&date2=" + Date2,
+        type: "GET",
+      }).done(function (result) {
+          debugger
+          $('#IdTotalPension').show();
+          $('#btn_totalPension_loading').hide();
+        var actionRes = result;
+        if (actionRes == "1") {
+          $('#reportData').show();
+          $(".alert-warning").hide();
+            $('#reportData').attr('src', '/ReportForms/ContributionByEmployer.aspx');
+            $(evt.target).find("i.fa-spinner").hide();
+        }
+        else {
+          $(".alert-warning").show();
+          $('#reportData').hide();
+            toasterInfoMessage("Result not found on this search criteria.");
+            $(evt.target).find("i.fa-spinner").hide();
+           
+        }
+      });
+          
+    }
+    $("#EmplCode").on('change', function () {
+      debugger
+      $('#select2-EmployeeId-container').text('---Select---');
+      var seletedType = $("#EmplCode option:selected").text();
+      var parts = seletedType.split(" | ");
+      var BeneficiaryType = parts[0].trim();
+      $.ajax({
+        url: "@Url.Action("BeneficiariesSearchAjax", "Reports")?seletedType=" + BeneficiaryType,
+        success: function (res) {
+          debugger
+          var data = $("#EmployeeId");
+          data.empty();
+          $.each(res, function (index, item) {
+            debugger
+            data.append($("<option></option>").attr("value", item.Key).text(item.Value));
+          });
+          $("#EmployeeId").multiselect("destroy");
+          $("#EmployeeId").multiselect({
+            enableFiltering: true,
+            enableCaseInsensitiveFiltering: true,
+            buttonWidth: '300px'
+          });
+        },
+        error: function (error) {
+          // Handle any errors here
+        }
+      });
+    });
+  </script>
+}

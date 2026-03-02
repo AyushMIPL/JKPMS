@@ -1,0 +1,265 @@
+﻿@model App.Data.Entities.PensionApplications
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>PensionApplications</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ContributorID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ContributorID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MiddleName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MiddleName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DesignationID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DesignationID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PensionableStatus)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PensionableStatus)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BenefitTypes)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BenefitTypes)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LeaveDue)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LeaveDue)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ResignationDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ResignationDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.RetirementDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RetirementDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DOB)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DOB)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateofAppointment1st)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateofAppointment1st)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateofAppointmentLast)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateofAppointmentLast)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LengthOfQualifyingServiceInMonthsTo31Dec2003)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LengthOfQualifyingServiceInMonthsTo31Dec2003)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LengthOfQualifyingServiceInMonthsFrom1Jan2014)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LengthOfQualifyingServiceInMonthsFrom1Jan2014)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LongerShorterReason)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LongerShorterReason)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.RetirementAnnualSalary1)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RetirementAnnualSalary1)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.RetirementAnnualSalary2)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RetirementAnnualSalary2)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ApplicationSubmittedBy)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ApplicationSubmittedBy)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NotedBy)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NotedBy)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.HROfficer)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.HROfficer)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.FullpensionAmount1)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FullpensionAmount1)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.FullpensionAmount2)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FullpensionAmount2)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TotalFullpension)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TotalFullpension)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MaxPension)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MaxPension)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.GratuityReducedPension)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.GratuityReducedPension)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.pensionPerAnnum)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.pensionPerAnnum)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ApprovalLevel1)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ApprovalLevel1)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ApprovalLevel2)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ApprovalLevel2)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IsActive)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IsActive)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

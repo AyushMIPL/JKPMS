@@ -1,0 +1,64 @@
+﻿@{
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+  <div class="col-sm-2 bg-primary custom-grid menu-grid">
+    <button type="button" class="navbar-toggle" id="inboxMenuToggle">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <div class="menu-header">
+      Menu
+    </div>
+    <ul class="inbox-menu" id="inboxMenu">
+      <li class="active">
+        <a href="@Url.Action("UpdatePayrollEntries", "PensionProcess", new { Id = @ViewBag.CId })">
+          <i class="fa fa-inbox fa-lg"></i>
+          <span class="m-left-xs" title="Update Payroll Entries">Update Payroll Entries</span>
+        </a>
+
+      </li>
+      @*<li>
+          <a href="@Url.Action("PayrollInformation", "PensionProcess", new { Id = @ViewBag.CId })">
+            <i class="fa fa-bookmark fa-lg"></i>
+            <span class="m-left-xs">Payroll Information</span>
+          </a>
+        </li>*@
+      <li>
+        <a href="@Url.Action("IncomeIndex", "PensionProcess", new { Id = @ViewBag.CId })">
+          <i class="fa fa-star fa-lg"></i>
+          <span class="m-left-xs" title="Payroll Income">Payroll Income</span>
+        </a>
+      </li>
+      <li>
+        <a href="@Url.Action("DeductionIndex", "PensionProcess", new { Id = @ViewBag.CId })">
+          <i class="fa fa-bookmark fa-lg"></i>
+          <span class="m-left-xs" title="Payroll Deduction">Payroll Deduction</span>
+        </a>
+      </li>
+      <li>
+        <a href="@Url.Action("DirectDepositIndex", "PensionProcess", new { Id = @ViewBag.CId })">
+          <i class="fa fa-bookmark fa-lg"></i>
+          <span class="m-left-xs" title="Payroll Direct Deposit">Payroll Direct Deposit</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="col-sm-10">
+    @RenderSection("profileUpdatePayroll", required: false)
+  </div>
+</div>
+
+@section scripts{
+  <style>
+    .menu-grid .inbox-menu > li > a {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
+
+  @RenderSection("Scripts", false);
+}

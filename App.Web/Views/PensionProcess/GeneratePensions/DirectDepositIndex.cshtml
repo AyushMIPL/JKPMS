@@ -1,0 +1,208 @@
+﻿@model List<App.Data.Entities.MasterEmpBankDetails>
+
+@{
+  Layout = "~/Views/Shared/_LayoutUpdatePayroll.cshtml";
+}
+@section profileUpdatePayroll
+{
+  @Html.Hidden("PensionerID")
+
+  <div class="panel panel-default">
+    <div class="panel-heading clearfix">
+      <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+        Direct Deposit Details:@string.Format("{0} ({1})", ViewBag.Name, ViewBag.PensionerID)
+        @*<ul class="tool-bar">
+          <li>
+          <li><a href="javascript:AddBank();" data-toggle="tooltip" data-placement="bottom" title="Add Direct Deposit" data-original-title="Add Direct Deposit"><i class="fa fa-plus"></i></a></li>
+
+        </ul>*@
+      </h4>
+    </div>
+    <div class="panel-body">
+      @using (Html.BeginForm("DirectDepositIndex", "PensionProcess", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+      {@Html.Hidden("CId")
+        <table class="table dataTable" id="tbl">
+          <thead>
+            <tr>
+              <th>Bank Code</th>
+              <th>Account Type<br /> (C - Current<br />S - Savings)</th>
+              <th>Account NO</th>
+              <th>Type<br />(P- Percentage <br /> A - Amount <br /> R - Remainder )</th>
+              <th>Amount<br />(Amount/%)</th>
+              @*<th></th>*@
+            </tr>
+          </thead>
+          <tbody>
+            @if (Model != null)
+            {
+              for (int i = 0; i < Model.ToArray().Count(); i++)
+              {
+                @Html.HiddenFor(m => Model[i].line_no)
+                <tr>
+                  <td>@Html.DropDownListFor(m => Model[i].bank_code, new SelectList(ViewBag.bank_code, "Value", "Text", Model[i].bank_code), htmlAttributes: new { @class = "form-control input-sm" })</td>
+                  <td>@Html.DropDownListFor(m => Model[i].typeofacct, new SelectList(ViewBag.typeofacct, "Value", "Text", Model[i].typeofacct), htmlAttributes: new { @class = "form-control input-sm" })</td>
+                  <td>@Html.TextBoxFor(m => Model[i].bank_acct_no, new { @class = "form-control input-sm allownumericwithdecimal" })</td>
+                  <td>@Html.DropDownListFor(m => Model[i].type, new SelectList(ViewBag.type, "Value", "Text", Model[i].type), htmlAttributes: new { @class = "form-control input-sm" })</td>
+                  <td>@Html.TextBoxFor(m => Model[i].amount, new { @class = "form-control input-sm allownumericwithdecimal" })</td>
+                  @*<td><button type="button" class="btn btn-xs btn-danger deleterow" onclick="deleteRow(this);" <i class="fa fa-trash-o fa-lg"></i></button></td>*@
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+        <div class="form-group">
+          <label class="col-sm-4 control-label"></label>
+          <div class="col-sm-8">
+            <input type="submit" class="btn btn-success" value="Submit" />
+            @Html.ActionLink("Cancel", "DirectDepositIndex", "PensionProcess", new { id = @ViewBag.PensionerID }, new { @class = "btn btn-primary" })
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  @*<div class="modal fade in" id="simpleModal1" aria-hidden="false" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" onclick="hidemodal();" aria-hidden="true">×</button>
+          </div>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-sm-11">
+                <div class="form-group">
+                  <label class="col-sm-3 control-label">Bank Code</label>
+                  <div class="col-sm-8">
+                    @Html.DropDownList("bank_code", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm" })
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-3 control-label">Account Type</label>
+                  <div class="col-sm-8">
+                    @Html.DropDownList("typeofacct", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm" })
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-3 control-label">Account NO</label>
+                  <div class="col-sm-8">
+                    @Html.TextBox("AccountNO", "", new { @class = "form-control input-sm", placeholder = "AccountNO" })
+
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-3 control-label">Type</label>
+                  <div class="col-sm-8">
+                    @Html.DropDownList("type", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm" })
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-3 control-label">Amount</label>
+                  <div class="col-sm-8">
+                    @Html.TextBox("Amount", "", new { @class = "form-control input-sm", placeholder = "Amount" })
+
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-3 control-label"></label>
+                  <div class="col-sm-8">
+                    <input type="button" class="btn btn-success" value="Add Details" onclick="AddBankDetails();" />
+                    <input type="button" class="btn btn-primary" value="Cancel" onclick="hidemodal();" />
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+    <style>
+      .select2-container {
+        width: 100% !important;
+      }
+    </style>*@
+
+}
+@section Scripts {
+  <script src="~/Content/endless/js/jquery.dataTables.min.js"></script>
+  <script nonce="@ViewBag.StyleNonce">
+    //$(function () {
+    //  var pensionerID = $("#PensionerID").val();
+    //  var oTable = $('#tbl').dataTable({
+    //    "bJQueryUI": true,
+    //    "sPaginationType": "full_numbers",
+    //    "bServerSide": true,
+    //    "bDestroy": true,
+    //    "sAjaxSource": "/PensionProcess/IncomeAjaxHandlerOld/?PensionerID=" + pensionerID,
+    //    "aoColumns": [
+
+    //					{ "sName": "IncomeCode" },
+    //					{ "sName": "Rate" },
+    //        { "sName": "Number" },
+    //        { "sName": "Amount" },
+    //        {
+    //          "sName": "DocNo",
+    //          "bSearchable": false,
+    //          "bSortable": false,
+    //          "fnRender": function (oObj) {
+    //            var strString = '<a href="/PensionProcess/EditIncomeDetailsOld/' + oObj.aData[4] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i></a>';
+
+    //            return strString;
+    //          }
+    //        }
+    //    ]
+    //  });
+    //})
+    //function AddBank() {
+    //  $("#simpleModal1").show();
+    //}
+    //function hidemodal() {
+    //  $("#simpleModal1").hide();
+    //}
+    //function AddBankDetails() {
+    //  
+    //  var count = $("#tbl > tbody > tr").length;
+    //  var bank_code = $("#bank_code").val();
+    //  var typeofacct = $("#typeofacct").val();
+    //  var accountNO = $("#AccountNO").val();
+    //  var type = $("#type").val();
+    //  var amount = $("#Amount").val();
+    //  if (bank_code != "" && typeofacct != "" && accountNO != "" && type != "" && amount != "") {
+    //    $("#tbl").append('<tr><td><select class="form-control input-sm" name="[' + count + '].bank_code"><option value="">---Select---</option><option value="03">BNS</option><option value="02">CCB</option><option value="04">FCIB</option><option value="01">NBA</option></select></td><td><select class="form-control input-sm " name="[' + count + '].typeofacct"><option value="">---Select---</option><option value="C">Current</option><option value="S">Saving</option></select></td><td>  <input type="text" class="form-control input-sm" name="[' + count + '].accountNO" value="' + accountNO + '"/></td><td><select class="form-control input-sm" name="[' + count + '].type"><option value="">---Select---</option><option value="A">Amount</option><option value="P">Percentage</option><option value="R">Remainder</option></select></td><td>  <input type="text" class="form-control input-sm" name="[' + count + '].amount" value="' + amount + '"/></td><td><button type="button" onclick="deleteRow(this);" class="btn btn-xs btn-danger deleterow" <i class="fa fa-trash-o fa-lg"></i></button></td></tr>');
+    //    $('[name="[' + count + '].bank_code"').val(bank_code);
+    //    $('[name="[' + count + '].typeofacct"').val(typeofacct);
+    //    $('[name="[' + count + '].type"').val(type);
+    //    $('select').select2({
+    //      placeholder: "---Select---",
+    //      allowClear: true
+    //    });
+    //    hidemodal();
+    //    clearPopupValues();
+    //    toasterSuccessMessage("Details Added Successfully.");
+    //  }
+    //  else {
+    //    toasterErrorMessage("Fill All Details to Add Income.");
+    //  }
+
+    //}
+
+    //function clearPopupValues() {
+    //  $("#bank_code").select2("val", "");
+    //  $("#typeofacct").select2("val", "");
+    //  $("#AccountNO").val("");
+    //  $("#type").select2("val", "");
+    //  $("#Amount").val("");
+    //}
+    //function deleteRow(x) {
+    //  $(".deleterow").on('click', function () {
+    //    $(this).closest('tr').remove();
+    //  })
+    //}
+
+    $(function () {
+      $(".form-control").each(function () {
+        $(this).prop("disabled", true);
+      })
+    })
+  </script>
+}

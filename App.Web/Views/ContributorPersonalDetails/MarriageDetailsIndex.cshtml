@@ -1,0 +1,83 @@
+﻿@model IEnumerable<App.Data.Entities.MasterContributorMarriageDetails>
+@{
+  ViewBag.Title = "Marriage Details";
+  Layout = "~/Views/Shared/_LayoutProfile.cshtml";
+}
+@section profileContainer
+{@Html.Hidden("PersonId")
+@Html.Hidden("CId")
+@Html.Hidden("ActiveContributor")
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+      Marriage Details: @string.Format("{0} ({1})", ViewBag.Name,ViewBag.PersonId)
+      
+      <ul class="tool-bar">
+        <li><a href="/ContributorPersonalDetails/AddMarriageDetails/@ViewBag.CId" data-toggle="tooltip" data-placement="bottom" title="Add Marriage Details" data-original-title="Add Marriage Details"><i class="fa fa-plus"></i></a></li>
+        
+      </ul>
+    </h4>
+  </div>
+  <div class="panel-body">
+    <table class="table dataTable" id="tbl">
+      <thead>
+        <tr>
+          @*<th>PersonId</th>*@
+          <th>Spouse Name</th>
+          <th>Date Of Birth</th>
+          <th>Phone</th>
+          <th>Marriage Begin Date</th>
+          <th>Marriage End Date</th>
+          <th style="width:110px"></th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+  }
+@section Scripts {
+
+<script src="~/Content/endless/js/jquery.dataTables.min.js"></script>
+  <script nonce="@ViewBag.StyleNonce">
+    $(function () {      
+      if ($("#ActiveContributor").val() == "No") {
+        $(".tool-bar").hide();
+      }
+      doBindData();
+    });
+    function doBindData() {
+      var personId = $("#PersonId").val();
+      var oTable = $('#tbl').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "sAjaxSource": "/ContributorPersonalDetails/MarriageAjaxHandler/?PersonId=" + personId,
+        "aoColumns": [
+
+						//{ "sName": "PersonId" },
+            { "sName": "SpouseName" },
+            { "sName": "DateOfBirth" },
+            { "sName": "Phone" },
+            { "sName": "MarriageBeginDate" },
+             { "sName": "MarriageEndDate" },
+            {
+						  "sName": "ID",
+						  "bSearchable": false,
+						  "bSortable": false,
+						  "fnRender": function (oObj) {
+						    
+						    var strString = '<a href="/ContributorPersonalDetails/EditMarriageDetails/' + oObj.aData[5] + '\" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i> Edit</a>';
+						    //strString += '&nbsp;<a href="/ContributorPersonalDetails/DeleteMarriageDetails/' + oObj.aData[4] + '\" class="btn btn-primary btn-xs">Delete</a>';
+						   
+						    return strString;
+						  }
+						}
+        ]
+      });
+    }
+</script>
+  }
+

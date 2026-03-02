@@ -1,0 +1,104 @@
+﻿@model App.Data.Entities.MailSettings
+
+@{
+  ViewBag.Title = "Delete";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Delete Mail Settings</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+  <dl class="dl-horizontal">
+    <dt>
+      @Html.DisplayNameFor(model => model.ProcessName)
+    </dt>
+
+    <dd>
+      @Html.DisplayFor(model => model.ProcessName)
+    </dd>
+
+    <dt>
+      @Html.DisplayNameFor(model => model.MailTo)
+    </dt>
+
+    <dd>
+      @Html.DisplayFor(model => model.MailTo)
+    </dd>
+
+    <dt>
+      @Html.DisplayNameFor(model => model.CC)
+    </dt>
+
+    <dd>
+      @Html.DisplayFor(model => model.CC)
+    </dd>
+
+    <dt>
+      @Html.DisplayNameFor(model => model.BCC)
+    </dt>
+
+    <dd>
+      @Html.DisplayFor(model => model.BCC)
+    </dd>
+
+    <dt>
+      @Html.DisplayNameFor(model => model.Subject)
+    </dt>
+
+    <dd>
+      @Html.DisplayFor(model => model.Subject)
+    </dd>
+
+    <dt>
+      @Html.DisplayNameFor(model => model.Contents)
+    </dt>
+
+    <dd>
+      @Html.DisplayFor(model => model.Contents)
+    </dd>
+
+    <dt>
+      @Html.DisplayNameFor(model => model.IsSendNotificationAlert)
+    </dt>
+
+    <dd>
+      @Html.DisplayFor(model => model.IsSendNotificationAlert)
+    </dd>
+
+    <dt>
+      @Html.DisplayNameFor(model => model.ProcessWillStartAt)
+    </dt>
+
+    <dd>
+      @Html.DisplayFor(model => model.ProcessWillStartAt)
+    </dd>
+
+    <dt>
+      @Html.DisplayNameFor(model => model.DelayTime)
+    </dt>
+
+    <dd>
+      @Html.DisplayFor(model => model.DelayTime)
+    </dd>
+
+    <dt>
+      @Html.DisplayNameFor(model => model.IsActive)
+    </dt>
+
+    <dd>
+      @Html.DisplayFor(model => model.IsActive)
+    </dd>
+
+  </dl>
+
+  @using (Html.BeginForm())
+  {
+    @Html.AntiForgeryToken()
+
+    <div class="form-actions no-color">
+      <input type="submit" title="Delete" value="Delete" class="btn btn-default" /> |
+      @Html.ActionLink("Back to List", "Index")
+    </div>
+  }
+</div>

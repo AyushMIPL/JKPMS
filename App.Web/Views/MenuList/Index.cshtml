@@ -1,0 +1,633 @@
+﻿@model App.Data.ViewModels.PensionProcessViewModelTest
+
+
+@{
+  ViewBag.Title = "Index";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+
+  <meta name="apple-mobile-web-app-title" content="CodePen">
+  <title>index</title>
+
+  <link rel="canonical" href="https://codepen.io/jksigns/pen/XzbmNm">
+  <link href="~/Content/endless/LatestJS/font-awesome.css" rel="stylesheet" />
+
+  @*<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />*@
+
+  <style>
+    /* body {
+          background-color: #a3d5d3;
+          padding-top: 5%;
+        }*/
+
+    .design2 .counter-box i {
+      font-size: 40px;
+      margin: 0 0 15px;
+      color: #bebdbd;
+    }
+
+    .design2 .counter {
+      display: block;
+      font-size: 17px;
+      font-weight: 700;
+      color: #363535;
+      line-height: 28px;
+    }
+
+    .design2 .counter-box p {
+      margin: 5px 0 0;
+      padding: 0;
+      color: #909090;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    /* .row-equal-height {
+          display: -webkit-box;
+          display: -webkit-flex;
+          display: -ms-flexbox;
+          display: flex;
+        }*/
+
+    .p_column {
+      background: #fff;
+      color: #000;
+      font-size: 22px;
+      font-weight: 500;
+      margin: 5px 15px 0;
+      padding: 30px 10px 10px;
+      border: solid 2px #e5e4e4;
+      box-shadow: 0px 0px 20px 1px rgba(0, 0, 0, 0.08);
+      border-radius: 2px;
+      position: relative;
+      -webkit-transition: 0.4s;
+      -o-transition: 0.4s;
+      transition: 0.4s;
+      border-radius: 8px;
+      min-height: 218px !important;
+    }
+
+
+      .p_column:before,
+      .p_column:after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 0;
+        top: 42%;
+        bottom: 86px;
+        border-style: solid;
+        border-top-color: transparent;
+        border-right-color: transparent;
+        border-bottom-color: transparent;
+        -webkit-transition: 0.4s;
+        -o-transition: 0.4s;
+        transition: 0.4s;
+      }
+
+
+
+      .p_column:before {
+        border-left-color: #efefef;
+        border-width: 23px;
+        right: -45px;
+        top: 41%;
+      }
+
+
+
+      .p_column:after {
+        border-left-color: #fff;
+        border-width: 20px;
+        right: -40px;
+      }
+
+      .p_column p {
+        font-size: 16px;
+        line-height: 24px;
+        margin-bottom: 0
+      }
+
+
+      .p_column:hover {
+        background: #f1f1f1;
+        color: #fff;
+        border: solid 2px #219cf2;
+      }
+
+        .p_column:hover:before {
+          border-left-color: #b0b9c1;
+        }
+
+        .p_column:hover:after {
+          border-left-color: #219cf2;
+        }
+
+
+    .four.col-md-3.p_column.active {
+      background-color: #f1f1f1;
+      border: 2px solid #2196F3;
+    }
+
+      .four.col-md-3.p_column.active:after {
+        right: -45px;
+        border-left-color: #2196F3;
+        border-width: 23px;
+      }
+
+      .four.col-md-3.p_column.active:before {
+        display: none;
+      }
+
+    .row-equal-height {
+      margin-bottom: 20px;
+    }
+
+    .icon-fa {
+      position: absolute;
+      right: 8px;
+      top: 10px;
+      color: #2196f3;
+      display: none;
+    }
+
+    .active .icon-fa {
+      display: block;
+    }
+
+    .p_column:hover:before {
+      display: none;
+    }
+
+    @@media (min-width: 992px) {
+      .col-md-3 {
+        width: 22% !important;
+      }
+    }
+
+    /*11-17*/
+
+    .design2 .counter-box i {
+      font-size: 20px;
+      margin: 0 0 15px;
+      color: #bebdbd;
+      padding-right: 5px;
+    }
+
+    .design2 .counter {
+      display: block;
+      font-size: 17px;
+      font-weight: 700;
+      color: #363535;
+      line-height: 28px;
+      border: 1px solid #dfdede;
+      padding-top: 7px;
+      border-radius: 5px;
+    }
+
+      .design2 .counter:hover {
+        display: block;
+        font-size: 17px;
+        font-weight: 700;
+        color: #fff;
+        background-color: #2196f3;
+        line-height: 28px;
+        border: 1px solid #2196f3;
+        padding-top: 7px;
+        border-radius: 5px;
+      }
+
+    .icon-fa {
+      position: absolute;
+      left: -255px;
+      top: 0px;
+      color: #2196f3;
+      display: none;
+    }
+
+    .border-bottom-dotted {
+      margin-top: 5px;
+      border-bottom: 1px dotted #dfdede;
+    }
+
+    .design2 .active .counter {
+      display: block;
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      background-color: #2196f3;
+      line-height: 28px;
+      border: 1px solid #2196f3;
+      padding-top: 7px;
+      border-radius: 5px;
+    }
+
+    .active
+    .counter-box i {
+      font-size: 20px;
+      margin: 0 0 15px;
+      color: #ffffff;
+      padding-right: 5px;
+    }
+
+
+    .batch-id {
+      display: flex;
+      justify-content: space-between;
+      font-size: 15px;
+      margin-top: 5px;
+    }
+
+    .batch-id-a {
+      display: flex;
+      font-size: 13px;
+      margin-top: 5px;
+      color: #000;
+      font-weight: 600;
+    }
+
+    .batch-id-b {
+      display: flex;
+      font-size: 13px;
+      margin-top: 5px;
+      color: #333
+    }
+  </style>
+
+</head>
+
+<body translate="no">
+
+  <link href="~/Content/endless/LatestJS/bootstrap.min.css" rel="stylesheet" />
+
+
+  @*<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">*@
+
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <div class="row">
+
+        <div class="form-group hidden">
+          <div class="col-sm-4">
+            @Html.LabelFor(model => model.EmployeeCode, new { @class = "control-label mb-2" })
+            @Html.TextBoxFor(m => m.EmployeeCode, new { @class = "form-control input-sm", placeholder = "Beneficiary Code" })
+          </div>
+        </div>
+        <div class="form-group mb-2">
+          <div class="col-sm-4">
+            @Html.LabelFor(model => model.RegionNames, "District", new { @class = "control-label mb-2" })
+            @Html.TextBoxFor(x => x.RegionNames, new { @class = "form-control", @autocomplete = "off", @placeholder = " Regions" })
+          </div>
+        </div>
+        @*<div class="form-group">
+              <div class="col-sm-4">
+                  @Html.LabelFor(model => model.EmpType, new { @class = "control-label mb-2" })
+                  @Html.DropDownList("ddlEmpTypes", ViewBag.EmployeeType as SelectList, " -- Select Type -- ", new { @class = "form-control input-sm" })
+              </div>
+          </div>*@
+
+        <div class="form-group">
+          <div class="col-sm-4">
+            @Html.LabelFor(model => model.LPayDate, new { @class = "control-label mb-2" })
+            <div class="input-group date">
+
+              @Html.EditorFor(model => model.LPayDate, new { @placeholder = "Last Pay Date" })
+              <span class="input-group-addon">
+                <i class="fa fa-calendar"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-4">
+          <div class="form-group hidden">
+
+            <div class="col-sm-12">
+              @Html.LabelFor(model => model.FirstName, new { @class = "control-label mb-2" })
+              @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control input-sm", placeholder = "First Name" })
+
+            </div>
+          </div>
+          <div class="form-group">
+
+            <div class="col-sm-12">
+              @Html.LabelFor(model => model.PayrollDate, new { @class = "control-label mb-2" })
+              <div class="input-group date">
+
+                @Html.EditorFor(model => model.PayrollDate, new { @placeholder = "PayRoleDate" })
+                <span class="input-group-addon">
+                  <i class="fa fa-calendar"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group hidden">
+
+            <div class="col-sm-12">
+              @Html.LabelFor(model => model.LastName, new { @class = "control-label mb-2" })
+              @Html.TextBoxFor(m => m.LastName, new { @class = "form-control input-sm", placeholder = "Last Name" })
+            </div>
+          </div>
+          <div class="form-group">
+
+            <div class="col-sm-12">
+              @Html.LabelFor(model => model.EOPDate, new { @class = "control-label mb-2" })
+              <div class="input-group date">
+                @Html.EditorFor(model => model.EOPDate, new { @placeholder = "End Of Period" })
+                <span class="input-group-addon">
+                  <i class="fa fa-calendar"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="control-label mb-0 mt-3" for="EmpType"> &nbsp; </div>
+          <div class="control-label mb-0 mt-3" for="EmpType"> &nbsp; </div>
+          <input type="submit" id="Btn" class="btn btn-success p-3 px-5 mr-4" value="Batch" onclick="batch()" style="float: right;" />
+          <button type="button" class="btn btn-success height px-5 hidden" onclick="javascript:return ShowDivPension()"><i class="fa fa-calculator"></i> Calculate</button>
+        </div>
+
+      </div>
+      <div class="row">
+
+      </div>
+    </div>
+  </div>
+
+  <div class="">
+    <div class="row row-equal-height design2 text-center">
+      @foreach (var modulename in Model.SecmoduleList)
+      {
+
+        <div class="four col-md-3 p_column">
+          @*<a href="@Url.Action(modulename.ActionName, modulename.ControllerName)">*@
+          <div class="icon-fa"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i></div>
+          <div class="counter-box">
+            <span class="counter" onclick="handleClick('@modulename.ModuleName')"> <i class="fa @modulename.ModuleClass"></i>  @modulename.ModuleName</span>
+            <div class=" border-bottom-dotted"></div>
+
+            <div class="batch-id">
+              <div class="batch-id-a">
+                Batch Id:
+
+              </div>
+              <div class="batch-id-b">
+                1 @*@modulename.Id*@
+
+              </div>
+
+            </div>
+            <div class="batch-id">
+              <div class="batch-id-a">
+                Started On:
+
+              </div>
+              <div class="batch-id-b">
+                @modulename.CreatedOn.Value.ToString("dd/MM/yyyy")
+              </div>
+
+            </div>
+            <div class="batch-id">
+              <div class="batch-id-a">
+                Modified On:
+
+              </div>
+              <div class="batch-id-b">
+                @modulename.ModifiedOn.Value.ToString("dd/MM/yyyy")
+
+              </div>
+            </div>
+          </div>
+          @*</a>*@
+        </div>
+
+      }
+    </div>
+  </div>
+
+
+
+  @*<script src="https:////ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>*@
+
+
+
+
+</body>
+</html>
+
+
+<input type="hidden" value="" id="pybatchid" />
+
+
+
+@section scripts{
+  <script src="~/Scripts/autocomplete.js"></script>
+  <link href="~/Content/endless/css/jquery-ui.css" rel="stylesheet" />
+
+  <script nonce="@ViewBag.StyleNonce">
+
+    $(".p_column").on('click', function (event) {
+      //alert("working")
+
+      $(".p_column").removeClass("active");
+      // add class to the one we clicked
+      $(this).addClass("active");
+    });
+
+  </script>
+
+  <script nonce="@ViewBag.StyleNonce">
+
+     function batch() {
+        debugger
+      var data = new Array();
+      $('input[type="text"]').each(function () {
+        if ($(this).val() != "") {
+          var Values = $("label[for='" + $(this).attr('id') + "']").text() + "=" + $(this).val();
+          data.push(Values);
+        }
+      });
+
+      var value = $("#ddlEmpTypes option:selected").val();
+      if (value != '') {
+        var ddl = "Pensioner Type=" + $("#ddlEmpTypes option:selected").val();
+        data.push(ddl);
+      }
+
+      $.ajax({
+        url: "@Url.Action("INSERTBatchProcessInfoAjax", "PensionProcessHeaders")?Data=" + data.join("_R_"),
+        type: "GET",
+      }).done(function (result) {
+        location.reload();
+      });
+    }
+
+    $(function () {
+      debugger
+
+      if ($("#pybatchid").val() != 0) {
+        $('input[type="text"]').each(function () {
+          debugger
+          $(this).attr("disabled", true);
+        });
+        var pybatchid = $("#pybatchid").val();
+        $("#Btn").val("Batch:" + pybatchid + " is Active for Pension Process")
+        $('#Btn').attr('disabled', 'disabled');
+        $('input[type="text"]').each(function () {
+          $(this).attr('disabled', 'disabled');
+        });
+        $('#ddlEmpTypes').attr('disabled', 'disabled');
+        $.ajax({
+          url: "@Url.Action("DisplayAjax", "PensionProcessHeaders")?Pybatchid=" + pybatchid,
+          type: "GET",
+        }).done(function (result) {
+          var trHTML = '';
+          $('#tbl> tbody > tr').empty();
+          $.each(result, function (index, item) {
+            debugger
+            trHTML += '<tr><td>' + item.pybatchid + '</td><td>' + item.processname + '</td><td>' + item.processstartedon + '</td><td>' + item.processendedon + '</td><td>' + item.recordssearched + '</td><td>' + item.recordsprocessed + '</td><td>' + item.errormessage + '</td></tr>';
+          })
+          $('#tbl').append(trHTML);
+          debugger;
+        });
+      }
+      else {
+        $("#Btn").val("No Active Batch for Pension Process.. Click to start new Batch");
+        $("#Btn").removeClass("btn btn-success").addClass("btn btn-primary")
+      }
+    })
+  </script>
+
+
+  <script nonce="@ViewBag.StyleNonce">
+
+    function handleClick(modulename) {
+      debugger
+      switch (modulename) {
+        case 'Create New Process':
+
+          break;
+
+        case 'Autogenerate Pensions':
+          callAutogeneratePensions();
+          break;
+        case 'Pension Exception Reports':
+          break;
+        case 'Generate Payslip':
+          break;
+        case 'Direct Deposit Enteries':
+          break;
+        case 'Print Bank Listing':
+          break;
+        case 'Generate Bank Media':
+          break;
+        case 'Download Media File':
+          break;
+        case 'Upload Bank Media File':
+          break;
+        case 'Post Pension Payroll':
+          break;
+        case 'Cancel Batch Process':
+          break;
+        case 'Close Batch Process':
+          CloseBatchProcess();
+          break;
+        case 'Cancel Individual Payroll':
+          break;
+        default:
+        // Default case or handle other modules
+      }
+
+    }
+
+    function callAutogeneratePensions() {
+      debugger
+      var data = {
+        _AccountNumber: 0,
+        EmployeeCode: null,
+        FirstName: null,
+        LastName: null,
+        EmpType: null,
+        TxtEmpl_type: null,
+        JobCode: null,
+        PayPeriod: null,
+        Title: null,
+        LPayDate: null,
+        LPayDateChecked: false,
+        FullTime: null,
+        PayrollDate: null,
+        PayrollDateChecked: false,
+        EOPDate: null,
+        EOPDateChecked: false,
+        pybatchid: 0,
+        batchprocessid: 0,
+        processname: null,
+        processstartedon: null,
+        processendedon: null,
+        recordssearched: 0,
+        recordsprocessed: 0,
+        status: 0,
+        searchcriteria: null,
+        errormessage: null,
+        RegionNames: null
+      };
+      $.ajax({
+          url: '@Url.Action("GeneratePensionProcess", "PensionProcess")',
+          type: 'POST',
+        data: data,
+        success: function (result) {
+          debugger
+              console.log('Success:', result);
+        },
+        error: function (error) {
+          debugger
+              console.error('Error:', error);
+        }
+      });
+    }
+
+    //Close Batch Process
+
+    function CloseBatchProcess() {
+      debugger
+      var obj = { pybatchid: $('#pybatchid').val() };
+      $.ajax({
+        type: "POST",
+        url: '@Url.Action("CloseBatchProcessAjax", "PensionProcess")',
+        dataType: "json",
+        data: JSON.stringify(obj),
+        contentType: "application/json; charset=utf-8",
+      }).done(function (result) {
+        debugger
+        $('#Ok_To_Postd_Data').popup("hide");
+        if (result.message) {
+          debugger
+          toastr.success(result.message);
+
+          location.reload();
+        }
+        // Handle the result of your action here
+      });
+    }
+  </script>
+
+
+
+}

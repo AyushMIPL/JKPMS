@@ -1,0 +1,643 @@
+﻿
+
+<div class="panel panel-default">
+  <div class="panel-body">
+    @*<div class="row py-4">
+      <div class="col-sm-4">
+
+        <label>Scheme Type</label>
+        @Html.DropDownList("EmployerId", null, "---Select---", new { @class = "form-control select-sm" })
+      </div>
+      <div class="col-sm-4">
+        <label>Beneficiaries</label>
+        @Html.DropDownList("PersonID", null, "---Select---", new { @class = "form-control select-sm" })
+      </div>
+        <div class="col-sm-4">
+          <button type="button" class="btn btn-success height px-5 mr-3" onclick="
+      ()" style="margin-top: 28px;"><i class="fa fa-search"></i> Search</button>
+          <button type="button" class="btn btn-danger height px-5 border-raduis" onclick="deleteAll()" style="margin-top: 28px;"><i class="fa fa-trash-o fa-lg"></i> Delete Selected Record</button>
+        </div>
+
+        </div>*@
+
+    <div class="row py-4">
+      <div id="formToDateDiv">
+        <div class="col-sm-4">
+          <label>Date From</label>
+          <div>
+            <input type="date" id="From" class="form-control" placeholder="select date" @*onchange="validateDateRange()"*@>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <label>To</label>
+          <div>
+            <input type="date" id="to" class="form-control" placeholder="select date" @*onchange="validateDateRange()"*@>
+          </div>
+        </div>
+      </div>
+      @*<div class="col-sm-4">
+
+            <label>Date From</label>
+            <div class="input-group date">
+
+              @Html.TextBox("SelectFrom", "", new { @class = "form-control ", @placeholder = "Select Start Date", @id = "From", @onchange = "validateDateRange()" })
+              <span class="input-group-addon">
+                <i class="fa fa-calendar"></i>
+              </span>
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+
+            <label> To Date</label>
+            <div class="input-group date">
+                @Html.TextBox("SelectTo", "", new { @class = "form-control ", @placeholder = "Select End Date", @id = "to", @onchange = "validateDateRange()" })
+                <span class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                </span>
+            </div>
+        </div>*@
+
+      <div class="col-sm-4">
+        <button type="button" class="btn btn-success px-5 height display_none mmargin-top" title="Please Wait While We Process Your Request" id="btn_Date_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+        <button type="button" id="IdSeaved" class="btn btn-success height px-5 mr-3 mmargin-top"><i class="fa fa-search"></i> Search </button>
+        @* <button type="button" class="btn btn-danger height px-5 border-raduis" onclick="deleteAll()" style="margin-top: 28px;"><i class="fa fa-trash-o fa-lg"></i> Delete Selected Record</button>*@
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h4 class="headline c_Detaiils_h">
+      Modify Finalized Details
+      @*<ul class="tool-bar" style="margin-top: -19px;">
+
+        </ul>*@
+    </h4>
+  </div>
+  <div class="panel-body">
+    @using (Html.BeginForm("ModifyFinalizedDetails", "ContributorPersonalDetails", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+      @Html.ValidationSummary("", new { @class = "text-danger" })
+
+      <table class="table dataTable" id="tblList">
+        <thead>
+          <tr>
+            @*<th><input type="checkbox" checked="checked" class="checkboxMain" style="margin-top:-15px !important;" /></th>*@
+            <th class="c_Detaiils_w1">Id</th>
+            <th class="c_Detaiils_w2">FilePath</th>
+            <th class="c_Detaiils_w1">Finalized</th>
+            <th class="c_Detaiils_w2">Date</th>
+            <th class="c_Detaiils_w1">IsProcessed</th>
+            @*<th>IsActive</th>*@
+          </tr>
+
+        </thead>
+        <tbody></tbody>
+      </table>
+
+
+      #region
+      @*<table class="table dataTable" id="tblList">
+            <thead>
+                <tr class="th-color">
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th colspan="3" style="border:inherit; text-align:center">System Defined</th>
+                    <th colspan="3" style="border:inherit; text-align:center">Get Amount From Employer</th>
+                    <th></th>
+                    <th></th>
+                    <th style="display:none"></th>
+                    <th style="display:none"></th>
+                </tr>
+                <tr>
+                    <th><input id="parentCheckbox" type="checkbox" style="position:relative"></th>
+                    <th>JKPS ID</th>
+                    <th>Contributor Name</th>
+                    <th>Source</th>
+                    <th>Salary</th>
+                    <th>Employee’s <br /> Contribution<br /><label id="SystemContributorTotalContribution"></label></th>
+                    <th>Employer<br /> Contribution<br /><label id="SystemEmployerTotalContribution"></label></th>
+                    <th>Salary</th>
+                    <th>Employee’s <br /> Contribution<br /><label id="lblEmp"></label></th>
+                    <th>Employer <br />Contribution<br /><label id="lblCont"></label></th>
+                    <th>Period<br /><label id="lblMonth"></label></th>
+                    <th></th>
+                    <th style="display:none"></th>
+                    <th style="display:none"></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>*@
+      #endregion
+
+
+    }
+  </div>
+</div>
+<div class="modal fade in" id="simpleModal" aria-hidden="false" style="display: none;text-align: center;margin-top:200px;">
+  <div class="modal-dialog">
+    <div class="modal-content" style="width:500px;">
+      <div class="modal-header">
+        <button type="button" class="close hidemodal2" aria-hidden="true">×</button>
+        Enter Password
+      </div>
+      <div class="form-group" style="text-align:center">
+        <input type="password" class="form-control input-sm" id="exampleInputPassword1" placeholder="Password" style="width:200px;margin-left:150px;margin-top:5px ;text-align:center;">
+        <label id="Passworderror" style="color:red;margin-left:5px;"></label>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-sm btn-success" data-dismiss="modal" id="continueWithPassword" aria-hidden="true">Continue <i class="fa fa-chevron-right"></i></button>
+        <a href="javascript:hidemodal();" class="btn btn-primary btn-sm">Cancel</a>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+<div class="custom-popup width-100 confirmClass" id="confirmDeleteContribution" style="display:none;">
+  <div class="padding-md">
+    <h4 class="m-top-none"> Selected item(s) will be deleted Permanently. Are you sure want to continue?</h4>
+  </div>
+  <div class="modal-header">
+    Enter Reason to delete Record
+  </div>
+  <div class="form-group" style="text-align:center">
+    <input type="text" class="form-control input-sm" id="NotesBehindDelete">
+    <label id="notesError" style="color:red;margin-left:5px;"></label>
+  </div>
+  <div class="text-center">
+    <a class="btn btn-success m-right-sm" id="onClickDeleteConfirm">Delete</a>
+    <a class="btn btn-danger confirmDeleteContribution_close">Cancel</a>
+  </div>
+</div>
+@section scripts{
+  <script src="~/Content/endless/LatestJS/jquery.dataTables.min.js"></script>
+  <script nonce="@ViewBag.StyleNonce">
+    $(document).ready(function () {
+      var Date1 = $("#From").val();
+      $("#lblEmp").text('EC$ 0.00');
+      $("#lblCont").text('EC$ 0.00');
+      $("#SystemContributorTotalContribution").text('EC$ 0.00');
+      $("#SystemEmployerTotalContribution").text('EC$ 0.00');
+      dobind();
+    })
+
+    $("#parentCheckbox").on("click", function () {
+      if (this.checked) {
+        $(".childcheckbox").each(function () {
+          $(this).prop("checked", true);
+        })
+      }
+      else {
+        $(".childcheckbox").each(function () {
+          $(this).prop("checked", false);
+        })
+      }
+    });
+
+    function deleteAll() {
+      var grp = [];
+      $(".childcheckbox").each(function () {
+        if (this.checked) {
+          grp.push($(this).val());
+        }
+      })
+      if (grp.length > 0) {
+        $('#confirmDeleteContribution').popup("show");
+
+      }
+      else {
+        toasterErrorMessage("Please select atleast one contribution to delete");
+      }
+    }
+
+    document.getElementById("onClickDeleteConfirm").addEventListener("click", function () {
+      onClickDeleteConfirm();
+    });
+
+    function onClickDeleteConfirm() {
+        if ($("#NotesBehindDelete").val() != "") {
+            $('#confirmDeleteContribution').popup("hide");
+            $("#simpleModal").show();
+        }
+        else {
+            $("#notesError").text('Please Enter Notes to Continue.');
+        }
+    }
+        function dobind() {
+            debugger
+    $("#finalButton").prop("disabled", "disabled");
+    empId = $("#EmployerId").val();
+    month = $("#Month").val();
+    year = $("#Year").val();
+    var oTable = $('#tblList').dataTable({
+      "bJQueryUI": true,
+      "sPaginationType": "full_numbers",
+      "bServerSide": true,
+      "bDestroy": true,
+      "sAjaxSource": "@Url.Action("DetailContributionSearchAjax", "ContributorPersonalDetails")",
+        @*"sAjaxSource": "@Url.Action("DetailContributionSearchAjax", "ContributorPersonalDetails")" + "?month=" + month + "&year=" + year;*@
+      "aoColumns": [
+
+          { "sName": "Id" },
+          { "sName": "FilePath" },
+          { "sName": "Finalized" },
+          { "sName": "CreatedOn" },
+          //{
+          //    "sName": "IsActive",
+          //    "bSearchable": false,
+          //    "bSortable": false,
+          //    "fnRender": function (oObj) {
+          //        if (oObj.aData[5] == "False")
+          //            return '<span class="badge badge-danger">inactive</span>';
+          //        else
+          //            return '<span class="badge badge-success">active</span>';
+          //    }
+
+          //},
+          {
+              "sName": "IsProcessed",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                  $('#btn_Date_loading').hide();
+                  $('#IdSeaved').show();
+                  if (oObj.aData[5] == "False")
+                      return '<span>No</span>';
+                  else
+                      return '<span>Yes</span>';
+
+              }
+          },
+        //  {"sName": "IsProcessed",
+        //  "bSearchable": false,
+        //      "bSortable": false,
+        //      "fnRender": function (oObj) {
+        //          debugger
+        //    if (oObj.aData[2] == "true") {
+        //      return "Un-Finalized";
+        //    }
+        //    else {
+        //      return '<button type="button" class="btn btn - primary" onclick="FinalizeTotalContribution(' + "'" + oObj.aData[3] + "'" + ')">Finalize</button>';
+        //    }
+        //  }
+        //}
+        ],
+    });
+          /*('#btn_Date_loading').hide();*/
+   }
+
+        @*function dobind() {
+>>>>>>> .r170
+            $("#parentCheckbox").css('display', '');
+            var empId = $("#EmployerId").val();
+            var conId = $("#PersonID").val();
+            //year = $("#Year").val();
+            var oTable = $('#tblList').dataTable({
+                "bJQueryUI": true,
+                "sPaginationType": "full_numbers",
+                "bServerSide": true,
+                "bDestroy": true,
+                "bAutoWidth": false,
+                "sAjaxSource": "@Url.Action("EditDetailSearchAjax1", "ContributorPersonalDetails")?empId=" + empId + "&conId=" + conId,
+                "aoColumns": [
+        {
+            "sName": "SelectAll",
+            "bSearchable": false,
+            "bSortable": false,
+            "fnRender": function (oObj) {
+                var strString = '<input class="childcheckbox" value="' + oObj.aData[0] + '" type="checkbox">';
+                return strString;
+            }
+        },
+            { "sName": "JKPSID" },
+                        { "sName": "ContributorName" },
+                        { "sName": "Source" },
+                        { "sName": "SystemSalary" },
+                        { "sName": "SystemContributorContribution" },
+                        { "sName": "SystemEmployerContribution" },
+                        { "sName": "Salary" },
+                        { "sName": "ContributorContribution" },
+                        { "sName": "EmployerContribution" },
+                        { "sName": "Month" },
+
+            {
+                "sName": "Id",
+                "bSearchable": false,
+                "bSortable": false,
+                "fnRender": function (oObj) {
+                    $("#lblEmp").text(oObj.aData[13]);
+                    $("#lblCont").text(oObj.aData[12]);
+                    $("#lblMonth").text(oObj.aData[14]);
+                    $("#SystemContributorTotalContribution").text(oObj.aData[15]);
+                    $("#SystemEmployerTotalContribution").text(oObj.aData[16]);
+                    var strString = '<a href="javascript:showModalPassword(' + oObj.aData[11] + ');" class="btn btn-info btn-xs" title="Edit"><i class="fa fa-pencil"></i> Edit</a>';
+                    //strString += '&nbsp;<a href="javascript:;"  onclick="javascript:del(' + oObj.aData[9] + ');" class="btn btn-xs btn-danger" title="Delete"><i class="fa fa-trash-o fa-lg"></i> Delete</a>';
+                    return strString;
+                }
+            }
+                ]
+            })
+
+            if($(".dataTables_empty"))
+            {
+                $("#lblEmp").text('EC$ 0.00');
+                $("#lblCont").text('EC$ 0.00');
+                $("#SystemContributorTotalContribution").text('EC$ 0.00');
+                $("#SystemEmployerTotalContribution").text('EC$ 0.00');
+                $("#lblMonth").text('');
+            }
+        }*@
+
+
+        function del(ctrlId) {
+            $("#hdActiveOrDelete").val("Delete");
+            $("#hdDocumentId").val(ctrlId);
+            $('#confirmDelete').popup("show");
+    }
+        const Confirm_Delete_ClassBtn = document.querySelectorAll('.Confirm_Delete_Class');
+        debugger
+        Confirm_Delete_ClassBtn.forEach(button => {
+          button.addEventListener('click', onDeleteConfirm);
+        });
+        function onDeleteConfirm() {
+            $('#confirmDelete').popup("hide");
+            $("#simpleModal").show();
+            var id = $("#hdDocumentId").val();
+        }
+        $("input").keypress(function (event) {
+            if (event.which == 13) {
+                event.preventDefault();
+                continueWithPassword();
+            }
+        });
+        function showModalPassword(ctrlId) {
+            $("#hdActiveOrDelete").val("Edit");
+            $("#hdDocumentId").val(ctrlId);
+            $("#simpleModal").show();
+    }
+
+        document.getElementById("continueWithPassword").addEventListener("click", function () {
+          continueWithPassword();
+        });
+
+        function continueWithPassword() {
+            var status = $("#hdActiveOrDelete").val();
+            var id = $("#hdDocumentId").val();
+            var p = $("#exampleInputPassword1").val();
+            debugger
+            if (p != "") {
+                $.ajax({
+                    url: "@Url.Action("checkPasswordAjax", "ContributorPersonalDetails")?p=" + p,
+                    type: "GET",
+                })
+              .done(function (result) {
+                  debugger
+                  if (result == 1) {
+                      if (status == "Edit") {
+                          window.location.href = "/ContributorPersonalDetails/EditContributorFinalizedDetails/?id=" + id;
+                      }
+                      else {
+                          var grp = [];
+                          var notes = $("#NotesBehindDelete").val();
+                          if (status == "Delete") {
+                              grp.push(id);
+                          }
+                          else {
+                              $(".childcheckbox").each(function () {
+                                  if (this.checked) {
+                                      grp.push($(this).val());
+                                  }
+                              })
+                          }
+
+                          $.ajax({
+                              url: "@Url.Action("deleteAllContributionAjax", "ContributorPersonalDetails")?Value=" + grp + "&Notes=" + notes,
+                              type: "GET",
+                          })
+                        .done(function (result) {
+                            var actionRes = result;
+                            if (actionRes == "0") {
+                                toasterErrorMessage("There is some error, please try again.");
+                                hidemodal();
+                                return actionRes;
+                            }
+                            else {
+                                toasterSuccessMessage("Record deleted successfully.");
+                                hidemodal();
+                                dobind();
+                            }
+                        });
+                      }
+                  }
+                  else {
+                      $("#exampleInputPassword1").val("");
+                      $("#Passworderror").text('Please Check Your Password');
+
+                  }
+              })
+            }
+            else {
+                $("#Passworderror").text('Please Enter Password Before Continue.');
+            }
+    }
+
+    const hidemodal2_ClassBtn = document.querySelectorAll('.hidemodal2');
+    hidemodal2_ClassBtn.forEach(button => {
+      button.addEventListener('click', hidemodal);
+    });
+
+        function hidemodal() {
+            $("#simpleModal").hide();
+            $("#Passworderror").text('');
+            $("#exampleInputPassword1").val('');
+        }
+
+        function detailSearch(evt) {
+            debugger;
+            $('#btn_Date_loading').show();
+            $('#IdSeaved').hide();
+          //$("i.fa-spinner").show();
+            var empId = $("#EmployerId").val();
+            var conId = $("#PersonID").val();
+            if (empId == "" || conId == "") {
+                toasterErrorMessage("Please fill all the required fields");
+                $('#IdSeaved').show();
+                ('#btn_Date_loading').hide();
+                //$(evt.target).find("i.fa-spinner").hide();
+          }
+
+            else {
+              dobind();
+
+            }
+            //$(evt.target).find("i.fa-spinner").hide();
+
+    }
+
+    document.getElementById("IdSeaved").addEventListener("click", function () {
+      debugger
+      DetailSearchOnDate();
+    });
+
+    function DetailSearchOnDate(evt) {
+      debugger;
+
+      var fromdate = $("#From").val();
+      var todate = $("#to").val();
+      var oTable = $('#tblList').dataTable({
+      "bJQueryUI": true,
+      "sPaginationType": "full_numbers",
+      "bServerSide": true,
+      "bDestroy": true,
+
+        "sAjaxSource": "@Url.Action("DetailContributionSearchOnDateAjax", "ContributorPersonalDetails")?From=" + fromdate + "&To=" + todate,
+
+      "aoColumns": [
+
+          { "sName": "Id" },
+          { "sName": "FilePath" },
+          { "sName": "Finalized" },
+          { "sName": "CreatedOn" },
+          //{
+          //    "sName": "IsActive",
+          //    "bSearchable": false,
+          //    "bSortable": false,
+          //    "fnRender": function (oObj) {
+          //        if (oObj.aData[5] == "False")
+          //            return '<span class="badge badge-danger">inactive</span>';
+          //        else
+          //            return '<span class="badge badge-success">active</span>';
+          //    }
+
+          //},
+          {
+              "sName": "IsProcessed",
+              "bSearchable": false,
+              "bSortable": false,
+              "fnRender": function (oObj) {
+                  $('#btn_Date_loading').hide();
+                  $('#IdSeaved').show();
+                  if (oObj.aData[5] == "False")
+                      return '<span>No</span>';
+                  else
+                      return '<span>Yes</span>';
+
+              }
+          },
+        //  {"sName": "IsProcessed",
+        //  "bSearchable": false,
+        //      "bSortable": false,
+        //      "fnRender": function (oObj) {
+        //          debugger
+        //    if (oObj.aData[2] == "true") {
+        //      return "Un-Finalized";
+        //    }
+        //    else {
+        //      return '<button type="button" class="btn btn - primary" onclick="FinalizeTotalContribution(' + "'" + oObj.aData[3] + "'" + ')">Finalize</button>';
+        //    }
+        //  }
+        //}
+        ],
+    });
+
+    }
+
+
+
+        $(function () {
+            $("#parentCheckbox").css('display', 'none');
+        })
+
+
+      $("#EmployerId").on('change', function () {
+        debugger
+          $('#select2-PersonID-container').text('---Select---');
+        var BeneficiaryType = $("#EmployerId option:selected").text();
+        var parts = BeneficiaryType.split(" | ");
+        var seletedType = parts[0].trim();
+                $.ajax({
+                  url: "@Url.Action("GetseletedType", "ContributorPersonalDetails")?seletedType=" + seletedType,
+                  success: function (res) {
+                    var data = $("#PersonID");
+                    data.empty();
+                    data.append($("<option></option>").text("---Select---"));
+                    $.each(res, function (index, item) {
+                      data.append($("<option></option>").attr("value", item.Key).text(item.Value));
+                    });
+                  },
+                  error: function (error) {
+                    // Handle any errors here
+                  }
+                });
+      });
+
+
+        @*$("#EmployerId").on('change', function () {
+            var empId = $("#EmployerId").val();
+            $("#PersonID").select2("val", "");
+            $("#PersonID").empty();
+            $('#PersonID').append($('<option/>').attr("value", "").text("---Select---"));
+            if (empId != "") {
+                $.ajax({
+                    url: "@Url.Action("GetContributorAjax", "ContributorPersonalDetails")?EmpId=" + empId,
+                    type: "GET",
+                }).done(function (result) {
+
+                    debugger
+                    $.each(result, function (i, Contributor) {
+                        $('#PersonID').append($('<option/>').attr("value", Contributor.Id).text(Contributor.Name));
+
+                    })
+                })
+            }
+        })*@
+
+      var currentDate = new Date();
+      // Get the first day of the current month
+      var firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      // Get the last day of the current month
+      var lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+      // Format the dates if needed
+      var formattedFirstDay = $.datepicker.formatDate('yy-mm-dd', firstDay);
+      var formattedLastDay = $.datepicker.formatDate('yy-mm-dd', lastDay);
+
+
+      $('#From').val(formattedFirstDay);
+      $('#to').val(formattedLastDay);
+
+
+
+      var lastValidFromDate = formattedFirstDay;
+      var lastValidToDate = formattedLastDay;
+
+    $("#to,#From").on("change", function () {
+      validateDateRange();
+    });
+
+      function validateDateRange() {
+        debugger
+        var fromDateInput = $("#From").val();
+        var toDateInput = $("#to").val();
+
+        if (fromDateInput > toDateInput) {
+          toasterErrorMessage("From Date should be less than or equal to To Date");
+          $("#From").val(lastValidFromDate);
+          $("#to").val(lastValidToDate);
+        } else {
+          lastValidFromDate = fromDateInput;
+          lastValidToDate = toDateInput;
+        }
+      }
+
+
+
+
+
+
+  </script>
+}
+

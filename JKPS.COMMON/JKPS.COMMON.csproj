@@ -1,0 +1,453 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8FE1D688-C17A-4189-A44C-8E9EB08DF512}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>JKPS.COMMON</RootNamespace>
+    <AssemblyName>JKPS.COMMON</AssemblyName>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Autofac, Version=2.6.1.841, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\BaseCommon.1.0.0\lib\Autofac.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Castle.Core, Version=3.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\packages\BaseCommon.1.0.0\lib\Castle.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\BaseCommon.1.0.0\lib\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LogES4Net, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LogES4Net.dll.1.0.0\lib\net20\LogES4Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DVOConExceptions.cs" />
+    <Compile Include="DVOMedia_Queue.cs" />
+    <Compile Include="DVOMediaDownloads.cs" />
+    <Compile Include="DVOProcessHolidayPayCal.cs" />
+    <Compile Include="DVOMailHistory.cs" />
+    <Compile Include="DVOEmployeeWorkHr.cs" />
+    <Compile Include="DVOEmployeeWorkHrDetails.cs" />
+    <Compile Include="DVOFiscalMainCategory.cs" />
+    <Compile Include="DVOFiscalSuperCategory.cs" />
+    <Compile Include="DVOfissfcat.cs" />
+    <Compile Include="DVOIncomeCodeSettings.cs" />
+    <Compile Include="DVOItemCategoryStuitmcat.cs" />
+    <Compile Include="DVORequisitionstureqstd.cs" />
+    <Compile Include="DVORequisitionstureqste.cs" />
+    <Compile Include="DVORequisitionTypeStureqtyp.cs" />
+    <Compile Include="DVORequistionDefaults.cs" />
+    <Compile Include="DVOActiveDatabase.cs" />
+    <Compile Include="DVOActivityLog.cs" />
+    <Compile Include="DVOBTLFiscalLinkerFisbtllinker.cs" />
+    <Compile Include="DVOFiscalLinkerFisbtlkeyvaladd.cs" />
+    <Compile Include="DVOIssueTendersTbissued.cs" />
+    <Compile Include="DVOAdjustInventorystiadjmd.cs" />
+    <Compile Include="DVOAdjustInventorystiadjme.cs" />
+    <Compile Include="DVOApplicationUserInfo.cs" />
+    <Compile Include="DVOARCashProcessingDetailStrcashd.cs" />
+    <Compile Include="DVOARCashProcessingStrcashe.cs" />
+    <Compile Include="DVOCatalogDetailstuctlgd.cs" />
+    <Compile Include="DVOCheckRegisterstpchkreconcile.cs" />
+    <Compile Include="DVOClaimEarnings.cs" />
+    <Compile Include="DVOCustomerDetailstrcustr.cs" />
+    <Compile Include="DVOCustomerItemAlias.cs" />
+    <Compile Include="DVOddmStypddreAndStypddrd.cs" />
+    <Compile Include="DVODeductionCommision.cs" />
+    <Compile Include="DVODeleteOldActivity.cs" />
+    <Compile Include="DvoDirectDepositEntries.cs" />
+    <Compile Include="DVOEmployeeInfoLogEmpupdlog.cs" />
+    <Compile Include="DVOEmpPayDates.cs" />
+    <Compile Include="DVOEmpTypLogEmpsaltyplog.cs" />
+    <Compile Include="DVOExceptionReports.cs" />
+    <Compile Include="DVOFisBudgetset.cs" />
+    <Compile Include="DVOFiscalCategory.cs" />
+    <Compile Include="DVOFiscalKeyValAdd.cs" />
+    <Compile Include="DVOFiscalKeyValSub.cs" />
+    <Compile Include="DVOFiscalLinker.cs" />
+    <Compile Include="DVOFiscalMainCat.cs" />
+    <Compile Include="DVOFiscalPrepaired.cs" />
+    <Compile Include="DVOFiscalSubCat.cs" />
+    <Compile Include="DVOGLBudgetEntryAdjustmentInbestad.cs" />
+    <Compile Include="DVOGLstgactvd.cs" />
+    <Compile Include="DVOGLstgtranr.cs" />
+    <Compile Include="DVOGLstxchrtd.cs" />
+    <Compile Include="DVOGLPayrollGLAccounts.cs" />
+    <Compile Include="DVOGLstxtranr.cs" />
+    <Compile Include="DVOicpost.cs" />
+    <Compile Include="DVOInvAdjStiadjme.cs" />
+    <Compile Include="DVOInventoryControlTableInfo.cs" />
+    <Compile Include="DVOInventoryCountSheet1.cs" />
+    <Compile Include="DVOInventoryCountSheet2.cs" />
+    <Compile Include="DVOInventoryDefaultsticntrc.cs" />
+    <Compile Include="DVOInventoryItemsStilocar.cs" />
+    <Compile Include="DVOInventoryReceivedstipurcd.cs" />
+    <Compile Include="DVOInventoryReceivedstipurce.cs" />
+    <Compile Include="DVOInventorystiactvd.cs" />
+    <Compile Include="DVOInventorystiserla.cs" />
+    <Compile Include="DVOInventorystiserld.cs" />
+    <Compile Include="DVOInventorystiserle.cs" />
+    <Compile Include="DVOInventorystistatd.cs" />
+    <Compile Include="DVOInventorystitranr.cs" />
+    <Compile Include="DVOInvTransactionsStistatd.cs" />
+    <Compile Include="DVOInvTransactionStitrane.cs" />
+    <Compile Include="DVOInvVendorItemCostSticstvr.cs" />
+    <Compile Include="DVOItemCatalogstiinvtr.cs" />
+    <Compile Include="DVOItemInventoryInfo.cs" />
+    <Compile Include="DvoLedgerDefaults.cs" />
+    <Compile Include="DVOMCstxcrtpr.cs" />
+    <Compile Include="DVOMCstxcurrr.cs" />
+    <Compile Include="DVOMCstxpcrtr.cs" />
+    <Compile Include="DVOMultiTaxstxmtaxd.cs" />
+    <Compile Include="DVOMultiTaxstxmtaxr.cs" />
+    <Compile Include="DVOMultiTaxstxmtxpr.cs" />
+    <Compile Include="DVONssVoidClsAcct.cs" />
+    <Compile Include="DVONssVoidr.cs" />
+    <Compile Include="DVOOrderCustomerInfostrcustr.cs" />
+    <Compile Include="DVOOrderDetailstoordrd.cs" />
+    <Compile Include="DVOOrderEntryLineType.cs" />
+    <Compile Include="DVOOrderEntrystoshipd.cs" />
+    <Compile Include="DVOOrderstoordre.cs" />
+    <Compile Include="DVOOrderTermsStrtermr.cs" />
+    <Compile Include="DVOOrderTypeDefinition.cs" />
+    <Compile Include="DVOOrderTypeStuotypd.cs" />
+    <Compile Include="DVOOrderUpdateShipInfoStrshipr.cs" />
+    <Compile Include="DVOPaymentToEmployee.cs" />
+    <Compile Include="DVOPayrollautopay.cs" />
+    <Compile Include="DVOMasterBanks.cs" />
+    <Compile Include="DVOBudgetCheckStxparmd.cs" />
+    <Compile Include="DVOBudgetEditListing.cs" />
+    <Compile Include="DVOBudgetEditListing2.cs" />
+    <Compile Include="DVOBudgetEstimateList.cs" />
+    <Compile Include="DVOChangePwd.cs" />
+    <Compile Include="DVOFlexSegCommon.cs" />
+    <Compile Include="DVOPaybleListingstpopend.cs" />
+    <Compile Include="DVOPayrollDefaults.cs" />
+    <Compile Include="DVOPayrollstypaydd.cs" />
+    <Compile Include="DVOPayrollstypayid.cs" />
+    <Compile Include="DVOPayrollStypayod.cs" />
+    <Compile Include="DVOPayrollProcess_PayEmployee.cs" />
+    <Compile Include="DVOPaySlipsA4.cs" />
+    <Compile Include="DVOPOInvoicesStuinvce.cs" />
+    <Compile Include="DVOPOOrderReceiptDetailSturectd.cs" />
+    <Compile Include="DVOPOOrderReceiptSturecte.cs" />
+    <Compile Include="DVOPOPurchaseOrdersDetailStuordrd.cs" />
+    <Compile Include="DVOPostAPGlobal.cs" />
+    <Compile Include="DVOPostICGlobal.cs" />
+    <Compile Include="DVOPostTranr.cs" />
+    <Compile Include="DVOMasterBankDetails.cs" />
+    <Compile Include="DVOMasterEmpTypeDeductions.cs" />
+    <Compile Include="DVOMasterEmpTypeIncomes.cs" />
+    <Compile Include="DVOMasterEmpTypeObligations.cs" />
+    <Compile Include="DVOPrintSummaryAnalysis.cs" />
+    <Compile Include="DVODeductionTaxTables.cs" />
+    <Compile Include="DVODeductionTaxTablesRpt.cs" />
+    <Compile Include="DVOPurchasingDefault.cs" />
+    <Compile Include="DVOPYBatchProcessDetailStybatchd.cs" />
+    <Compile Include="DVOPYBatchProcessStybatchr.cs" />
+    <Compile Include="DVOPYCommonEntities.cs" />
+    <Compile Include="DVOQtrlyHourlyWages.cs" />
+    <Compile Include="DVOQuarterlyReport..cs" />
+    <Compile Include="DVORequestorInfoSturqsor.cs" />
+    <Compile Include="DVOSalesRegister.cs" />
+    <Compile Include="DVOsbacctstatus.cs" />
+    <Compile Include="DVOSBclients.cs" />
+    <Compile Include="DVOSBDefaults.cs" />
+    <Compile Include="DVOSBTransactionDetails.cs" />
+    <Compile Include="DVOsbvoidclsacct.cs" />
+    <Compile Include="DVOsbvoidr.cs" />
+    <Compile Include="DVOsecusrmdlothrol.cs" />
+    <Compile Include="DVOsecusrmdlwsirol.cs" />
+    <Compile Include="DVOShipDetailstrshipr.cs" />
+    <Compile Include="DVOStgjourd.cs" />
+    <Compile Include="DVOStgjoure.cs" />
+    <Compile Include="DVOstgstder.cs" />
+    <Compile Include="DVOstocntrc.cs" />
+    <Compile Include="DVOStoinvce.cs" />
+    <Compile Include="DVOstokitrd.cs" />
+    <Compile Include="DVOstokitre.cs" />
+    <Compile Include="DVOstootypr.cs" />
+    <Compile Include="DVOstrcasd.cs" />
+    <Compile Include="DVOstrcasr.cs" />
+    <Compile Include="DVOstuservtyp.cs" />
+    <Compile Include="DVOstxinfor.cs" />
+    <Compile Include="DVOstxnoted.cs" />
+    <Compile Include="DVOstydedanlyd.cs" />
+    <Compile Include="DVOstydedanlyr.cs" />
+    <Compile Include="DVOtblscrninfo.cs" />
+    <Compile Include="DVOtblusrqueries.cs" />
+    <Compile Include="DVOTBPayd.cs" />
+    <Compile Include="DVOTBSchemes.cs" />
+    <Compile Include="DVOTBtbrecd.cs" />
+    <Compile Include="DVOTBWithdraw.cs" />
+    <Compile Include="DVOTest.cs" />
+    <Compile Include="DVOTreasuryBillClasses.cs" />
+    <Compile Include="DVOTreasuryBillControls.cs" />
+    <Compile Include="DVOTreasuryBillEnquiry.cs" />
+    <Compile Include="DVOTreasuryBillMaintanance.cs" />
+    <Compile Include="DVOTreasuryBilltbissuet.cs" />
+    <Compile Include="DVOTreasuryBillTenders.cs" />
+    <Compile Include="DVOUpdateInventoryShippedstiselld.cs" />
+    <Compile Include="DVOUpdateInventoryTransfersStitrane.cs" />
+    <Compile Include="DVOUpdateInventoryTransferstitrand.cs" />
+    <Compile Include="DVOUpdateInvShippedStiselle.cs" />
+    <Compile Include="DVOUpdateRequisitionD.cs" />
+    <Compile Include="DVOUpdateRequisitionH.cs" />
+    <Compile Include="DVOUpdDailyExRates.cs" />
+    <Compile Include="DVOVoidArTrx.cs" />
+    <Compile Include="DVOWarehousestiwhser.cs" />
+    <Compile Include="DVOLineTypestultypr.cs" />
+    <Compile Include="DVOOrderTypestuotypr.cs" />
+    <Compile Include="DVODeductionsGet.cs" />
+    <Compile Include="DVOMasterIncCodes.cs" />
+    <Compile Include="DVOMasterOblCodes1.cs" />
+    <Compile Include="DVOPayrollFunctions.cs" />
+    <Compile Include="DVOPayUpdateTimeCard.cs" />
+    <Compile Include="DVOMasterEmployeeDeductions.cs" />
+    <Compile Include="DVOMasterDedCodes.cs" />
+    <Compile Include="DVOMasterEmpBankDetails.cs" />
+    <Compile Include="DVOMasterEmployeeIncomes.cs" />
+    <Compile Include="DVOMasterEmployeeObligations.cs" />
+    <Compile Include="DVOPREmployeePositionHistoryInyemppd.cs" />
+    <Compile Include="DVOEmployeeSummary.cs" />
+    <Compile Include="DVOFeedBack.cs" />
+    <Compile Include="DVOFlexKeySegmentDefinition.cs" />
+    <Compile Include="DVOGLAccountBalance.cs" />
+    <Compile Include="DVOAPCheckProcessingDetailStpcashd.cs" />
+    <Compile Include="DVOAPCheckProcessingStpcashe.cs" />
+    <Compile Include="DVOAccountsPayableJournal.cs" />
+    <Compile Include="DVOAPUpdatetoPay.cs" />
+    <Compile Include="DVOCapExpMntRpt.cs" />
+    <Compile Include="DVOCommonEntities.cs" />
+    <Compile Include="DVOGLBeginPeriod.cs" />
+    <Compile Include="DVOGLSetupWarrantEntry.cs" />
+    <Compile Include="DVOGLTRanActVD.cs" />
+    <Compile Include="DVOGLTransH.cs" />
+    <Compile Include="DVOLockstxckrgr.cs" />
+    <Compile Include="DVOLockTableStatus.cs" />
+    <Compile Include="DVOLoginLog.cs" />
+    <Compile Include="DVONssCloseAccount.cs" />
+    <Compile Include="DVONssContracts.cs" />
+    <Compile Include="DVONssControls.cs" />
+    <Compile Include="DVONSSDetail.cs" />
+    <Compile Include="DVONssTransection.cs" />
+    <Compile Include="DVONssTransectionDetails.cs" />
+    <Compile Include="DVOOutstandingChecks.cs" />
+    <Compile Include="DVOMasterEmpTypes.cs" />
+    <Compile Include="DVOPayEmpPayDetail.cs" />
+    <Compile Include="DVOPaymentDue.cs" />
+    <Compile Include="DVOGLActivitySummary.cs" />
+    <Compile Include="DVOAccountGroups.cs" />
+    <Compile Include="DVOAccountGroupsZ.cs" />
+    <Compile Include="DVOAccountPermission.cs" />
+    <Compile Include="DVOAPPayTVendor.cs" />
+    <Compile Include="DVOAppHistory.cs" />
+    <Compile Include="DVOApprovalLevel.cs" />
+    <Compile Include="DVOApprovals.cs" />
+    <Compile Include="DVOApprovalSystemUserInfo.cs" />
+    <Compile Include="DVOAPVendorInformation.cs" />
+    <Compile Include="DVOAPVendorTerms.cs" />
+    <Compile Include="DVOASApprovalClassesInfo.cs" />
+    <Compile Include="DVOASApprovalLevelInfo.cs" />
+    <Compile Include="DVOASPurchaseClass.cs" />
+    <Compile Include="DVOASUpdPurchaseClass.cs" />
+    <Compile Include="DVOBatch.cs" />
+    <Compile Include="DVOBatchInfo.cs" />
+    <Compile Include="DVOBCBudgetSets.cs" />
+    <Compile Include="DVOCapExpByMinistry.cs" />
+    <Compile Include="DVOCapExpByMinistryAndObject.cs" />
+    <Compile Include="DVOCapExpByMinistryFormW2.cs" />
+    <Compile Include="DVOCapRevByDetailedObjcet.cs" />
+    <Compile Include="DVOCapRevByMinistry.cs" />
+    <Compile Include="DvoCheckListing.cs" />
+    <Compile Include="DVODistinctYear.cs" />
+    <Compile Include="DVOMasterEmployee.cs" />
+    <Compile Include="DVOExpnRevPreviousYearComp.cs" />
+    <Compile Include="DVOGLActivityDetail.cs" />
+    <Compile Include="DVOGLBudgetAllocationDistributionInballod.cs" />
+    <Compile Include="DVOCapExpByObj.cs" />
+    <Compile Include="DVODistinctMonth.cs" />
+    <Compile Include="DVOGenJourView.cs" />
+    <Compile Include="DVOGLBudgetEntryInbestid.cs" />
+    <Compile Include="DVOGLUpdateAccountSubGroups.cs" />
+    <Compile Include="DVOInxSegvd.cs" />
+    <Compile Include="DVOJournalHeaderEntry.cs" />
+    <Compile Include="DVOingappcls.cs" />
+    <Compile Include="DVOBase.cs" />
+    <Compile Include="DVOCompanyView.cs" />
+    <Compile Include="DVOFlexSegment.cs" />
+    <Compile Include="DVOGeneralLedger.cs" />
+    <Compile Include="DVOGLSegment.cs" />
+    <Compile Include="DVOGLTrialBalance.cs" />
+    <Compile Include="DVOLocks.cs" />
+    <Compile Include="DVOMatrix.cs" />
+    <Compile Include="DVOMinstry.cs" />
+    <Compile Include="DVOMisc.cs" />
+    <Compile Include="DVOMonthlyBudgetAlloca.cs" />
+    <Compile Include="DVOOrganiztionalStructureChart.cs" />
+    <Compile Include="DVOOSCheckingAccount.cs" />
+    <Compile Include="DVOPayableListingDetailStpinvcd.cs" />
+    <Compile Include="DVOPayableListingStpinvce.cs" />
+    <Compile Include="DVOPostAP.cs" />
+    <Compile Include="DVOPostAR.cs" />
+    <Compile Include="DVOPostGL.cs" />
+    <Compile Include="DVOPostGLDetail.cs" />
+    <Compile Include="DVOPostGLGlobal.cs" />
+    <Compile Include="DVOPostNSS.cs" />
+    <Compile Include="DVOPostTrx.cs" />
+    <Compile Include="DVOPrintBudgetsExpenditures.cs" />
+    <Compile Include="DVOPrintVoteBook.cs" />
+    <Compile Include="DVOPrintVoteBook1.cs" />
+    <Compile Include="DVOMasterOblCodes.cs" />
+    <Compile Include="DVORecExpByMinistry.cs" />
+    <Compile Include="DVORecExpByOBj.cs" />
+    <Compile Include="DVORecExpByProgram%28FromW2A%29.cs" />
+    <Compile Include="DVORecRevByMinistry.cs" />
+    <Compile Include="DVORecRevByObj.cs" />
+    <Compile Include="DVOSalaryCategory.cs" />
+    <Compile Include="DVOSalaryCode.cs" />
+    <Compile Include="DVOSalaryScale.cs" />
+    <Compile Include="DVOSecAccountRanges.cs" />
+    <Compile Include="DVOGLAccountTypeMaintenance.cs" />
+    <Compile Include="DVOSecCompany.cs" />
+    <Compile Include="DVOSecModule.cs" />
+    <Compile Include="DVOSecModuleType.cs" />
+    <Compile Include="DVOSecRole.cs" />
+    <Compile Include="DVOSecRoleModule.cs" />
+    <Compile Include="DVOSecUserModule.cs" />
+    <Compile Include="DVOSecUsers.cs" />
+    <Compile Include="DVOFlxview.cs" />
+    <Compile Include="DVOSource.cs" />
+    <Compile Include="DVOStyvoidAndEmpInfo.cs" />
+    <Compile Include="DVOSystemUserInfo.cs" />
+    <Compile Include="DVOTimeCard.cs" />
+    <Compile Include="DVOTreasuryBillCertificate.cs" />
+    <Compile Include="DVOTreasuryBillDetailInttbild.cs" />
+    <Compile Include="DVOTenderInttendr.cs" />
+    <Compile Include="DVOTreasuryBillIssueNumbersIntissur.cs" />
+    <Compile Include="DVOUpdAccrualCode.cs" />
+    <Compile Include="DVOUpdateBankCode.cs" />
+    <Compile Include="DVOUpdateBudgetControlDefaults.cs" />
+    <Compile Include="DVOUpdateIncCode.cs" />
+    <Compile Include="DVOUpdateLedgerDefaults.cs" />
+    <Compile Include="DVOUpdateNSSinsacctr.cs" />
+    <Compile Include="DVOUpdatePayableDefaults.cs" />
+    <Compile Include="DvoUpdatePayableDefDetails.cs" />
+    <Compile Include="DVOUpdatePayDefaults.cs" />
+    <Compile Include="DVOUpdateSalaryPositions.cs" />
+    <Compile Include="DVOUpdateTimeCard.cs" />
+    <Compile Include="DVOUpdateVoidChecks.cs" />
+    <Compile Include="DVOUpdPurchaseClasses.cs" />
+    <Compile Include="DVOUpdPurchaseDef.cs" />
+    <Compile Include="DVOUpdPurchaseDefDetail.cs" />
+    <Compile Include="DVOUpdReceivaleDef.cs" />
+    <Compile Include="DVOUserAccountPermissionInaccdef.cs" />
+    <Compile Include="DVOUserApprovalInfoOverAll.cs" />
+    <Compile Include="DVOGLWarrantEntryInbwarah.cs" />
+    <Compile Include="DVOGLWarrantDescriptionInbwarad.cs" />
+    <Compile Include="DvoVendorInfo.cs" />
+    <Compile Include="DVOVendorOpenItemsStpopend.cs" />
+    <Compile Include="DvoVendorTerms.cs" />
+    <Compile Include="DVOWarrantTypeInbbdocr.cs" />
+    <Compile Include="Enumerators.cs" />
+    <Compile Include="DVOExceptionRecord.cs" />
+    <Compile Include="Form2Class.cs" />
+    <Compile Include="IBaseForm.cs" />
+    <Compile Include="iDVO.cs" />
+    <Compile Include="DVOJournalDetailsEntry.cs" />
+    <Compile Include="DVOPostARGlobal.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="DVOSBhdr.cs" />
+    <Compile Include="TransactionDAL.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Log4Net.config" />
+    <None Include="packages.config" />
+    <None Include="Scripts\jquery-3.7.1.min.map" />
+    <None Include="Scripts\jquery-3.7.1.slim.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Scripts\jquery-3.7.1.intellisense.js" />
+    <Content Include="Scripts\jquery-3.7.1.js" />
+    <Content Include="Scripts\jquery-3.7.1.min.js" />
+    <Content Include="Scripts\jquery-3.7.1.slim.js" />
+    <Content Include="Scripts\jquery-3.7.1.slim.min.js" />
+    <Content Include="Scripts\nugetexample.js" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

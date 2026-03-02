@@ -1,0 +1,408 @@
+﻿@model App.Data.Entities.MasterEmpBankDetails
+
+@{
+  Layout = "~/Views/Shared/_LayoutPensioner.cshtml";
+  var roleid = ViewBag.roleidlist;
+  var Remarks = @Html.Raw(Model.Remarks);
+  var RemarkForChangeString = Remarks.ToString().Trim();
+}
+
+@{
+  bool showRegion = false;
+  if (!string.IsNullOrEmpty(RemarkForChangeString))
+  {
+    showRegion = true;
+  }
+}
+
+@section profilePensioner
+{
+
+
+  <div class="panel panel-default">
+    <div class="panel-heading clearfix">
+      <h4 class="headline Dash_contributorSummary">
+        Bank Details:@string.Format("{0} ({1})", ViewBag.Name, ViewBag.ApplicationReferenceNo)
+
+        @*<ul class="tool-bar">
+
+          </ul>*@
+      </h4>
+    </div>
+    <div class="panel-body">
+      @using (Html.BeginForm("EditBankDetails", "MasterPensioner", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "bankId" }))
+      {
+
+        @Html.Hidden("PensionerID")
+        @Html.HiddenFor(model => model.line_no)
+        @Html.HiddenFor(model => model.emp_bank_ID, new { @Value = ViewBag.Id })
+        @Html.HiddenFor(model => model.type)
+        @Html.HiddenFor(model => model.Bank_document)
+        @*@Html.ValidationSummary("", new { @class = "text-danger" })*@
+        <div class="row">
+          <div class="col-sm-10">
+            <div class="form-group hidden">
+              @Html.LabelFor(model => model.empl_code, "Pensioner ID", new { @class = "col-sm-3 control" })
+              <div class="col-sm-7">
+                @Html.TextBoxFor(m => m.empl_code, new { @class = "form-control input-sm", placeholder = "Application Reference No", @readonly = "readonly", @Value = ViewBag.PensionerID })
+              </div>
+            </div>
+
+            @*<div class="form-group hidden">
+                  @Html.LabelFor(model => model.empl_code, "Application Reference No *", new { @class = "col-sm-3 control-label" })
+                  <div class="col-sm-7">
+                      @Html.TextBoxFor(m => m.empl_code, new { @class = "form-control input-sm", placeholder = "Application Reference No", @readonly = "readonly", @Value = ViewBag.ApplicationReferenceNo })
+                  </div>
+              </div>*@
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.bank_code, new { @class = "col-sm-3 control Color-Red-asterisk" })
+              <div class="col-sm-7">
+                @Html.DropDownList("bank_code", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm disable-dropdown", @disabled = "true" })
+              </div>
+            </div>
+            <div class="form-group hidden">
+              @Html.LabelFor(model => model.typeofacct, new { @class = "col-sm-3 control Color-Red-asterisk" })
+              <div class="col-sm-7">
+                @Html.DropDownList("typeofacct", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm disable-dropdown" })
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.bank_acct_no, new { @class = "col-sm-3 control Color-Red-asterisk" })
+              <div class="col-sm-7 custom-color">
+                @Html.TextBoxFor(m => m.bank_acct_no, new { @class = "form-control input-sm disable-textbox", placeholder = "Enter Bank Account Number", @readonly = "readonly" })
+              </div>
+              @*<div class="col-sm-6">
+                  @foreach (var item in @ViewBag.permitionlist)
+                  {
+                    if (item.FieldName.Trim() == "bank_acct_no")
+                    {
+                      @Html.TextBoxFor(m => m.bank_acct_no, new { @class = "form-control input-sm disable-textbox " + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Enter Bank Account Number" })
+                    }
+                  }
+                </div>*@
+            </div>
+            <div class="form-group hidden">
+              @Html.LabelFor(model => model.type, new { @class = "col-sm-3 control" })
+              <div class="col-sm-7">
+                @Html.DropDownList("type", null, "---Select---", htmlAttributes: new { @class = "form-control input-sm", Disabled = "true" })
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.APPLICANT_BANK_IFSC_CODE, new { @class = "col-sm-3 control" })
+              @*<div class="col-sm-7 custom-color">
+                    @Html.TextBoxFor(m => m.APPLICANT_BANK_IFSC_CODE, new { @class = "form-control input-sm", placeholder = "Enter IFSC Code", @readonly = "readonly" })
+
+                </div>*@
+              <div class="col-sm-7 custom-color">
+                @foreach (var item in @ViewBag.permitionlist)
+                {
+                  if (item.FieldName.Trim() == "APPLICANT_BANK_IFSC_CODE")
+                  {
+                    @Html.TextBoxFor(m => m.APPLICANT_BANK_IFSC_CODE, new { @class = "form-control input-sm" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Enter IFSC Code" })
+                  }
+                }
+              </div>
+            </div>
+
+            <div class="form-group hidden">
+              @Html.LabelFor(model => model.amount, new { @class = "col-sm-3 control" })
+              <!--<div class="col-sm-7">
+              @Html.TextBoxFor(m => m.amount, new { @class = "form-control input-sm allownumericwithdecimal", placeholder = "Amount", @readonly = "readonly" })-->
+              @*@if (Model == null)
+                {@Html.TextBoxFor(m => m.amount, new { @class = "form-control input-sm allownumericwithdecimal", placeholder = "Amount", @readonly = "readonly" })}
+                else
+                {
+                  var formated = String.Format("{0:0.00}", Model.amount);
+                  @Html.TextBoxFor(m => m.amount, formated, new { @class = "form-control input-sm ", placeholder = "Amount" })
+                }*@
+              <!--</div>-->
+              <div class="col-sm-6">
+                @foreach (var item in @ViewBag.permitionlist)
+                {
+                  if (item.FieldName.Trim() == "APPLICANT_BANK_IFSC_CODE")
+                  {
+                    @Html.TextBoxFor(m => m.amount, new { @class = "form-control input-sm allownumericwithdecimal" + (item.AllowEdit == true ? "" : "readonlyy"), placeholder = "Amount" })
+                  }
+                }
+              </div>
+            </div>
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.CBS_NAME, new { @class = "col-sm-3 control" })
+              <div class="col-sm-7 custom-color">
+                @*@Html.TextBoxFor(m => m.CBS_NAME, new { @class = "form-control input-sm", placeholder = "Enter CBS Name", @readonly = "readonly" })*@
+                @foreach (var item in @ViewBag.permitionlist)
+                {
+                  if (item.FieldName.Trim() == "CBS_NAME")
+                  {
+                    @Html.TextBoxFor(m => m.CBS_NAME, new { @class = "form-control input-sm " + (item.AllowEdit == true ? "readonlyy" : " "), placeholder = "Enter CBS Name" })
+                  }
+                }
+              </div>
+            </div>
+            <div class="form-group">
+              @Html.LabelFor(model => model.BRANCH_CODE, new { @class = "col-sm-3 control" })
+              <div class="col-sm-7 custom-color">
+                @Html.TextBoxFor(m => m.BRANCH_CODE, new { @class = "form-control input-sm", placeholder = "Enter Branch Code", @readonly = "readonly" })
+
+              </div>
+            </div>
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.ACCOUNT_STATUS, new { @class = "col-sm-3 control" })
+              <div class="col-sm-7 ">
+                @Html.DropDownListFor(m => m.ACCOUNT_STATUS, new SelectList(new[]
+                {
+                    new SelectListItem{Value="--Select--",Text="Select"},
+                    new SelectListItem{Value="ACTIVE",Text="Active"},
+                    new SelectListItem{Value="NOT ACTIVE",Text="Not Active "},
+                }, "Value", "Text"), new { @class = "form-control input-sm disable-dropdown", @disabled = "disabled" })
+              </div>
+            </div>
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.AADHAAR_STATUS, new { @class = "col-sm-3 control" })
+              <div class="col-sm-7 custom-color">
+                @Html.TextBoxFor(m => m.AADHAAR_STATUS, new { @class = "form-control input-sm", placeholder = "Enter Aadhar Status Code", @readonly = "readonly" })
+
+              </div>
+            </div>
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.ACCT_SCHEME_TYPE, new { @class = "col-sm-3 control" })
+              <div class="col-sm-7 custom-color">
+                @Html.TextBoxFor(m => m.ACCT_SCHEME_TYPE, new { @class = "form-control input-sm", placeholder = "Enter Account Scheme Type", @readonly = "readonly" })
+
+              </div>
+            </div>
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.document, new { @class = "col-sm-3 control" })
+              <div class="col-sm-7">
+                @Html.TextBoxFor(model => model.document, new
+                {
+                 type = "file",
+                 multiple = "multiple",
+                 accept = ".pdf, .jpeg, .jpg, .png",
+                 disabled = "disabled"
+           })
+                @*@Html.ValidationMessageFor(m=>m.Bank_document,"",new { @class= "text-danger" })*@
+              </div>
+            </div>
+
+
+
+            <div class="form-group">
+              @Html.LabelFor(model => model.Remarks, "Remark *", new { @class = "col-sm-3 control Color-Red-asterisk" })
+              <div class="col-sm-7">
+                <div id="ReasonForChangeDiv">
+                  <label>@Remarks</label>
+                </div>
+              </div>
+
+
+              @Html.LabelFor(model => model.Remarks, " ", new { @class = "col-sm-3 control" })
+              <div class="col-sm-7 MPSReasonmargin">
+                @Html.TextAreaFor(m => m.Remarks, new { @class = "form-control input-sm disable-textbox", placeholder = "Enter your Remark", @readonly = "readonly" })
+                <p id="remarksErr" class="red"></p>
+
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-sm-3 control-label"></label>
+              <div class="col-sm-7">
+                <a type="button" id="EditEnableId" class="btn btn-success"><i class="fa fa-edit"> </i> Edit</a>
+                <button type="button" class="btn btn-success px-5 height dash_displaynone" title="Please Wait While We Process Your Request" id="btn_EditBank_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                @*<button type="submit" id="IdEditbank" class="btn btn-success"><i class="fa fa-save"> </i> Update</button>*@
+                <button type="submit" id="IdEditbank" class="btn btn-success @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")"><i class="fa fa-save"> </i> Update</button>
+                <a href="/MasterPensioner/BankDetailsIndex/@ViewBag.CId" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+                <a type="button" id="cancelid" class="btn btn-success"><i class="fa fa-cancel"> </i> Cancel</a>
+                @*@Html.ActionLink("Cancel", "BankDetailsIndex", "MasterPensioner", new { id = @ViewBag.CId }, new { @class = "btn btn-primary" })*@
+              </div>
+            </div>
+          </div>
+        </div>
+
+      }
+    </div>
+  </div>
+
+
+}
+@section scripts{
+  <script src="~/Content/endless/js/jquery.dataTables.min.js"></script>
+
+  <script nonce="@ViewBag.StyleNonce">
+
+        //$(document).ready(function(){
+        //$('#tbl').dataTable();
+        //})
+
+    $('#IdEditbank').on('click', function (e) {
+      var Remarks = $('#Remarks').val();
+      if (Remarks === null || Remarks.trim() === '') {
+        e.preventDefault();
+        $("#remarksErr").text("Remarks is Required..");
+      }
+      else {
+        $("#remarksErr").text("");
+      }
+    });
+
+      $("#IdEditbank").hide();
+      $("#cancelid").hide();
+    $("#bank_code").on('change', function () {
+      if ($("#bank_code").val() != null) {
+        $.ajax({
+          type: "POST",
+          url: '@Url.Action("BankDetailsDropDownAjax", "MasterPensioner")',
+          dataType: "json",
+          data: JSON.stringify({ emplcode: $("#empl_code").val(), bankcode: $("#bank_code").val() }),
+          contentType: "application/json; charset=utf-8",
+
+        }).done(function (result) {
+          debugger
+          if (result == "Error") {
+            toasterErrorMessage("This Bank Code Already Exist For this Pensioner");
+          }
+        })
+      }
+    })
+
+        $("#amount").blur(function () {
+            debugger;
+      if ($("#amount").val() != null) {
+          var amount = parseFloat($('#amount').text());
+
+        if (amount > 101 || amount < 0) {
+          toasterErrorMessage("Percentage should between 0 to 100.");
+        }
+        else if ($("#bank_code").val() == null) {
+          toasterErrorMessage("Please select bank code.");
+        }
+        else {
+          $.ajax({
+            type: "POST",
+            url: '@Url.Action("BankDetailsAjax", "MasterPensioner")',
+            dataType: "json",
+            data: JSON.stringify({ emplcode: $("#empl_code").val(), bankcode: $("#bank_code").val(), amount: $("#amount").val() }),
+            contentType: "application/json; charset=utf-8",
+
+          }).done(function (result) {
+            debugger
+              if (result == "Error") {
+                  //toasterErrorMessage("Total Percentage of direct deposit lines should between 0 to 100.");
+                  //toasterErrorMessage("Amount shouldn't less then Income. Pleae set Income first and then set Amount.");
+              }
+              else {
+                  toasterErrorMessage("Amount shouldn't less then Income. Pleae set Income first and then set Amount.");
+
+              }
+          })
+        }
+      }
+    })
+
+    $('#amount').keypress(function (event) {
+      if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+        event.preventDefault();
+      }
+    });
+
+
+
+      $(document).ready(function () {
+      //if (@roleid == 1 || @roleid == 2 || @roleid == 4 || @roleid == 6)
+      //{
+        //$(".disable-textbox").prop("readonly", false);
+       // $(".disable-dropdown").prop("disabled", false);
+      //}
+      //else {
+        //$(".disable-textbox").prop("readonly", true);
+        //$(".disable-dropdown").prop("disabled", true);
+      //}
+      $('form').submit(function () {
+          $('#IdEditbank').hide();
+          $('#btn_EditBank_loading').show();
+        var form = $("#bankId");
+        debugger;
+        @*var Districtpermition = '@ViewBag.districtPermission';
+        if (Districtpermition != "False") {
+          var document = $("#document").val();
+          if (document == '' || document == null)
+          {
+                  toasterErrorMessage("Supportive document is required.")
+                  $('#IdEditbank').show();
+                  $('#btn_EditBank_loading').hide();
+                  return false;
+           }
+
+        }*@
+          if (!form.valid()) {
+              $('#IdEditbank').show();
+              $('#btn_EditBank_loading').hide();
+              return false;
+          }
+      });
+        var error = '@TempData["error"]';
+        if (error && error.length > 0) {
+            $('#IdEditbank').hide();
+            $('#btn_EditBank_loading').hide();
+        }
+        $('#btn_EditBank_loading').hide();
+        $("#Remarks").val('');
+        debugger;
+        if (showRegion) {
+          $("#ReasonForChangeDiv").addClass("hidden");
+        } else {
+          $("#ReasonForChangeDiv").removeClass("hidden");
+        }
+    });
+
+    document.getElementById("EditEnableId").addEventListener("click", function () {
+      EnableFrom();
+    });
+
+
+
+      function EnableFrom() {
+        $("#bankId :input:not()").attr("readonly", false);
+        $("#bank_code").attr("disabled",false)
+        $("#ACCOUNT_STATUS").attr("disabled", false)
+        $("#document").prop("disabled", false);
+        $("#IdEditbank").show();
+        $("#EditEnableId").hide();
+        $("#cancelid").show();     
+      }
+
+    document.getElementById("cancelid").addEventListener("click", function () {
+      DisableFrom();
+    });
+
+      function DisableFrom() {
+        $("#bankId :input:not()").attr("readonly", true);
+        $("#bank_code").attr("disabled", true)
+        $("#ACCOUNT_STATUS").attr("disabled", true)
+        $("#IdEditbank").hide();
+        $("#cancelid").hide();
+        $("#EditEnableId").show();
+        if (document.getElementById("document") != null && document.getElementById("document") != "" && document.getElementById("document") != undefined) {
+          $("#remarksErr").text("");
+          $("#Remarks").val("")
+        }
+
+      }
+
+
+  </script>
+
+
+  @*<script nonce="@ViewBag.StyleNonce">
+
+    </script>*@
+
+
+
+}

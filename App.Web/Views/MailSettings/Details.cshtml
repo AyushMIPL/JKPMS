@@ -1,0 +1,104 @@
+﻿@model App.Data.Entities.MailSettings
+
+@{
+  ViewBag.Title = "Details";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card">
+  <div class="card-header head_bg">
+    <p>Mail Settings Details</p>
+  </div>
+  <div class="card-block">
+    <div class="form-horizontal">
+
+      <div class="row">
+        <div class="col-md-6 row">
+          <div class="col-md-4">
+            @Html.DisplayNameFor(model => model.ProcessName)
+          </div>
+          <div class="col-md-8">
+            @Html.DisplayFor(model => model.ProcessName)
+          </div>
+        </div>
+
+        <div class="col-md-6 row">
+          <div class="col-md-4">
+            @Html.DisplayNameFor(model => model.MailTo)
+          </div>
+          <div class="col-md-8">
+            @Html.DisplayFor(model => model.MailTo)
+          </div>
+        </div>
+        <div class="col-md-6 row">
+          <div class="col-md-4">
+            @Html.DisplayNameFor(model => model.CC)
+          </div>
+          <div class="col-md-8">
+            @Html.DisplayFor(model => model.CC)
+          </div>
+        </div>
+        <div class="col-md-6 row">
+          <div class="col-md-4">
+            @Html.DisplayNameFor(model => model.BCC)
+          </div>
+          <div class="col-md-8">
+            @Html.DisplayFor(model => model.BCC)
+          </div>
+        </div>
+        <div class="col-md-6 row">
+          <div class="col-md-4">
+            @Html.DisplayNameFor(model => model.Subject)
+          </div>
+          <div class="col-md-8">
+            @Html.DisplayFor(model => model.Subject)
+          </div>
+        </div>
+        <div class="col-md-6 row">
+          <div class="col-md-4">
+            @Html.DisplayNameFor(model => model.Contents)
+          </div>
+          <div class="col-md-8">
+            @Html.DisplayFor(model => model.Contents)
+          </div>
+        </div>
+        <div class="col-md-6 row">
+          <div class="col-md-4">
+            @Html.DisplayNameFor(model => model.IsSendNotificationAlert)
+          </div>
+          <div class="col-md-8">
+            @Html.DisplayFor(model => model.IsSendNotificationAlert)
+          </div>
+        </div>
+        <div class="col-md-6 row">
+          <div class="col-md-4">
+            @Html.DisplayNameFor(model => model.ProcessWillStartAt)
+          </div>
+          <div class="col-md-8">
+            @Html.DisplayFor(model => model.ProcessWillStartAt)
+          </div>
+        </div>
+        <div class="col-md-6 row">
+          <div class="col-md-4">
+            @Html.DisplayNameFor(model => model.DelayTime)
+          </div>
+          <div class="col-md-8">
+            @Html.DisplayFor(model => model.DelayTime)
+          </div>
+        </div>
+        <div class="col-md-6 row">
+          <div class="col-md-4">
+            @Html.DisplayNameFor(model => model.IsActive)
+          </div>
+          <div class="col-md-8">
+            @Html.DisplayFor(model => model.IsActive)
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12 text-right">
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id })
+        @Html.ActionLink("Back to List", "Index")
+      </div>
+    </div>
+  </div>
+</div>

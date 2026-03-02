@@ -1,0 +1,581 @@
+﻿@model App.Data.Entities.PensionApplications
+@{
+  Layout = null;
+}
+<div class="panel-body">
+
+  @using (Html.BeginForm("Details", "PensionApplications", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "form1" }))
+  {
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary("", new { @class = "text-danger" })
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.DeathInjuryNormal)
+    @Html.Hidden("EditAllowed")
+    <div class="row">
+      <div class="col-sm-8">
+        <div class="form-group">
+          @Html.LabelFor(model => model.EmployerID, "Employer *", htmlAttributes: new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            @Html.DropDownList("EmployerID", null, "---Select---", htmlAttributes: new { @class = "form-control disableCon" })
+          </div>
+        </div>
+        <div class="form-group">
+          @Html.LabelFor(model => model.PersonID, "Name of Officer *", htmlAttributes: new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            @Html.DropDownList("PersonID", null, "---Select---", htmlAttributes: new { @class = "form-control disableCon" })
+          </div>
+        </div>
+        <div class="form-group" style="display:none">
+          <label class="col-sm-4 control-label" id="status">Death in Service</label>
+          <div class="col-sm-8">
+            <div class="checkbox disableCon">
+              <input type="checkbox" id="injuryOrDeath" />
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          @Html.LabelFor(model => model.DesignationId, "Post *", htmlAttributes: new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            @Html.DropDownList("DesignationId", null, "---Select---", htmlAttributes: new { @class = "form-control disableCon" })
+          </div>
+        </div>
+        <div class="form-group">
+          @Html.LabelFor(model => model.PensionableStatus, "Pensionable Status", htmlAttributes: new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            <div class="checkbox disableCon">
+              @Html.EditorFor(model => model.PensionableStatus)
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          @Html.LabelFor(model => model.BenefitTypes, "Benefit Type *", htmlAttributes: new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            @Html.DropDownList("BenefitTypes", null, "---Select---", htmlAttributes: new { @class = "form-control disableCon" })
+
+          </div>
+        </div>
+
+        <div class="form-group">
+          @Html.LabelFor(model => model.LeaveDue, "Leave Due", htmlAttributes: new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            @Html.TextBoxFor(model => model.LeaveDue, new { @class = "form-control input-sm disableCon" })
+            @Html.ValidationMessageFor(model => model.LeaveDue, "", new { @class = "text-danger" })
+          </div>
+        </div>
+
+        <div class="form-group">
+          @Html.LabelFor(model => model.RetirementOrResignationDate, "Date of Retirement/Resignation *", htmlAttributes: new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            <div class="input-group date" id="Retire">
+              @Html.EditorFor(model => model.RetirementOrResignationDate, new { })
+              <span class="input-group-addon">
+                <i class="fa fa-calendar"></i>
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="form-group">
+          @Html.LabelFor(model => model.DOB, "Date of Birth", htmlAttributes: new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            @Html.TextBoxFor(model => model.DOB, new { @class = "form-control input-sm", @readonly = "readonly" })
+
+          </div>
+        </div>
+
+        <div class="form-group">
+          @Html.LabelFor(model => model.DateofAppointment1st, "Date of First Appointment", htmlAttributes: new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            @Html.TextBoxFor(model => model.DateofAppointment1st, new { @class = "form-control input-sm", @readonly = "readonly" })
+
+          </div>
+        </div>
+
+        <div class="form-group Public">
+          <div class="col-sm-4 TextRight">
+            @Html.LabelFor(model => model.LengthOfQualifyingServiceInMonthsTo31Dec2003, "Service Length(Upto Dec, 2003)", htmlAttributes: new { @class = "control-label" })
+            &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Length of Qualifying Service in Month(to Dec 31, 2003)"></i>
+          </div>
+          <div class="col-sm-8">
+            @Html.TextBoxFor(model => model.LengthOfQualifyingServiceInMonthsTo31Dec2003, new { @class = "form-control input-sm", @readonly = "readonly" })
+
+          </div>
+          <div style="width:1%;float: right;margin-top: -25px;"><a href="javascript:showDetails(0)" class="btn btn-primary btn-xs" title="Details"><i class="fa fa-list"></i></a></div>
+        </div>
+
+        <div class="form-group Public injured">
+          <div class="col-sm-4 TextRight">
+            @Html.LabelFor(model => model.LengthOfQualifyingServiceInMonthsFrom1Jan2014, "Service Length(From Jan, 2004)", htmlAttributes: new { @class = "control-label" })
+            &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Length of Qualifying Service in Month(from Jan 1, 2004)"></i>
+          </div>
+          <div class="col-sm-8">
+            @Html.TextBoxFor(model => model.LengthOfQualifyingServiceInMonthsFrom1Jan2014, new { @class = "form-control input-sm", @readonly = "readonly" })
+
+          </div>
+          <div style="width:1%;float: right;margin-top: -25px;"><a href="javascript:showDetails(1)" class="btn btn-primary btn-xs" title="Details"><i class="fa fa-list"></i></a></div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-4 TextRight">
+            @Html.LabelFor(model => model.LongerShorterReason, "Reason", htmlAttributes: new { @class = "control-label" })
+            &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="If Length of Qualifying Service is longer or shorter than peroid between date of first appointment and date of retirement, state Why"></i>
+          </div>
+          <div class="col-sm-8">
+            @Html.TextAreaFor(model => model.LongerShorterReason, 8, 8, new { @class = "form-control input-sm", placeholder = "Add Reasons" })
+
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-4 TextRight">
+            @Html.LabelFor(model => model.RetirementAnnualSalary1, "Salary P.A", htmlAttributes: new { @class = "control-label" })
+            &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Salary P.A./Salary P.A. plus responsibility/inducement allowance at date of retirement, if in post longer than 3 years"></i>
+          </div>
+          <div class="col-sm-8">
+            @Html.TextBoxFor(model => model.RetirementAnnualSalary1, new { @class = "form-control input-sm", @readonly = "readonly" })
+
+          </div>
+        </div>
+
+        <div class="form-group">
+          @Html.LabelFor(model => model.ApplicationSubmittedBy, "Application Submitted By *", htmlAttributes: new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            @Html.TextBoxFor(model => model.ApplicationSubmittedBy, new { @class = "form-control input-sm" })
+
+          </div>
+        </div>
+
+
+
+        <div class="form-group">
+          <div class="col-sm-4 TextRight">
+            @Html.LabelFor(model => model.FullpensionAmount1, "Pension(Upto Dec, 2003)", htmlAttributes: new { @class = "control-label" })
+            &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Full Pension = (Length of pensionable service)(Month))/600)*(Salary)"></i>
+          </div>
+          <div class="col-sm-8">
+            @Html.TextBoxFor(model => model.FullpensionAmount1, new { @class = "form-control input-sm", @readonly = "readonly" })
+
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-4 TextRight">
+            @Html.LabelFor(model => model.FullpensionAmount2, "Pension(From Jan, 2004)", htmlAttributes: new { @class = "control-label" })
+            &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Full Pension = (Length of pensionable service)(Month))/960)*(Salary)"></i>
+          </div>
+          <div class="col-sm-8">
+            @Html.TextBoxFor(model => model.FullpensionAmount2, new { @class = "form-control input-sm", @readonly = "readonly" })
+
+          </div>
+        </div>
+
+        <div class="form-group ">
+          <div class="col-sm-4 TextRight">
+            &nbsp;@Html.LabelFor(model => model.TotalFullpension, "Total Pension", htmlAttributes: new { @class = "control-label" })
+            <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Total Full Pension which exceeds maximum allowed(12 plus 13)"></i>
+          </div>
+          <div class="col-sm-8">
+            @Html.TextBoxFor(model => model.TotalFullpension, new { @class = "form-control input-sm", @readonly = "readonly" })
+
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-4 TextRight">
+            @Html.LabelFor(model => model.MaxPension, "Maximum Pension", htmlAttributes: new { @class = "control-label" })
+            &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Maximum Full Pension Allowed"></i>
+          </div>
+          <div class="col-sm-8">
+            @Html.TextBoxFor(model => model.MaxPension, new { @class = "form-control input-sm", @readonly = "readonly" })
+
+          </div>
+
+        </div>
+        <div class="form-group">
+          @Html.LabelFor(model => model.ReducedPension, "Reduced Pension", htmlAttributes: new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            @Html.TextBoxFor(model => model.ReducedPension, new { @class = "form-control input-sm", @readonly = "readonly" })
+
+          </div>
+        </div>
+        <div class="form-group">
+          @Html.LabelFor(model => model.Gratuity, "Gratuity", htmlAttributes: new { @class = "col-sm-4 control-label" })
+          <div class="col-sm-8">
+            @Html.TextBoxFor(model => model.Gratuity, new { @class = "form-control input-sm", @readonly = "readonly" })
+
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-4 TextRight">
+            @Html.LabelFor(model => model.GratuityReducedPension, "Discounted Gratuity", htmlAttributes: new { @class = "control-label" })
+            &nbsp;<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="bottom" title="Gratuity Reduced Pension Gratuity Payable(1/4 x Pension Payable at x 12.5)"></i>
+          </div>
+          <div class="col-sm-8">
+            @Html.TextBoxFor(model => model.GratuityReducedPension, new { @class = "form-control input-sm", @readonly = "readonly" })
+
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-md-offset-2 col-md-10">
+            <button type="button" class="btn btn-success" id="btnSaveInfo">Update</button>
+            @Html.ActionLink("Back to List", "Index", "PensionApplications", null, new { @class = "btn btn-primary" })
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+<div class="modal fade in" id="formModal" aria-hidden="false" style="display: none;">
+  <div class="modal-dialog" style="width:85%">
+    <div class="modal-content">
+
+
+      <div id="PartialDiv">
+
+      </div><!-- /.modal-content -->
+
+      <div class="modal-footer">
+        <button class="btn btn-sm btn-success" data-dismiss="modal" aria-hidden="true" onclick="hidePension();">Close</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div class="panel-body" id="deathCase" style="display:none">
+  <table class="table dataTable" id="DeathSurvivor">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>RelationShip</th>
+        <th>Age</th>
+        <th>Pension Amount</th>
+      </tr>
+
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+<script nonce="@ViewBag.StyleNonce">
+
+  if ($("#EditAllowed").val() == "No")
+  {
+    $("#btnSaveInfo").prop("disabled", "disabled");
+    toasterErrorMessage("Application cannot be edited as it has already been approved.");
+  }
+
+
+  function deathbind() {
+    var id = $("#PersonID").val();
+    var pensionAmount = $("#TotalFullpension").val();
+    if (id != "" && pensionAmount != "") {
+      var oTable = $('#DeathSurvivor').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bServerSide": true,
+        "bDestroy": true,
+        "sAjaxSource": "@Url.Action("DeathDependantAjax", "PensionApplications")?Id=" + id + "&PensionAmount=" + pensionAmount,
+        "aoColumns": [
+
+    { "sName": "Name" },
+  {
+    "sName": "RelationShip",
+    "bSearchable": false,
+    "bSortable": false,
+    "fnRender": function (oObj) {
+      if (oObj.aData[1] != "C")
+        return '<span > Spouse </span>';
+      else
+        return '<span >Child</span>';
+    }
+  },
+  { "sName": "Age" },
+  {
+    "sName": "PensionAmount",
+    "fnRender": function (oObj) {
+      return '<span class="auto">' + oObj.aData[3] + ' </span>';
+    }
+  }
+
+  ]
+  })
+  }
+  }
+  $(document).ajaxStop(function () {
+    $(".auto").autoNumeric({ aSep: ',', aDec: '.' });
+  });
+  function DisableContrls() {
+    $(".disableCon").each(function () {
+      $(this).prop("disabled", "disabled");
+    });
+    return false;
+  }
+  $("#btnSaveInfo").click(function () {
+    $(".disableCon").each(function () {
+      $(this).prop("disabled", false);
+    });
+    $("#form1").submit();
+  })
+
+  $(function () {
+    DisableContrls();
+    if ($("#DeathInjuryNormal").val() == "D") {
+      $("#injuryOrDeath").prop('checked', true);
+    }
+
+    $('select').select2({
+      placeholder: "---Select---",
+      allowClear: true
+    });
+    var date = new Date();
+    var end = (date.getMonth() + 1) + "/" + date.getDate() + "/" + (date.getFullYear());
+    $('#Retire').datepicker({
+      //endDate: end,
+      endDate: end,
+      //startDate: end,
+      startView: 1,
+      format: "mm/dd/yyyy",
+      autoclose: true
+    });
+
+  })
+
+  $("#EmployerID").change(function () {
+    var eid = $(this).val();
+    $("#PersonID").select2("val", "");
+    $("#PersonID").empty();
+    $('#PersonID').append($('<option/>').attr("value", "").text("---Select---"));
+    clearall();
+    if (eid != "") {
+      $.ajax({
+        type: 'Get',
+        url: '/PensionApplications/GetPensioner?EmpId=' + eid,
+        dataType: 'json'
+      }).done(function (result) {
+        $.each(result, function (i, names) {
+          $('#PersonID').append($('<option/>').attr("value", names.Value).text(names.Text));
+
+        });
+      });
+    }
+  });
+
+  $("#PersonID").change(function () {
+    var PersonID = $(this).val();
+    if (PersonID != "") {
+      $.ajax({
+        url: "@Url.Action("GetPost", "PensionApplications")?Id=" + PersonID,
+        type: 'Get',
+        dataType: 'json'
+      }).done(function (result) {
+        debugger
+        clearall();
+        if (result.SalaryAmount != 0 && result.DateOfBirth != null && result.FirstAppointmentDate != null) {
+          var exp = $("#expectedRet").val();
+          $("#RetirementOrResignationDate").val(exp);
+          $("#DateofAppointment1st").val(result.FirstAppointmentDate);
+          $("#DOB").val(result.DateOfBirth);
+          $("#RetirementAnnualSalary1").val(result.SalaryAmount.toFixed(2));
+          $("#DesignationId").select2("val", result.DesignationId);
+          var date = new Date();
+          var cdate = (date.getMonth() + 4) + "/" + date.getDate() + "/" + (date.getFullYear());
+          var eDate = new Date(cdate);
+          var bdate = new Date(result.ExpectedRetirement);
+          if (bdate < eDate) {
+            $('#Retire').datepicker('setEndDate', result.ExpectedRetirement);
+          }
+          else {
+            $('#Retire').datepicker('setEndDate', eDate);
+          }
+        }
+        else {
+          toasterErrorMessage("Details for this Contributor are not completed...Complete it First");
+          clearall();
+        }
+      });
+    }
+  })
+
+  $("#RetirementOrResignationDate").on('change', function () {
+    debugger
+    var retirementOrResignationDate = $(this).val();
+    if (retirementOrResignationDate != "") {
+      var personID = $("#PersonID").val();
+      $.ajax({
+        url: "@Url.Action("CalculatePublicPensionDetails", "PensionApplications")?RetirementOrResignationDate=" + retirementOrResignationDate + "&PersonID=" + parseInt(personID),
+        type: 'Get',
+        dataType: 'json'
+      }).done(function (result) {
+        if (result.error != "" && result.error != null) {
+          toasterErrorMessage(result.error);
+        }
+        else {
+          $("#LengthOfQualifyingServiceInMonthsFrom1Jan2014").val(result.LengthOfQualifyingServiceInMonthsFrom1Jan2014);
+          $("#LengthOfQualifyingServiceInMonthsTo31Dec2003").val(result.LengthOfQualifyingServiceInMonthsTo31Dec2003);
+          $("#TotalFullpension").val(result.FullPension);
+          $("#MaxPension").val(result.MaxPension);
+          $("#Gratuity").val(result.Gratuity);
+          //$("#RetirementAnnualSalary2").val(result.SalaryAmount);
+          $("#RetirementAnnualSalary1").val(result.SalaryAmount);
+          $("#FullpensionAmount1").val(result.FullPension1);
+          $("#FullpensionAmount2").val(result.FullPension2);
+          $("#GratuityReducedPension").val(result.DiscountedGratuity);
+          $("#ReducedPension").val(result.ReducedPension);
+          if ($("#DeathInjuryNormal").val() == "D") {
+            $("#deathCase").show();
+            deathbind();
+          }
+
+        }
+      })
+    }
+    else {
+      toasterErrorMessage("Select Resignation Date");
+    }
+  })
+
+  $("#BenefitTypes").on('change', function () {
+    if ($("#BenefitTypes").val() != "") {
+      $("#PensionableStatus").prop("checked", true);
+    }
+    else {
+      $("#PensionableStatus").prop("checked", false);
+    }
+  })
+  $("#PensionableStatus").on('click', function (ev) {
+    ev.preventDefault();
+  })
+  function clearall() {
+    $("#DateofAppointment1st").val("");
+    $("#DateofAppointmentLast").val("");
+    $("#DOB").val("");
+    $("#RetirementAnnualSalary1").val("");
+    $('#DesignationId').select2('val', '');
+    $("#LengthOfQualifyingServiceInMonthsFrom1Jan2014").val("");
+    $("#LengthOfQualifyingServiceInMonthsTo31Dec2003").val("");
+    $("#TotalFullpension").val("");
+    $("#MaxPension").val("");
+    $("#Gratuity").val("");
+    $("#RetirementAnnualSalary2").val("");
+    $("#FullpensionAmount1").val("");
+    $("#FullpensionAmount2").val("");
+    $("#ApplicationSubmittedBy").val("");
+    $("#GratuityReducedPension").val("");
+    $("#ReducedPension").val("");
+    $("#RetirementOrResignationDate").val("");
+    //$("#expectedRet").val("");
+  }
+
+  function retireWithin3Month() {
+    var employerId = $("#EmployerID").val();
+    if (employerId != "") {
+      $.get('@Url.Action("_ContributorDetails", "PensionApplications")', function (data) {
+        $('#PartialDiv').html(data);
+        contributorbind();
+        $("#formModal").show();
+      })
+    }
+    else {
+      toasterErrorMessage("Please Select Employer");
+    }
+  }
+  function contributorbind() {
+    var employerId = $("#EmployerID").val();
+    var oTable = $('#example').dataTable({
+      "bJQueryUI": true,
+      "sPaginationType": "full_numbers",
+      "bServerSide": true,
+      "bDestroy": true,
+      "sAjaxSource": "/PensionApplications/ContributorAjaxHandler/?Id=" + employerId,
+      "aoColumns": [
+      { "sName": "PersonID" },
+      { "sName": "FullName" },
+      { "sName": "EmployerName" },
+      { "sName": "SocialSecurityNumber" },
+      {
+        "sName": "Gender",
+        "bSearchable": false,
+        "bSortable": false,
+        "fnRender": function (oObj) {
+          if (oObj.aData[4] != "M")
+            return '<span > Female </span>';
+          else
+            return '<span >Male</span>';
+        }
+      },
+      { "sName": "DateOfBirth" },
+      { "sName": "Mobile" },
+      { "sName": "ExpectedRetirementDate" },
+      {
+        "sName": "ID",
+        "bSearchable": false,
+        "bSortable": false,
+        "fnRender": function (oObj) {
+
+          var strString = '<a href="javascript:AutoSelectContributor(' + oObj.aData[8] + ');" class="btn btn-xs btn-success" title="Select"><i class="fa fa-list"></i></a>';
+
+          return strString;
+        }
+      }
+      ]
+    });
+  }
+
+  function AutoSelectContributor(Id) {
+    $("#formModal").hide();
+    $("#PersonID").select2("val", Id);
+
+  }
+  function hidePension() {
+    $("#formModal").hide();
+  }
+
+  function dobind() {
+    var id = $("#hdDocumentId").val();
+    var eid = $("#EmployerID").val();
+    var pid = $("#PersonID").val();
+    var ret = $("#RetirementOrResignationDate").val();
+    var fdate = $("#DateofAppointment1st").val();
+    var oTable = $('#exampless').dataTable({
+      "bJQueryUI": true,
+      "sPaginationType": "full_numbers",
+      "bServerSide": true,
+      "bDestroy": true,
+      "sAjaxSource": "@Url.Action("EditDetailSearchAjax", "PensionApplications")?EId=" + eid + "&PId=" + pid + "&ret=" + ret + "&fdate=" + fdate + "&id=" + id,
+      "aoColumns": [
+
+  { "sName": "JKPSID" },
+  { "sName": "Month" },
+  { "sName": "Year" },
+  { "sName": "SystemSalary" },
+  { "sName": "SystemContributorContribution" },
+  { "sName": "SystemEmployerContribution" },
+  { "sName": "Salary" },
+  { "sName": "ContributorContribution" },
+  { "sName": "EmployerContribution" }
+
+      ]
+    }).rowGrouping({
+      bExpandableGrouping: false,
+      iGroupingColumnIndex: 2,
+      bHideGroupingColumn: true
+
+    });
+  }
+  function showDetails(id) {
+    $("#hdDocumentId").val(id);
+    debugger
+    if ($("#LengthOfQualifyingServiceInMonthsTo31Dec2003").val() != "" || $("#LengthOfQualifyingServiceInMonthsTo31Dec2003").val().length > 0) {
+      $.get('@Url.Action("_serviceLengthContribution", "PensionApplications")', function (data) {
+        $('#PartialDiv').html(data);
+        dobind();
+        $("#formModal").show();
+      })
+
+    }
+  }
+
+
+
+</script>

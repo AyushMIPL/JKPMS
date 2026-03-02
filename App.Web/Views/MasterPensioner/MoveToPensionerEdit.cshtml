@@ -1,0 +1,296 @@
+﻿@model App.Data.Entities.MasterContributor
+
+@{
+    ViewBag.Title = "ContributorDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+            Move Contributor to Pensioner
+
+            @*<ul class="tool-bar">
+
+                </ul>*@
+        </h4>
+    </div>
+    <div class="panel-body">
+        @using (Html.BeginForm("MoveToPensionerEdit", "MasterPensioner", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary("", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.Id)
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.PersonID, new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.PersonID, new { @class = "form-control input-sm", placeholder = "PersonID", @readonly = "readonly" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.NationalityID, "Pensioner Type", new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.DropDownList("PensionerTypeID", null, htmlAttributes: new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.FullName, "Name", new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.FullName, new { @class = "form-control input-sm", placeholder = "Enter Full Name Here" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Employer.EmployerName, "Employer Name", new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.DropDownList("EmployeeID", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Gender, new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(m => m.Gender, new { @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.DateOfBirth, "Date Of Birth", new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8" id="date">
+                            <div class="input-group date">
+                                @Html.EditorFor(m => m.DateOfBirth, new { @class = "form-control", placeholder = "Date Of Birth" })
+
+                                <span class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Mobile, new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control input-sm", placeholder = "Enter Mobile Here" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Phone, new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.Phone, new { @class = "form-control input-sm", placeholder = "Enter Phone Here" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.PhoneOffice, new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.PhoneOffice, new { @class = "form-control input-sm", placeholder = "Enter PhoneOffice Here" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Email, new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control input-sm", placeholder = "Enter Email Here" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SalaryAmount, new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.SalaryAmount, new { @class = "form-control input-sm", placeholder = "Enter Salary Here" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Country.CountryCode, new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.Country.CountryCode, new { @class = "form-control input-sm", placeholder = "Enter CountryCode Here" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Employer.UniqueID, new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.Employer.UniqueID, new { @class = "form-control input-sm", placeholder = "Enter EmployerId Here" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Nationality.Name, new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.Nationality.Name, new { @class = "form-control input-sm", placeholder = "Enter Nationality Here" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.PermanentCity.Name, new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @*@Html.TextBoxFor(m => m.PermanentCity.Name, new { @class = "form-control input-sm", placeholder = "Enter PermanentCity Here" })*@
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Prefix.Name, "Prefix", new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.Prefix.Name, new { @class = "form-control input-sm", placeholder = "Enter Prefix Here" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Suffix.Name, "Suffix", new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.Suffix.Name, new { @class = "form-control input-sm", placeholder = "Enter Suffix Here" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SocialSecurityNo, new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.SocialSecurityNo, new { @class = "form-control input-sm", placeholder = "Enter SocialSecurityNo Here" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.PermanentAddress, new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.PermanentAddress, new { @class = "form-control input-sm", placeholder = "Enter PermanentAddress Here" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.PostalAddress, new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.PostalAddress, new { @class = "form-control input-sm", placeholder = "Enter PostalAddress Here" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.MasterPFRate.Name, new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.MasterPFRate.Name, new { @class = "form-control input-sm", placeholder = "Enter PF For Here" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.MasterPFRate.PFRate, new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.MasterPFRate.PFRate, new { @class = "form-control input-sm", placeholder = "Enter PF(%) Here" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ExpectedRetirementDate, "Expected Retirement Date", new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            <div class="input-group date">
+                                @Html.EditorFor(m => m.ExpectedRetirementDate, new { @class = "form-control", placeholder = "Expected Retirement Date" })
+
+                                <span class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.RetirementOrResignationDate, new { @class = "col-sm-4 control-label" })
+                        <div class="col-sm-8">
+                            <div class="input-group date" id="Retire">
+                                @Html.EditorFor(model => model.RetirementOrResignationDate, new { @placeholder = "Retirement Or Resignation Date" })
+                                <span class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="form-group">
+                          @Html.LabelFor(model => model.DirDept, "Direct Deposit", htmlAttributes: new { @class = "control-label col-lg-4" })
+                          <div class="col-sm-8">
+                            @Html.DropDownList("DirDept", null, "---Select---", htmlAttributes: new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.DirDept, "", new { @class = "text-danger" })
+                          </div>
+                        </div>*@
+                    <div class="form-group">
+                        <label for="IsActive" class="col-sm-4 control-label">Status:</label>
+                        <div class="col-sm-8">
+                            <div class="checkbox">
+                                @Html.CheckBoxFor(m => m.IsActive, new { @class = "form-control input-sm" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label"></label>
+                        <div class="panel-footer col-sm-8">
+                            <button type="button" class="btn btn-success" onclick="confirmMove( @Model.Id)"><i class="fa fa-share fa-lg"></i> Move</button>
+                            <a href="/MasterPensioner/ActiveContributorIndex" class="btn btn-primary"><i class="fa fa-reply"> </i> Back to List</a>
+                            @*@Html.ActionLink("Back to List", "ActiveContributorIndex", "MasterPensioner", null, new { @class = "btn btn-primary" })*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+@section scripts{
+    <script nonce="@ViewBag.StyleNonce">
+        $(".input-sm").each(function () {
+            $(this).prop("disabled", "disabled");
+        });
+
+
+        $("#ExpectedRetirementDate").attr("readonly", true);
+        $("#DateOfBirth").attr("readonly", true);
+        function confirmMove(Id) {
+            $("#hdDocumentId").val(Id);
+            $('#MoveConfirm').popup("show");
+        }
+        function onMoveConfirm() {
+            var id = $("#hdDocumentId").val();
+            var resignationDate = $("#RetirementOrResignationDate").val();
+            var employerID = $('#EmployeeID').val();
+            var personId = $("#PersonID").val();
+            $.ajax({
+                url: "@Url.Action("checkApplicationPendingAjax", "MasterPensioner")?Id=" + id,
+                type: "Get",
+                async: false,
+            }).done(function (result) {
+                debugger
+                if (result == "1") {
+                    toasterErrorMessage("Refund/Pension Application is already in process.");
+                    $('#MoveConfirm').popup("hide");
+                }
+                else {
+                    if (resignationDate != "" && employerID != "" && employerID != "undefined") {
+                        $.ajax({
+                            url: "@Url.Action("Create", "MasterPensioner")?Id=" + id + "&ResignationDate=" + resignationDate + "&actPayrollDepartmentKeyValue=" + employerID,
+                            type: "Get",
+                            async: false,
+                        }).done(function (result) {
+                            debugger
+                            if (result > 0) {
+                                window.location.href = "@Url.Action("Edit","MasterPensioner")?Id=" + result;
+                            }
+                            else {
+                                toasterErrorMessage(result);
+                                $('#MoveConfirm').popup("hide");
+                            }
+
+                        })
+                    }
+                    else {
+                        if (employerID == "")
+                            toasterErrorMessage("Please Select Employer");
+                        else
+                            toasterErrorMessage("Please Enter Retirement or Resignation Date");
+
+                        $('#MoveConfirm').popup("hide");
+                    }
+                }
+
+            })
+
+
+        }
+
+        function onMoveCancel() {
+            $('#MoveConfirm').popup("hide");
+        }
+
+        var date = new Date();
+        var dob = (date.getMonth() + 1) + "/" + date.getDate() + "/" + (date.getFullYear());
+        $('#Retire').datepicker({
+            endDate: dob,
+            //startDate: end,
+            startView: 1,
+            format: "mm/dd/yyyy",
+            autoclose: true
+        });
+
+    </script>
+}
+

@@ -1,0 +1,61 @@
+﻿Content-Type: text/html; charset=utf-8
+<img style="text-align:center" src="~/Images/JKPSLogo.jpg" />
+<p class="p-top-xs">Dear @ViewBag.Name,</p>
+<br />
+@if (ViewBag.Status == "NewApplication")
+{
+  <p class="p-top-xs">
+    Thank you for applying Refund application to Public Service Pension Fund Office, Anguilla. Your application is being processed and will inform you via email once it will be approved or rejected.
+  </p>
+  <br />
+
+}
+else if (ViewBag.Status == "ApplicationApproved")
+{
+  <p class="p-top-xs">
+    Greetings from Public Service Pension Fund Office, Anguilla.
+  </p>
+  <p class="p-top-xs">
+    We are pleased to inform you that your Refund application has been approved.
+  </p>
+  <br />
+  @*<p class="p-top-xs">
+      Sincerely,
+      Public Service Pension Fund Office, Anguilla
+      This is an auto generated e-mail. Please do not reply.
+    </p>*@
+}
+else if (ViewBag.Status == "ApplicationRejected")
+{
+  <p class="p-top-xs">
+    Greetings from Public Service Pension Fund Office, Anguilla.
+  </p>
+  <p class="p-top-xs">
+    We are inform you that your Refund application has been rejected due to some reason.  For further query please contact to Public Service Pension Fund.
+  </p>
+  <br />
+  @*<p class="p-top-xs">
+      Sincerely,
+      Public Service Pension Fund Office, Anguilla
+      This is an auto generated e-mail. Please do not reply.
+    </p>*@
+}
+else
+{
+  <p class="p-top-xs">There is an Upcoming @ViewBag.Status</p>
+  <br />
+  <p class="p-top-xs">@Html.Action("_PrintRefundApplication", "PaymentAndRefund", new { id = ViewBag.id })</p>
+}
+@*<p class="p-top-xs">Thanks,</p>
+  <p class="p-top-xs">JKPS Management</p>*@
+<p class="p-top-xs">
+  Sincerely,
+</p>
+<p class="p-top-xs">
+  Public Service Pension Fund Office, Anguilla
+</p>
+<p class="p-top-xs">
+  This is an auto generated e-mail. Please do not reply.
+</p>
+
+

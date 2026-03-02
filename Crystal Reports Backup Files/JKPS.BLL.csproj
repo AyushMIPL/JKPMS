@@ -1,0 +1,298 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E78CEFF6-49F8-46E1-8E8B-1E8A2DF4D0DF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>JKPS.BLL</RootNamespace>
+    <AssemblyName>JKPS.BLL</AssemblyName>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Autofac, Version=2.6.1.841, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\BaseCommon.1.0.0\lib\Autofac.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Castle.Core, Version=3.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\packages\BaseCommon.1.0.0\lib\Castle.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CrystalDecisions.Windows.Forms, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
+    <Reference Include="IBM.Data.IfxTrace, Version=2.81.0.0, Culture=neutral, PublicKeyToken=7c307b91aa13d208">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Users\mipl-0105\Desktop\IBM.Data.IfxTrace.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\BaseCommon.1.0.0\lib\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LogES4Net, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LogES4Net.dll.1.0.0\lib\net20\LogES4Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BLLAccountbalancesstxchrtd.cs" />
+    <Compile Include="BLLAccountVerification.cs" />
+    <Compile Include="BLLConExceptions.cs" />
+    <Compile Include="BLLMedia_Queue.cs" />
+    <Compile Include="BLLMediaDownloads.cs" />
+    <Compile Include="BLLAPCheckProcessingDetailStpcashd.cs" />
+    <Compile Include="BLLAPCheckProcessingStpcashe.cs" />
+    <Compile Include="BLLAPVendorInformation.cs" />
+    <Compile Include="BLLAPVenTerms.cs" />
+    <Compile Include="BLLBankCodesMasterBanks.cs" />
+    <Compile Include="BLLDeductionAnalysis.cs" />
+    <Compile Include="BLLDirectDepositMedia.cs" />
+    <Compile Include="BLLEmployeeInfoLogEmpupdlog.cs" />
+    <Compile Include="BLLEmployeeWorkHr.cs" />
+    <Compile Include="BLLEmployeeWorkHrDetails.cs" />
+    <Compile Include="BLLEmpPayDates.cs" />
+    <Compile Include="BLLEmpTypLogEmpsaltyplog.cs" />
+    <Compile Include="BLLGeneralLedger.cs" />
+    <Compile Include="BLLIncomeStatements.cs" />
+    <Compile Include="BLLLineTypestultypr.cs" />
+    <Compile Include="BLLPayrollChecksJournal.cs" />
+    <Compile Include="BLLPayRollSocSecRpt.cs" />
+    <Compile Include="BLLFlexSegCommon.cs" />
+    <Compile Include="BLLGeneratePaySlipDetails.cs" />
+    <Compile Include="BLLLockMonitoring.cs" />
+    <Compile Include="BLLPayEmployeeTypes.cs" />
+    <Compile Include="BLLPayrollAutopay.cs" />
+    <Compile Include="BLLPayrollFunctions.cs" />
+    <Compile Include="BLLPayUpdateTimeCard.cs" />
+    <Compile Include="BLLPRBankMediaInybankd.cs" />
+    <Compile Include="BLLPRDeductionCodesStydedcr.cs" />
+    <Compile Include="BLLPREmployeeDeductionCodesAndRateDetailStyempdd.cs" />
+    <Compile Include="BLLMasterEmpBankDetails.cs" />
+    <Compile Include="BLLPREmployeeIncomeCodeAndRateDetailStyempid.cs" />
+    <Compile Include="BLLPREmployeeObligationCodesAndRateDetailStyempod.cs" />
+    <Compile Include="BLLPREmployeePositionHistoryInyemppd.cs" />
+    <Compile Include="BLLPREmpTypeDeductionStytypdd.cs" />
+    <Compile Include="BLLPREmpTypeIncomeStytypid.cs" />
+    <Compile Include="BLLPREmpTypeObligationStytypod.cs" />
+    <Compile Include="BLLPrintAnalysisSummary.cs" />
+    <Compile Include="BLLPrintChk.cs" />
+    <Compile Include="BLLPRObligationCodesStyoblcr.cs" />
+    <Compile Include="BLLPRUpdateTaxTables.cs" />
+    <Compile Include="BLLPurchasingDefaults.cs" />
+    <Compile Include="BLLPYBatchProcessDetailStybatchd.cs" />
+    <Compile Include="BLLPYBatchProcessStybatchr.cs" />
+    <Compile Include="BLLPyPostException.cs" />
+    <Compile Include="BLLQuarterly941Report.cs" />
+    <Compile Include="BLLQueryAnalyzer.cs" />
+    <Compile Include="BLLRequestorInfoSturqsor.cs" />
+    <Compile Include="BLLRequisitionTypeStureqtyp.cs" />
+    <Compile Include="BLLRequistionDefaults.cs" />
+    <Compile Include="BLLRequitions.cs" />
+    <Compile Include="BLLSalaryCategory.cs" />
+    <Compile Include="BLLSalaryCode.cs" />
+    <Compile Include="BLLSalesRegister.cs" />
+    <Compile Include="BLLScreenInfo.cs" />
+    <Compile Include="BLLScreenNotesStxnoted.cs" />
+    <Compile Include="BLLsecusrmdlothrol.cs" />
+    <Compile Include="BLLsecusrmdlwsirol.cs" />
+    <Compile Include="BLLTBComparisionReport.cs" />
+    <Compile Include="BLLtblusrqueries.cs" />
+    <Compile Include="BLLTBSchemes.cs" />
+    <Compile Include="BLLTBtbrecd.cs" />
+    <Compile Include="BllTest.cs" />
+    <Compile Include="BLLUpdateBankCode.cs" />
+    <Compile Include="BLLUpdateSalaryPositions.cs" />
+    <Compile Include="BLLUpdateServiceType.cs" />
+    <Compile Include="BLLUpdateTimeCard.cs" />
+    <Compile Include="BLLUpdateVoidChecks.cs" />
+    <Compile Include="BLLUpdDailyExRates.cs" />
+    <Compile Include="BLLUpdKitDef.cs" />
+    <Compile Include="BLLUpdKitDefD.cs" />
+    <Compile Include="BLLUpdPeriodExchangeRate.cs" />
+    <Compile Include="BLLDuplicateDirectDepositMedia.cs" />
+    <Compile Include="BLLMailHistory.cs" />
+    <Compile Include="BLLProcessHolidayPayCal.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="PostingBLL\BLLCheckSelectedPayroll.cs" />
+    <Compile Include="BLLAccountingLiberary.cs" />
+    <Compile Include="BLLActivityLog.cs" />
+    <Compile Include="BLLChangePwd.cs" />
+    <Compile Include="BLLCommonUtilities.cs" />
+    <Compile Include="BLLFeedBack.cs" />
+    <Compile Include="BLLFlexkeyValueSegmentDefinition.cs" />
+    <Compile Include="BLLFrmSize.cs" />
+    <Compile Include="BLLGeneralLibrary.cs" />
+    <Compile Include="BLLGLSetupWarrantEntry.cs" />
+    <Compile Include="BLLJournalEntry.cs" />
+    <Compile Include="BLLAccountGroups.cs" />
+    <Compile Include="BLLApprovalSystemUserInfo.cs" />
+    <Compile Include="BLLBatchMaintenance.cs" />
+    <Compile Include="BLLMasterEmployee.cs" />
+    <Compile Include="BLLFlxsegView.cs" />
+    <Compile Include="BLLGLAccountTypeMaintenance.cs" />
+    <Compile Include="BLLCompanyView.cs" />
+    <Compile Include="BLLFlexSegment.cs" />
+    <Compile Include="BLLGLSegment.cs" />
+    <Compile Include="BLLGLTrialBalance.cs" />
+    <Compile Include="BLLGLUpdateAccountSubGroups.cs" />
+    <Compile Include="BLLMisc.cs" />
+    <Compile Include="BLLOSCheckingAccount.cs" />
+    <Compile Include="BLLPayableListingDetailStpinvcd.cs" />
+    <Compile Include="BLLPayableListingStpinvce.cs" />
+    <Compile Include="BLLSecAccountRanges.cs" />
+    <Compile Include="BLLSecCompany.cs" />
+    <Compile Include="BLLSecRoleModule.cs" />
+    <Compile Include="BLLSecRoles.cs" />
+    <Compile Include="BLLSecModule.cs" />
+    <Compile Include="BLLSecUserModule.cs" />
+    <Compile Include="BLLSecUsers.cs" />
+    <Compile Include="BLLTenderInttendr.cs" />
+    <Compile Include="BLLUpdateAccrualCode.cs" />
+    <Compile Include="BLLUpdateIncomeCodes.cs" />
+    <Compile Include="BLLUpdatePayableDefaults.cs" />
+    <Compile Include="BLLUpdPayDefault.cs" />
+    <Compile Include="ExceptionUtilities.cs" />
+    <Compile Include="HelpProvider.cs" />
+    <Compile Include="MailingUtilities.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReportingUtilities.cs" />
+    <Compile Include="BLLUpdatePayrollEntries.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Accounting Lib\" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Log4Net.config" />
+    <None Include="packages.config" />
+    <None Include="Scripts\jquery-3.7.1.min.map" />
+    <None Include="Scripts\jquery-3.7.1.slim.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Scripts\jquery-3.7.1.intellisense.js" />
+    <Content Include="Scripts\jquery-3.7.1.js" />
+    <Content Include="Scripts\jquery-3.7.1.min.js" />
+    <Content Include="Scripts\jquery-3.7.1.slim.js" />
+    <Content Include="Scripts\jquery-3.7.1.slim.min.js" />
+    <Content Include="Scripts\nugetexample.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\App.Data\App.Data.csproj">
+      <Project>{3FC755EA-44DA-4277-807E-FAB3665A0896}</Project>
+      <Name>App.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ExceptionManagement\ExceptionManagement.csproj">
+      <Project>{5fbac76f-433e-4cd2-9aa1-ab1c2f756d90}</Project>
+      <Name>ExceptionManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JKPS.COMMON\JKPS.COMMON.csproj">
+      <Project>{8fe1d688-c17a-4189-a44c-8e9eb08df512}</Project>
+      <Name>JKPS.COMMON</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JKPS.DL\JKPS.DL.csproj">
+      <Project>{cfee4d4f-f11d-43ae-a3ea-06320086d9a8}</Project>
+      <Name>JKPS.DL</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
