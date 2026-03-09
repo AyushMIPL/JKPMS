@@ -39,6 +39,7 @@ using System.Threading.Tasks;
 using Microsoft.Ajax.Utilities;
 using System.Drawing;
 using System.Web.Hosting;
+using ClosedXML.Excel;
 
 namespace App.Web.Controllers
 {
@@ -3215,7 +3216,6 @@ namespace App.Web.Controllers
 
                 // File path, attampt, dealy in attampt
                 bool isExist = Helper.Helper.FileCheckInFTP(path, 3, 30);
-
                 if (isExist)
                 {
                     // Download the file from the FTP server
@@ -3232,9 +3232,6 @@ namespace App.Web.Controllers
                     var directoryNames = regions == "KASHMIR REGION" ? "K_Disbursement" : "J_Disbursement";
                     //string serverMapPath = Server.MapPath($"~/BankMediaFile/{directoryNames}");
                     string serverMapPath = Helper.Helper.GetAllFilesPath(region, directoryNames);
-
-
-
 
                     //string serverMapPath = Server.MapPath("~/BankMediaFile/JK_Disbursement");
                     if (!Directory.Exists(serverMapPath))
@@ -3256,11 +3253,26 @@ namespace App.Web.Controllers
                     FileHelper fileHelper = new FileHelper();
                     bool isFileDeleted = fileHelper.TryDeleteFile(excelFilePath);
 
-                    Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
-                    Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(csvFilePath);
-                    wb.SaveAs(excelFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlOpenXMLWorkbook);
-                    wb.Close(false);
-                    app.Quit();
+                    //Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
+                    //Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(csvFilePath);
+                    //wb.SaveAs(excelFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlOpenXMLWorkbook);
+                    //wb.Close(false);
+                    //app.Quit();
+                    var workbook = new XLWorkbook();
+                    var worksheet = workbook.Worksheets.Add("Sheet1");
+
+                    string[] lines = System.IO.File.ReadAllLines(csvFilePath);
+
+                    for (int i = 0; i < lines.Length; i++)
+                    {
+                        string[] values = lines[i].Split(',');
+                        for (int j = 0; j < values.Length; j++)
+                        {
+                            worksheet.Cell(i + 1, j + 1).Value = values[j];
+                        }
+                    }
+
+                    workbook.SaveAs(excelFilePath);
 
                     // delete file in safe way
                     bool isCsvFileDeleted = fileHelper.TryDeleteFile(csvFilePath);
@@ -3275,7 +3287,7 @@ namespace App.Web.Controllers
 
                     //string uploadformattedName = $"{distict_value}_{batch_value}_{DateTime.Now.ToString("yyyyMMdd_HHmmss")}_JK_Disbursement.xlsx";
 
-                    var ftpAndStpWritePath= UploadDisbursementFile(path, uploadformattedName);
+                    var ftpAndStpWritePath = UploadDisbursementFile(path, uploadformattedName);
                     //A/var ftpAndStpWritePath= UploadDisbursementFile(excelFilePath, uploadformattedName);
 
 
@@ -3314,9 +3326,13 @@ namespace App.Web.Controllers
                     parameters[19] = filesize;  // File Size
 
                     objDalBaseClass.ExecuteProcedure(ref parameters, "SaveMediaQueueDetail");
-
+                    //return Json("File has been successfully saved.");
+                    return Json(ftpAndStpWritePath);
                 }
-                return Json("File has been successfully saved.");
+                else {
+                    return Json($"File does not exist on path '{path}'.");
+                }
+                    
             }
             catch (Exception ex)
             {
@@ -4401,7 +4417,7 @@ namespace App.Web.Controllers
 
         private string UploadDisbursementFile(string excelFilePath, string formattedName)
         {
-
+            string fileReturn = "";
             try
             {
                 Dictionary<string, string> ftpSetting = Helper.Helper.GetFTPSetting();
@@ -4437,7 +4453,7 @@ namespace App.Web.Controllers
                     }
                     FtpWebResponse ftpResponse = (FtpWebResponse)ftpRequest.GetResponse();
                     ftpResponse.Close();
-                    return ftpServerUrl;
+                    fileReturn = ftpServerUrl;
                 }
                 else
                 {
@@ -4451,14 +4467,14 @@ namespace App.Web.Controllers
                         string localfilepathSFTP = Server.MapPath("~/"+ ftpSetting["sftpPrivateKeyPath"]);
 
                         var nn = Path.Combine(remoteDirectory, formattedName);
-                        //var keyFile = new PrivateKeyFile(ftpSetting["sftpPrivateKeyPath"]);
-                        var keyFile = new PrivateKeyFile(localfilepathSFTP);
-                        var keyFiles = new[] { keyFile };
-                        var methods = new List<AuthenticationMethod>
-            {
-                new PasswordAuthenticationMethod(username, password),
-                new PrivateKeyAuthenticationMethod(username, keyFiles)
-            };
+                            //var keyFile = new PrivateKeyFile(ftpSetting["sftpPrivateKeyPath"]);
+                            var keyFile = new PrivateKeyFile(localfilepathSFTP);
+                            var keyFiles = new[] { keyFile };
+                            var methods = new List<AuthenticationMethod>
+                        {
+                            new PasswordAuthenticationMethod(username, password),
+                            new PrivateKeyAuthenticationMethod(username, keyFiles)
+                        };
 
                         // Create a new connection info with public key authentication
                         ConnectionInfo connectionInfo = new ConnectionInfo(host, port, username, methods.ToArray());
@@ -4501,14 +4517,16 @@ namespace App.Web.Controllers
                         // Disconnect from the SFTP server
                         sftpClient.Disconnect();
                         }
-                        return Path.Combine(remoteDirectory, formattedName);
-                   
+                        fileReturn = Path.Combine(remoteDirectory, formattedName);
+                    //fileReturn = "File sent!";
+
                 }
             }
             catch (Exception ex)
             {
                 throw;
             }
+            return fileReturn;
             //return fileSizeInKB;
         }
         // Old function to create text file and download
