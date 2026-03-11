@@ -176,6 +176,24 @@
   </div>
 </div>
 
+@* Password Confirmation Modal *@
+<div class="custom-popup width-100 confirmClass display_none" id="passwordConfirmPopup">
+  <div class="padding-md">
+    <h4 class="m-top-none">Password Verification</h4>
+    <p>Please enter your password to proceed with the disbursement.</p>
+    <div class="form-group">
+      <label for="txtConfirmPassword">Password</label>
+      <input type="password" class="form-control" id="txtConfirmPassword" placeholder="Enter your password" autocomplete="off" />
+    </div>
+    <div id="passwordError" class="text-danger" style="display:none; font-size:14px; margin-top:5px;"></div>
+  </div>
+  <div class="text-center">
+    <a type="button" class="btn btn-success px-5 height display_none" id="btn_password_loading"><i class="fa fa-spinner fa-spin"></i> Verifying</a>
+    <a class="btn btn-success m-right-sm" id="btnSubmitPassword">Submit</a>
+    <a class="btn btn-danger" id="btnCancelPassword">Cancel</a>
+  </div>
+</div>
+
 @if (currentMonthBatchDetail != null)
 {
   <div class="panel panel-default">
@@ -437,7 +455,9 @@ var startDate = new Date(parseInt(financialYear),3,1);
             DirectGenerateBankMediaDistricts.forEach(function (item, index) {
 
               if (document.getElementById(item) != null && document.getElementById(item) != undefined) {
-                document.getElementById(item).addEventListener("click", function () {
+                document.getElementById(item).addEventListener("click", function (e) {
+                  e.preventDefault();
+                  e.stopPropagation();
                   DirectGenerateBankMedia(this, item);
                 });
               }
@@ -518,18 +538,18 @@ var startDate = new Date(parseInt(financialYear),3,1);
                 //buttonHtml = buttonHtml + '<button href="#" disable class="btn btn-info btn-xs" title="Download File" id="Download_' + District + '"> <i class="fa fa-arrow-down" aria-hidden="true"></i></button>';
                 if (buttonHtml1 == "True") {
                   if ('@IsGeneratePensionWithoutSftp' == "False") {
-                    buttonHtml = buttonHtml + '<button href="#" disable class="btn btn-info btn-xs" id="' + District + '">Send Disbursement <i class="fa fa-cloud-upload" aria-hidden="true"></i></button> &nbsp;';
+                    buttonHtml = buttonHtml + '<button type="button" class="btn btn-info btn-xs" id="' + District + '">Send Disbursement <i class="fa fa-cloud-upload" aria-hidden="true"></i></button> &nbsp;';
                   }
                   if ('@IsGeneratePensionWithoutSftp' == "True") {
-                    buttonHtml = buttonHtml + '<button href="#" disable class="btn btn-info btn-xs" title="Download File" id="Download_' + District + '">Download Disbursement File <i class="fa fa-arrow-down" aria-hidden="true"></i></button>';
+                    buttonHtml = buttonHtml + '<button type="button" class="btn btn-info btn-xs" title="Download File" id="Download_' + District + '">Download Disbursement File <i class="fa fa-arrow-down" aria-hidden="true"></i></button>';
                   }
                 }
                 else {
                   if ('@IsGeneratePensionWithoutSftp' == "False") {
-                    buttonHtml = buttonHtml + '<button href="#" disable class="btn btn-info btn-xs disabled" id="' + District + '" >Send Disbursement <i class="fa fa-cloud-upload" aria-hidden="true"></i></button> &nbsp;';
+                    buttonHtml = buttonHtml + '<button type="button" class="btn btn-info btn-xs disabled" id="' + District + '" disabled>Send Disbursement <i class="fa fa-cloud-upload" aria-hidden="true"></i></button> &nbsp;';
                   }
                   if ('@IsGeneratePensionWithoutSftp' == "True") {
-                    buttonHtml = buttonHtml + '<button href="#" disable class="btn btn-info btn-xs" title="Download File" id="Download_' + District + '">Download Disbursement File <i class="fa fa-arrow-down" aria-hidden="true"></i></button>';
+                    buttonHtml = buttonHtml + '<button type="button" class="btn btn-info btn-xs" title="Download File" id="Download_' + District + '">Download Disbursement File <i class="fa fa-arrow-down" aria-hidden="true"></i></button>';
                   }
                 }
 
@@ -646,18 +666,73 @@ var startDate = new Date(parseInt(financialYear),3,1);
 
         // new code   SFTP file send
       function DirectGenerateBankMedia(button, District) {
+        // Store district value and show password confirmation popup first
+        $("#District_value").val(District);
+        $('#txtConfirmPassword').val('');
+        $('#passwordError').hide().text('');
+        $('#btnSubmitPassword').show();
+        $('#btn_password_loading').hide();
+        $('#passwordConfirmPopup').popup('show');
+        // Focus password input to prevent keystrokes from going to DataTable search
+        setTimeout(function() { $('#txtConfirmPassword').focus(); }, 300);
+      }
 
-        $('#SFTPfileSend').popup("show");
-        $("#District_value").val( District);
+      // Password cancel handler
+      if (document.getElementById('btnCancelPassword') != null) {
+        document.getElementById('btnCancelPassword').addEventListener('click', function () {
+          $('#passwordConfirmPopup').popup('hide');
+          // Clear DataTable search filter to restore all rows
+          var oTable = $('#tbl_Summary').dataTable();
+          oTable.fnFilter('');
+        });
+      }
 
+      // Password submit handler
+      if (document.getElementById('btnSubmitPassword') != null) {
+        document.getElementById('btnSubmitPassword').addEventListener('click', function () {
+          var password = $('#txtConfirmPassword').val();
+          if (!password || password.trim() === '') {
+            $('#passwordError').text('Please enter your password.').show();
+            return;
+          }
+
+          $('#passwordError').hide();
+          $('#btnSubmitPassword').hide();
+          $('#btn_password_loading').show();
+
+          $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ValidateUserPasswordAjax", "PensionProcess")',
+            data: { password: password },
+            success: function (response) {
+              $('#btnSubmitPassword').show();
+              $('#btn_password_loading').hide();
+              if (response.success) {
+                // Password is correct - close password popup and show SFTP confirm popup
+                $('#passwordConfirmPopup').popup('hide');
+                $('#SFTPfileSend').popup('show');
+              } else {
+                // Show error inside the popup
+                $('#passwordError').text(response.message).show();
+              }
+            },
+            error: function () {
+              $('#btnSubmitPassword').show();
+              $('#btn_password_loading').hide();
+              $('#passwordError').text('An error occurred. Please try again.').show();
+            }
+          });
+        });
       }
       const onCancel_ClassBtn = document.querySelectorAll('.onCancel_class');
       onCancel_ClassBtn.forEach(button => {
         button.addEventListener('click', onCancel);
       });
         function onCancel() {
-
         $('#SFTPfileSend').popup("hide");
+        // Clear DataTable search filter to restore all rows
+        var oTable = $('#tbl_Summary').dataTable();
+        oTable.fnFilter('');
       }
         function SFTPfiledata(button) {
        ;
@@ -683,16 +758,27 @@ var startDate = new Date(parseInt(financialYear),3,1);
           $('#BtnFinelize').show();
           $('#btn_Confirm_loading').hide();
             $('#SFTPfileSend').popup("hide");
+            // Clear DataTable search filter to restore all rows
+            var oTable = $('#tbl_Summary').dataTable();
+            oTable.fnFilter('');
             if (response == "Already uploaded.") {
                 toasterErrorMessage("Disbursement is already sent or you dont have permission to send the disbursement.");
             }
             else {
                 toasterSuccessMessage("File has been successfully saved.");
+                // Disable the Send Disbursement button for this district after successful send
+                var districtBtn = document.getElementById(District);
+                if (districtBtn) {
+                    districtBtn.classList.add('disabled');
+                    districtBtn.setAttribute('disabled', 'disabled');
+                }
             }
         },
         error: function (xhr, status, error) {
           toasterErrorMessage("There is no record to create media.");
-          /*button.setAttribute('disabled', 'disabled');*/
+          // Clear DataTable search filter to restore all rows
+          var oTable = $('#tbl_Summary').dataTable();
+          oTable.fnFilter('');
         }
       });
     }

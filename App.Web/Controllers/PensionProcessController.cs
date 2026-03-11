@@ -3145,6 +3145,28 @@ namespace App.Web.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<JsonResult> ValidateUserPasswordAjax(string password)
+        {
+            try
+            {
+                string userName = AppUserManager.GetUserName();
+                var user = await OwinUserManger.FindAsync(userName, password);
+                if (user != null)
+                {
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Invalid password. Please try again." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred. Please try again." });
+            }
+        }
+
         public ActionResult SFTPfileSendAjax(string batch_value, string distict_value)
         {
             try
@@ -4414,7 +4436,6 @@ namespace App.Web.Controllers
             }
             return PartialView("~/Views/PensionProcess/DirectDeposits/GenerateBankMedia.cshtml", generatePensionProcessModel);
         }
-
         private string UploadDisbursementFile(string excelFilePath, string formattedName)
         {
             string fileReturn = "";
@@ -4457,29 +4478,33 @@ namespace App.Web.Controllers
                 }
                 else
                 {
-                   
+                    // Check if we should use SFTP or fallback to FTP for upload
+                    string useSftpSetting = System.Web.Configuration.WebConfigurationManager.AppSettings["UseSFTP"];
+                    bool useSFTP = !string.IsNullOrEmpty(useSftpSetting) && Convert.ToBoolean(useSftpSetting);
+
+                    if (useSFTP)
+                    {
+                        // --- SFTP Upload (client's SFTP server) ---
                         string host = ftpSetting["sftpServerUrl"];
                         int port = Convert.ToInt32(ftpSetting["sftpPort"]); //SFTP default port is 22
                         string username = ftpSetting["sftpUsername"];
                         string password = ftpSetting["sftpPassword"];
                         string localFilePath = excelFilePath;
                         string remoteDirectory = ftpSetting["sftpFilePath"] + "/PaymentFiles/Outbox";
-                        string localfilepathSFTP = Server.MapPath("~/"+ ftpSetting["sftpPrivateKeyPath"]);
+                        string localfilepathSFTP = Server.MapPath("~/" + ftpSetting["sftpPrivateKeyPath"]);
 
                         var nn = Path.Combine(remoteDirectory, formattedName);
-                            //var keyFile = new PrivateKeyFile(ftpSetting["sftpPrivateKeyPath"]);
-                            var keyFile = new PrivateKeyFile(localfilepathSFTP);
-                            var keyFiles = new[] { keyFile };
-                            var methods = new List<AuthenticationMethod>
-                        {
-                            new PasswordAuthenticationMethod(username, password),
-                            new PrivateKeyAuthenticationMethod(username, keyFiles)
-                        };
+                        //var keyFile = new PrivateKeyFile(ftpSetting["sftpPrivateKeyPath"]);
+                        var keyFile = new PrivateKeyFile(localfilepathSFTP);
+                        var keyFiles = new[] { keyFile };
+                        var methods = new List<AuthenticationMethod>
+                            {
+                                new PasswordAuthenticationMethod(username, password),
+                                new PrivateKeyAuthenticationMethod(username, keyFiles)
+                            };
 
                         // Create a new connection info with public key authentication
                         ConnectionInfo connectionInfo = new ConnectionInfo(host, port, username, methods.ToArray());
-                        //new PrivateKeyAuthenticationMethod(username, privateKeyFile));
-
 
                         // Create an SftpClient using the connection info
                         using (SftpClient sftpClient = new SftpClient(connectionInfo))
@@ -4493,33 +4518,56 @@ namespace App.Web.Controllers
                                 sftpClient.CreateDirectory(remoteDirectory);
                             }
 
-                        //using (var fileStream = new FileStream(localFilePath, FileMode.Open))
-                        //{
-                        //    // Upload the file
-                        //    sftpClient.UploadFile(fileStream, Path.Combine(remoteDirectory, formattedName));
-                        //}
+                            var ftpRequest = (FtpWebRequest)WebRequest.Create(localFilePath);
+                            ftpRequest.Method = WebRequestMethods.Ftp.DownloadFile;
+                            ftpRequest.Credentials = new NetworkCredential(ftpSetting["ftpUsername"], ftpSetting["ftpPassword"]);
+                            ftpRequest.UseBinary = true;
 
-                        var ftpRequest = (FtpWebRequest)WebRequest.Create(localFilePath);
-                        ftpRequest.Method = WebRequestMethods.Ftp.DownloadFile;
-                        ftpRequest.Credentials =new NetworkCredential(ftpSetting["ftpUsername"], ftpSetting["ftpPassword"]);
-                        ftpRequest.UseBinary = true;
+                            using (var ftpResponse = (FtpWebResponse)ftpRequest.GetResponse())
+                            using (var ftpStream = ftpResponse.GetResponseStream())
 
-                        using (var ftpResponse = (FtpWebResponse)ftpRequest.GetResponse())
-                        using (var ftpStream = ftpResponse.GetResponseStream())
-                       
+                                // Upload directly without saving locally
+                                sftpClient.UploadFile(ftpStream, Path.Combine(remoteDirectory, formattedName));
 
-                            // Upload directly without saving locally
-                            sftpClient.UploadFile(ftpStream, Path.Combine(remoteDirectory, formattedName));
-
+                            // Disconnect from the SFTP server
                             sftpClient.Disconnect();
-                        
-
-                        // Disconnect from the SFTP server
-                        sftpClient.Disconnect();
                         }
                         fileReturn = Path.Combine(remoteDirectory, formattedName);
-                    //fileReturn = "File sent!";
+                    }
+                    else
+                    {
+                        // --- FTP Upload (existing FTP server at /PaymentFiles/Outbox) ---
+                        // Download the file from the source FTP path
+                        var ftpDownloadRequest = (FtpWebRequest)WebRequest.Create(excelFilePath);
+                        ftpDownloadRequest.Method = WebRequestMethods.Ftp.DownloadFile;
+                        ftpDownloadRequest.Credentials = new NetworkCredential(ftpSetting["ftpUsername"], ftpSetting["ftpPassword"]);
+                        ftpDownloadRequest.UseBinary = true;
 
+                        byte[] fileContents;
+                        using (var ftpDownloadResponse = (FtpWebResponse)ftpDownloadRequest.GetResponse())
+                        using (var ftpStream = ftpDownloadResponse.GetResponseStream())
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            ftpStream.CopyTo(memoryStream);
+                            fileContents = memoryStream.ToArray();
+                        }
+
+                        // Upload to FTP server at /PaymentFiles/Outbox/
+                        string ftpUploadUrl = ftpSetting["ftpServerUrl"] + "/PaymentFiles/Outbox/" + formattedName;
+
+                        FtpWebRequest ftpUploadRequest = (FtpWebRequest)WebRequest.Create(ftpUploadUrl);
+                        ftpUploadRequest.Method = WebRequestMethods.Ftp.UploadFile;
+                        ftpUploadRequest.Timeout = 600000;
+                        ftpUploadRequest.Credentials = new NetworkCredential(ftpSetting["ftpUsername"], ftpSetting["ftpPassword"]);
+                        using (Stream requestStream = ftpUploadRequest.GetRequestStream())
+                        {
+                            requestStream.Write(fileContents, 0, fileContents.Length);
+                        }
+                        FtpWebResponse ftpUploadResponse = (FtpWebResponse)ftpUploadRequest.GetResponse();
+                        ftpUploadResponse.Close();
+
+                        fileReturn = ftpUploadUrl;
+                    }
                 }
             }
             catch (Exception ex)
@@ -4529,6 +4577,120 @@ namespace App.Web.Controllers
             return fileReturn;
             //return fileSizeInKB;
         }
+        //private string UploadDisbursementFile(string excelFilePath, string formattedName)
+        //{
+        //    string fileReturn = "";
+        //    try
+        //    {
+        //        Dictionary<string, string> ftpSetting = Helper.Helper.GetFTPSetting();
+        //        // Get the file name
+
+        //        bool IsFTP = Convert.ToBoolean(ftpSetting["IsFTP"]);
+        //        if (IsFTP)
+        //        {
+        //            //string formattedName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "JK_Disbursement" + (Path.GetExtension(excelFilePath));
+
+        //            byte[] fileContents = System.IO.File.ReadAllBytes(excelFilePath);
+
+        //            // Get the size of the file in bytes
+        //            //long fileSizeInBytes = fileContents.Length;
+        //            //fileSizeInKB = fileSizeInBytes / 1024.0;
+
+        //            //var region = Session["RegionName"].ToString();
+        //            var region = GetRegionName();
+        //            var directoryName = region == "KASHMIR REGION" ? "K_Disbursement" : "J_Disbursement";
+        //            //string ftpServerUrl = ftpSetting["sftpServerUrl"] + $"/DataFiles/{directoryName}/Outbox/" + formattedName;
+        //            string ftpServerUrl = Helper.Helper.GetUploadDataFile(region, directoryName, formattedName);
+
+        //            //string ftpServerUrl1 = ftpSetting["ftpServerUrl"] ++ "/DataFiles/Disbursement/Outbox/" + formattedName;
+
+        //            FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create(ftpServerUrl);
+        //            ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
+        //            ftpRequest.Timeout = 600000;
+        //            ftpRequest.Credentials = new NetworkCredential(ftpSetting["ftpUsername"], ftpSetting["ftpPassword"]);
+        //            using (Stream requestStream = ftpRequest.GetRequestStream())
+        //            {
+        //                requestStream.Write(fileContents, 0, fileContents.Length);
+
+        //            }
+        //            FtpWebResponse ftpResponse = (FtpWebResponse)ftpRequest.GetResponse();
+        //            ftpResponse.Close();
+        //            fileReturn = ftpServerUrl;
+        //        }
+        //        else
+        //        {
+
+        //                string host = ftpSetting["sftpServerUrl"];
+        //                int port = Convert.ToInt32(ftpSetting["sftpPort"]); //SFTP default port is 22
+        //                string username = ftpSetting["sftpUsername"];
+        //                string password = ftpSetting["sftpPassword"];
+        //                string localFilePath = excelFilePath;
+        //                string remoteDirectory = ftpSetting["sftpFilePath"] + "/PaymentFiles/Outbox";
+        //                string localfilepathSFTP = Server.MapPath("~/"+ ftpSetting["sftpPrivateKeyPath"]);
+
+        //                var nn = Path.Combine(remoteDirectory, formattedName);
+        //                    //var keyFile = new PrivateKeyFile(ftpSetting["sftpPrivateKeyPath"]);
+        //                    var keyFile = new PrivateKeyFile(localfilepathSFTP);
+        //                    var keyFiles = new[] { keyFile };
+        //                    var methods = new List<AuthenticationMethod>
+        //                {
+        //                    new PasswordAuthenticationMethod(username, password),
+        //                    new PrivateKeyAuthenticationMethod(username, keyFiles)
+        //                };
+
+        //                // Create a new connection info with public key authentication
+        //                ConnectionInfo connectionInfo = new ConnectionInfo(host, port, username, methods.ToArray());
+        //                //new PrivateKeyAuthenticationMethod(username, privateKeyFile));
+
+
+        //                // Create an SftpClient using the connection info
+        //                using (SftpClient sftpClient = new SftpClient(connectionInfo))
+        //                {
+        //                    // Connect to the SFTP server
+        //                    sftpClient.Connect();
+
+        //                    // Ensure the remote directory exists
+        //                    if (!sftpClient.Exists(remoteDirectory))
+        //                    {
+        //                        sftpClient.CreateDirectory(remoteDirectory);
+        //                    }
+
+        //                //using (var fileStream = new FileStream(localFilePath, FileMode.Open))
+        //                //{
+        //                //    // Upload the file
+        //                //    sftpClient.UploadFile(fileStream, Path.Combine(remoteDirectory, formattedName));
+        //                //}
+
+        //                var ftpRequest = (FtpWebRequest)WebRequest.Create(localFilePath);
+        //                ftpRequest.Method = WebRequestMethods.Ftp.DownloadFile;
+        //                ftpRequest.Credentials =new NetworkCredential(ftpSetting["ftpUsername"], ftpSetting["ftpPassword"]);
+        //                ftpRequest.UseBinary = true;
+
+        //                using (var ftpResponse = (FtpWebResponse)ftpRequest.GetResponse())
+        //                using (var ftpStream = ftpResponse.GetResponseStream())
+
+
+        //                    // Upload directly without saving locally
+        //                    sftpClient.UploadFile(ftpStream, Path.Combine(remoteDirectory, formattedName));
+
+        //                    sftpClient.Disconnect();
+
+
+        //                // Disconnect from the SFTP server
+        //                sftpClient.Disconnect();
+        //                }
+        //                fileReturn = Path.Combine(remoteDirectory, formattedName);
+        //            //fileReturn = "File sent!";
+
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw;
+        //    }
+        //    return fileReturn;
+        //    //return fileSizeInKB;
+        //}
         // Old function to create text file and download
         //[HttpPost]
         //[ValidateAntiForgeryToken]

@@ -128,6 +128,10 @@ namespace App.Web.Helper
             string ftpPassword = System.Web.Configuration.WebConfigurationManager.AppSettings["ftpPassword"];
             string localFilePath = System.Web.Configuration.WebConfigurationManager.AppSettings["localFilePath"];
 
+            string ftpServerUrl1 = System.Web.Configuration.WebConfigurationManager.AppSettings["ftpServerUrl1"];
+            string ftpUsername1 = System.Web.Configuration.WebConfigurationManager.AppSettings["ftpUsername1"];
+            string ftpPassword1 = System.Web.Configuration.WebConfigurationManager.AppSettings["ftpPassword1"];
+
             //string ftptransfermode = System.Web.Configuration.WebConfigurationManager.AppSettings["ftptransfermode"];
             //string ftpUsePassive = System.Web.Configuration.WebConfigurationManager.AppSettings["ftpUsePassive"];
 
@@ -149,6 +153,9 @@ namespace App.Web.Helper
           { "ftpUsername", UrlEncryption.Decrypt(ftpUsername) },
           { "ftpPassword", UrlEncryption.Decrypt(ftpPassword) },
           { "localFilePath", localFilePath },
+          { "ftpServerUrl1", ftpServerUrl1 },
+          { "ftpUsername1", UrlEncryption.Decrypt(ftpUsername1) },
+          { "ftpPassword1", UrlEncryption.Decrypt(ftpPassword1) },
           //{ "ftptransfermode", ftptransfermode },
           //{ "ftpUsePassive", ftpUsePassive },
 
