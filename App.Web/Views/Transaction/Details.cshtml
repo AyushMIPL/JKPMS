@@ -1,0 +1,140 @@
+@{
+    ViewBag.Title = "Transaction Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var header = ViewBag.Header as App.Data.Entities.TxnHeader;
+    var details = ViewBag.Details as List<App.Data.Entities.TxnDetail>;
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+            Transaction Details - Header #@header.HeaderId
+            <ul class="tool-bar">
+                <li><a href="/Transaction/Index" data-toggle="tooltip" data-placement="bottom" title="Back to List"><i class="fa fa-arrow-left"></i></a></li>
+            </ul>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div class="panel panel-default">
+            <ul class="list-group">
+                <li class="list-group-item clearfix">
+                    <div class="pull-left m-left-sm">
+                        <span><b style="font-weight:bolder">Header ID: </b></span>
+                        <label class="control-label">@header.HeaderId</label>
+                    </div>
+                    <div class="pull-right">
+                        <span><b style="font-weight:bolder">Source Table: </b></span>
+                        <label class="control-label">@(header.SourceTable ?? "N/A")</label>
+                    </div>
+                </li>
+                <li class="list-group-item clearfix">
+                    <div class="pull-left m-left-sm">
+                        <span><b style="font-weight:bolder">Transaction Date: </b></span>
+                        <label class="control-label">@(header.TxnDate.HasValue ? header.TxnDate.Value.ToString("dd/MM/yyyy") : "N/A")</label>
+                    </div>
+                    <div class="pull-right">
+                        <span><b style="font-weight:bolder">Imported On: </b></span>
+                        <label class="control-label">@(header.ImportedOn.HasValue ? header.ImportedOn.Value.ToString("dd/MM/yyyy HH:mm:ss") : "N/A")</label>
+                    </div>
+                </li>
+                <li class="list-group-item clearfix">
+                    <div class="pull-left m-left-sm">
+                        <span><b style="font-weight:bolder">Total Detail Records: </b></span>
+                        <label class="control-label">@(details != null ? details.Count : 0)</label>
+                    </div>
+                    @if (details != null && details.Any())
+                    {
+                        <div class="pull-right">
+                            <span><b style="font-weight:bolder">Total Amount: </b></span>
+                            <label class="control-label">₹ @(details.Sum(d => d.Amount ?? 0).ToString("N2"))</label>
+                        </div>
+                    }
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@if (details != null && details.Any())
+{
+    <div class="panel panel-default">
+        <div class="panel-heading clearfix">
+            <h4 class="headline" style="margin:0px;padding:0px;border:none;">
+                Detail Records
+            </h4>
+        </div>
+        <div class="panel-body">
+            <table class="table dataTable" id="tblDetails">
+                <thead>
+                    <tr>
+                        <th>Detail ID</th>
+                        <th>App Ref No</th>
+                        <th>Department</th>
+                        <th>Name</th>
+                        <th>Account No</th>
+                        <th>IFSC</th>
+                        <th>Amount</th>
+                        <th>Scheme</th>
+                        <th>Status</th>
+                        <th>Txn Ref</th>
+                        <th>Txn Date</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in details)
+                    {
+                        <tr>
+                            <td>@item.DetailId</td>
+                            <td>@(item.ApplicationReferenceNo ?? "")</td>
+                            <td>@(item.Department ?? "")</td>
+                            <td>@(item.Name ?? "")</td>
+                            <td>@(item.AccountNo ?? "")</td>
+                            <td>@(item.IFSC ?? "")</td>
+                            <td class="text-right">₹ @((item.Amount ?? 0).ToString("N2"))</td>
+                            <td>@(item.Scheme ?? "")</td>
+                            <td>
+                                @{
+                                    string badgeClass = "badge-info";
+                                    string statusText = item.Status ?? "";
+                                    string statusLower = statusText.ToLower();
+                                    if (statusLower == "success" || statusLower == "completed" || statusLower == "processed") { badgeClass = "badge-success"; }
+                                    else if (statusLower == "failed" || statusLower == "rejected" || statusLower == "error") { badgeClass = "badge-danger"; }
+                                    else if (statusLower == "pending" || statusLower == "in progress") { badgeClass = "badge-warning"; }
+                                }
+                                @if (!string.IsNullOrEmpty(statusText))
+                                {
+                                    <span class="badge @badgeClass">@statusText</span>
+                                }
+                            </td>
+                            <td>@(item.TransactionReference ?? "")</td>
+                            <td>@(item.TransactionDate ?? "")</td>
+                            <td>@(item.Remarks ?? "")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="alert alert-info">No detail records found for this header.</div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+<script nonce="@ViewBag.StyleNonce">
+    $(function () {
+        $('#tblDetails').dataTable({
+            "bJQueryUI": true,
+            "sPaginationType": "full_numbers",
+            "bServerSide": false,
+            "aaSorting": [[0, "asc"]]
+        });
+    });
+</script>
+}

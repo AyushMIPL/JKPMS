@@ -1,0 +1,343 @@
+@model App.Data.ViewModels.TransactionIndexViewModel
+@{
+    ViewBag.Title = "Transaction Monitoring";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style nonce="@ViewBag.StyleNonce">
+    .txn-headline { margin:0px; padding:0px; border:none; }
+    .txn-filter-actions { margin-top:5px; }
+    .txn-record-count { font-size:13px; margin-left:10px; }
+    .txn-spinner-hidden { display:none; }
+    .txn-overlay {
+        display:none;
+        position:fixed;
+        top:0; left:0; right:0; bottom:0;
+        background:rgba(0,0,0,0.5);
+        z-index:99999;
+    }
+    .txn-overlay-content {
+        position:absolute;
+        top:50%; left:50%;
+        transform:translate(-50%,-50%);
+        text-align:center;
+        color:#fff;
+    }
+    .txn-overlay-content i {
+        font-size:48px;
+        margin-bottom:15px;
+    }
+    .txn-overlay-content p {
+        font-size:18px;
+        font-weight:600;
+    }
+    .txn-overlay-visible { display:block; }
+</style>
+
+<div id="exportOverlay" class="txn-overlay">
+    <div class="txn-overlay-content">
+        <i class="fa fa-spinner fa-spin"></i>
+        <p>Exporting to Excel, please wait...</p>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline txn-headline">
+            Transaction Monitoring
+            <ul class="tool-bar"></ul>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label class="control-label">Txn Date From</label>
+                    <div class="input-group date">
+                        <input type="text" id="txnDateFrom" class="form-control input-sm" placeholder="dd/mm/yyyy" autocomplete="off" />
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label class="control-label">Txn Date To</label>
+                    <div class="input-group date">
+                        <input type="text" id="txnDateTo" class="form-control input-sm" placeholder="dd/mm/yyyy" autocomplete="off" />
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label class="control-label">Department</label>
+                    @Html.DropDownListFor(m => m.Department, Model.Departments, "-- All Departments --", new { @class = "form-control input-sm", id = "filterDepartment" })
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label class="control-label">Status</label>
+                    @Html.DropDownListFor(m => m.Status, Model.Statuses, "-- All Statuses --", new { @class = "form-control input-sm", id = "filterStatus" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label class="control-label">Scheme</label>
+                    @Html.DropDownListFor(m => m.Scheme, Model.Schemes, "-- All Schemes --", new { @class = "form-control input-sm", id = "filterScheme" })
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label class="control-label">Application Ref No</label>
+                    <input type="text" id="searchAppRef" class="form-control input-sm" placeholder="Search App Ref..." />
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label class="control-label">Account No</label>
+                    <input type="text" id="searchAccNo" class="form-control input-sm" placeholder="Search Account No..." />
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label class="control-label">Transaction Ref</label>
+                    <input type="text" id="searchTxnRef" class="form-control input-sm" placeholder="Search Txn Ref..." />
+                </div>
+            </div>
+        </div>
+        <div class="row txn-filter-actions">
+            <div class="col-sm-12">
+                <button type="button" id="btnSearch" class="btn btn-success"><i class="fa fa-search"></i> Search</button>
+                &nbsp;
+                <button type="button" id="btnReset" class="btn btn-default"><i class="fa fa-refresh"></i> Reset</button>
+                @*<button type="button" id="btnExport" class="btn btn-info pull-right"><i class="fa fa-file-excel-o"></i> Export to Excel <i id="exportSpinner" class="fa fa-spinner fa-spin txn-spinner-hidden"></i></button>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline txn-headline">
+            Transaction Records
+            <span class="badge badge-info txn-record-count" id="totalRecordCount"></span>
+        </h4>
+    </div>
+    <div class="panel-body">
+
+        <table class="table dataTable" id="tblTransactions">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    @*<th>Source</th>*@
+                    <th>Txn Date</th>
+                    <th>Department</th>
+                    <th>Name</th>
+                    <th>Account No</th>
+                    <th>Amount</th>
+                    <th>Scheme</th>
+                    <th>Status</th>
+                    <th>Txn Ref</th>
+                    <th>Txn Date (Text)</th>
+                    <th>Remarks</th>
+                    @*<th></th>*@
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+<script nonce="@ViewBag.StyleNonce">
+    // Polyfill: .andSelf() was removed in jQuery 3.x, replaced by .addBack()
+    if (!jQuery.fn.andSelf) {
+        jQuery.fn.andSelf = jQuery.fn.addBack;
+    }
+
+    var oTable;
+
+    $(function () {
+        doBindData();
+    });
+
+    function getFilterParams() {
+        return {
+            txnDateFrom: $('#txnDateFrom').val(),
+            txnDateTo: $('#txnDateTo').val(),
+            department: $('#filterDepartment').val(),
+            status: $('#filterStatus').val(),
+            scheme: $('#filterScheme').val(),
+            searchAppRef: $('#searchAppRef').val(),
+            searchAccNo: $('#searchAccNo').val(),
+            searchTxnRef: $('#searchTxnRef').val()
+        };
+    }
+
+    function doBindData() {
+        oTable = $('#tblTransactions').dataTable({
+            "bJQueryUI": true,
+            "sPaginationType": "full_numbers",
+            "bServerSide": true,
+            "bDestroy": true,
+            "bProcessing": true,
+            "sAjaxSource": "/Transaction/AjaxHandler",
+            "fnServerParams": function (aoData) {
+                var filters = getFilterParams();
+                aoData.push({ "name": "txnDateFrom", "value": filters.txnDateFrom });
+                aoData.push({ "name": "txnDateTo", "value": filters.txnDateTo });
+                aoData.push({ "name": "department", "value": filters.department });
+                aoData.push({ "name": "status", "value": filters.status });
+                aoData.push({ "name": "scheme", "value": filters.scheme });
+                aoData.push({ "name": "searchAppRef", "value": filters.searchAppRef });
+                aoData.push({ "name": "searchAccNo", "value": filters.searchAccNo });
+                aoData.push({ "name": "searchTxnRef", "value": filters.searchTxnRef });
+            },
+            "fnDrawCallback": function (oSettings) {
+                var totalRecords = oSettings._iRecordsTotal;
+                var filteredRecords = oSettings._iRecordsDisplay;
+                if (totalRecords == filteredRecords) {
+                    $('#totalRecordCount').text('Total: ' + totalRecords + ' records');
+                } else {
+                    $('#totalRecordCount').text('Showing: ' + filteredRecords + ' of ' + totalRecords + ' records');
+                }
+            },
+            "aoColumns": [
+                { "sName": "DetailId", "bVisible": false },
+                //{ "sName": "SourceTable" },
+                { "sName": "TxnDate" },
+                { "sName": "Department" },
+                { "sName": "Name" },
+                { "sName": "AccountNo" },
+                { "sName": "Amount" },
+                //{
+                //    "sName": "Amount",
+                //    "sClass": "text-right",
+                //    "fnRender": function (oObj) {
+                //        var amt = parseFloat(oObj.aData[6]);
+                //        if (isNaN(amt)) return '0.00';
+                //        return '₹ ' + amt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                //    }
+                //},
+                { "sName": "Scheme" },
+                {
+                    "sName": "Status",
+                    "fnRender": function (oObj) {
+                        var status = oObj.aData[7];
+                        if (!status || status === '') return '';
+                        var badgeClass = 'badge-info';
+                        var statusLower = status.toLowerCase();
+                        if (statusLower === 'success' || statusLower === 'completed' || statusLower === 'processed') badgeClass = 'badge-success';
+                        else if (statusLower === 'failed' || statusLower === 'rejected' || statusLower === 'error') badgeClass = 'badge-danger';
+                        else if (statusLower === 'pending' || statusLower === 'in progress') badgeClass = 'badge-warning';
+                        return '<span class="badge ' + badgeClass + '">' + status + '</span>';
+                    }
+                },
+                { "sName": "TransactionReference" },
+                { "sName": "TransactionDate" },
+                { "sName": "Remarks", "bSortable": false },
+                //{
+                //    "sName": "Actions",
+                //    "bSearchable": false,
+                //    "bSortable": false,
+                //    "fnRender": function (oObj) {
+                //        var headerId = oObj.aData[12];
+                //        return '<a href="/Transaction/Details/' + headerId + '" class="btn btn-xs btn-primary" title="View Details"><i class="fa fa-list"></i> Details</a>';
+                //    }
+                //}
+            ]
+        });
+    }
+
+    // Search button
+    if (document.getElementById("btnSearch")) {
+        document.getElementById("btnSearch").addEventListener("click", function () {
+            doBindData();
+        });
+    }
+
+    // Reset button
+    if (document.getElementById("btnReset")) {
+        document.getElementById("btnReset").addEventListener("click", function () {
+            $('#txnDateFrom').val('');
+            $('#txnDateTo').val('');
+            $('#filterDepartment').val('');
+            $('#filterStatus').val('');
+            $('#filterScheme').val('');
+            $('#searchAppRef').val('');
+            $('#searchAccNo').val('');
+            $('#searchTxnRef').val('');
+            doBindData();
+        });
+    }
+
+    // Export to Excel
+    if (document.getElementById("btnExport")) {
+        document.getElementById("btnExport").addEventListener("click", function () {
+            var filters = getFilterParams();
+            var token = new Date().getTime().toString();
+
+            // Show full-screen overlay
+            $('#exportOverlay').addClass('txn-overlay-visible');
+
+            // Build a form to POST
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '@Url.Action("ExportToExcel", "Transaction")';
+            form.setAttribute('style', 'display:none');
+
+            // Add download token
+            var tokenHidden = document.createElement('input');
+            tokenHidden.type = 'hidden';
+            tokenHidden.name = 'downloadToken';
+            tokenHidden.value = token;
+            form.appendChild(tokenHidden);
+
+            // Add anti-forgery token
+            var tokenInput = document.createElement('input');
+            tokenInput.type = 'hidden';
+            tokenInput.name = '__RequestVerificationToken';
+            var tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (tokenElement) tokenInput.value = tokenElement.value;
+            form.appendChild(tokenInput);
+
+            // Add filter params
+            for (var key in filters) {
+                if (filters.hasOwnProperty(key)) {
+                    var input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = filters[key] || '';
+                    form.appendChild(input);
+                }
+            }
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+
+            // Poll for the download cookie to know when file is ready
+            var pollTimer = setInterval(function () {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var c = cookies[i].trim();
+                    if (c.indexOf('downloadToken=' + token) === 0) {
+                        clearInterval(pollTimer);
+                        $('#exportOverlay').removeClass('txn-overlay-visible');
+                        // Remove the cookie
+                        document.cookie = 'downloadToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+                        return;
+                    }
+                }
+            }, 500);
+
+            // Safety timeout: hide overlay after 120 seconds in case of error
+            setTimeout(function () {
+                clearInterval(pollTimer);
+                $('#exportOverlay').removeClass('txn-overlay-visible');
+            }, 120000);
+        });
+    }
+</script>
+}

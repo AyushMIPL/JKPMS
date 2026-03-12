@@ -160,6 +160,8 @@ namespace App.Data
             modelBuilder.Entity<MasterFinancialYears>().ToTable("MasterFinancialYears");
             modelBuilder.Entity<LoginLog>().ToTable("LoginLog");
             modelBuilder.Entity<ClientTestTable>().ToTable("ClientTestTable");
+            modelBuilder.Entity<TxnHeader>().ToTable("txnHeader");
+            modelBuilder.Entity<TxnDetail>().ToTable("txnDetail");
         }
 
         public override async Task<int> SaveChangesAsync()
@@ -534,6 +536,8 @@ namespace App.Data
         public DbSet<AuditLogs> AuditLogs { get; set; }
         public DbSet<LoginLog> LoginLog { get; set; }
         public DbSet<ClientTestTable> ClientTestTable { get; set; }
+        public DbSet<TxnHeader> TxnHeaders { get; set; }
+        public DbSet<TxnDetail> TxnDetails { get; set; }
         public DbSet<Widgets> Widgets { get; set; }
         public IEnumerable<object> AppUser { get; set; }
         public DbSet Set(string name)

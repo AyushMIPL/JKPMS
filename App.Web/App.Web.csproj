@@ -562,6 +562,7 @@
     <Compile Include="Controllers\StateController.cs" />
     <Compile Include="Controllers\SuffixController.cs" />
     <Compile Include="Controllers\TehsilController.cs" />
+    <Compile Include="Controllers\TransactionController.cs" />
     <Compile Include="Controllers\UnAuthorizeController.cs" />
     <Compile Include="Filters\AuthorizeExAttribute.cs" />
     <Compile Include="Filters\IpWhitelistAndApiKeyMiddleware.cs" />
@@ -1849,6 +1850,8 @@
     <Content Include="Views\PensionProcess\DirectDeposits\UploadDisbursement.cshtml" />
     <Content Include="Views\Account\Widgets.cshtml" />
     <Content Include="Views\MasterPensioner\FindbeneficiaryDetails.cshtml" />
+    <Content Include="Views\Transaction\Details.cshtml" />
+    <Content Include="Views\Transaction\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
