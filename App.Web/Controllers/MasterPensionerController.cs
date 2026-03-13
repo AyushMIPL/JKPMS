@@ -7531,8 +7531,8 @@ namespace App.Web.Controllers
           string password = ftpSetting["sftpPassword"];
           string localFilePath = excelFilePath;
           string remoteDirectory = ftpSetting["sftpFilePath"] + "/AccountValidation/Outbox";
-
-          var keyFile = new PrivateKeyFile(ftpSetting["sftpPrivateKeyPath"]);
+          string localfilepathSFTP = Server.MapPath("~/" + ftpSetting["sftpPrivateKeyPath"]);
+          var keyFile = new PrivateKeyFile(localfilepathSFTP);
           var keyFiles = new[] { keyFile };
           var methods = new List<AuthenticationMethod>
             {

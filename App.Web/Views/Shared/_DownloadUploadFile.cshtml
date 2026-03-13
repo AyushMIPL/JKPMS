@@ -1,4 +1,4 @@
-﻿@using App.Data
+@using App.Data
 @{
     ViewBag.Title = "Create";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -55,7 +55,7 @@
                             <th>Created By</th>
                             <th>Remark</th>
                             @*<th>CreatedBy</th>
-                                <th>Uploaded By</th>*@
+                              <th>Uploaded By</th>*@
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -255,13 +255,83 @@ else if (ViewBag.DownloadNUploadFile == DownloadNUploadFile.DownloadbaknkMedia.T
     </div>
 </div>
 
+@* Password Confirmation Modal *@
+<div class="custom-popup width-100 confirmClass display_none" id="passwordConfirmPopup">
+  <div class="padding-md">
+    <h4 class="m-top-none">Password Verification</h4>
+    <p>Please enter your password to proceed.</p>
+    <div class="form-group">
+      <label for="txtConfirmPassword">Password</label>
+      <input type="password" class="form-control" id="txtConfirmPassword" placeholder="Enter your password" autocomplete="off" />
+    </div>
+    <div id="passwordError" class="text-danger" style="display:none; font-size:14px; margin-top:5px;"></div>
+  </div>
+  <div class="text-center">
+    <a type="button" class="btn btn-success px-5 height display_none" id="btn_password_loading"><i class="fa fa-spinner fa-spin"></i> Verifying</a>
+    <a class="btn btn-success m-right-sm" id="btnSubmitPassword">Submit</a>
+    <a class="btn btn-danger" id="btnCancelPassword">Cancel</a>
+  </div>
+</div>
+
 
 @section scripts{`
     <script nonce="@ViewBag.StyleNonce">
       debugger
       if (document.getElementById("IdMasterForwardToFSTP") != null && document.getElementById("IdMasterForwardToFSTP") != undefined) {
         document.getElementById("IdMasterForwardToFSTP").addEventListener("click", function () {
-          MasterForwardToFSTP();
+          ValidatePasswordAndExecute(MasterForwardToFSTP);
+        });
+      }
+
+      function ValidatePasswordAndExecute(onSuccessCallback) {
+        $('#txtConfirmPassword').val('');
+        $('#passwordError').hide().text('');
+        $('#btnSubmitPassword').show();
+        $('#btn_password_loading').hide();
+        
+        // Show popup
+        $('#passwordConfirmPopup').popup('show');
+        setTimeout(function() { $('#txtConfirmPassword').focus(); }, 300);
+
+        // Submit handler
+        $('#btnSubmitPassword').off('click').on('click', function () {
+          var password = $('#txtConfirmPassword').val();
+          if (!password || password.trim() === '') {
+            $('#passwordError').text('Please enter your password.').show();
+            return;
+          }
+
+          $('#passwordError').hide();
+          $('#btnSubmitPassword').hide();
+          $('#btn_password_loading').show();
+
+          $.ajax({
+            type: 'POST',
+            url: '/PensionProcess/ValidateUserPasswordAjax',
+            data: { password: password },
+            success: function (response) {
+              $('#btnSubmitPassword').show();
+              $('#btn_password_loading').hide();
+              if (response.success) {
+                $('#passwordConfirmPopup').popup('hide');
+                if (typeof onSuccessCallback === "function") {
+                  onSuccessCallback();
+                }
+              } else {
+                $('#passwordError').text(response.message).show();
+              }
+            },
+            error: function () {
+              $('#btnSubmitPassword').show();
+              $('#btn_password_loading').hide();
+              $('#passwordError').text('An error occurred. Please try again.').show();
+            }
+          });
+        });
+
+        // Cancel handler
+        $('#btnCancelPassword').off('click').on('click', function () {
+          $('#passwordConfirmPopup').popup('hide');
         });
       }
 
