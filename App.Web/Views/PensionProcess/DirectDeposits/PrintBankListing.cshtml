@@ -442,6 +442,7 @@ var startDate = new Date(parseInt(financialYear),3,1);
       document.getElementById("loader").style.display = "block";
         }
         var oTable = $("#tbl_Summary").dataTable({
+          "bFilter": false,
           "bJQueryUI": true,
           "paging": false,
           "sPaginationType": "full_numbers",
