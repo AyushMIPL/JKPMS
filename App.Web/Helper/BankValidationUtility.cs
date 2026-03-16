@@ -159,9 +159,10 @@ namespace App.Web.Helper
           string inboxDestinationDir = ftpSetting["sftpFilePath"] + "/AccountValidation/Inbox/Processed/";
           string outboxSourceDir = ftpSetting["sftpFilePath"] + "/AccountValidation/Outbox/";
           string outboxDestinationDir = ftpSetting["sftpFilePath"] + "/AccountValidation/Outbox/Processed/";
+          string currentDirectoryPath1 = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).Replace("file:\\", "").Replace("\\bin", "");
+          string localfilepathSFTP = Path.Combine(currentDirectoryPath1 + ftpSetting["sftpPrivateKeyPath"]);
 
-
-          var keyFile = new PrivateKeyFile(ftpSetting["sftpPrivateKeyPath"]);
+          var keyFile = new PrivateKeyFile(localfilepathSFTP);
           var keyFiles = new[] { keyFile };
           var methods = new List<AuthenticationMethod>
             {

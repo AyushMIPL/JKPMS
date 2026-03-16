@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
@@ -3966,9 +3966,23 @@ namespace App.Web.Controllers
             }
             catch (Exception ex)
             {
-                throw;
+                throw;  
             }
             return Json("File Uploaded", JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult UpdateValidationResponseAjax()
+        {
+            try
+            {
+                Helper.BankValidationUtility bankValidationUtility = new Helper.BankValidationUtility();
+                bankValidationUtility.UpdateValidationResponse();
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+            return Json("Validation Response Uploaded", JsonRequestBehavior.AllowGet);
         }
 
         public async Task<ActionResult> UpdateDisbursmentfiledataAjax(string batch_value, string distict_value, HttpPostedFileBase file)

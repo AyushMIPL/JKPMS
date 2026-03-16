@@ -18,20 +18,31 @@
             <div id="collapseOne" @*class="panel-collapse collapse"*@>
                 <div class="panel-body">
                     <div class="row py-12">
-                        <div class="col-sm-4">
-                            <div class="control-label mb-2 mt-3" for="EmpType"> &nbsp; </div>
-                            <div class="upload-file">
-                                <input type="file" id="file" name="file" class="upload-demo" accept=".xlsx, .xls" required data-val="true" data-val-required="please select a file">
-                                <label data-title="Select file" for="file">
-                                    <span data-title="No file selected..."></span>
-                                </label>
-                            </div>
+                        @if (IsGeneratePensionWithoutSftp)
+                        {
+                            <div class="col-sm-4">
+                                <div class="control-label mb-2 mt-3" for="EmpType"> &nbsp; </div>
+                                <div class="upload-file">
+                                    <input type="file" id="file" name="file" class="upload-demo" accept=".xlsx, .xls" required data-val="true" data-val-required="please select a file">
+                                    <label data-title="Select file" for="file">
+                                        <span data-title="No file selected..."></span>
+                                    </label>
+                                </div>
 
-                        </div>
+                            </div>
+                        }
                         <div class="col-sm-4">
                             <div class="control-label mb-2 mt-3" for="EmpType"> &nbsp; </div>
-                            <button type="button" class="btn btn-success px-5 height display_none" title="Please Wait While We Process Your Request" id="btn_Verification_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
-                            <button type="button" class="btn btn-success height px-5 border-raduis mr-2 @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")" id="MasterEmployeeExcelUpload"><i class="fa fa-save"> </i> Upload</button>
+                            @if (IsGeneratePensionWithoutSftp)
+                            {
+                                <button type="button" class="btn btn-success px-5 height display_none" title="Please Wait While We Process Your Request" id="btn_Verification_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                                <button type="button" class="btn btn-success height px-5 border-raduis mr-2 @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")" id="MasterEmployeeExcelUpload"><i class="fa fa-save"> </i> Upload</button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-success px-5 height display_none" title="Please Wait While We Process Your Request" id="btn_Verification_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                                <button type="button" class="btn btn-success height px-5 border-raduis mr-2 @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")" id="MasterEmployeeExcelUpload"><i class="fa fa-save"> </i> Process Response via SFTP</button>
+                            }
                             <button type="button" class="btn btn-success px-5 height display_none" title="Please Wait While We Process Your Request" id="btn_Saved_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
                             <button type="button" class="btn btn-success height px-5 border-raduis mr-2 display_none" id="MasterEmployeeExcelSave"><i class="fa fa-save"> </i> Save&nbsp;<i class="fa fa-spinner fa-spin display_none"></i></button>
 
@@ -284,55 +295,61 @@ else if (ViewBag.DownloadNUploadFile == DownloadNUploadFile.DownloadbaknkMedia.T
       }
 
       function ValidatePasswordAndExecute(onSuccessCallback) {
-        $('#txtConfirmPassword').val('');
-        $('#passwordError').hide().text('');
-        $('#btnSubmitPassword').show();
-        $('#btn_password_loading').hide();
-        
-        // Show popup
-        $('#passwordConfirmPopup').popup('show');
-        setTimeout(function() { $('#txtConfirmPassword').focus(); }, 300);
+          var isGeneratePensionWithoutSftp = '@ViewBag.IsGeneratePensionWithoutSftp'.toLowerCase() === 'true';
+          if (!isGeneratePensionWithoutSftp) {
+              $('#txtConfirmPassword').val('');
+              $('#passwordError').hide().text('');
+              $('#btnSubmitPassword').show();
+              $('#btn_password_loading').hide();
 
-        // Submit handler
-        $('#btnSubmitPassword').off('click').on('click', function () {
-          var password = $('#txtConfirmPassword').val();
-          if (!password || password.trim() === '') {
-            $('#passwordError').text('Please enter your password.').show();
-            return;
+              // Show popup
+              $('#passwordConfirmPopup').popup('show');
+              setTimeout(function () { $('#txtConfirmPassword').focus(); }, 300);
+
+              // Submit handler
+              $('#btnSubmitPassword').off('click').on('click', function () {
+                  var password = $('#txtConfirmPassword').val();
+                  if (!password || password.trim() === '') {
+                      $('#passwordError').text('Please enter your password.').show();
+                      return;
+                  }
+
+                  $('#passwordError').hide();
+                  $('#btnSubmitPassword').hide();
+                  $('#btn_password_loading').show();
+
+                  $.ajax({
+                      type: 'POST',
+                      url: '/PensionProcess/ValidateUserPasswordAjax',
+                      data: { password: password },
+                      success: function (response) {
+                          $('#btnSubmitPassword').show();
+                          $('#btn_password_loading').hide();
+                          if (response.success) {
+                              $('#passwordConfirmPopup').popup('hide');
+                              if (typeof onSuccessCallback === "function") {
+                                  onSuccessCallback();
+                              }
+                          } else {
+                              $('#passwordError').text(response.message).show();
+                          }
+                      },
+                      error: function () {
+                          $('#btnSubmitPassword').show();
+                          $('#btn_password_loading').hide();
+                          $('#passwordError').text('An error occurred. Please try again.').show();
+                      }
+                  });
+              });
+
+              // Cancel handler
+              $('#btnCancelPassword').off('click').on('click', function () {
+                  $('#passwordConfirmPopup').popup('hide');
+              });
           }
-
-          $('#passwordError').hide();
-          $('#btnSubmitPassword').hide();
-          $('#btn_password_loading').show();
-
-          $.ajax({
-            type: 'POST',
-            url: '/PensionProcess/ValidateUserPasswordAjax',
-            data: { password: password },
-            success: function (response) {
-              $('#btnSubmitPassword').show();
-              $('#btn_password_loading').hide();
-              if (response.success) {
-                $('#passwordConfirmPopup').popup('hide');
-                if (typeof onSuccessCallback === "function") {
-                  onSuccessCallback();
-                }
-              } else {
-                $('#passwordError').text(response.message).show();
-              }
-            },
-            error: function () {
-              $('#btnSubmitPassword').show();
-              $('#btn_password_loading').hide();
-              $('#passwordError').text('An error occurred. Please try again.').show();
-            }
-          });
-        });
-
-        // Cancel handler
-        $('#btnCancelPassword').off('click').on('click', function () {
-          $('#passwordConfirmPopup').popup('hide');
-        });
+          else {
+              onSuccessCallback();
+          }
       }
 
     //binding For bank Media beneficiary details
@@ -586,6 +603,39 @@ else if (ViewBag.DownloadNUploadFile == DownloadNUploadFile.DownloadbaknkMedia.T
 
     //UploadVerification File beneficiary details
     function MasterEmployeeExcelUpload(evt) {
+        var isGeneratePensionWithoutSftp = '@ViewBag.IsGeneratePensionWithoutSftp'.toLowerCase() === 'true';
+
+        // If SFTP is ENABLED (WithoutSftp is FALSE), then trigger SFTP pull instead of local upload.
+        if (!isGeneratePensionWithoutSftp) {
+            $('#btn_Verification_loading').show();
+            $('#MasterEmployeeExcelUpload').hide();
+
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("UpdateValidationResponseAjax", "PensionProcess")',
+                success: function (response) {
+                    if (response === "Validation Response Uploaded") {
+                        toasterSuccessMessage("Validation Response from SFTP Processed Successfully.");
+                        location.reload();
+                    } else if (response.error) {
+                        toasterErrorMessage("Error: " + response.error);
+                        $('#btn_Verification_loading').hide();
+                        $('#MasterEmployeeExcelUpload').show();
+                    } else {
+                        toasterErrorMessage("Oops! Something went wrong.");
+                        $('#btn_Verification_loading').hide();
+                        $('#MasterEmployeeExcelUpload').show();
+                    }
+                },
+                error: function () {
+                    toasterErrorMessage("Failed to process validation response from SFTP.");
+                    $('#btn_Verification_loading').hide();
+                    $('#MasterEmployeeExcelUpload').show();
+                }
+            });
+            return; // Skip normal file upload
+        }
+
         var IsFile = $("#file").val();
         //$(evt.target).find("i.fa-spinner").show();
         $('#btn_Verification_loading').show();

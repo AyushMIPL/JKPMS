@@ -364,3 +364,4 @@ FodyWeavers.xsd
 /App.Web/BankMediaFile/J_Disbursement
 /App.Web/DataFile/J_MasterEmployeeDownloads
 /App.Web/DataFile/J_Uploads
+/App.Web/DataFile/MasterEmployeeDownloads

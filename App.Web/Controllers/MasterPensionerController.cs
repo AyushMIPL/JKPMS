@@ -7535,7 +7535,7 @@ namespace App.Web.Controllers
           var keyFile = new PrivateKeyFile(localfilepathSFTP);
           var keyFiles = new[] { keyFile };
           var methods = new List<AuthenticationMethod>
-            {
+            { 
                 new PasswordAuthenticationMethod(username, password),
                 new PrivateKeyAuthenticationMethod(username, keyFiles)
             };
