@@ -1,0 +1,87 @@
+@model IEnumerable<App.Data.Entities.MailTemplate>
+
+@{
+    ViewBag.Title = "Email Templates";
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline">
+            Email Templates
+            <ul class="tool-bar">
+                <li>
+                    <a href="@Url.Action("Index", "MasterProcessKey")" class="btn btn-sm btn-info" style="color: white; padding: 4px 10px; border-radius: 4px; font-weight: 500;" title="Manage Process Keys">
+                        <i class="fa fa-key"></i> Process Keys
+                    </a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Index", "MasterEmail")" class="btn btn-sm btn-info" style="color: white; padding: 4px 10px; border-radius: 4px; font-weight: 500;" title="Manage Emails">
+                        <i class="fa fa-envelope-o"></i> Master Emails
+                    </a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Create")" data-toggle="tooltip" data-placement="bottom" title="Add new mail template">
+                        <i class="fa fa-plus"></i>
+                    </a>
+                </li>
+            </ul>
+        </h4>
+    </div>
+    <div class="panel-body">
+        
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success mt-2">
+                @TempData["Success"]
+            </div>
+        }
+
+        <table class="table table-striped table-bordered" id="tplTable">
+            <thead>
+                <tr>
+                    <th>Template Name</th>
+                    <th>Process Key</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.TemplateName</td>
+                        <td>@item.ProcessKey</td>
+                        <td>@item.Subject</td>
+                        <td>
+                            @if (item.IsActive)
+                            {
+                                <span class="badge badge-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-danger">Inactive</span>
+                            }
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-info btn-xs" title="Edit">
+                                <i class="fa fa-pencil"></i> Edit
+                            </a>
+                            <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-danger btn-xs" title="Delete" onclick="return confirm('Are you sure you want to delete this template?');">
+                                <i class="fa fa-trash-o fa-lg"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#tplTable').DataTable();
+        });
+    </script>
+}

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
@@ -7490,6 +7490,7 @@ namespace App.Web.Controllers
 
     private void UploadValidationFile(string excelFilePath, string formattedName)
     {
+      string fileReturn = "";
       try
       {
         Dictionary<string, string> ftpSetting = Helper.Helper.GetFTPSetting();
@@ -7522,6 +7523,7 @@ namespace App.Web.Controllers
           }
           FtpWebResponse ftpResponse = (FtpWebResponse)ftpRequest.GetResponse();
           ftpResponse.Close();
+          fileReturn = ftpServerUrl;
         }
         else
         {
@@ -7566,6 +7568,7 @@ namespace App.Web.Controllers
             // Disconnect from the SFTP server
             sftpClient.Disconnect();
           }
+          fileReturn = Path.Combine(remoteDirectory, formattedName);
           //using (var client = new SftpClient(host, port, username, password))
           //{
           //  client.Connect();
@@ -7584,6 +7587,20 @@ namespace App.Web.Controllers
 
           //  client.Disconnect();
           //}
+        }
+
+        try
+        {
+          var placeholders = new Dictionary<string, string>
+          {
+            { "FilePath", fileReturn }
+          };
+
+          Services.EmailService.SendProcessEmail("Disbursement_FILE_UPLOAD", placeholders);
+        }
+        catch (Exception ex)
+        {
+          ExceptionManagement.ExceptionManager.Publish(ex);
         }
       }
       catch (Exception ex)

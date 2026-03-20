@@ -1,45 +1,46 @@
+using App.Data;
+using App.Data.Entities;
+using App.Data.Extentions;
+using App.Data.ViewModels;
+using App.Web.Filters;
+using App.Web.Helper;
+using App.Web.Models;
+using App.Web.Repository;
+using ClosedXML.Excel;
+using CrystalDecisions.Shared.Json;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using JKPS.BLL;
+using JKPS.COMMON;
+using JKPS.CommonUtilities;
+using JKPS.DL;
+using Microsoft.Ajax.Utilities;
+using Microsoft.AspNet.Identity;
+using Renci.SshNet;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
-using System.Web;
-using System.Web.Mvc;
-using App.Data;
-using App.Data.Entities;
-using App.Web.Models;
-using System.Text;
-using App.Data.ViewModels;
-using App.Data.Extentions;
-using System.Reflection;
-using JKPS.BLL;
-using JKPS.CommonUtilities;
-using JKPS.COMMON;
-using System.IO;
-using App.Web.Filters;
-using App.Web.Repository;
-using System.Data.SqlClient;
-using CrystalDecisions.Shared.Json;
-using System.Web.Script.Serialization;
-using JKPS.DL;
-using System.Collections;
-using Renci.SshNet;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.AspNet.Identity;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml;
-using System.Globalization;
-using System.Web.SessionState;
-using static App.Web.Helper.Helper;
-using System.Web.WebPages;
 using System.Printing;
-using App.Web.Helper;
+using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Ajax.Utilities;
-using System.Drawing;
+using System.Web;
 using System.Web.Hosting;
-using ClosedXML.Excel;
+using System.Web.Mvc;
+using System.Web.Script.Serialization;
+using System.Web.SessionState;
+using System.Web.UI.WebControls;
+using System.Web.WebPages;
+using static App.Web.Helper.Helper;
 
 namespace App.Web.Controllers
 {
@@ -4547,6 +4548,11 @@ namespace App.Web.Controllers
                             sftpClient.Disconnect();
                         }
                         fileReturn = Path.Combine(remoteDirectory, formattedName);
+                        var placeholders = new Dictionary<string, string>
+                        {
+                            { "FilePath", fileReturn }
+                        };
+                        Services.EmailService.SendProcessEmail("Disbursement_FILE_UPLOAD", placeholders);
                     }
                     else
                     {

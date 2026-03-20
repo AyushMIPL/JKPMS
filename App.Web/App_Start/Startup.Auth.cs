@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
@@ -94,14 +94,25 @@ namespace App.Web
 
                 // Add Content Security Policy header
 
-                context.Response.Headers.Add("Content-Security-Policy", new[] { "default-src 'self'" +
-                    "; img-src 'self' http: https: data:;" +
-                    "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com http://fonts.googleapis.com http://fonts.gstatic.com; " +
-                    $"style-src 'nonce-{nonce}';"+
-                    //"style-src-elem 'self';"+
-                    "style-src-elem * 'unsafe-inline';"+
-                    $"script-src 'self' 'nonce-{nonce}';"+
-                    //"object-src 'none';"+
+                //context.Response.Headers.Add("Content-Security-Policy", new[] { "default-src 'self'" +
+                //    "; img-src 'self' http: https: data:;" +
+                //    "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com http://fonts.googleapis.com http://fonts.gstatic.com; " +
+                //    $"style-src 'self' 'unsafe-inline';"+
+                //    //"style-src-elem 'self';"+
+                //    "style-src-elem * 'unsafe-inline';"+
+                //    $"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.ckeditor.com http://localhost:* 'nonce-{nonce}';"+
+                //    //"object-src 'none';"+
+                //    "frame-ancestors 'self';"
+                //});
+
+                context.Response.Headers.Add("Content-Security-Policy", new[]
+                {
+                    "default-src 'self';" +
+                    "img-src 'self' http: https: data:;" +
+                    "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com http://fonts.googleapis.com http://fonts.gstatic.com;" +
+                    "style-src 'self' 'unsafe-inline';" +
+                    "style-src-elem * 'unsafe-inline';" +
+                    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.ckeditor.com http://localhost:*;" +
                     "frame-ancestors 'self';"
                 });
 

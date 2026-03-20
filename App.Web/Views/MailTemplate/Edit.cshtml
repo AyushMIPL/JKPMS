@@ -1,0 +1,148 @@
+@model App.Data.Entities.MailTemplate
+
+@{
+    ViewBag.Title = "Edit Email Template";
+    var processKeys = ViewBag.ProcessKeys as List<string> ?? new List<string>();
+    var emailsList = ViewBag.Emails as List<string> ?? new List<string>();
+    var selectedToEmails = (Model.ToEmails ?? "").Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+    var selectedCcEmails = (Model.CcEmails ?? "").Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+}
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="headline">
+            Edit Email Template
+            <ul class="tool-bar">
+                <li>
+                    <a href="@Url.Action("Index")" class="btn btn-default btn-xs"><i class="fa fa-arrow-left"></i> Back to List</a>
+                </li>
+            </ul>
+        </h4>
+    </div>
+    <div class="panel-body">
+        @using (Html.BeginForm("Edit", "MailTemplate", FormMethod.Post, new { id = "mailTemplateForm", @class = "form-horizontal" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.Id)
+
+            <div class="form-group row">
+                @Html.LabelFor(model => model.TemplateName, "Template Name", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-8">
+                    @Html.EditorFor(model => model.TemplateName, new { htmlAttributes = new { @class = "form-control", required = "required", maxlength = "200" } })
+                    @Html.ValidationMessageFor(model => model.TemplateName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group row mt-3">
+                @Html.LabelFor(model => model.ProcessKey, "Process Key", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-8">
+                    <select name="ProcessKey" class="form-control select2-tags" required="required">
+                        <option value=""></option>
+                        @foreach(var key in processKeys)
+                        {
+                            <option value="@key" @(Model.ProcessKey == key ? "selected" : "")>@key</option>
+                        }
+                    </select>
+                    <small class="text-muted">Unique key used in code to fetch this template (e.g. SFTP_FILE_UPLOAD) - <a href="/MasterProcessKey/Index" target="_blank" title="Manage Process Keys">Manage Process Keys</a></small>
+                    @Html.ValidationMessageFor(model => model.ProcessKey, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group row mt-3">
+                @Html.LabelFor(model => model.Subject, "Subject", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Subject, new { htmlAttributes = new { @class = "form-control", required = "required", maxlength = "500" } })
+                    @Html.ValidationMessageFor(model => model.Subject, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group row mt-3">
+                @Html.LabelFor(model => model.Body, "Body", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextAreaFor(model => model.Body, new { @class = "form-control", id = "BodyEditor", rows = "10" })
+                    @Html.ValidationMessageFor(model => model.Body, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group row mt-3">
+                @Html.LabelFor(model => model.ToEmails, "To Emails", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <select name="ToEmailsList" class="form-control select2-multiple" multiple="multiple">
+                        @foreach(var email in selectedToEmails)
+                        {
+                            <option value="@email" selected>@email</option>
+                        }
+                        @foreach(var email in emailsList.Where(e => !selectedToEmails.Contains(e, StringComparer.OrdinalIgnoreCase)))
+                        {
+                            <option value="@email">@email</option>
+                        }
+                    </select>
+                    <small class="text-muted">Separate multiple emails with semicolon (;) or type a new email - <a href="/MasterEmail/Index" target="_blank" title="Manage Master Emails">Manage Emails</a></small>
+                    @Html.ValidationMessageFor(model => model.ToEmails, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group row mt-3">
+                @Html.LabelFor(model => model.CcEmails, "Cc Emails", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <select name="CcEmailsList" class="form-control select2-multiple" multiple="multiple">
+                        @foreach(var email in selectedCcEmails)
+                        {
+                            <option value="@email" selected>@email</option>
+                        }
+                        @foreach(var email in emailsList.Where(e => !selectedCcEmails.Contains(e, StringComparer.OrdinalIgnoreCase)))
+                        {
+                            <option value="@email">@email</option>
+                        }
+                    </select>
+                    <small class="text-muted">Separate multiple emails with semicolon (;) or type a new email - <a href="/MasterEmail/Index" target="_blank" title="Manage Master Emails">Manage Emails</a></small>
+                    @Html.ValidationMessageFor(model => model.CcEmails, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group row mt-3">
+                @Html.LabelFor(model => model.IsActive, "Is Active", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="checkbox">
+                        @Html.EditorFor(model => model.IsActive)
+                        @Html.ValidationMessageFor(model => model.IsActive, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row mt-4">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Save Changes" class="btn btn-primary" />
+                    <a href="@Url.Action("Index")" class="btn btn-default">Cancel</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section scripts {
+    <script nonce="@(ViewBag.StyleNonce ?? Session["StyleNonce"])" src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script nonce="@(ViewBag.StyleNonce ?? Session["StyleNonce"])" src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
+    <script nonce="@(ViewBag.StyleNonce ?? Session["StyleNonce"])">
+        $(document).ready(function() {
+            $('.select2-tags').select2({
+                tags: true,
+                placeholder: 'Select or type to add new',
+                allowClear: true
+            });
+
+            $('.select2-multiple').select2({
+                tags: true,
+                placeholder: 'Select emails or type to add new',
+                tokenSeparators: [',', ';', ' ']
+            });
+
+            CKEDITOR.replace('BodyEditor', {
+                height: 300,
+            });
+        });
+    </script>
+}

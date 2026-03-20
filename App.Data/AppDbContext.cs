@@ -1,4 +1,4 @@
-﻿using App.Data.Entities;
+using App.Data.Entities;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Data.Entity;
@@ -162,6 +162,7 @@ namespace App.Data
             modelBuilder.Entity<ClientTestTable>().ToTable("ClientTestTable");
             modelBuilder.Entity<TxnHeader>().ToTable("txnHeader");
             modelBuilder.Entity<TxnDetail>().ToTable("txnDetail");
+            modelBuilder.Entity<MailTemplate>().ToTable("MailTemplates");
         }
 
         public override async Task<int> SaveChangesAsync()
@@ -539,6 +540,9 @@ namespace App.Data
         public DbSet<TxnHeader> TxnHeaders { get; set; }
         public DbSet<TxnDetail> TxnDetails { get; set; }
         public DbSet<Widgets> Widgets { get; set; }
+        public DbSet<MailTemplate> MailTemplates { get; set; }
+        public DbSet<MasterEmail> MasterEmails { get; set; }
+        public DbSet<MasterProcessKey> MasterProcessKeys { get; set; }
         public IEnumerable<object> AppUser { get; set; }
         public DbSet Set(string name)
         {
