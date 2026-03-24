@@ -590,6 +590,31 @@
     <Compile Include="Helper\UrlEncryption.cs" />
     <Compile Include="ListToDataset.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="ReportForms\TransactionMonitoring.aspx.cs">
+      <DependentUpon>TransactionMonitoring.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ReportForms\TransactionMonitoring.aspx.designer.cs">
+      <DependentUpon>TransactionMonitoring.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ReportForms\TransactionMonitoring1.aspx.cs">
+      <DependentUpon>TransactionMonitoring1.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ReportForms\TransactionMonitoring1.aspx.designer.cs">
+      <DependentUpon>TransactionMonitoring1.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\DSTransactionMonitoring.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DSTransactionMonitoring.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\rptTransactionMonitoring.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>rptTransactionMonitoring.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Services\EmailService.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\DynamicMenuItem.cs" />
@@ -1209,9 +1234,11 @@
     <Content Include="Images\PSPFLogo.png" />
     <Content Include="Images\swach-bharat.png" />
     <Content Include="Log file\jkps_log.txt" />
+    <Content Include="ReportForms\TransactionMonitoring.aspx" />
     <Content Include="ReportForms\ContributionByEmployer.aspx" />
     <Content Include="ReportForms\ContributionsByContributors.aspx" />
     <Content Include="ReportForms\RetirementsDetails.aspx" />
+    <Content Include="ReportForms\TransactionMonitoring1.aspx" />
     <Content Include="Scripts\autocomplete.js" />
     <Content Include="Scripts\autoNumeric.js" />
     <Content Include="Content\endless\fonts\fontawesome-webfont.eot" />
@@ -1488,6 +1515,17 @@
     </Content>
     <Content Include="Reports\DSYearlyPensionDetails.xsc">
       <DependentUpon>DSYearlyPensionDetails.xsd</DependentUpon>
+    </Content>
+    <Content Include="Reports\DSTransactionMonitoring.xsc">
+      <DependentUpon>DSTransactionMonitoring.xsd</DependentUpon>
+    </Content>
+    <None Include="Reports\DSTransactionMonitoring.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DSTransactionMonitoring.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <Content Include="Reports\DSTransactionMonitoring.xss">
+      <DependentUpon>DSTransactionMonitoring.xsd</DependentUpon>
     </Content>
     <None Include="Reports\DSYearlyPensionDetails.xsd" />
     <Content Include="Reports\DSYearlyPensionDetails.xss">
@@ -2083,6 +2121,10 @@
     <EmbeddedResource Include="Reports\rptTotalPensionPayments.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>rptTotalPensionPayments.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\rptTransactionMonitoring.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>rptTransactionMonitoring.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Reports\SubGLSumReport.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>

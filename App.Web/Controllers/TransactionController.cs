@@ -11,6 +11,9 @@ using App.Data.ViewModels;
 using App.Web.Filters;
 using App.Web.Models;
 using ClosedXML.Excel;
+using System.Data;
+using System.Data.SqlClient;
+using System.Text;
 
 namespace App.Web.Controllers
 {
@@ -380,6 +383,114 @@ namespace App.Web.Controllers
             {
                 TempData["error"] = "Error exporting to Excel: " + ex.Message;
                 return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult PrintTransactionMonitoring(string txnDateFrom, string txnDateTo, string department, string status, string scheme, string searchAppRef, string searchAccNo, string searchTxnRef)
+        {
+            try
+            {
+                StringBuilder sql = new StringBuilder();
+                sql.Append("SELECT d.DetailId, h.SourceTable, h.TxnDate, h.ImportedOn, d.[Application Reference No#] as ApplicationReferenceNo, ");
+                sql.Append("d.Department, d.Name, d.[Account No#] as AccountNo, d.Amount, d.Scheme, d.Status, ");
+                sql.Append("d.TransactionReference, d.TransactionDate, d.Remarks, d.IFSC, d.[Department Account No#] as DepartmentAccountNo, ");
+                sql.Append("d.[Department Bank Name] as DepartmentBankName, d.[Department Bank IFSC] as DepartmentBankIFSC ");
+                sql.Append("FROM txnDetail d ");
+                sql.Append("JOIN txnHeader h ON d.HeaderId = h.HeaderId ");
+                sql.Append("WHERE 1=1 ");
+
+                List<SqlParameter> parameters = new List<SqlParameter>();
+
+                if (!string.IsNullOrEmpty(txnDateFrom))
+                {
+                    DateTime fromDate;
+                    if (DateTime.TryParseExact(txnDateFrom, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out fromDate))
+                    {
+                        sql.Append(" AND h.TxnDate >= @txnDateFrom");
+                        parameters.Add(new SqlParameter("@txnDateFrom", fromDate));
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(txnDateTo))
+                {
+                    DateTime toDate;
+                    if (DateTime.TryParseExact(txnDateTo, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out toDate))
+                    {
+                        toDate = toDate.AddDays(1);
+                        sql.Append(" AND h.TxnDate < @txnDateTo");
+                        parameters.Add(new SqlParameter("@txnDateTo", toDate));
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(department))
+                {
+                    sql.Append(" AND d.Department = @department");
+                    parameters.Add(new SqlParameter("@department", department));
+                }
+
+                if (!string.IsNullOrEmpty(status))
+                {
+                    sql.Append(" AND d.Status = @status");
+                    parameters.Add(new SqlParameter("@status", status));
+                }
+
+                if (!string.IsNullOrEmpty(scheme))
+                {
+                    sql.Append(" AND d.Scheme = @scheme");
+                    parameters.Add(new SqlParameter("@scheme", scheme));
+                }
+
+                if (!string.IsNullOrEmpty(searchAppRef))
+                {
+                    sql.Append(" AND (d.[Application Reference No#] LIKE @searchAppRef OR d.[Application Reference No#1] LIKE @searchAppRef)");
+                    parameters.Add(new SqlParameter("@searchAppRef", "%" + searchAppRef + "%"));
+                }
+
+                if (!string.IsNullOrEmpty(searchAccNo))
+                {
+                    sql.Append(" AND d.[Account No#] LIKE @searchAccNo");
+                    parameters.Add(new SqlParameter("@searchAccNo", "%" + searchAccNo + "%"));
+                }
+
+                if (!string.IsNullOrEmpty(searchTxnRef))
+                {
+                    sql.Append(" AND d.TransactionReference LIKE @searchTxnRef");
+                    parameters.Add(new SqlParameter("@searchTxnRef", "%" + searchTxnRef + "%"));
+                }
+
+                sql.Append(" ORDER BY h.TxnDate DESC");
+
+                DataSet ds = new DataSet();
+                string conString = ConnectionStringProvider.GetConnectionString();
+                using (SqlConnection con = new SqlConnection(conString))
+                {
+                    using (SqlCommand cmd = new SqlCommand(sql.ToString(), con))
+                    {
+                        if (parameters.Count > 0)
+                        {
+                            cmd.Parameters.AddRange(parameters.ToArray());
+                        }
+                        SqlDataAdapter da = new SqlDataAdapter(cmd);
+                        da.Fill(ds, "DataTable1");
+                    }
+                }
+
+                if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    this.HttpContext.Session["ReportName"] = "rptTransactionMonitoring.rpt";
+                    this.HttpContext.Session["ReportName1"] = Path.Combine(Server.MapPath("~/Reports/rptTransactionMonitoring.rpt"));
+                    this.HttpContext.Session["rptSource"] = ds;
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "No records found for the selected filters." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error generating report: " + ex.Message });
             }
         }
 

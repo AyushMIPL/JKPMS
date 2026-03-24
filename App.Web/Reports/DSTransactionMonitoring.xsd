@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="DSTransactionMonitoring" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xs:element name="DSTransactionMonitoring" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="DataTable1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="DetailId" type="xs:int" minOccurs="0" />
+              <xs:element name="SourceTable" type="xs:string" minOccurs="0" />
+              <xs:element name="TxnDate" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="ImportedOn" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="ApplicationReferenceNo" type="xs:string" minOccurs="0" />
+              <xs:element name="Department" type="xs:string" minOccurs="0" />
+              <xs:element name="Name" type="xs:string" minOccurs="0" />
+              <xs:element name="AccountNo" type="xs:string" minOccurs="0" />
+              <xs:element name="Amount" type="xs:double" minOccurs="0" />
+              <xs:element name="Scheme" type="xs:string" minOccurs="0" />
+              <xs:element name="Status" type="xs:string" minOccurs="0" />
+              <xs:element name="TransactionReference" type="xs:string" minOccurs="0" />
+              <xs:element name="TransactionDate" type="xs:string" minOccurs="0" />
+              <xs:element name="Remarks" type="xs:string" minOccurs="0" />
+              <xs:element name="IFSC" type="xs:string" minOccurs="0" />
+              <xs:element name="DepartmentAccountNo" type="xs:string" minOccurs="0" />
+              <xs:element name="DepartmentBankName" type="xs:string" minOccurs="0" />
+              <xs:element name="DepartmentBankIFSC" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -112,13 +112,28 @@
                 <button type="button" id="btnSearch" class="btn btn-success"><i class="fa fa-search"></i> Search</button>
                 &nbsp;
                 <button type="button" id="btnReset" class="btn btn-default"><i class="fa fa-refresh"></i> Reset</button>
+                <button type="button" id="btnPrint" class="btn btn-primary"><i class="fa fa-print"></i> Print Report</button>
                 @*<button type="button" id="btnExport" class="btn btn-info pull-right"><i class="fa fa-file-excel-o"></i> Export to Excel <i id="exportSpinner" class="fa fa-spinner fa-spin txn-spinner-hidden"></i></button>*@
             </div>
         </div>
     </div>
 </div>
 
-<div class="panel panel-default">
+<div id="reportContainer" style="display:none; margin-bottom:20px;">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="headline txn-headline">
+                Report Viewer
+                <button type="button" class="btn btn-xs btn-danger pull-right" id="btnCloseReport"><i class="fa fa-times"></i> Close</button>
+            </h4>
+        </div>
+        <div class="panel-body" style="padding:0;">
+            <iframe id="reportData" style="border: 0px; height: 800px; width: 100%;"></iframe>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default" id="txnTablePanel">
     <div class="panel-heading clearfix">
         <h4 class="headline txn-headline">
             Transaction Records
@@ -337,6 +352,48 @@
                 clearInterval(pollTimer);
                 $('#exportOverlay').removeClass('txn-overlay-visible');
             }, 120000);
+        });
+    }
+
+    // Print Report
+    if (document.getElementById("btnPrint")) {
+        document.getElementById("btnPrint").addEventListener("click", function () {
+            var filters = getFilterParams();
+            
+            // Show overlay/loader
+            $('#exportOverlay').find('p').text('Generating report, please wait...');
+            $('#exportOverlay').addClass('txn-overlay-visible');
+
+            $.ajax({
+                url: '/Transaction/PrintTransactionMonitoring',
+                type: 'POST',
+                data: filters,
+                success: function (response) {
+                    if (response.success) {
+                        $('#txnTablePanel').hide();
+                        $('#reportContainer').show();
+                        $('#reportData').attr('src', '/ReportForms/TransactionMonitoring.aspx');
+                    } else {
+                        alert(response.message || "Error generating report.");
+                    }
+                },
+                error: function () {
+                    alert("An error occurred while communicating with the server.");
+                },
+                complete: function() {
+                    $('#exportOverlay').removeClass('txn-overlay-visible');
+                    $('#exportOverlay').find('p').text('Exporting to Excel, please wait...');
+                }
+            });
+        });
+    }
+
+    // Close Report button
+    if (document.getElementById("btnCloseReport")) {
+        document.getElementById("btnCloseReport").addEventListener("click", function () {
+            $('#reportContainer').hide();
+            $('#txnTablePanel').show();
+            $('#reportData').attr('src', 'about:blank');
         });
     }
 </script>

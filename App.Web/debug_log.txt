@@ -1,0 +1,14 @@
+
+[24/03/2026 15:12:11] Error in ConfigureCrystalReports (Export):
+System.Threading.ThreadAbortException: Thread was being aborted.
+   at System.Threading.Thread.AbortInternal()
+   at System.Threading.Thread.Abort(Object stateInfo)
+   at System.Web.HttpResponse.AbortCurrentThread()
+   at App.Web.ReportForms.TransactionMonitoring.ConfigureCrystalReports(ExportFormatType formatType, Boolean showPdfInIframe) in D:\Ayush\SourceCode\Official\JKPMS_Git\App.Web\ReportForms\TransactionMonitoring.aspx.cs:line 150
+
+[24/03/2026 15:14:52] Error in ConfigureCrystalReports (Export):
+System.Threading.ThreadAbortException: Thread was being aborted.
+   at System.Threading.Thread.AbortInternal()
+   at System.Threading.Thread.Abort(Object stateInfo)
+   at System.Web.HttpResponse.AbortCurrentThread()
+   at App.Web.ReportForms.TransactionMonitoring.ConfigureCrystalReports(ExportFormatType formatType, Boolean showPdfInIframe) in D:\Ayush\SourceCode\Official\JKPMS_Git\App.Web\ReportForms\TransactionMonitoring.aspx.cs:line 150
