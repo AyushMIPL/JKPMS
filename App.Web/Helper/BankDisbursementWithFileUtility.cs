@@ -1,4 +1,4 @@
-﻿using App.Data;
+using App.Data;
 using JKPS.BLL;
 using JKPS.COMMON;
 using JKPS.DL;
@@ -300,8 +300,8 @@ namespace App.Web.Helper
                 DataTable dataTable = ConvertCsvToDataTable(csvFilePath);
                 
                 int benif_Count = dataTable.Rows.Count;
-                int Validated_count = dataTable.AsEnumerable().Count(row => row.Field<string>("Status") == "OK");
-                int Notvalidated_count = dataTable.AsEnumerable().Count(row => row.Field<string>("Status") != "OK");
+                int Validated_count = dataTable.AsEnumerable().Count(row => StatusValidator.IsValidSuccess(row.Field<string>("Status")));
+                int Notvalidated_count = dataTable.AsEnumerable().Count(row => !StatusValidator.IsValidSuccess(row.Field<string>("Status")));
                 SaveDownloadMediaDetail(file.FileName, false, benif_Count, Validated_count, Notvalidated_count, "");
             }
             catch (Exception ex)

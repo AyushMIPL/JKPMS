@@ -587,6 +587,7 @@
     <Compile Include="Helper\ResponseCaptureStream.cs" />
     <Compile Include="Helper\SecurityHelper.cs" />
     <Compile Include="Helper\SiteHelper.cs" />
+    <Compile Include="Helper\StatusValidator.cs" />
     <Compile Include="Helper\UrlEncryption.cs" />
     <Compile Include="ListToDataset.cs" />
     <Compile Include="Logger.cs" />

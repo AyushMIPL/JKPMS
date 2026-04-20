@@ -1,4 +1,4 @@
-﻿using App.Data.Entities;
+using App.Data.Entities;
 using JKPS.COMMON;
 using JKPS.DL;
 using Quartz;
@@ -406,11 +406,11 @@ namespace App.Web.Helper
         int benif_Count = dataTable.Rows.Count;
 
         int Validated_count = dataTable.AsEnumerable()
-            .Where(row => replaceCharacters(row.Field<string>("ACCOUNT_STATUS")) == "ACTIVE"
-            && replaceCharacters(row.Field<string>("AADHAAR_STATUS")) == "AADHAAR SEEDED"
-            && replaceCharacters(row.Field<string>("ACCT_SCHEME_TYPE")) == "SAVINGS ACCOUNT"
-            && replaceCharacters(row.Field<string>("NAME_OF_APPLICANT")) == replaceCharacters(row.Field<string>("CBS_NAME"))
-            && replaceCharacters(row.Field<string>("BENE_IFSC")) == replaceCharacters(row.Field<string>("BRANCH_CODE"))
+            .Where(row => StatusValidator.IsActive(row.Field<string>("ACCOUNT_STATUS"))
+            && StatusValidator.Normalize(row.Field<string>("AADHAAR_STATUS")) == "AADHAAR SEEDED"
+            && StatusValidator.Normalize(row.Field<string>("ACCT_SCHEME_TYPE")) == "SAVINGS ACCOUNT"
+            && StatusValidator.Normalize(row.Field<string>("NAME_OF_APPLICANT")) == StatusValidator.Normalize(row.Field<string>("CBS_NAME"))
+            && StatusValidator.Normalize(row.Field<string>("BENE_IFSC")) == StatusValidator.Normalize(row.Field<string>("BRANCH_CODE"))
           ).Count();
 
         int Notvalidated_count = benif_Count - Validated_count;

@@ -1,4 +1,4 @@
-﻿
+
 
 using App.Data;
 using App.Data.Entities;
@@ -504,17 +504,31 @@ namespace App.Web.Helper
 
                 //A/int Validated_count = dataTable.AsEnumerable().Count(row => row.Field<string>("Status") == "OK");
                 //A/int Notvalidated_count = dataTable.AsEnumerable().Count(row => row.Field<string>("Status") != "OK");
-                int statusColumnIndx = 13;
-                var validStatuses = new HashSet<string>(StringComparer.OrdinalIgnoreCase){"OK","DELIVERED","POSTED"};
-
+                
+                // Enhanced validation logic using StatusValidator for synonyms and normalization
+                // Check multiple potential status columns (11, 12, 13, 14, 15) to be robust
+                int[] potentialStatusIndices = { 11, 12, 13, 14, 15 };
+                
                 int Validated_count = dataTable.AsEnumerable()
                     .Count(row =>
                     {
-                        var status = row[statusColumnIndx]?.ToString()?.Trim();
-                        return !string.IsNullOrEmpty(status) && validStatuses.Contains(status);
+                        foreach (int idx in potentialStatusIndices)
+                        {
+                            if (idx < row.Table.Columns.Count)
+                            {
+                                var status = row[idx]?.ToString();
+                                if (StatusValidator.IsValidSuccess(status))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
                     });
 
                 int Notvalidated_count = dataTable.Rows.Count - Validated_count;
+                
+                Logger.Info($"File: {Path.GetFileName(filePath)} | Total: {benif_Count} | Validated: {Validated_count} | NotValidated: {Notvalidated_count}");
 
                 SaveDownloadMediaDetail(Path.GetFileName(filePath), false, benif_Count, Validated_count, Notvalidated_count, "");
 
@@ -591,8 +605,15 @@ namespace App.Web.Helper
                         if (string.IsNullOrWhiteSpace(line))
                             continue;
 
-                        // Split and skip first column
-                        string[] values = line.Split(',')
+                        // Try to detect delimiter (Comma or Tab)
+                        char delimiter = ',';
+                        if (line.Contains("\t") && line.Split('\t').Length > line.Split(',').Length)
+                        {
+                            delimiter = '\t';
+                        }
+
+                        // Split and skip first column (if it's a legacy requirement/row index)
+                        string[] values = line.Split(delimiter)
                                                .Where((item, index) => index != 0)
                                                .ToArray();
 
@@ -606,13 +627,15 @@ namespace App.Web.Helper
                             columnsCreated = true;
                         }
 
-                        DataRow row = dataTable.NewRow();
-                        for (int i = 0; i < values.Length; i++)
+                        if (values.Length > 0)
                         {
-                            row[i] = values[i];
+                            DataRow row = dataTable.NewRow();
+                            for (int i = 0; i < Math.Min(values.Length, dataTable.Columns.Count); i++)
+                            {
+                                row[i] = values[i];
+                            }
+                            dataTable.Rows.Add(row);
                         }
-
-                        dataTable.Rows.Add(row);
                     }
                 }
             }

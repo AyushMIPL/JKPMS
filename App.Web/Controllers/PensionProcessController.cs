@@ -3302,7 +3302,8 @@ namespace App.Web.Controllers
 
                     //var regionss = Session["RegionName"].ToString();
                     var regionss = GetRegionName();
-                    var directoryNamess = regionss == "KASHMIR REGION" ? "K_Disbursement.xlsx" : "J_Disbursement.xlsx";
+                    var directoryNamess = regionss == "KASHMIR REGION" ? "K_Disbursement.csv" : "J_Disbursement.csv";
+                    //var directoryNamess = regionss == "KASHMIR REGION" ? "K_Disbursement.xlsx" : "J_Disbursement.xlsx";
                     string uploadformattedName = $"{distict_value}_{batch_value}_{DateTime.Now.ToString("yyyyMMdd_HHmmss")}{directoryNamess}";
 
 
