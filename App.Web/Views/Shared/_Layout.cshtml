@@ -838,32 +838,37 @@ $(".theme-setting").on('click', function () {
     allowClear: true
   });
 
-  var DropDownCls = $("#EmployeeId").attr("class");
-  if ($("#EmployeeId").length > 0) {
-    if ($("#EmployeeId").attr("class").includes("select2"))
-      $("#EmployeeId").select2("destroy");
-    $("#EmployeeId").multiselect({
+  var employeeIdObj = $("#EmployeeId");
+  if (employeeIdObj.length > 0) {
+    var employeeIdClass = employeeIdObj.attr("class");
+    if (employeeIdClass && employeeIdClass.includes("select2")) {
+      employeeIdObj.select2("destroy");
+    }
+    employeeIdObj.multiselect({
       enableFiltering: true,
       enableCaseInsensitiveFiltering: true,
       buttonWidth: '263px'
     });
   }
-  var DropDownBanksNameCls = $("#BanksName").attr("class");
-  if ($("#BanksName").length > 0) {
-    if ($("#BanksName").attr("class").includes("select2"))
-      $("#BanksName").select2("destroy");
-    $("#BanksName").multiselect({
+  var banksNameObj = $("#BanksName");
+  if (banksNameObj.length > 0) {
+    var banksNameClass = banksNameObj.attr("class");
+    if (banksNameClass && banksNameClass.includes("select2")) {
+      banksNameObj.select2("destroy");
+    }
+    banksNameObj.multiselect({
       buttonWidth: '330px',
       includeSelectAllOption: true,
       nonSelectedText: 'Select an Option'
     });
   }
-  var DropDownpaymentStatus = $("#paymentStatus").attr("class");
-  if ($("#paymentStatus").length > 0) {
-    if ($("#paymentStatus").attr("class").includes("select2"))
-      $("#paymentStatus").select2("destroy");
-
+  var paymentStatusObj = $("#paymentStatus");
+  if (paymentStatusObj.length > 0) {
+    var paymentStatusClass = paymentStatusObj.attr("class");
+    if (paymentStatusClass && paymentStatusClass.includes("select2")) {
+      paymentStatusObj.select2("destroy");
     }
+  }
 
 
     $('.spaceNotAllowed').on('input', function () {

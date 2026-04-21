@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <mvcSiteMap xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns="http://mvcsitemap.codeplex.com/schemas/MvcSiteMap-File-4.0"
             xsi:schemaLocation="http://mvcsitemap.codeplex.com/schemas/MvcSiteMap-File-4.0 MvcSiteMapSchema.xsd">
@@ -84,6 +84,7 @@
         <mvcSiteMapNode title="Print Payslip" controller="PensionProcess" action="PrintPayslip" />
         <mvcSiteMapNode title="Post Pension Payroll" controller="PensionProcess" action="UpdatePostedStatus" />
         <mvcSiteMapNode title="Print Bank Listing" controller="PensionProcess" action="PrintBankListing" />
+        <mvcSiteMapNode title="Upload Pension File" controller="PensionProcess" action="UploadPensionFile" />
         <mvcSiteMapNode title="Generate Bank Media" controller="PensionProcess" action="GenerateBankMedia" />
         <mvcSiteMapNode title="Close Batch Process" controller="PensionProcess" action="CloseBatchProcess" />
         <mvcSiteMapNode title="Cancel Batch Process" controller="PensionProcess" action="CancelBatchProcess" />

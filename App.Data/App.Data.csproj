@@ -398,6 +398,7 @@
     <Compile Include="Entities\MasterNationality.cs" />
     <Compile Include="Entities\MasterPensionerType.cs" />
     <Compile Include="Entities\MasterTehsil.cs" />
+    <Compile Include="Entities\PensionFileUploadHistory.cs" />
     <Compile Include="Entities\MediaDownloads.cs" />
     <Compile Include="Entities\Media_Queue.cs" />
     <Compile Include="Entities\PayControl.cs" />
@@ -486,6 +487,7 @@
     <Compile Include="ViewModels\PensionCalculationFormulasModel.cs" />
     <Compile Include="ViewModels\PensionCalculationViewModel.cs" />
     <Compile Include="ViewModels\PensionProcessViewModel.cs" />
+    <Compile Include="ViewModels\PensionFileUploadViewModel.cs" />
     <Compile Include="ViewModels\RejectedViewModel.cs" />
     <Compile Include="ViewModels\RoleModuleViewModel.cs" />
     <Compile Include="ViewModels\SocialSecurityViewModel.cs" />

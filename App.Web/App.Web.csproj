@@ -1807,6 +1807,7 @@
     <Content Include="Views\PensionProcess\Batch\CloseBatchProcess.cshtml" />
     <Content Include="Views\PensionProcess\Payslips\PrintPayslip.cshtml" />
     <Content Include="Views\PensionProcess\DirectDeposits\PrintBankListing.cshtml" />
+    <Content Include="Views\PensionProcess\DirectDeposits\UploadPensionFile.cshtml" />
     <Content Include="Views\PensionProcess\DirectDeposits\GenerateBankMedia.cshtml" />
     <Content Include="Views\Reports\RetirementsDetails.cshtml" />
     <Content Include="Views\Reports\NewContributor.cshtml" />

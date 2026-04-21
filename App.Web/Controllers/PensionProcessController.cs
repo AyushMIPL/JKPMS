@@ -3457,6 +3457,233 @@ namespace App.Web.Controllers
             }
         }
 
+        public ActionResult UploadPensionFile()
+        {
+            return View("~/Views/PensionProcess/DirectDeposits/UploadPensionFile.cshtml");
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> UploadPensionFileAjax(PensionFileUploadViewModel model)
+        {
+            try
+            {
+                if (model.UploadedFile == null || model.UploadedFile.ContentLength == 0)
+                {
+                    return Json(new { success = false, message = "Please select a valid file." });
+                }
+
+                string fileName = Path.GetFileName(model.UploadedFile.FileName);
+                string extension = Path.GetExtension(fileName).ToLower();
+
+                if (extension != ".csv" && extension != ".xlsx")
+                {
+                    return Json(new { success = false, message = "Invalid file format. Only .csv and .xlsx are allowed." });
+                }
+
+                // Follow existing storage pattern
+                var region = GetRegionName();
+                var directoryName = region == "KASHMIR REGION" ? "K_Disbursement" : "J_Disbursement";
+                string serverMapPath = Helper.Helper.GetAllFilesPath(region, directoryName);
+
+                if (!Directory.Exists(serverMapPath))
+                {
+                    Directory.CreateDirectory(serverMapPath);
+                }
+
+                // 1. Save to Web Server (temporary for processing)
+                string uniqueFileName = $"{DateTime.Now:yyyyMMdd_HHmmss}_{fileName}";
+                string webPath = Path.Combine(serverMapPath, uniqueFileName);
+                model.UploadedFile.SaveAs(webPath);
+
+                // 2. Save to Central Repository (for future download)
+                string centralPath = Helper.Helper.CheckForExistingRecordPath(region, directoryName, uniqueFileName);
+                try
+                {
+                    string centralDir = Path.GetDirectoryName(centralPath);
+                    if (!Directory.Exists(centralDir)) Directory.CreateDirectory(centralDir);
+                    System.IO.File.Copy(webPath, centralPath, true);
+                }
+                catch (Exception ex)
+                {
+                    // Log error but continue if central storage fails (we still have it on web server)
+                    // You might want to log this to a file
+                }
+
+                // Create history record pointing to the central storage
+                var history = new PensionFileUploadHistory
+                {
+                    FileName = fileName,
+                    FilePath = centralPath, // Store central path for long-term retrieval
+                    BankReferenceNo = model.BankReferenceNo,
+                    Remarks = model.Remarks,
+                    Status = "Pending",
+                    IsActive = true,
+                    CreatedBy = Convert.ToInt32(Session["UserId"]),
+                    CreatedOn = DateTime.Now,
+                    ModifiedBy = Convert.ToInt32(Session["UserId"]),
+                    ModifiedOn = DateTime.Now
+                };
+
+                db.PensionFileUploadHistory.Add(history);
+                db.SaveChanges();
+
+                // Process and send to bank
+                string resultPath = string.Empty;
+                try
+                {
+                    // Reuse existing Disbursement logic
+                    resultPath = UploadDisbursementFile(webPath, uniqueFileName);
+                    history.Status = "Sent";
+                    history.Remarks = "Successfully sent to bank. SFTP Path: " + resultPath;
+                }
+                catch (Exception ex)
+                {
+                    history.Status = "Failed";
+                    history.Remarks = "Error sending to bank: " + ex.Message;
+                }
+
+                db.SaveChanges();
+
+                return Json(new { success = true, status = history.Status, message = history.Remarks });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred: " + ex.Message });
+            }
+        }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult BeneficiaryUploadHistoryAjaxHandler(JQueryDataTableParamModel param)
+        {
+            try
+            {
+                var history = db.PensionFileUploadHistory.AsNoTracking().Where(x => x.IsActive);
+
+                // Searching
+                if (!string.IsNullOrEmpty(param.sSearch))
+                {
+                    history = history.Where(x => x.FileName.Contains(param.sSearch) || x.Status.Contains(param.sSearch) || x.BankReferenceNo.Contains(param.sSearch));
+                }
+
+                var totalRecords = history.Count();
+
+                // Ordering
+                var displayedHistory = history.OrderByDescending(x => x.CreatedOn)
+                                              .Skip(param.iDisplayStart)
+                                              .Take(param.iDisplayLength)
+                                              .ToList();
+
+                var result = from h in displayedHistory
+                             select new[]
+                             {
+                                 h.FileName,
+                                 getUserName(h.CreatedBy),
+                                 h.CreatedOn.HasValue ? h.CreatedOn.Value.ToString("dd/MM/yyyy HH:mm") : "N/A",
+                                 h.Status,
+                                 h.BankReferenceNo,
+                                 h.Id.ToString()
+                             };
+
+                return Json(new
+                {
+                    sEcho = param.sEcho,
+                    iTotalRecords = totalRecords,
+                    iTotalDisplayRecords = totalRecords,
+                    aaData = result
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                // Capture the error and return it in a format DataTables can still display or we can debug
+                return Json(new
+                {
+                    sEcho = param.sEcho,
+                    iTotalRecords = 0,
+                    iTotalDisplayRecords = 0,
+                    aaData = new List<string[]>(),
+                    error = "Server Error: " + ex.Message
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult RetryUploadPensionFileAjax(int id)
+        {
+            try
+            {
+                var history = db.PensionFileUploadHistory.Find(id);
+                if (history == null)
+                {
+                    return Json(new { success = false, message = "Record not found." });
+                }
+
+                if (!System.IO.File.Exists(history.FilePath))
+                {
+                    return Json(new { success = false, message = "Source file no longer exists on server." });
+                }
+
+                string uniqueFileName = Path.GetFileName(history.FilePath);
+                try
+                {
+                    string resultPath = UploadDisbursementFile(history.FilePath, uniqueFileName);
+                    history.Status = "Sent";
+                    history.Remarks = "Successfully sent to bank (Retry). SFTP Path: " + resultPath;
+                }
+                catch (Exception ex)
+                {
+                    history.Status = "Failed";
+                    history.Remarks = "Error during retry: " + ex.Message;
+                }
+
+                db.SaveChanges();
+                return Json(new { success = true, status = history.Status, message = history.Remarks });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred during retry: " + ex.Message });
+            }
+        }
+
+        public ActionResult DownloadUploadedPensionFile(int id)
+        {
+            var history = db.PensionFileUploadHistory.Find(id);
+            if (history != null)
+            {
+                if (System.IO.File.Exists(history.FilePath))
+                {
+                    byte[] fileBytes = System.IO.File.ReadAllBytes(history.FilePath);
+                    return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, history.FileName);
+                }
+                else
+                {
+                    // Check fallback (web server)
+                    var region = GetRegionName();
+                    var directoryName = region == "KASHMIR REGION" ? "K_Disbursement" : "J_Disbursement";
+                    string webPath = Path.Combine(Helper.Helper.GetAllFilesPath(region, directoryName), history.FileName);
+                    
+                    if (System.IO.File.Exists(webPath))
+                    {
+                        byte[] fileBytes = System.IO.File.ReadAllBytes(webPath);
+                        return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, history.FileName);
+                    }
+                }
+            }
+            return HttpNotFound("The requested file could not be found on the server.");
+        }
+
+        private string getUserName(int Id)
+        {
+            string result = db.UserProfiles.Where(x => x.UserId == Id).Select(x => x.FirstName).FirstOrDefault();
+            if (result == null)
+            {
+                return "N/A";
+            }
+            else
+            {
+                return result;
+            }
+        }
+
 
 
         //public ActionResult DownLoadBankDisbursementFileAjax(string batch_value, string distict_value)
@@ -4534,16 +4761,34 @@ namespace App.Web.Controllers
                                 sftpClient.CreateDirectory(remoteDirectory);
                             }
 
-                            var ftpRequest = (FtpWebRequest)WebRequest.Create(localFilePath);
-                            ftpRequest.Method = WebRequestMethods.Ftp.DownloadFile;
-                            ftpRequest.Credentials = new NetworkCredential(ftpSetting["ftpUsername"], ftpSetting["ftpPassword"]);
-                            ftpRequest.UseBinary = true;
+                            // Handle both local and remote files for upload
+                            Stream fileStream = null;
+                            FtpWebResponse ftpResponse = null;
 
-                            using (var ftpResponse = (FtpWebResponse)ftpRequest.GetResponse())
-                            using (var ftpStream = ftpResponse.GetResponseStream())
+                            if (localFilePath.StartsWith("ftp://", StringComparison.OrdinalIgnoreCase))
+                            {
+                                var ftpRequest = (FtpWebRequest)WebRequest.Create(localFilePath);
+                                ftpRequest.Method = WebRequestMethods.Ftp.DownloadFile;
+                                ftpRequest.Credentials = new NetworkCredential(ftpSetting["ftpUsername"], ftpSetting["ftpPassword"]);
+                                ftpRequest.UseBinary = true;
+                                ftpResponse = (FtpWebResponse)ftpRequest.GetResponse();
+                                fileStream = ftpResponse.GetResponseStream();
+                            }
+                            else
+                            {
+                                fileStream = System.IO.File.OpenRead(localFilePath);
+                            }
 
-                                // Upload directly without saving locally
-                                sftpClient.UploadFile(ftpStream, Path.Combine(remoteDirectory, formattedName));
+                            try
+                            {
+                                // Upload to SFTP
+                                sftpClient.UploadFile(fileStream, Path.Combine(remoteDirectory, formattedName));
+                            }
+                            finally
+                            {
+                                if (fileStream != null) fileStream.Dispose();
+                                if (ftpResponse != null) ftpResponse.Dispose();
+                            }
 
                             // Disconnect from the SFTP server
                             sftpClient.Disconnect();
@@ -4558,19 +4803,28 @@ namespace App.Web.Controllers
                     else
                     {
                         // --- FTP Upload (existing FTP server at /PaymentFiles/Outbox) ---
-                        // Download the file from the source FTP path
-                        var ftpDownloadRequest = (FtpWebRequest)WebRequest.Create(excelFilePath);
-                        ftpDownloadRequest.Method = WebRequestMethods.Ftp.DownloadFile;
-                        ftpDownloadRequest.Credentials = new NetworkCredential(ftpSetting["ftpUsername"], ftpSetting["ftpPassword"]);
-                        ftpDownloadRequest.UseBinary = true;
-
                         byte[] fileContents;
-                        using (var ftpDownloadResponse = (FtpWebResponse)ftpDownloadRequest.GetResponse())
-                        using (var ftpStream = ftpDownloadResponse.GetResponseStream())
-                        using (var memoryStream = new MemoryStream())
+
+                        if (excelFilePath.StartsWith("ftp://", StringComparison.OrdinalIgnoreCase))
                         {
-                            ftpStream.CopyTo(memoryStream);
-                            fileContents = memoryStream.ToArray();
+                            // Download from source FTP path
+                            var ftpDownloadRequest = (FtpWebRequest)WebRequest.Create(excelFilePath);
+                            ftpDownloadRequest.Method = WebRequestMethods.Ftp.DownloadFile;
+                            ftpDownloadRequest.Credentials = new NetworkCredential(ftpSetting["ftpUsername"], ftpSetting["ftpPassword"]);
+                            ftpDownloadRequest.UseBinary = true;
+
+                            using (var ftpDownloadResponse = (FtpWebResponse)ftpDownloadRequest.GetResponse())
+                            using (var ftpStream = ftpDownloadResponse.GetResponseStream())
+                            using (var memoryStream = new MemoryStream())
+                            {
+                                ftpStream.CopyTo(memoryStream);
+                                fileContents = memoryStream.ToArray();
+                            }
+                        }
+                        else
+                        {
+                            // Read directly from local disk
+                            fileContents = System.IO.File.ReadAllBytes(excelFilePath);
                         }
 
                         // Upload to FTP server at /PaymentFiles/Outbox/
