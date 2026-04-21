@@ -1,4 +1,4 @@
-﻿@using MvcCheckBoxList.Model
+@using MvcCheckBoxList.Model
 @model App.Data.ViewModels.GeneratePensionProcessModel
 
 @{
@@ -205,6 +205,8 @@
       <thead>
         <tr>
           <th>File Name</th>
+          <th>Region</th>
+          <th>Period</th>
 
           <th>Paid</th>
           <th>Unpaid</th>
@@ -273,6 +275,8 @@
 
         "aoColumns": [
           { "sName": "FilePath" },
+          { "sName": "Region" },
+          { "sName": "Period" },
           { "sName": "TotalValidated" },
           { "sName": "TotalNotvalidated" },
           { "sName": "TotalBeneficiary" },

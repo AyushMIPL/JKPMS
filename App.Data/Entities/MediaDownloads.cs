@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,6 +19,8 @@ namespace App.Data.Entities
         public int TotalBeneficiary { get; set; }
         public int TotalValidated { get; set; }
         public int TotalNotvalidated { get; set; }
+        public string Region { get; set; }
+        public string Period { get; set; }
         public string Remark { get; set; }
     }
 }

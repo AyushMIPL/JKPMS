@@ -7423,6 +7423,8 @@ namespace App.Web.Controllers
                 //filtered = (IEnumerable<MediaDownloads>)Media_QueueDetailsList;
                 filtered = Media_QueueDetailsList
                  .Where(c => c.FileName.ToLower().Contains(param.sSearch.ToLower())
+                  || c.Region.ToLower().Contains(param.sSearch.ToLower())
+                  || c.Period.ToLower().Contains(param.sSearch.ToLower())
                   || c.TotalBeneficiary.ToString().Contains(param.sSearch.ToLower())
                   || c.TotalValidated.ToString().Contains(param.sSearch.ToLower())
                   || c.TotalNotvalidated.ToString().Contains(param.sSearch.ToLower())
@@ -7443,13 +7445,15 @@ namespace App.Web.Controllers
             //Sorting through column index
             var sortColumnIndex = Convert.ToInt32(Request["iSortCol_0"]);
 
-            Func<MediaDownloads, string> orderingFunction = (c => sortColumnIndex == 1 ? c.FileName + "" :
-                                                                  sortColumnIndex == 0 ? c.TotalBeneficiary + "" :
-                                                                  sortColumnIndex == 2 ? c.TotalValidated + "" :
-                                                                  sortColumnIndex == 3 ? c.TotalNotvalidated + "" :
-                                                                  sortColumnIndex == 4 ? c.HasDownoaded + "" :
-                                                                  sortColumnIndex == 5 ? c.CreatedOn.ToString() :
-                                                                  sortColumnIndex == 6 ? c.CreatedBy + "" :
+            Func<MediaDownloads, string> orderingFunction = (c => sortColumnIndex == 0 ? c.FileName + "" :
+                                                                  sortColumnIndex == 1 ? c.Region + "" :
+                                                                  sortColumnIndex == 2 ? c.Period + "" :
+                                                                  sortColumnIndex == 3 ? c.TotalValidated + "" :
+                                                                  sortColumnIndex == 4 ? c.TotalNotvalidated + "" :
+                                                                  sortColumnIndex == 5 ? c.TotalBeneficiary + "" :
+                                                                  sortColumnIndex == 6 ? c.HasDownoaded + "" :
+                                                                  sortColumnIndex == 7 ? c.CreatedOn.ToString() :
+                                                                  sortColumnIndex == 8 ? c.CreatedBy + "" :
                                                                                         "");
 
             // asc or desc
@@ -7469,6 +7473,8 @@ namespace App.Web.Controllers
                          let userProfile = db.UserProfiles.FirstOrDefault(x => x.Id == uploadedById && x.IsActive == true)
                          select new[] {
                        c.FileName,
+                       c.Region ?? "",
+                       c.Period ?? "",
                        c.TotalValidated.ToString(),
                        c.TotalNotvalidated.ToString(),
                        c.TotalBeneficiary.ToString(),

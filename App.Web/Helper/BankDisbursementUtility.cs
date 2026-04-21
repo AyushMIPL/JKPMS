@@ -184,12 +184,21 @@ namespace App.Web.Helper
                                 var regionDis = currentRegionProvider.GetCurrentRegion();
                                 var directoryNamDis = regionDis == "KASHMIR REGION" ? "K_BankMediaFileUpload" : "J_BankMediaFileUpload";
 
+                                if (!IsSentViaSystem(latestFile.Name))
+                                {
+                                    Logger.Warn($"File {latestFile.Name} was not sent via the system. Skipping.");
+                                    var task1 = Task.Run(() => true);
+                                    return task1;
+                                }
+
                                 string databaseFilePath = ftpSetting["localFilePath"] + $"/DataFiles/{directoryNamDis}/" + csvFileName;
 
                                 //string databaseFilePath = ftpSetting["localFilePath"] + "/DataFiles/BankMediaFileUpload/" + csvFileName;
 
                                 UpdateBankMediaExcelDatabase(databaseFilePath);
-                                SaveDownloadMediaDetail(latestFile.Name, true);
+                                // Fetch Period from Batch Header
+                                string period = GetPeriodFromBatch(latestFile.Name);
+                                SaveDownloadMediaDetail(latestFile.Name, true, 0, 0, 0, "", regions, period);
                                 UpdatePostedStatus();
                                 CloseBatchProcessAjax();
                                 SaveArchiveFile(latestFile.Name, new NetworkCredential(ftpUsername, ftpPassword), ftpHost);
@@ -286,6 +295,13 @@ namespace App.Web.Helper
 
                                 string databaseFilePath = ftpSetting["localFilePath"] + $"\\DataFiles\\{directoryNameDiss}\\" + csvFileName;
                                 //string databaseFilePath = ftpSetting["localFilePath"] + "/DataFiles/BankMediaFileUpload/" + csvFileName;
+                                if (!IsSentViaSystem(latestFile.Name))
+                                {
+                                    Logger.Warn($"File {latestFile.Name} was not sent via the system. Skipping.");
+                                    var task2 = Task.Run(() => true);
+                                    return task2;
+                                }
+
                                 try
                                 {
                                     UpdateBankMediaExcelDatabase(databaseFilePath);
@@ -295,7 +311,9 @@ namespace App.Web.Helper
 
                                    
                                 }
-                                SaveDownloadMediaDetail(latestFile.Name, true);
+                                // Fetch Period from Batch Header
+                                string period = GetPeriodFromBatch(latestFile.Name);
+                                SaveDownloadMediaDetail(latestFile.Name, true, 0, 0, 0, "", region, period);
                                 UpdatePostedStatus();
                                 CloseBatchProcessAjax();
 
@@ -443,7 +461,7 @@ namespace App.Web.Helper
                 throw;
             }
         }
-        private void SaveDownloadMediaDetail(string fileName, bool IsProcessed, Int32 TotalBeneficiary = 0, Int32 TotalValidated = 0, Int32 TotalNotvalidated = 0, string remark = "")
+        private void SaveDownloadMediaDetail(string fileName, bool IsProcessed, Int32 TotalBeneficiary = 0, Int32 TotalValidated = 0, Int32 TotalNotvalidated = 0, string remark = "", string region = "", string period = "")
         {
             try
             {
@@ -456,7 +474,7 @@ namespace App.Web.Helper
                     DALBaseClassHelper objDALBaseClassHelper = new DALBaseClassHelper();
                     DALBaseClass objDalBaseClass = objDALBaseClassHelper.GetDAL();
 
-                    object[] parameters = new object[16];
+                    object[] parameters = new object[18];
                     parameters[0] = fileName; // FileName 
                     parameters[1] = true; // HasDownoaded
                     parameters[2] = IsProcessed; // IsProcessed
@@ -474,7 +492,9 @@ namespace App.Web.Helper
                     parameters[12] = TotalBeneficiary; // ModifiedBy
                     parameters[13] = TotalValidated; // ModifiedOn
                     parameters[14] = TotalNotvalidated; // RecordID
-                    parameters[15] = remark; // RecordID
+                    parameters[15] = remark; // Remark
+                    parameters[16] = region; // Region
+                    parameters[17] = period; // Period
 
                     // Execute the stored procedure
                     objDalBaseClass.ExecuteProcedure(ref parameters, "SaveDownloadMediaDetail");
@@ -784,6 +804,73 @@ namespace App.Web.Helper
                 throw;
             }
 
+        }
+
+        private bool IsSentViaSystem(string fileName)
+        {
+            try
+            {
+                string[] parts = fileName.Split('_');
+                if (parts.Length < 2) return false;
+
+                string district = parts[0];
+                string batchIdStr = parts[1];
+                int batchId = 0;
+                if (!int.TryParse(batchIdStr, out batchId)) return false;
+
+                DALBaseClassHelper objDALBaseClassHelper = new DALBaseClassHelper();
+                DALBaseClass objDalBaseClass = objDALBaseClassHelper.GetDAL();
+
+                int txnReportType = (int)MediaType.TxnReport;
+
+                // Check if a record exists in Media_Queue for this batch and district that was sent (TxnReport)
+                string sql = $"SELECT COUNT(*) FROM [dbo].[Media_Queue] WHERE RecordId = {batchId} AND (Districts = '{district.Replace("'", "''")}' OR Districts LIKE '%{district.Replace("'", "''")}%') AND MediaType = {txnReportType}";
+
+                var ds = objDalBaseClass.GetData(sql);
+                if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    return Convert.ToInt32(ds.Tables[0].Rows[0][0]) > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error in IsSentViaSystem for {fileName}: {ex.Message}");
+            }
+            return false;
+        }
+
+        private string GetPeriodFromBatch(string fileName)
+        {
+            try
+            {
+                string[] parts = fileName.Split('_');
+                if (parts.Length < 2) return "";
+
+                string batchIdStr = parts[1];
+                int batchId = 0;
+                if (!int.TryParse(batchIdStr, out batchId)) return "";
+
+                DALBaseClassHelper objDALBaseClassHelper = new DALBaseClassHelper();
+                DALBaseClass objDalBaseClass = objDALBaseClassHelper.GetDAL();
+
+                // Join with Process_DirectDeposit_Header to get batch_date
+                string sql = $"SELECT batch_date FROM [dbo].[Process_DirectDeposit_Header] WHERE pybatchid = {batchId} OR doc_no = {batchId}";
+
+                var ds = objDalBaseClass.GetData(sql);
+                if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    if (ds.Tables[0].Rows[0][0] != DBNull.Value)
+                    {
+                        DateTime batchDate = Convert.ToDateTime(ds.Tables[0].Rows[0][0]);
+                        return batchDate.ToString("MMMM yyyy"); // e.g., "March 2025"
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error in GetPeriodFromBatch for {fileName}: {ex.Message}");
+            }
+            return "";
         }
     }
 }
