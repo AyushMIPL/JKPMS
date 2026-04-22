@@ -3459,6 +3459,34 @@ namespace App.Web.Controllers
 
         public ActionResult UploadPensionFile()
         {
+            // Requirement 3: Source District list filtered by the currently logged-in region
+            var currentRegion = GetRegionName();
+            ViewBag.Regions = (from r in db.MasterRegion.Where(x => x.Name == currentRegion)
+                               join d in db.MasterDistrict on r.Id equals d.RegionId
+                               orderby d.Name
+                               select new SelectListItem
+                               {
+                                   Text = d.Name,
+                                   Value = d.Name
+                               }).ToList();
+
+            // Requirement 6: Year and Month selection
+            var years = new List<SelectListItem>();
+            int currentYear = DateTime.Now.Year;
+            for (int i = currentYear - 2; i <= currentYear + 2; i++)
+            {
+                years.Add(new SelectListItem { Text = i.ToString(), Value = i.ToString(), Selected = (i == currentYear) });
+            }
+            ViewBag.Years = years;
+
+            var months = new List<SelectListItem>();
+            for (int i = 1; i <= 12; i++)
+            {
+                string monthName = new DateTime(2000, i, 1).ToString("MMMM");
+                months.Add(new SelectListItem { Text = monthName, Value = monthName, Selected = (i == DateTime.Now.Month) });
+            }
+            ViewBag.Months = months;
+
             return View("~/Views/PensionProcess/DirectDeposits/UploadPensionFile.cshtml");
         }
 
@@ -3480,9 +3508,10 @@ namespace App.Web.Controllers
                     return Json(new { success = false, message = "Invalid file format. Only .csv and .xlsx are allowed." });
                 }
 
-                // Follow existing storage pattern
-                var region = GetRegionName();
-                var directoryName = region == "KASHMIR REGION" ? "K_Disbursement" : "J_Disbursement";
+                bool isValidation = model.UploadType == "Validation";
+                var region = string.IsNullOrEmpty(model.Region) ? GetRegionName() : model.Region;
+                var directoryName = region.Contains("KASHMIR") ? (isValidation ? "K_Validation" : "K_Disbursement") : (isValidation ? "J_Validation" : "J_Disbursement");
+                
                 string serverMapPath = Helper.Helper.GetAllFilesPath(region, directoryName);
 
                 if (!Directory.Exists(serverMapPath))
@@ -3490,12 +3519,17 @@ namespace App.Web.Controllers
                     Directory.CreateDirectory(serverMapPath);
                 }
 
-                // 1. Save to Web Server (temporary for processing)
                 string uniqueFileName = $"{DateTime.Now:yyyyMMdd_HHmmss}_{fileName}";
                 string webPath = Path.Combine(serverMapPath, uniqueFileName);
                 model.UploadedFile.SaveAs(webPath);
 
-                // 2. Save to Central Repository (for future download)
+                // Construct Period from Month and Year
+                if (!isValidation)
+                {
+                    model.Period = $"{model.UploadMonth} {model.UploadYear}";
+                }
+
+                // Central Repository Storage
                 string centralPath = Helper.Helper.CheckForExistingRecordPath(region, directoryName, uniqueFileName);
                 try
                 {
@@ -3503,47 +3537,59 @@ namespace App.Web.Controllers
                     if (!Directory.Exists(centralDir)) Directory.CreateDirectory(centralDir);
                     System.IO.File.Copy(webPath, centralPath, true);
                 }
-                catch (Exception ex)
-                {
-                    // Log error but continue if central storage fails (we still have it on web server)
-                    // You might want to log this to a file
-                }
+                catch (Exception) { }
 
-                // Create history record pointing to the central storage
                 var history = new PensionFileUploadHistory
                 {
                     FileName = fileName,
-                    FilePath = centralPath, // Store central path for long-term retrieval
-                    BankReferenceNo = model.BankReferenceNo,
+                    FilePath = centralPath,
                     Remarks = model.Remarks,
+                    Region = model.Region,
+                    Period = model.Period,
+                    UploadType = model.UploadType,
                     Status = "Pending",
                     IsActive = true,
-                    CreatedBy = Convert.ToInt32(Session["UserId"]),
+                    CreatedBy = AppUserManager.GetUserId(),
                     CreatedOn = DateTime.Now,
-                    ModifiedBy = Convert.ToInt32(Session["UserId"]),
+                    ModifiedBy = AppUserManager.GetUserId(),
                     ModifiedOn = DateTime.Now
                 };
 
                 db.PensionFileUploadHistory.Add(history);
                 db.SaveChanges();
 
-                // Process and send to bank
-                string resultPath = string.Empty;
-                try
+                if (isValidation)
                 {
-                    // Reuse existing Disbursement logic
-                    resultPath = UploadDisbursementFile(webPath, uniqueFileName);
-                    history.Status = "Sent";
-                    history.Remarks = "Successfully sent to bank. SFTP Path: " + resultPath;
+                    try
+                    {
+                        // Trigger SFTP Forwarding for Validation File
+                        string sftpPath = ForwardValidationFileToSftp(webPath, uniqueFileName, region);
+                        history.Status = "Sent";
+                        history.Remarks = "Validation file forwarded to SFTP. Path: " + sftpPath;
+                    }
+                    catch (Exception ex)
+                    {
+                        history.Status = "Failed";
+                        history.Remarks = "SFTP Forwarding failed: " + ex.Message;
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    history.Status = "Failed";
-                    history.Remarks = "Error sending to bank: " + ex.Message;
+                    try
+                    {
+                        // Disbursement Logic
+                        string resultPath = UploadDisbursementFile(webPath, uniqueFileName);
+                        history.Status = "Sent";
+                        history.Remarks = "Disbursement file sent to bank. SFTP Path: " + resultPath;
+                    }
+                    catch (Exception ex)
+                    {
+                        history.Status = "Failed";
+                        history.Remarks = "Error sending to bank: " + ex.Message;
+                    }
                 }
 
                 db.SaveChanges();
-
                 return Json(new { success = true, status = history.Status, message = history.Remarks });
             }
             catch (Exception ex)
@@ -3552,17 +3598,76 @@ namespace App.Web.Controllers
             }
         }
 
+        private string ForwardValidationFileToSftp(string localFilePath, string formattedName, string region)
+        {
+            Dictionary<string, string> ftpSetting = Helper.Helper.GetFTPSetting();
+            bool IsFTP = Convert.ToBoolean(ftpSetting["IsFTP"]);
+            string fileReturn = "";
+
+            if (IsFTP)
+            {
+                byte[] fileContents = System.IO.File.ReadAllBytes(localFilePath);
+                var directoryName = region.Contains("KASHMIR") ? "K_Validation" : "J_Validation";
+                string ftpServerUrl = Helper.Helper.UploadValidationFilePath(region, directoryName, formattedName);
+
+                FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create(ftpServerUrl);
+                ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
+                ftpRequest.Timeout = 600000;
+                ftpRequest.Credentials = new NetworkCredential(ftpSetting["sftpUsername"], ftpSetting["sftpPassword"]);
+                using (Stream requestStream = ftpRequest.GetRequestStream())
+                {
+                    requestStream.Write(fileContents, 0, fileContents.Length);
+                }
+                FtpWebResponse ftpResponse = (FtpWebResponse)ftpRequest.GetResponse();
+                ftpResponse.Close();
+                fileReturn = ftpServerUrl;
+            }
+            else
+            {
+                string host = ftpSetting["sftpServerUrl"];
+                int port = Convert.ToInt32(ftpSetting["sftpPort"]);
+                string username = ftpSetting["sftpUsername"];
+                string password = ftpSetting["sftpPassword"];
+                string remoteDirectory = ftpSetting["sftpFilePath"] + "/AccountValidation/Outbox";
+                string localfilepathSFTP = Server.MapPath("~/" + ftpSetting["sftpPrivateKeyPath"]);
+                
+                var keyFile = new PrivateKeyFile(localfilepathSFTP);
+                var methods = new List<AuthenticationMethod>
+                {
+                    new PasswordAuthenticationMethod(username, password),
+                    new PrivateKeyAuthenticationMethod(username, new[] { keyFile })
+                };
+
+                ConnectionInfo connectionInfo = new ConnectionInfo(host, port, username, methods.ToArray());
+                using (SftpClient sftpClient = new SftpClient(connectionInfo))
+                {
+                    sftpClient.Connect();
+                    if (!sftpClient.Exists(remoteDirectory)) sftpClient.CreateDirectory(remoteDirectory);
+                    using (var fileStream = new FileStream(localFilePath, FileMode.Open))
+                    {
+                        sftpClient.UploadFile(fileStream, Path.Combine(remoteDirectory, formattedName));
+                    }
+                    sftpClient.Disconnect();
+                }
+                fileReturn = Path.Combine(remoteDirectory, formattedName);
+            }
+            return fileReturn;
+        }
+
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult BeneficiaryUploadHistoryAjaxHandler(JQueryDataTableParamModel param)
+        public JsonResult BeneficiaryUploadHistoryAjaxHandler(JQueryDataTableParamModel param, string uploadType = "Disbursement")
         {
             try
             {
                 var history = db.PensionFileUploadHistory.AsNoTracking().Where(x => x.IsActive);
 
+                // Requirement 5: Filter by type
+                history = history.Where(x => (x.UploadType ?? "Disbursement") == uploadType);
+
                 // Searching
                 if (!string.IsNullOrEmpty(param.sSearch))
                 {
-                    history = history.Where(x => x.FileName.Contains(param.sSearch) || x.Status.Contains(param.sSearch) || x.BankReferenceNo.Contains(param.sSearch));
+                    history = history.Where(x => x.FileName.Contains(param.sSearch) || x.Status.Contains(param.sSearch) || x.Region.Contains(param.sSearch) || x.Period.Contains(param.sSearch));
                 }
 
                 var totalRecords = history.Count();
@@ -3577,10 +3682,10 @@ namespace App.Web.Controllers
                              select new[]
                              {
                                  h.FileName,
-                                 getUserName(h.CreatedBy),
+                                 h.Region ?? "N/A",
+                                 h.Period ?? "N/A",
                                  h.CreatedOn.HasValue ? h.CreatedOn.Value.ToString("dd/MM/yyyy HH:mm") : "N/A",
                                  h.Status,
-                                 h.BankReferenceNo,
                                  h.Id.ToString()
                              };
 
@@ -3625,9 +3730,18 @@ namespace App.Web.Controllers
                 string uniqueFileName = Path.GetFileName(history.FilePath);
                 try
                 {
-                    string resultPath = UploadDisbursementFile(history.FilePath, uniqueFileName);
-                    history.Status = "Sent";
-                    history.Remarks = "Successfully sent to bank (Retry). SFTP Path: " + resultPath;
+                    if (history.UploadType == "Validation")
+                    {
+                        string sftpPath = ForwardValidationFileToSftp(history.FilePath, uniqueFileName, history.Region);
+                        history.Status = "Sent";
+                        history.Remarks = "Validation file forwarded to SFTP (Retry). Path: " + sftpPath;
+                    }
+                    else
+                    {
+                        string resultPath = UploadDisbursementFile(history.FilePath, uniqueFileName);
+                        history.Status = "Sent";
+                        history.Remarks = "Successfully sent to bank (Retry). SFTP Path: " + resultPath;
+                    }
                 }
                 catch (Exception ex)
                 {

@@ -11,7 +11,9 @@ namespace App.Data.Entities
         public string FileName { get; set; }
         public string FilePath { get; set; }
         public string Status { get; set; } // Pending, Sent, Failed
-        public string BankReferenceNo { get; set; }
         public string Remarks { get; set; }
+        public string Region { get; set; }
+        public string Period { get; set; }
+        public string UploadType { get; set; } // Disbursement, Validation
     }
 }

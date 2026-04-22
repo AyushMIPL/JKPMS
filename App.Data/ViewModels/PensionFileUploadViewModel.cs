@@ -14,9 +14,11 @@ namespace App.Data.ViewModels
         [Display(Name = "Pension File")]
         public System.Web.HttpPostedFileBase UploadedFile { get; set; }
 
-        [Display(Name = "Bank Reference No")]
-        [StringLength(100)]
-        public string BankReferenceNo { get; set; }
+        public string Region { get; set; }
+        public string UploadYear { get; set; }
+        public string UploadMonth { get; set; }
+        public string Period { get; set; }
+        public string UploadType { get; set; }
 
         [Display(Name = "Remarks")]
         public string Remarks { get; set; }
@@ -30,8 +32,10 @@ namespace App.Data.ViewModels
         public string FileName { get; set; }
         public string FilePath { get; set; }
         public string Status { get; set; }
-        public string BankReferenceNo { get; set; }
         public string Remarks { get; set; }
+        public string Region { get; set; }
+        public string Period { get; set; }
+        public string UploadType { get; set; }
         public string UploadedBy { get; set; }
         public DateTime UploadedOn { get; set; }
     }

@@ -4,53 +4,161 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<style nonce="@ViewBag.StyleNonce">
+    /* Premium Tab Styling */
+    .nav-tabs {
+        border-bottom: 2px solid #e7e7e7;
+        margin-bottom: 0;
+    }
+    .nav-tabs > li > a {
+        border: none !important;
+        color: #666;
+        padding: 12px 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border-radius: 5px 5px 0 0;
+        margin-right: 5px;
+        background-color: transparent !important;
+        border-bottom: 2px solid transparent !important;
+    }
+    .nav-tabs > li > a:hover {
+        background-color: rgba(0,0,0,0.05) !important;
+        color: #333;
+    }
+    .nav-tabs > li.active > a, 
+    .nav-tabs > li.active > a:hover, 
+    .nav-tabs > li.active > a:focus {
+        background-color: #fff !important;
+        color: #27ae60 !important; /* Premium green accent */
+        border: 2px solid #e7e7e7 !important;
+        border-bottom-color: #fff !important; /* Visual integration */
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        margin-bottom: -2px; /* Pull down to overlay border */
+    }
+    .tab-content {
+        background-color: #fff;
+        padding: 30px;
+        border: 2px solid #e7e7e7;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .panel-body-upload {
+        background-color: #fcfcfc;
+        padding: 20px;
+    }
+    .control-label {
+        font-weight: 600;
+        color: #555;
+    }
+</style>
+
 <div class="panel panel-default">
     <div class="panel-heading">
         <h4 class="headline">Upload already generated pension files</h4>
     </div>
-    <div class="panel-body pt-2 pb-5">
-        @using (Html.BeginForm("UploadPensionFileAjax", "PensionProcess", FormMethod.Post, new { enctype = "multipart/form-data", id = "uploadForm", @class = "form-horizontal" }))
-        {
-            @Html.AntiForgeryToken()
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.UploadedFile, new { @class = "col-sm-4 control-label" })
-                        <div class="col-sm-8">
-                            <input type="file" name="UploadedFile" id="UploadedFile" class="form-control" accept=".csv,.xlsx" />
-                            @Html.ValidationMessageFor(m => m.UploadedFile, "", new { @class = "text-danger" })
+    <div class="panel-body panel-body-upload pb-5">
+        <!-- Requirement 1: Improved tab structure -->
+        <ul class="nav nav-tabs" id="uploadTabs" role="tablist">
+            <li class="active">
+                <a href="#disbursementTab" data-toggle="tab" role="tab" data-type="Disbursement">
+                    <i class="fa fa-money"></i> Upload Disbursement File
+                </a>
+            </li>
+            <li>
+                <a href="#validationTab" data-toggle="tab" role="tab" data-type="Validation">
+                    <i class="fa fa-check-circle"></i> Upload Account Validation File
+                </a>
+            </li>
+        </ul>
+
+        <!-- Tab Panes -->
+        <div class="tab-content">
+            <div class="tab-pane active" id="disbursementTab">
+                @using (Html.BeginForm("UploadPensionFileAjax", "PensionProcess", FormMethod.Post, new { enctype = "multipart/form-data", id = "disbursementForm", @class = "form-horizontal upload-form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="UploadType" value="Disbursement" />
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.UploadedFile, new { @class = "col-sm-4 control-label" })
+                                <div class="col-sm-8">
+                                    <input type="file" name="UploadedFile" class="form-control" accept=".csv,.xlsx" />
+                                    @Html.ValidationMessageFor(m => m.UploadedFile, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Region *</label>
+                                <div class="col-sm-8">
+                                    <!-- Requirement 3: Filtered Regions (Districts) -->
+                                    @Html.DropDownListFor(m => m.Region, (IEnumerable<SelectListItem>)ViewBag.Regions, "Select Region", new { @class = "form-control", required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Year *</label>
+                                <div class="col-sm-8">
+                                    @Html.DropDownListFor(m => m.UploadYear, (IEnumerable<SelectListItem>)ViewBag.Years, "Select Year", new { @class = "form-control", required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Month *</label>
+                                <div class="col-sm-8">
+                                    @Html.DropDownListFor(m => m.UploadMonth, (IEnumerable<SelectListItem>)ViewBag.Months, "Select Month", new { @class = "form-control", required = "required" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Remarks, new { @class = "col-sm-4 control-label" })
+                                <div class="col-sm-8">
+                                    @Html.TextAreaFor(m => m.Remarks, new { @class = "form-control", rows = "5", placeholder = "Additional remarks mapping to file" })
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.BankReferenceNo, new { @class = "col-sm-4 control-label" })
-                        <div class="col-sm-8">
-                            @Html.TextBoxFor(m => m.BankReferenceNo, new { @class = "form-control", placeholder = "Enter Bank Reference No" })
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.Remarks, new { @class = "col-sm-4 control-label" })
-                        <div class="col-sm-8">
-                            @Html.TextAreaFor(m => m.Remarks, new { @class = "form-control", rows = "3", placeholder = "Additional remarks mapping to file" })
-                        </div>
-                    </div>
-                </div>
+                }
             </div>
-            <div class="row m-top-sm">
+
+            <div class="tab-pane" id="validationTab">
+                @using (Html.BeginForm("UploadPensionFileAjax", "PensionProcess", FormMethod.Post, new { enctype = "multipart/form-data", id = "validationForm", @class = "form-horizontal upload-form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="UploadType" value="Validation" />
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Validation File *</label>
+                                <div class="col-sm-8">
+                                    <input type="file" name="UploadedFile" class="form-control" accept=".csv,.xlsx" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Remarks, new { @class = "col-sm-4 control-label" })
+                                <div class="col-sm-8">
+                                    @Html.TextAreaFor(m => m.Remarks, new { @class = "form-control", rows = "3", placeholder = "Additional remarks for validation file" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            
+            <div class="row m-top-sm mt-3">
                 <div class="col-sm-offset-2 col-sm-10">
-                    <button type="button" id="btnUpload" class="btn btn-success px-5">
-                        <i class="fa fa-cloud-upload"></i> Upload & Send to Bank
+                    <button type="button" id="btnUpload" class="btn btn-success px-5 shadow-sm">
+                        <i class="fa fa-cloud-upload"></i> <span id="btnText">Upload & Send to Bank</span>
                         <i id="uploadSpinner" class="fa fa-spinner fa-spin" style="display:none;"></i>
                     </button>
-                    <button type="reset" id="btnReset" class="btn btn-default">Reset</button>
                 </div>
             </div>
-        }
+        </div>
     </div>
 </div>
 
-<div class="panel panel-default m-top-md">
+<div class="panel panel-default m-top-md shadow-sm">
     <div class="panel-heading">
         <h4 class="headline">Upload History</h4>
     </div>
@@ -60,10 +168,10 @@
                 <thead>
                     <tr>
                         <th>File Name</th>
-                        <th>Uploaded By</th>
+                        <th>Region</th>
+                        <th>Period</th>
                         <th>Upload Date</th>
                         <th>Status</th>
-                        <th>Ref No</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -75,16 +183,24 @@
 
 @section scripts {
     <script nonce="@ViewBag.StyleNonce">
+        var currentUploadType = "Disbursement";
+        var historyTable;
+
         $(document).ready(function () {
-            var oTable = $('#tblUploadHistory').dataTable({
+            // Initialize History Table
+            historyTable = $('#tblUploadHistory').dataTable({
                 "bServerSide": true,
                 "sAjaxSource": "/PensionProcess/BeneficiaryUploadHistoryAjaxHandler",
+                "fnServerParams": function (aoData) {
+                    aoData.push({ "name": "uploadType", "value": currentUploadType });
+                },
                 "bProcessing": true,
                 "sPaginationType": "full_numbers",
                 "bDestroy": true,
                 "aoColumns": [
                     { "sName": "FileName" },
-                    { "sName": "UploadedBy" },
+                    { "sName": "Region" },
+                    { "sName": "Period" },
                     { "sName": "UploadedOn" },
                     { 
                         "sName": "Status",
@@ -96,18 +212,17 @@
                             return '<span class="' + badgeClass + '">' + data + '</span>';
                         }
                     },
-                    { "sName": "BankReferenceNo" },
                     {
                         "sName": "Actions",
                         "bSearchable": false,
                         "bSortable": false,
                         "render": function (data, type, row) {
                             var id = row[5];
-                            var status = row[3];
+                            var status = row[4];
                             var buttons = `<a href="/PensionProcess/DownloadUploadedPensionFile/${id}" class="btn btn-info btn-xs" title="Download Original File"><i class="fa fa-download"></i> Download</a>`;
                             
                             if (status === "Failed") {
-                                buttons += '<button type="button" onclick="retryUpload(' + id + ')" class="btn btn-warning btn-xs" title="Retry Send"><i class="fa fa-refresh"></i> Retry</button>';
+                                buttons += ' <button type="button" onclick="retryUpload(' + id + ')" class="btn btn-warning btn-xs" title="Retry Send"><i class="fa fa-refresh"></i> Retry</button>';
                             }
                             return buttons;
                         }
@@ -115,22 +230,38 @@
                 ]
             });
 
-            //$('#uploadForm').submit(function (e) {
-            //    e.preventDefault();
-            //    e.stopImmediatePropagation();
-            //    handleFormSubmission(this);
-            //    return false;
-            //});
+            // Requirement 2: Fixed Tab Refresh using standard Bootstrap events
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                var type = $(e.target).data('type');
+                currentUploadType = type;
+                
+                // Update Button Text consistency
+                $('#btnText').text("Upload & Send to Bank");
+                
+                // Refresh Table
+                if (historyTable) {
+                    historyTable.fnDraw();
+                }
+            });
         });
 
         $(document).on('click', '#btnUpload', function () {
-            handleFormSubmission($('#uploadForm')[0]);
+            var activeFormId = currentUploadType === "Disbursement" ? "#disbursementForm" : "#validationForm";
+            var form = $(activeFormId)[0];
+            handleFormSubmission(form);
         });
 
         function handleFormSubmission(form) {
-            if (!$('#UploadedFile').val()) {
-                alert('Please select a file.');
+            var fileInput = $(form).find('input[type="file"]');
+            if (!fileInput.val()) {
+                alert('Please select a file to upload.');
                 return;
+            }
+
+            if (currentUploadType === "Disbursement") {
+                if (!$('#Region').val()) { alert('Please select a Region.'); return; }
+                if (!$('#UploadYear').val()) { alert('Please select a Year.'); return; }
+                if (!$('#UploadMonth').val()) { alert('Please select a Month.'); return; }
             }
 
             $('#uploadSpinner').show();
@@ -142,7 +273,6 @@
                 url: form.action,
                 type: 'POST',
                 data: formData,
-                //cache: false,
                 contentType: false,
                 processData: false,
                 success: function (response) {
@@ -151,8 +281,8 @@
                     
                     if (response.success) {
                         toasterSuccessMessage(response.message);
-                        $('#uploadForm')[0].reset();
-                        $('#tblUploadHistory').dataTable().fnDraw();
+                        form.reset();
+                        historyTable.fnDraw();
                     } else {
                         toasterErrorMessage(response.message);
                     }
@@ -167,7 +297,7 @@
         }
 
         function retryUpload(id) {
-            if (!confirm('Are you sure you want to retry sending this file to the bank?')) return;
+            if (!confirm('Are you sure you want to retry processing this file?')) return;
 
             $.ajax({
                 url: '/PensionProcess/RetryUploadPensionFileAjax',
@@ -176,7 +306,7 @@
                 success: function (response) {
                     if (response.success) {
                         toasterSuccessMessage(response.message);
-                        $('#tblUploadHistory').dataTable().fnDraw();
+                        historyTable.fnDraw();
                     } else {
                         toasterErrorMessage(response.message);
                     }
