@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -13,6 +13,8 @@ using App.Web.Models;
 using CaptchaMvc.Infrastructure;
 using CaptchaMvc.Interface;
 using CaptchaMvc.Models;
+using OfficeOpenXml;
+
 
 namespace App.Web
 {
@@ -38,6 +40,7 @@ namespace App.Web
                 return new KeyValuePair<string, ICaptchaValue>(Guid.NewGuid().ToString("N"),
                     new StringCaptchaValue(randomText, randomText, ignoreCase));
             };
+
 
         }
         protected void Application_Error()

@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Configuration;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
@@ -51,9 +52,7 @@ using DocumentFormat.OpenXml.Office2010.Excel;
 using System.Drawing;
 using System.Windows.Documents;
 using static App.Web.Helper.Helper;
-using System.Configuration;
-using MvcSiteMapProvider.Linq;
-using DocumentFormat.OpenXml.Drawing.Diagrams;
+using OfficeOpenXml;
 using Microsoft.AspNetCore.Http;
 
 namespace App.Web.Controllers
@@ -2892,11 +2891,42 @@ namespace App.Web.Controllers
     {
       try
       {
+        /*
         Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
         Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(excelFilePath);
         wb.SaveAs(csvFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlCSVWindows);
         wb.Close(false);
         app.Quit();
+        */
+
+        using (var stream = new FileStream(excelFilePath, FileMode.Open, FileAccess.Read))
+        {
+          using (var package = new ExcelPackage(stream))
+          {
+            var worksheet = package.Workbook.Worksheets[1];
+            var csvBuilder = new StringBuilder();
+            if (worksheet.Dimension != null)
+            {
+              int rowCount = worksheet.Dimension.End.Row;
+              int colCount = worksheet.Dimension.End.Column;
+
+              for (int row = 1; row <= rowCount; row++)
+              {
+                var values = new List<string>();
+                for (int col = 1; col <= colCount; col++)
+                {
+                  string text = worksheet.Cells[row, col].Value?.ToString() ?? "";
+                  text = text.Replace("\"", "\"\"");
+                  if (text.Contains(",") || text.Contains("\"") || text.Contains("\n"))
+                    text = $"\"{text}\"";
+                  values.Add(text);
+                }
+                csvBuilder.AppendLine(string.Join(",", values));
+              }
+            }
+            System.IO.File.WriteAllText(csvFilePath, csvBuilder.ToString(), Encoding.UTF8);
+          }
+        }
       }
       catch (Exception ex)
       {
@@ -3029,11 +3059,26 @@ namespace App.Web.Controllers
           // Save the file to the server
           System.IO.File.WriteAllBytes(csvFilePath, fileData);
           string excelFilePath = csvFilePath.Replace(".csv", ".xlsx");
+
+          /*
           Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
           Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(csvFilePath);
           wb.SaveAs(excelFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlOpenXMLWorkbook);
           wb.Close(false);
           app.Quit();
+          */
+
+          using (var package = new ExcelPackage())
+          {
+              var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+              var format = new ExcelTextFormat
+              {
+                  Delimiter = ',',
+                  Encoding = Encoding.UTF8
+              };
+              worksheet.Cells["A1"].LoadFromText(new FileInfo(csvFilePath), format);
+              package.SaveAs(new FileInfo(excelFilePath));
+          }
           byte[] excelFileData = System.IO.File.ReadAllBytes(excelFilePath);
           // Specify the file's content type (MIME type)
           string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"; // Use the appropriate MIME type for your file

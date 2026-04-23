@@ -5,51 +5,68 @@
 }
 
 <style nonce="@ViewBag.StyleNonce">
-    /* Premium Tab Styling */
+    /* ===== Tabs Container ===== */
     .nav-tabs {
-        border-bottom: 2px solid #e7e7e7;
+        border-bottom: 2px solid #27ae60;
         margin-bottom: 0;
     }
-    .nav-tabs > li > a {
-        border: none !important;
-        color: #666;
-        padding: 12px 25px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        border-radius: 5px 5px 0 0;
-        margin-right: 5px;
-        background-color: transparent !important;
-        border-bottom: 2px solid transparent !important;
-    }
-    .nav-tabs > li > a:hover {
-        background-color: rgba(0,0,0,0.05) !important;
-        color: #333;
-    }
-    .nav-tabs > li.active > a, 
-    .nav-tabs > li.active > a:hover, 
-    .nav-tabs > li.active > a:focus {
-        background-color: #fff !important;
-        color: #27ae60 !important; /* Premium green accent */
-        border: 2px solid #e7e7e7 !important;
-        border-bottom-color: #fff !important; /* Visual integration */
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-        margin-bottom: -2px; /* Pull down to overlay border */
-    }
+
+        /* ===== Tab Links ===== */
+        .nav-tabs > li > a {
+            border: none !important;
+            color: #666;
+            padding: 12px 25px;
+            font-weight: 600;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            background-color: transparent !important;
+            border-bottom: 2px solid transparent !important;
+            transition: all 0.25s ease-in-out;
+        }
+
+            .nav-tabs > li > a:hover {
+                background-color: rgba(0, 0, 0, 0.05) !important;
+                color: #333;
+            }
+
+        /* ===== Active Tab ===== */
+        .nav-tabs > li.active > a,
+        .nav-tabs > li.active > a:hover,
+        .nav-tabs > li.active > a:focus {
+            background-color: #eafaf1 !important;
+            color: #27ae60 !important;
+            border: 2px solid #27ae60 !important;
+            border-bottom: none !important;
+            position: relative;
+            z-index: 2;
+        }
+
+    /* ===== Tab Content ===== */
     .tab-content {
         background-color: #fff;
         padding: 30px;
         border: 2px solid #e7e7e7;
         border-top: none;
         border-radius: 0 0 8px 8px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }
+
+    /* ===== Panel Body ===== */
     .panel-body-upload {
         background-color: #fcfcfc;
         padding: 20px;
     }
+
+    /* ===== Labels ===== */
     .control-label {
         font-weight: 600;
         color: #555;
+    }
+
+    /* ===== Table Alignment ===== */
+    #tblUploadHistory th,
+    #tblUploadHistory td {
+        text-align: left !important;
+        vertical-align: middle;
     }
 </style>
 
@@ -59,7 +76,7 @@
     </div>
     <div class="panel-body panel-body-upload pb-5">
         <!-- Requirement 1: Improved tab structure -->
-        <ul class="nav nav-tabs" id="uploadTabs" role="tablist">
+        @*<ul class="nav nav-tabs" id="uploadTabs" role="tablist">
             <li class="active">
                 <a href="#disbursementTab" data-toggle="tab" role="tab" data-type="Disbursement">
                     <i class="fa fa-money"></i> Upload Disbursement File
@@ -68,6 +85,18 @@
             <li>
                 <a href="#validationTab" data-toggle="tab" role="tab" data-type="Validation">
                     <i class="fa fa-check-circle"></i> Upload Account Validation File
+                </a>
+            </li>
+        </ul>*@
+        <ul class="nav nav-tabs">
+            <li class="active">
+                <a href="#disbursementTab"  data-type="Disbursement">
+                    Upload Disbursement File
+                </a>
+            </li>
+            <li>
+                <a href="#validationTab"  data-type="Validation">
+                    Upload Account Validation File
                 </a>
             </li>
         </ul>
@@ -79,7 +108,7 @@
                 {
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="UploadType" value="Disbursement" />
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -90,7 +119,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-4 control-label">Region *</label>
+                                <label class="col-sm-4 control-label">District *</label>
                                 <div class="col-sm-8">
                                     <!-- Requirement 3: Filtered Regions (Districts) -->
                                     @Html.DropDownListFor(m => m.Region, (IEnumerable<SelectListItem>)ViewBag.Regions, "Select Region", new { @class = "form-control", required = "required" })
@@ -126,7 +155,7 @@
                 {
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="UploadType" value="Validation" />
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -145,7 +174,7 @@
                     </div>
                 }
             </div>
-            
+
             <div class="row m-top-sm mt-3">
                 <div class="col-sm-offset-2 col-sm-10">
                     <button type="button" id="btnUpload" class="btn btn-success px-5 shadow-sm">
@@ -168,11 +197,10 @@
                 <thead>
                     <tr>
                         <th>File Name</th>
-                        <th>Region</th>
+                        <th>District</th>
                         <th>Period</th>
                         <th>Upload Date</th>
                         <th>Status</th>
-                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -187,6 +215,32 @@
         var historyTable;
 
         $(document).ready(function () {
+
+            $('.nav-tabs li a').on('click', function (e) {
+                e.preventDefault();
+
+                var target = $(this).attr('href');
+                currentUploadType = $(this).data('type');
+
+                //  Remove active from all tabs
+                $('.nav-tabs li').removeClass('active');
+                $('.nav-tabs li a').removeClass('active');
+
+                //  Add active to clicked tab
+                $(this).parent().addClass('active');
+                $(this).addClass('active');
+
+                // Hide all tab panes
+                $('.tab-pane').removeClass('active').hide();
+
+                //  Show selected tab
+                $(target).addClass('active').show();
+
+                //  Handle table changes
+                toggleColumns();
+                historyTable.fnDraw();
+            });
+
             // Initialize History Table
             historyTable = $('#tblUploadHistory').dataTable({
                 "bServerSide": true,
@@ -198,7 +252,14 @@
                 "sPaginationType": "full_numbers",
                 "bDestroy": true,
                 "aoColumns": [
-                    { "sName": "FileName" },
+                    {
+                        "sName": "FileName",
+                        "mRender": function (data, type, row) {
+                            //console.log($.fn.dataTable.version);
+                            var id = row[5]; // or row.Id if using object
+                            return '<a href="/PensionProcess/DownloadUploadedPensionFile?id=' + id + '" target="_blank" title="Click to download" class="text-primary font-weight-bold"><i class="fa fa-download"></i> ' + data + '</a>';
+                        }
+                    },
                     { "sName": "Region" },
                     { "sName": "Period" },
                     { "sName": "UploadedOn" },
@@ -211,37 +272,21 @@
                             else badgeClass = "label label-warning";
                             return '<span class="' + badgeClass + '">' + data + '</span>';
                         }
-                    },
-                    {
-                        "sName": "Actions",
-                        "bSearchable": false,
-                        "bSortable": false,
-                        "render": function (data, type, row) {
-                            var id = row[5];
-                            var status = row[4];
-                            var buttons = `<a href="/PensionProcess/DownloadUploadedPensionFile/${id}" class="btn btn-info btn-xs" title="Download Original File"><i class="fa fa-download"></i> Download</a>`;
-                            
-                            if (status === "Failed") {
-                                buttons += ' <button type="button" onclick="retryUpload(' + id + ')" class="btn btn-warning btn-xs" title="Retry Send"><i class="fa fa-refresh"></i> Retry</button>';
-                            }
-                            return buttons;
-                        }
                     }
                 ]
             });
 
+            //setTimeout(function () {
+            //    toggleColumns();
+            //}, 100);
+
+
             // Requirement 2: Fixed Tab Refresh using standard Bootstrap events
             $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-                var type = $(e.target).data('type');
-                currentUploadType = type;
-                
-                // Update Button Text consistency
-                $('#btnText').text("Upload & Send to Bank");
-                
-                // Refresh Table
-                if (historyTable) {
-                    historyTable.fnDraw();
-                }
+                currentUploadType = $(e.target).data('type');
+
+                toggleColumns();                  
+                historyTable.fnDraw(); 
             });
         });
 
@@ -251,6 +296,42 @@
             handleFormSubmission(form);
         });
 
+        function toggleColumns() {
+
+            var oTable = $('#tblUploadHistory').dataTable();
+
+            if (currentUploadType !== "Disbursement") {
+                oTable.fnSetColumnVis(1, false); // District
+                oTable.fnSetColumnVis(2, false); // Period
+            } else {
+                oTable.fnSetColumnVis(1, true);
+                oTable.fnSetColumnVis(2, true);
+            }
+        }
+
+        function resetForm(form) {
+
+            // Reset native form
+            form.reset();
+
+            // Clear file input (important)
+            $(form).find('input[type="file"]').val('');
+
+            // Reset dropdowns properly (MVC fix)
+            $(form).find('select').each(function () {
+                $(this).val('').prop('selectedIndex', 0);
+                $(this).find('option').prop('selected', false);
+                $(this).find('option:first').prop('selected', true);
+                $(this).trigger('change'); // important if any UI plugin
+            });
+
+            // Clear textarea
+            $(form).find('textarea').val('');
+
+            // Clear validation messages
+            $(form).find('.text-danger').html('');
+        }
+
         function handleFormSubmission(form) {
             var fileInput = $(form).find('input[type="file"]');
             if (!fileInput.val()) {
@@ -259,7 +340,7 @@
             }
 
             if (currentUploadType === "Disbursement") {
-                if (!$('#Region').val()) { alert('Please select a Region.'); return; }
+                if (!$('#Region').val()) { alert('Please select a District .'); return; }
                 if (!$('#UploadYear').val()) { alert('Please select a Year.'); return; }
                 if (!$('#UploadMonth').val()) { alert('Please select a Month.'); return; }
             }
@@ -281,7 +362,7 @@
                     
                     if (response.success) {
                         toasterSuccessMessage(response.message);
-                        form.reset();
+                        resetForm(form);
                         historyTable.fnDraw();
                     } else {
                         toasterErrorMessage(response.message);

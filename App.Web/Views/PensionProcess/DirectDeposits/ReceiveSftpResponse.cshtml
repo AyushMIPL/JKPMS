@@ -1,0 +1,199 @@
+@{
+    ViewBag.Title = "Receive SFTP Response";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style nonce="@ViewBag.StyleNonce">
+    .nav-tabs {
+        border-bottom: 2px solid #27ae60;
+        margin-bottom: 0;
+    }
+    .nav-tabs > li > a {
+        border: none !important;
+        color: #666;
+        padding: 12px 25px;
+        font-weight: 600;
+        border-radius: 5px 5px 0 0;
+        margin-right: 5px;
+        background-color: transparent !important;
+        border-bottom: 2px solid transparent !important;
+        transition: all 0.25s ease-in-out;
+    }
+    .nav-tabs > li > a:hover {
+        background-color: rgba(0, 0, 0, 0.05) !important;
+        color: #333;
+    }
+    .nav-tabs > li.active > a,
+    .nav-tabs > li.active > a:hover,
+    .nav-tabs > li.active > a:focus {
+        background-color: #eafaf1 !important;
+        color: #27ae60 !important;
+        border: 2px solid #27ae60 !important;
+        border-bottom: none !important;
+        position: relative;
+        z-index: 2;
+    }
+    .tab-content {
+        background-color: #fff;
+        padding: 30px;
+        border: 2px solid #e7e7e7;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+    }
+    .control-label {
+        font-weight: 600;
+        color: #555;
+    }
+</style>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="headline">Receive Response from SFTP</h4>
+    </div>
+    <div class="panel-body pb-5">
+        <ul class="nav nav-tabs">
+            <li class="active">
+                <a href="#disbursementTab" data-type="Disbursement">
+                    Disbursement Responses
+                </a>
+            </li>
+            <li>
+                <a href="#validationTab" data-type="Validation">
+                    Account Validation Responses
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane active" id="disbursementTab">
+                <div class="text-center p-5">
+                    <p class="mb-4">Click below to fetch the latest Disbursement response files from the SFTP server.</p>
+                    <button type="button" class="btn btn-success btn-lg px-5 shadow-sm btnFetch" data-type="Disbursement">
+                        <i class="fa fa-download"></i> Fetch Disbursement Responses
+                        <i class="fa fa-spinner fa-spin fetch-spinner" style="display:none;"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="validationTab">
+                <div class="text-center p-5">
+                    <p class="mb-4">Click below to fetch the latest Account Validation response files from the SFTP server.</p>
+                    <button type="button" class="btn btn-success btn-lg px-5 shadow-sm btnFetch" data-type="Validation">
+                        <i class="fa fa-download"></i> Fetch Validation Responses
+                        <i class="fa fa-spinner fa-spin fetch-spinner" style="display:none;"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default m-top-md shadow-sm">
+    <div class="panel-heading">
+        <h4 class="headline">Processing History</h4>
+    </div>
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table id="tblSftpHistory" class="table table-striped table-bordered" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Type</th>
+                        <th>Process Date</th>
+                        <th>Status</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script nonce="@ViewBag.StyleNonce">
+        var historyTable;
+        var currentTabType = "Disbursement";
+
+        $(document).ready(function () {
+            $('.nav-tabs li a').on('click', function (e) {
+                e.preventDefault();
+                var target = $(this).attr('href');
+                currentTabType = $(this).data('type');
+
+                $('.nav-tabs li').removeClass('active');
+                $(this).parent().addClass('active');
+
+                $('.tab-pane').removeClass('active').hide();
+                $(target).addClass('active').show();
+
+                historyTable.fnDraw();
+            });
+
+            historyTable = $('#tblSftpHistory').dataTable({
+                "bServerSide": true,
+                "sAjaxSource": '@Url.Action("GetSftpHistoryAjaxHandler", "PensionProcess")',
+                "fnServerParams": function (aoData) {
+                    aoData.push({ "name": "responseType", "value": currentTabType });
+                },
+                "bProcessing": true,
+                "sPaginationType": "full_numbers",
+                "bDestroy": true,
+                "aoColumns": [
+                    { 
+                        "sName": "FileName",
+                        "mRender": function (data, type, row) {
+                            var id = row[5];
+                            var downloadUrl = '@Url.Action("DownloadSftpResponseFile", "PensionProcess")' + '?id=' + id;
+                            return '<a href="' + downloadUrl + '" target="_blank" title="Click to download" class="text-primary font-weight-bold"><i class="fa fa-download"></i> ' + data + '</a>';
+                        }
+                    },
+                    { "sName": "FileType" },
+                    { "sName": "ProcessDate" },
+                    { 
+                        "sName": "Status",
+                        "render": function (data) {
+                            var badgeClass = "label label-default";
+                            if (data === "Success") badgeClass = "label label-success";
+                            else if (data === "Failed") badgeClass = "label label-danger";
+                            return '<span class="' + badgeClass + '">' + data + '</span>';
+                        }
+                    },
+                    { "sName": "Remarks" }
+                ]
+            });
+
+            $(document).on('click', '.btnFetch', function () {
+                var btn = $(this);
+                var type = btn.data('type');
+                var spinner = btn.find('.fetch-spinner');
+
+                if (!confirm('Are you sure you want to fetch and process responses for ' + type + '?')) return;
+
+                btn.prop('disabled', true);
+                spinner.show();
+
+                $.ajax({
+                    url: '@Url.Action("FetchSftpResponseAjax", "PensionProcess")',
+                    type: 'POST',
+                    data: { responseType: type },
+                    success: function (response) {
+                        spinner.hide();
+                        btn.prop('disabled', false);
+                        if (response.success) {
+                            toasterSuccessMessage(response.message);
+                            historyTable.fnDraw();
+                        } else {
+                            toasterErrorMessage(response.message);
+                        }
+                    },
+                    error: function () {
+                        spinner.hide();
+                        btn.prop('disabled', false);
+                        toasterErrorMessage("An error occurred during the fetch operation.");
+                    }
+                });
+            });
+        });
+    </script>
+}

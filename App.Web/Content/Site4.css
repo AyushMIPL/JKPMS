@@ -1,4 +1,4 @@
-﻿/*User*/
+/*User*/
 a.disabled {
     color: gray;
     pointer-events: none;
@@ -228,23 +228,7 @@ a.disabled {
 .processapplicantedit {
     display: none;
 }
-/*Reuploadpermission*/
-.btn.btn-success.disabled {
-    color: gray;
-    pointer-events: none;
-    opacity: .8;
-}
-.my-span-icon span
-{
-    color: red !important;
-}
-.my-span-icon {
-    padding-left: 0 !important;
-    font-size: 16px !important;
-    font-family: 'Poppins', sans-serif;
-    color: #262626;
-    font-weight: 400 !important;
-}
+
 
 
 
@@ -308,15 +292,7 @@ label.control-label {
 .repatch {
     font-weight: bolder
 }
-.noreuploads {
-    text-align: center;
-}
-.reamouont {
-    text-align: center;
-}
-.reths {
-    width: 70px !important
-}
+
 .thextbas {
     text-align: left;
 }

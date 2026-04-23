@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
@@ -47,7 +47,9 @@ using System.Text;
 using System.IO;
 using Renci.SshNet;
 using App.Web.Filters;
-using Microsoft.Office.Interop.Excel;
+using OfficeOpenXml;
+// using Microsoft.Office.Interop.Excel;
+
 using ExceptionManagement;
 using DocumentFormat.OpenXml.EMMA;
 using System.Drawing.Imaging;
@@ -2279,96 +2281,7 @@ namespace App.Web.Controllers
 
     }
 
-    [HttpGet]
-    [AuthorizeEx]
-    public ActionResult ReuploadPermission()
-    {
-      int userid = AppUserManager.GetUserId();
-      //var roleList = db.SecRoleLocationModule.Where(x => x.UserId == userid).Select(x => x.RoleID).FirstOrDefault();
 
-      //var model = (from c in db.SecModule.Where(x => x.ControllerName == "PensionProcess" && x.ActionName == "PrintBankListing")
-      //             join p in db.SecRoleModule.AsNoTracking().Where(x => x.RoleID == roleList && x.IsActive == true) on c.Id equals p.ModuleID into ps
-      //             from p in ps.DefaultIfEmpty()
-      //             select new RoleModuleViewModel { RoleID = roleList.ToString(), ModuleName = "Print Bank Listing", ParentId = c.ParentId, ModuleID = c.Id, ViewPermission = p.ViewPermission == null ? false : (bool)p.ViewPermission, AddPermssion = p.AddPermssion == null ? false : (bool)p.AddPermssion, EditPermission = p.EditPermission == null ? false : (bool)p.EditPermission, DeletePermission = p.DeletePermission == null ? false : (bool)p.DeletePermission }).FirstOrDefault();
-
-      //if (model != null)
-      //{
-      //  ViewBag.AddPermission = model.AddPermssion;
-      //  ViewBag.EditPermission = model.EditPermission;
-      //}
-      PensionProcessViewModel Paysearch = ShowActiveBatch();
-      string disData = string.Empty;
-      //BindCmbBanckCode(string.Empty);
-      //BindComboEmployeeType(Paysearch.EmpType);
-      generatePensionProcess = new GeneratePensionProcessModel();
-      generatePensionProcess.DepositDate = Paysearch.PayrollDate;
-
-      //generatePensionProcess.PayDate = DVOApplicationUserInfo.DateConvertion(DateTime.Now);
-      ViewBag.pybatchid = Paysearch.pybatchid;
-      //Paysearch.RegionNames = Paysearch.RegionNames;
-      //if (Paysearch.RegionNames != "" && Paysearch.RegionNames != null)
-      //{
-      //  disData = Paysearch.RegionNames.ToLower().Trim();
-      //}
-      //ViewBag.Group = GetUsersAssignedLocations("", 0, 0, disData);
-
-      Dictionary<string, string> PensionDetailByMonthYear = BLLPYBatchProcessStybatchr.PensionDetailByMonthYear();
-      ViewBag.CurrentMonthBatch = PensionDetailByMonthYear;
-      if (PensionDetailByMonthYear == null)
-      {
-        ViewBag.pybatchid = 0;
-      }
-      else
-      {
-        ViewBag.pybatchid = PensionDetailByMonthYear["pybatchid"];
-      }
-      //if (PensionDetailByMonthYear != null)
-      //{
-
-      //  string[] regions = PensionDetailByMonthYear["Districts"].Split(',').Select(region => region.Trim()).ToArray();
-      //  var filteredRegions = regions.Where(region => region != "JAMMU REGION" && region != "KASHMIR REGION");
-      //  string Paydistricts = string.Join(", ", filteredRegions);
-
-      //  object[] parameters1 = new object[2];
-      //  parameters1[0] = PensionDetailByMonthYear["pybatchid"];
-      //  parameters1[1] = PensionDetailByMonthYear["Districts"];
-
-      //  DataSet ds_ = new DataSet();
-      //  StringBuilder SQL = new StringBuilder();
-      //  DALBaseClassHelper objDALBaseClassHelper = new DALBaseClassHelper();
-      //  DALBaseClass objDalBaseClass = objDALBaseClassHelper.GetDAL();
-      //  object objTransaction = objDALBaseClassHelper.GetTransactionObject();
-      //  //SQL.Append("SELECT Districts FROM Payroll_Process_Header WHERE pybatchid=" + parameters1[0].ToString());
-      //  SQL.Append("SELECT ok_to_post  FROM Process_PayEmployee PPE WITH (NOLOCK) JOIN MasterEmployee ME WITH (NOLOCK) ON ME.empl_code = PPE.empl_code JOIN Payroll_Process_Header PPH WITH (NOLOCK) ON PPE.pybatchid =PPH.pybatchid JOIN Payroll_Process_Details PPD WITH (NOLOCK) ON PPH.pybatchid =PPD.pybatchid JOIN Process_DirectDeposit_Header PDH WITH (NOLOCK) ON PPH.pybatchid = PDH.pybatchid JOIN Process_DirectDeposit_Details PDD WITH (NOLOCK) ON PDH.doc_no = PDD.doc_no WHERE PPE.ok_to_post IN ('N','Y') AND  ");
-
-      //  if (parameters1[0] != null)
-      //    SQL.Append("PPH.pybatchid='" + parameters1[0].ToString() + "'");
-
-      //  if (parameters1[1] != null)
-      //    SQL.Append(" and PPH.Districts IN  ('" + parameters1[1].ToString() + "')");
-
-
-      //  SqlDataAdapter da = new SqlDataAdapter(SQL.ToString(), objDalBaseClass.ConnectionString);
-      //  da.Fill(ds_);
-
-      //  if (ds_.Tables.Count > 0 && ds_.Tables[0].Rows.Count > 0)
-      //  {
-      //    ViewBag.responseok = true;
-      //    IsPendioGenrated = true;
-      //    ViewBag.ispensiongenerated = IsPendioGenrated;
-      //  }
-      //  else
-      //  {
-      //    ViewBag.responseok = false;
-      //    IsPendioGenrated = false;
-      //    ViewBag.ispensiongenerated = IsPendioGenrated;
-      //  }
-      //  ViewBag.ispensiongenerated = IsPendioGenrated;
-
-      //}
-      //return PartialView("~/Views/PensionProcess/DirectDeposits/PrintBankListing.cshtml", generatePensionProcess);
-      return View(generatePensionProcess);
-    }
 
     private PensionProcessViewModel ShowActiveBatch()
     {
@@ -2655,11 +2568,25 @@ namespace App.Web.Controllers
           FileHelper fileHelper = new FileHelper();
           bool isFileDeleted = fileHelper.TryDeleteFile(excelFilePath);
 
+          /*
           Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
           Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(csvFilePath);
           wb.SaveAs(excelFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlOpenXMLWorkbook);
           wb.Close(false);
           app.Quit();
+          */
+
+          using (var package = new ExcelPackage())
+          {
+              var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+              var format = new ExcelTextFormat
+              {
+                  Delimiter = ',',
+                  Encoding = Encoding.UTF8
+              };
+              worksheet.Cells["A1"].LoadFromText(new FileInfo(csvFilePath), format);
+              package.SaveAs(new FileInfo(excelFilePath));
+          }
 
           bool isCsvFileDeleted = fileHelper.TryDeleteFile(csvFilePath);
 

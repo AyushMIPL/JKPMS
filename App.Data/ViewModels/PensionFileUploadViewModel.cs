@@ -14,6 +14,7 @@ namespace App.Data.ViewModels
         [Display(Name = "Pension File")]
         public System.Web.HttpPostedFileBase UploadedFile { get; set; }
 
+        [Display(Name = "District")]
         public string Region { get; set; }
         public string UploadYear { get; set; }
         public string UploadMonth { get; set; }

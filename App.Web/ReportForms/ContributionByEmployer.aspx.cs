@@ -1,9 +1,11 @@
-﻿using CrystalDecisions.CrystalReports.Engine;
+using CrystalDecisions.CrystalReports.Engine;
 using CrystalDecisions.Shared;
 using CrystalDecisions.Web;
 using DocumentFormat.OpenXml.Math;
 using LinqToExcel;
-using Microsoft.Office.Interop.Excel;
+// using Microsoft.Office.Interop.Excel;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using Microsoft.Owin.BuilderProperties;
 using System;
 using System.Collections.Generic;
@@ -360,8 +362,7 @@ namespace App.Web.ReportForms
         {
             try
             {
-
-
+                /*
                 object missing = Type.Missing;
                 Microsoft.Office.Interop.Excel.Application oXL = new Microsoft.Office.Interop.Excel.Application();
                 oXL.Visible = false;
@@ -373,131 +374,123 @@ namespace App.Web.ReportForms
                 object misvalue = System.Reflection.Missing.Value;
                 oXL = new Microsoft.Office.Interop.Excel.Application();
                 oXL.Visible = false;
+                */
 
-                int row = PayReportData.Tables[0].Rows.Count + 1;
-
-                if (repoertName == "rptPaymentSuccessReport" || repoertName == "rptPaymentFailedReport" || repoertName == "rptArrears")
+                using (var package = new ExcelPackage())
                 {
-                    oSheet.Name = repoertName == "rptPaymentSuccessReport" ? "Success Payments" : (repoertName == "rptPaymentFailedReport" ? "Payment Failed" : "Arrear Payment");
-                    oSheet.Cells[1, 1] = "Application Ref No.";
-                    oSheet.Cells[1, 2] = "Beneficiary Name";
-                    oSheet.Cells[1, 3] = "Scheme";
-                    oSheet.Cells[1, 4] = "Bank Name";
-                    oSheet.Cells[1, 5] = "IFSC Code";
-                    oSheet.Cells[1, 6] = "Account No";
-                    oSheet.Cells[1, 6].EntireColumn.NumberFormat = "@";
-                    oSheet.Cells[1, 7] = "Paid On";
-                    oSheet.Cells[1, 7].EntireColumn.NumberFormat = "MM/DD/YYYY";
-                    oSheet.Cells[1, 8] = "Amount";
-                    oSheet.Cells[1, 9] = "District";
-                    oSheet.Cells[1, 10] = "TransactionRefrenceNo";
-                    oSheet.Cells[1, 11] = "TransactionDate";
-                    oSheet.Cells[1, 11].EntireColumn.NumberFormat = "MM/DD/YYYY";
-                    oSheet.Cells[1, 12] = "Reason/Remarks";
-                    dynamic[,] saNames = new dynamic[row, 12];
-                    int i = 0;
-                    if (PayReportData.Tables[0].Rows.Count > 0)
+                    var worksheet = package.Workbook.Worksheets.Add(repoertName == "rptPaymentSuccessReport" ? "Success Payments" : (repoertName == "rptPaymentFailedReport" ? "Payment Failed" : (repoertName == "rptPaymentHistory" ? "Payment History" : "Arrear Payment")));
+
+                    int rowCount = PayReportData.Tables[0].Rows.Count + 1;
+
+                    if (repoertName == "rptPaymentSuccessReport" || repoertName == "rptPaymentFailedReport" || repoertName == "rptArrears")
                     {
+                        worksheet.Cells[1, 1].Value = "Application Ref No.";
+                        worksheet.Cells[1, 2].Value = "Beneficiary Name";
+                        worksheet.Cells[1, 3].Value = "Scheme";
+                        worksheet.Cells[1, 4].Value = "Bank Name";
+                        worksheet.Cells[1, 5].Value = "IFSC Code";
+                        worksheet.Cells[1, 6].Value = "Account No";
+                        worksheet.Column(6).Style.Numberformat.Format = "@";
+                        worksheet.Cells[1, 7].Value = "Paid On";
+                        worksheet.Column(7).Style.Numberformat.Format = "MM/DD/YYYY";
+                        worksheet.Cells[1, 8].Value = "Amount";
+                        worksheet.Cells[1, 9].Value = "District";
+                        worksheet.Cells[1, 10].Value = "TransactionRefrenceNo";
+                        worksheet.Cells[1, 11].Value = "TransactionDate";
+                        worksheet.Column(11).Style.Numberformat.Format = "MM/DD/YYYY";
+                        worksheet.Cells[1, 12].Value = "Reason/Remarks";
+
+                        int i = 2;
                         foreach (DataRow item in PayReportData.Tables[0].Rows)
                         {
-                            saNames[i, 0] = item["ApplicationReferenceno"].ToString();
-                            saNames[i, 1] = item["ApplicantName"].ToString();
-                            saNames[i, 2] = item["type_code"].ToString();
-                            saNames[i, 3] = item["BankName"].ToString();
-                            saNames[i, 4] = item["IFSCCode"].ToString();
-                            saNames[i, 5] = item["bank_acct_no"].ToString();
-                            saNames[i, 6] = item["pay_date"].ToString();
-                            saNames[i, 7] = item["amount"].ToString();
-                            saNames[i, 8] = item["District"].ToString();
-                            saNames[i, 9] = item["TransactionRefrenceNo"].ToString();
-                            saNames[i, 10] = item["TransactionDate"].ToString();
-                            saNames[i, 11] = item["Reason/Remarks"].ToString();
+                            worksheet.Cells[i, 1].Value = item["ApplicationReferenceno"].ToString();
+                            worksheet.Cells[i, 2].Value = item["ApplicantName"].ToString();
+                            worksheet.Cells[i, 3].Value = item["type_code"].ToString();
+                            worksheet.Cells[i, 4].Value = item["BankName"].ToString();
+                            worksheet.Cells[i, 5].Value = item["IFSCCode"].ToString();
+                            worksheet.Cells[i, 6].Value = item["bank_acct_no"].ToString();
+                            worksheet.Cells[i, 7].Value = item["pay_date"].ToString();
+                            worksheet.Cells[i, 8].Value = item["amount"].ToString();
+                            worksheet.Cells[i, 9].Value = item["District"].ToString();
+                            worksheet.Cells[i, 10].Value = item["TransactionRefrenceNo"].ToString();
+                            worksheet.Cells[i, 11].Value = item["TransactionDate"].ToString();
+                            worksheet.Cells[i, 12].Value = item["Reason/Remarks"].ToString();
                             i++;
                         }
-                        oSheet.get_Range("A2", $"L{row}").Value2 = saNames;
+                        
+                        var range = worksheet.Cells[1, 1, rowCount, 12];
+                        range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                        range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                        range.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                        range.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                        worksheet.Cells[1, 1, rowCount, 12].AutoFitColumns();
                     }
-                }
-                else if (repoertName == "rptPaymentHistory")
-                {
-                    oSheet.Name = "Payment History";
-                    oSheet.Cells[1, 1] = "Name";
-                    oSheet.Cells[1, 2] = "Application Ref No.";
-                    oSheet.Cells[1, 3] = "Scheme";
-                    oSheet.Cells[1, 4] = "Address";
-                    oSheet.Cells[1, 5] = "Account No";
-                    oSheet.Cells[1, 5].EntireColumn.NumberFormat = "@";
-                    oSheet.Cells[1, 6] = "Bank Name";
-                    oSheet.Cells[1, 7] = "IFSC Code";
-                    oSheet.Cells[1, 8] = "Pension Generated On";
-                    oSheet.Cells[1, 8].EntireColumn.NumberFormat = "MM/DD/YYYY";
-                    oSheet.Cells[1, 9] = "Amount";
-                    oSheet.Cells[1, 10] = "Status";
-                    oSheet.Cells[1, 11] = "Reason";
-                    //oSheet.Cells[1, 12] = "TransactionDate";
-                    //oSheet.Cells[1, 12].EntireColumn.NumberFormat = "MM/DD/YYYY";
-                    oSheet.Cells[1, 12] = "TransactionRefrenceNo";
-
-                    dynamic[,] saNames = new dynamic[row, 13];
-                    int i = 0;
-                    if (PayReportData.Tables[0].Rows.Count > 0)
+                    else if (repoertName == "rptPaymentHistory")
                     {
+                        worksheet.Cells[1, 1].Value = "Name";
+                        worksheet.Cells[1, 2].Value = "Application Ref No.";
+                        worksheet.Cells[1, 3].Value = "Scheme";
+                        worksheet.Cells[1, 4].Value = "Address";
+                        worksheet.Cells[1, 5].Value = "Account No";
+                        worksheet.Column(5).Style.Numberformat.Format = "@";
+                        worksheet.Cells[1, 6].Value = "Bank Name";
+                        worksheet.Cells[1, 7].Value = "IFSC Code";
+                        worksheet.Cells[1, 8].Value = "Pension Generated On";
+                        worksheet.Column(8).Style.Numberformat.Format = "MM/DD/YYYY";
+                        worksheet.Cells[1, 9].Value = "Amount";
+                        worksheet.Cells[1, 10].Value = "Status";
+                        worksheet.Cells[1, 11].Value = "Reason";
+                        worksheet.Cells[1, 12].Value = "TransactionRefrenceNo";
+
+                        int i = 2;
                         foreach (DataRow item in PayReportData.Tables[0].Rows)
                         {
-                            saNames[i, 0] = item["ApplicantName"].ToString();
-                            saNames[i, 1] = item["ApprovalDate"].ToString();
-                            saNames[i, 2] = item["SchemeType"].ToString();
-                            saNames[i, 3] = item["Address"].ToString();
-                            saNames[i, 4] = item["AccountNo"].ToString();
-                            saNames[i, 5] = item["BankName"].ToString();
-                            saNames[i, 6] = item["IFSC_Code"].ToString();
-                            saNames[i, 7] = item["PaidOn"].ToString();
-                            saNames[i, 8] = item["Amount"].ToString();
-                            saNames[i, 9] = item["Status"].ToString();
-                            saNames[i, 10] = item["Reason"].ToString();
-                            //saNames[i, 11] = item["TransactionDate"].ToString();
-                            saNames[i, 11] = item["TransactionRefrenceNo"].ToString();
+                            worksheet.Cells[i, 0 + 1].Value = item["ApplicantName"].ToString();
+                            worksheet.Cells[i, 1 + 1].Value = item["ApprovalDate"].ToString();
+                            worksheet.Cells[i, 2 + 1].Value = item["SchemeType"].ToString();
+                            worksheet.Cells[i, 3 + 1].Value = item["Address"].ToString();
+                            worksheet.Cells[i, 4 + 1].Value = item["AccountNo"].ToString();
+                            worksheet.Cells[i, 5 + 1].Value = item["BankName"].ToString();
+                            worksheet.Cells[i, 6 + 1].Value = item["IFSC_Code"].ToString();
+                            worksheet.Cells[i, 7 + 1].Value = item["PaidOn"].ToString();
+                            worksheet.Cells[i, 8 + 1].Value = item["Amount"].ToString();
+                            worksheet.Cells[i, 9 + 1].Value = item["Status"].ToString();
+                            worksheet.Cells[i, 10 + 1].Value = item["Reason"].ToString();
+                            worksheet.Cells[i, 11 + 1].Value = item["TransactionRefrenceNo"].ToString();
                             i++;
                         }
-                        oSheet.get_Range("A2", $"M{row}").Value2 = saNames;
+                        
+                        var range = worksheet.Cells[1, 1, rowCount, 12];
+                        range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                        range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                        range.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                        range.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                        worksheet.Cells[1, 1, rowCount, 12].AutoFitColumns();
                     }
-                }
 
-
-                Microsoft.Office.Interop.Excel.Range range = oSheet.get_Range("A2", $"M{row}");
-                range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeBottom].Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Black);
-                range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeLeft].Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Black);
-                range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeRight].Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Black);
-                range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeTop].Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Black);
-                range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlInsideHorizontal].Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Black);
-                range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlInsideVertical].Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Black);
-                oRng = oSheet.get_Range("A2", $"M{row}");
-                oRng.EntireColumn.AutoFit();
-                oXL.Visible = false;
-                oXL.UserControl = false;
-                string rptPath = System.Web.HttpContext.Current.Session["ReportName"] != null ? System.Web.HttpContext.Current.Session["ReportName"].ToString() : "";
-                var fileName = Path.GetFileNameWithoutExtension(rptPath) + "_" + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Year;//TextHelper.GenerateRandomText(12);
-                fileName = fileName + ".xls";
-                bool exists = System.IO.Directory.Exists(Server.MapPath("~/DownloadedExcel"));
-                if (!exists)
-                    System.IO.Directory.CreateDirectory(Server.MapPath("~/DownloadedExcel"));
-                var path = Server.MapPath("~/DownloadedExcel/" + fileName);
-                if (System.IO.File.Exists(path))
-                {
-                    System.IO.File.Delete(path);
+                    string rptPath = System.Web.HttpContext.Current.Session["ReportName"] != null ? System.Web.HttpContext.Current.Session["ReportName"].ToString() : "";
+                    var fileName = Path.GetFileNameWithoutExtension(rptPath) + "_" + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Year;
+                    fileName = fileName + ".xlsx";
+                    bool exists = System.IO.Directory.Exists(Server.MapPath("~/DownloadedExcel"));
+                    if (!exists)
+                        System.IO.Directory.CreateDirectory(Server.MapPath("~/DownloadedExcel"));
+                    var path = Server.MapPath("~/DownloadedExcel/" + fileName);
+                    if (System.IO.File.Exists(path))
+                    {
+                        System.IO.File.Delete(path);
+                    }
+                    
+                    package.SaveAs(new FileInfo(path));
+                    
+                    Response.ClearContent();
+                    Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                    Response.AddHeader("content-disposition", "attachment; filename=" + fileName);
+                    Response.TransmitFile(path);
+                    Response.End();
                 }
-                oWB.SaveAs(Server.MapPath("~/DownloadedExcel/" + fileName), Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing,
-                false, false, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlNoChange,
-                Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
-                oWB.Close();
-                Response.ClearContent();
-                Response.ContentType = "application/xlsx";
-                Response.AddHeader("content-disposition", "attachment; filename=" + fileName);
-                Response.TransmitFile(path);
-                Response.End();
             }
             catch (ThreadAbortException ex)
             {
-
                 throw;
             }
         }
@@ -522,6 +515,7 @@ namespace App.Web.ReportForms
 
                 if (repoertName == "rptPaymentSuccessReport" || repoertName == "rptPaymentFailedReport" || repoertName == "rptArrears" || repoertName == "rptPaymentHistory")
                 {
+                    /*
                     object missing = Type.Missing;
                     Microsoft.Office.Interop.Excel.Application oXL = new Microsoft.Office.Interop.Excel.Application();
                     oXL.Visible = false;
@@ -533,127 +527,112 @@ namespace App.Web.ReportForms
                     object misvalue = System.Reflection.Missing.Value;
                     oXL = new Microsoft.Office.Interop.Excel.Application();
                     oXL.Visible = false;
+                    */
 
-                    int row = PayReportData.Tables[0].Rows.Count + 1;
-
-                    if (repoertName == "rptPaymentSuccessReport" || repoertName == "rptPaymentFailedReport" || repoertName == "rptArrears")
+                    using (var package = new ExcelPackage())
                     {
-                        oSheet.Name = repoertName == "rptPaymentSuccessReport" ? "Success Payments" : (repoertName == "rptPaymentFailedReport" ? "Payment Failed" : "Arrear Payment");
-                        oSheet.Cells[1, 1] = "Application Ref No.";
-                        oSheet.Cells[1, 2] = "Beneficiary Name";
-                        oSheet.Cells[1, 3] = "Scheme";
-                        oSheet.Cells[1, 4] = "Bank Name";
-                        oSheet.Cells[1, 5] = "IFSC Code";
-                        oSheet.Cells[1, 6] = "Account No";
-                        oSheet.Cells[1, 6].EntireColumn.NumberFormat = "@";
-                        oSheet.Cells[1, 7] = "Paid On";
-                        oSheet.Cells[1, 7].EntireColumn.NumberFormat = "MM/DD/YYYY";
-                        oSheet.Cells[1, 8] = "Amount";
-                        oSheet.Cells[1, 9] = "District";
-                        oSheet.Cells[1, 10] = "TransactionRefrenceNo";
-                        oSheet.Cells[1, 11] = "TransactionDate";
-                        oSheet.Cells[1, 11].EntireColumn.NumberFormat = "MM/DD/YYYY";
-                        oSheet.Cells[1, 12] = "Reason/Remarks";
-                        dynamic[,] saNames = new dynamic[row, 12];
-                        int i = 0;
-                        if (PayReportData.Tables[0].Rows.Count > 0)
+                        var worksheet = package.Workbook.Worksheets.Add(repoertName == "rptPaymentSuccessReport" ? "Success Payments" : (repoertName == "rptPaymentFailedReport" ? "Payment Failed" : (repoertName == "rptPaymentHistory" ? "Payment History" : "Arrear Payment")));
+
+                        int rowCount = PayReportData.Tables[0].Rows.Count + 1;
+
+                        if (repoertName == "rptPaymentSuccessReport" || repoertName == "rptPaymentFailedReport" || repoertName == "rptArrears")
                         {
+                            worksheet.Cells[1, 1].Value = "Application Ref No.";
+                            worksheet.Cells[1, 2].Value = "Beneficiary Name";
+                            worksheet.Cells[1, 3].Value = "Scheme";
+                            worksheet.Cells[1, 4].Value = "Bank Name";
+                            worksheet.Cells[1, 5].Value = "IFSC Code";
+                            worksheet.Cells[1, 6].Value = "Account No";
+                            worksheet.Column(6).Style.Numberformat.Format = "@";
+                            worksheet.Cells[1, 7].Value = "Paid On";
+                            worksheet.Column(7).Style.Numberformat.Format = "MM/DD/YYYY";
+                            worksheet.Cells[1, 8].Value = "Amount";
+                            worksheet.Cells[1, 9].Value = "District";
+                            worksheet.Cells[1, 10].Value = "TransactionRefrenceNo";
+                            worksheet.Cells[1, 11].Value = "TransactionDate";
+                            worksheet.Column(11).Style.Numberformat.Format = "MM/DD/YYYY";
+                            worksheet.Cells[1, 12].Value = "Reason/Remarks";
+
+                            int i = 2;
                             foreach (DataRow item in PayReportData.Tables[0].Rows)
                             {
-                                saNames[i, 0] = item["ApplicationReferenceno"].ToString();
-                                saNames[i, 1] = item["ApplicantName"].ToString();
-                                saNames[i, 2] = item["type_code"].ToString();
-                                saNames[i, 3] = item["BankName"].ToString();
-                                saNames[i, 4] = item["IFSCCode"].ToString();
-                                saNames[i, 5] = item["bank_acct_no"].ToString();
-                                saNames[i, 6] = item["pay_date"].ToString();
-                                saNames[i, 7] = item["amount"].ToString();
-                                saNames[i, 8] = item["District"].ToString();
-                                saNames[i, 9] = item["TransactionRefrenceNo"].ToString();
-                                saNames[i, 10] = item["TransactionDate"].ToString();
-                                saNames[i, 11] = item["Reason/Remarks"].ToString();
+                                worksheet.Cells[i, 1].Value = item["ApplicationReferenceno"].ToString();
+                                worksheet.Cells[i, 2].Value = item["ApplicantName"].ToString();
+                                worksheet.Cells[i, 3].Value = item["type_code"].ToString();
+                                worksheet.Cells[i, 4].Value = item["BankName"].ToString();
+                                worksheet.Cells[i, 5].Value = item["IFSCCode"].ToString();
+                                worksheet.Cells[i, 6].Value = item["bank_acct_no"].ToString();
+                                worksheet.Cells[i, 7].Value = item["pay_date"].ToString();
+                                worksheet.Cells[i, 8].Value = item["amount"].ToString();
+                                worksheet.Cells[i, 9].Value = item["District"].ToString();
+                                worksheet.Cells[i, 10].Value = item["TransactionRefrenceNo"].ToString();
+                                worksheet.Cells[i, 11].Value = item["TransactionDate"].ToString();
+                                worksheet.Cells[i, 12].Value = item["Reason/Remarks"].ToString();
                                 i++;
                             }
-                            oSheet.get_Range("A2", $"L{row}").Value2 = saNames;
-                        }
-                    }
-                    else if (repoertName == "rptPaymentHistory")
-                    {
-                        oSheet.Name = "Payment History";
-                        oSheet.Cells[1, 1] = "Name";
-                        oSheet.Cells[1, 2] = "Application Ref No.";
-                        oSheet.Cells[1, 3] = "Scheme";
-                        oSheet.Cells[1, 4] = "Address";
-                        oSheet.Cells[1, 5] = "Account No";
-                        oSheet.Cells[1, 5].EntireColumn.NumberFormat = "@";
-                        oSheet.Cells[1, 6] = "Bank Name";
-                        oSheet.Cells[1, 7] = "IFSC Code";
-                        oSheet.Cells[1, 8] = "Pension Generated On";
-                        oSheet.Cells[1, 8].EntireColumn.NumberFormat = "MM/DD/YYYY";
-                        oSheet.Cells[1, 9] = "Amount";
-                        oSheet.Cells[1, 10] = "Status";
-                        oSheet.Cells[1, 11] = "Reason";
-                        //oSheet.Cells[1, 12] = "TransactionDate";
-                        //oSheet.Cells[1, 12].EntireColumn.NumberFormat = "MM/DD/YYYY";
-                        oSheet.Cells[1, 12] = "TransactionRefrenceNo";
 
-                        dynamic[,] saNames = new dynamic[row, 13];
-                        int i = 0;
-                        if (PayReportData.Tables[0].Rows.Count > 0)
+                            var range = worksheet.Cells[1, 1, rowCount, 12];
+                            range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                            range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                            range.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                            range.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                            worksheet.Cells[1, 1, rowCount, 12].AutoFitColumns();
+                        }
+                        else if (repoertName == "rptPaymentHistory")
                         {
+                            worksheet.Cells[1, 1].Value = "Name";
+                            worksheet.Cells[1, 2].Value = "Application Ref No.";
+                            worksheet.Cells[1, 3].Value = "Scheme";
+                            worksheet.Cells[1, 4].Value = "Address";
+                            worksheet.Cells[1, 5].Value = "Account No";
+                            worksheet.Column(5).Style.Numberformat.Format = "@";
+                            worksheet.Cells[1, 6].Value = "Bank Name";
+                            worksheet.Cells[1, 7].Value = "IFSC Code";
+                            worksheet.Cells[1, 8].Value = "Pension Generated On";
+                            worksheet.Column(8).Style.Numberformat.Format = "MM/DD/YYYY";
+                            worksheet.Cells[1, 9].Value = "Amount";
+                            worksheet.Cells[1, 10].Value = "Status";
+                            worksheet.Cells[1, 11].Value = "Reason";
+                            worksheet.Cells[1, 12].Value = "TransactionRefrenceNo";
+
+                            int i = 2;
                             foreach (DataRow item in PayReportData.Tables[0].Rows)
                             {
-                                saNames[i, 0] = item["ApplicantName"].ToString();
-                                saNames[i, 1] = item["ApprovalDate"].ToString();
-                                saNames[i, 2] = item["SchemeType"].ToString();
-                                saNames[i, 3] = item["Address"].ToString();
-                                saNames[i, 4] = item["AccountNo"].ToString();
-                                saNames[i, 5] = item["BankName"].ToString();
-                                saNames[i, 6] = item["IFSC_Code"].ToString();
-                                saNames[i, 7] = item["PaidOn"].ToString();
-                                saNames[i, 8] = item["Amount"].ToString();
-                                saNames[i, 9] = item["Status"].ToString();
-                                saNames[i, 10] = item["Reason"].ToString();
-                                //saNames[i, 11] = item["TransactionDate"].ToString();
-                                saNames[i, 11] = item["TransactionRefrenceNo"].ToString();
+                                worksheet.Cells[i, 1].Value = item["ApplicantName"].ToString();
+                                worksheet.Cells[i, 2].Value = item["ApprovalDate"].ToString();
+                                worksheet.Cells[i, 3].Value = item["SchemeType"].ToString();
+                                worksheet.Cells[i, 4].Value = item["Address"].ToString();
+                                worksheet.Cells[i, 5].Value = item["AccountNo"].ToString();
+                                worksheet.Cells[i, 6].Value = item["BankName"].ToString();
+                                worksheet.Cells[i, 7].Value = item["IFSC_Code"].ToString();
+                                worksheet.Cells[i, 8].Value = item["PaidOn"].ToString();
+                                worksheet.Cells[i, 9].Value = item["Amount"].ToString();
+                                worksheet.Cells[i, 10].Value = item["Status"].ToString();
+                                worksheet.Cells[i, 11].Value = item["Reason"].ToString();
+                                worksheet.Cells[i, 12].Value = item["TransactionRefrenceNo"].ToString();
                                 i++;
                             }
-                            oSheet.get_Range("A2", $"M{row}").Value2 = saNames;
+
+                            var range = worksheet.Cells[1, 1, rowCount, 12];
+                            range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                            range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                            range.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                            range.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                            worksheet.Cells[1, 1, rowCount, 12].AutoFitColumns();
                         }
+
+                        string rptPath = System.Web.HttpContext.Current.Session["ReportName"] != null ? System.Web.HttpContext.Current.Session["ReportName"].ToString() : "";
+                        var fileName = Path.GetFileNameWithoutExtension(rptPath) + "_" + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Year;
+                        fileName = fileName + ".xlsx";
+
+                        byte[] fileBytes = package.GetAsByteArray();
+                        FileContentResult bytesdata = new FileContentResult(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                        {
+                            FileDownloadName = fileName
+                        };
+
+                        return bytesdata;
                     }
-
-                    Microsoft.Office.Interop.Excel.Range range = oSheet.get_Range("A2", $"M{row}");
-                    range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeBottom].Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Black);
-                    range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeLeft].Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Black);
-                    range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeRight].Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Black);
-                    range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeTop].Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Black);
-                    range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlInsideHorizontal].Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Black);
-                    range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlInsideVertical].Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Black);
-                    oRng = oSheet.get_Range("A2", $"M{row}");
-                    oRng.EntireColumn.AutoFit();
-                    oXL.Visible = false;
-                    oXL.UserControl = false;
-                    string rptPath = System.Web.HttpContext.Current.Session["ReportName"] != null ? System.Web.HttpContext.Current.Session["ReportName"].ToString() : "";
-                    var fileName = Path.GetFileNameWithoutExtension(rptPath) + "_" + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Year;//TextHelper.GenerateRandomText(12);
-                    fileName = fileName + ".xls";
-                    bool exists = System.IO.Directory.Exists(Server.MapPath("~/DownloadedExcel"));
-                    if (!exists)
-                        System.IO.Directory.CreateDirectory(Server.MapPath("~/DownloadedExcel"));
-                    var path = Server.MapPath("~/DownloadedExcel/" + fileName);
-                    if (System.IO.File.Exists(path))
-                    {
-                        System.IO.File.Delete(path);
-                    }
-
-                    string ReportPath = Server.MapPath("~/DownloadedExcel/" + fileName);
-
-                    byte[] fileBytes = File.ReadAllBytes(ReportPath);
-                    FileContentResult bytesdata = new FileContentResult(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet)
-                    {
-                        FileDownloadName = fileName
-                    };
-
-                    return bytesdata;
                 }
                 else
                 {

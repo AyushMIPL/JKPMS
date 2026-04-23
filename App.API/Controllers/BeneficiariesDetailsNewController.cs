@@ -1,4 +1,4 @@
-﻿using App.Data;
+using App.Data;
 using App.Data.Entities;
 using System;
 using System.Collections.Generic;
@@ -27,6 +27,8 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNetCore.Http;
 using DocumentFormat.OpenXml.Drawing;
 using System.Drawing;
+using OfficeOpenXml;
+
 
 namespace App.API.Controllers
 {
@@ -319,11 +321,25 @@ namespace App.API.Controllers
                                 int Notvalidated_count = dataTable.AsEnumerable().Count(row => row.Field<string>("ACCOUNT_STATUS") != "ACTIVE");
 
                                 string excelFilePath = csvFilePath.Replace(".csv", ".xlsx");
+                                /*
                                 Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
                                 Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(csvFilePath);
                                 wb.SaveAs(excelFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlOpenXMLWorkbook);
                                 wb.Close(false);
                                 app.Quit();
+                                */
+
+                                using (var package = new ExcelPackage())
+                                {
+                                    var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+                                    var format = new ExcelTextFormat
+                                    {
+                                        Delimiter = ',',
+                                        Encoding = Encoding.UTF8
+                                    };
+                                    worksheet.Cells["A1"].LoadFromText(new FileInfo(csvFilePath), format);
+                                    package.SaveAs(new FileInfo(excelFilePath));
+                                }
 
                                 //File Transfer To FstpServer
 

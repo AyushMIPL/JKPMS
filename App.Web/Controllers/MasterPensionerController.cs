@@ -17,7 +17,8 @@ using Postal;
 using App.Web.Repository;
 using System.IO;
 using System.Data.SqlClient;
-using Microsoft.Office.Interop.Excel;
+using OfficeOpenXml;
+// using Microsoft.Office.Interop.Excel;
 using DocumentFormat.OpenXml.Wordprocessing;
 using App.Data.ViewModels;
 using DocumentFormat.OpenXml.Office2010.Excel;
@@ -7048,11 +7049,25 @@ namespace App.Web.Controllers
             int Notvalidated_count = dataTable.AsEnumerable().Count(row => row.Field<string>("ACCOUNT_STATUS") != "ACTIVE");
 
             string excelFilePath = csvFilePath.Replace(".csv", ".xlsx");
+            /*
             Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
             Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(csvFilePath);
             wb.SaveAs(excelFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlOpenXMLWorkbook);
             wb.Close(false);
             app.Quit();
+            */
+
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+                var format = new ExcelTextFormat
+                {
+                    Delimiter = ',',
+                    Encoding = Encoding.UTF8
+                };
+                worksheet.Cells["A1"].LoadFromText(new FileInfo(csvFilePath), format);
+                package.SaveAs(new FileInfo(excelFilePath));
+            }
             //File Transfer To FstpServer
 
             // delete file in safe way
@@ -7283,11 +7298,25 @@ namespace App.Web.Controllers
           int Notvalidated_count = dataTable.AsEnumerable().Count(row => row.Field<string>("ACCOUNT_STATUS") != "ACTIVE");
 
           string excelFilePath = csvFilePath.Replace(".csv", ".xlsx");
+          /*
           Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
           Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(csvFilePath);
           wb.SaveAs(excelFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlOpenXMLWorkbook);
           wb.Close(false);
           app.Quit();
+          */
+
+          using (var package = new ExcelPackage())
+          {
+              var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+              var format = new ExcelTextFormat
+              {
+                  Delimiter = ',',
+                  Encoding = Encoding.UTF8
+              };
+              worksheet.Cells["A1"].LoadFromText(new FileInfo(csvFilePath), format);
+              package.SaveAs(new FileInfo(excelFilePath));
+          }
           //File Transfer To FstpServer
 
           // delete file in safe way
@@ -7718,12 +7747,49 @@ namespace App.Web.Controllers
     }
     static void SaveExcelAsCsv(string excelFilePath, string csvFilePath)
     {
-      Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
-      Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(excelFilePath);
-      wb.SaveAs(csvFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlCSVWindows);
-      wb.Close(false);
-      app.Quit();
+      try
+      {
+        /*
+        Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
+        Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(excelFilePath);
+        wb.SaveAs(csvFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlCSVWindows);
+        wb.Close(false);
+        app.Quit();
+        */
 
+        using (var stream = new FileStream(excelFilePath, FileMode.Open, FileAccess.Read))
+        {
+          using (var package = new ExcelPackage(stream))
+          {
+            var worksheet = package.Workbook.Worksheets[1];
+            var csvBuilder = new StringBuilder();
+            if (worksheet.Dimension != null)
+            {
+              int rowCount = worksheet.Dimension.End.Row;
+              int colCount = worksheet.Dimension.End.Column;
+
+              for (int row = 1; row <= rowCount; row++)
+              {
+                var values = new List<string>();
+                for (int col = 1; col <= colCount; col++)
+                {
+                  string text = worksheet.Cells[row, col].Value?.ToString() ?? "";
+                  text = text.Replace("\"", "\"\"");
+                  if (text.Contains(",") || text.Contains("\"") || text.Contains("\n"))
+                    text = $"\"{text}\"";
+                  values.Add(text);
+                }
+                csvBuilder.AppendLine(string.Join(",", values));
+              }
+            }
+            System.IO.File.WriteAllText(csvFilePath, csvBuilder.ToString(), Encoding.UTF8);
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+        throw;
+      }
     }
     private string UploadDataFile(byte[] fileContents, string fileName)
     {

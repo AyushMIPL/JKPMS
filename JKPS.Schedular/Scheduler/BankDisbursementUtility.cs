@@ -1,9 +1,11 @@
-﻿using App.Data.Entities;
+using App.Data.Entities;
 using JKPS.BLL;
 using JKPS.COMMON;
 using JKPS.DL;
 using Quartz;
 using Renci.SshNet;
+using OfficeOpenXml;
+
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -196,12 +198,49 @@ namespace JKPS.Schedular.Scheduler
     }
     static void SaveExcelAsCsv(string excelFilePath, string csvFilePath)
     {
-      Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
-      Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(excelFilePath);
-      wb.SaveAs(csvFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlCSVWindows);
-      wb.Close(false);
-      app.Quit();
+      try
+      {
+        /*
+        Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
+        Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(excelFilePath);
+        wb.SaveAs(csvFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlCSVWindows);
+        wb.Close(false);
+        app.Quit();
+        */
 
+        using (var stream = new FileStream(excelFilePath, FileMode.Open, FileAccess.Read))
+        {
+          using (var package = new ExcelPackage(stream))
+          {
+            var worksheet = package.Workbook.Worksheets[1];
+            var csvBuilder = new StringBuilder();
+            if (worksheet.Dimension != null)
+            {
+              int rowCount = worksheet.Dimension.End.Row;
+              int colCount = worksheet.Dimension.End.Column;
+
+              for (int row = 1; row <= rowCount; row++)
+              {
+                var values = new List<string>();
+                for (int col = 1; col <= colCount; col++)
+                {
+                  string text = worksheet.Cells[row, col].Value?.ToString() ?? "";
+                  text = text.Replace("\"", "\"\"");
+                  if (text.Contains(",") || text.Contains("\"") || text.Contains("\n"))
+                    text = $"\"{text}\"";
+                  values.Add(text);
+                }
+                csvBuilder.AppendLine(string.Join(",", values));
+              }
+            }
+            File.WriteAllText(csvFilePath, csvBuilder.ToString(), Encoding.UTF8);
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+        throw;
+      }
     }
     private string UploadDataFile(byte[] fileContents, string fileName)
     {

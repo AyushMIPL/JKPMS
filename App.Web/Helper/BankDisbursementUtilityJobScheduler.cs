@@ -1,4 +1,4 @@
-﻿using App.Data;
+using App.Data;
 using JKPS.BLL;
 using JKPS.COMMON;
 using JKPS.DL;
@@ -12,6 +12,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using OfficeOpenXml;
+using System.Text;
+
 
 namespace App.Web.Helper
 {
@@ -496,11 +499,36 @@ namespace App.Web.Helper
     {
       try
       {
+        /*
         Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
         Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(excelFilePath);
         wb.SaveAs(csvFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlCSVWindows);
         wb.Close(false);
         app.Quit();
+        */
+
+        using (var package = new ExcelPackage(new FileInfo(excelFilePath)))
+        {
+            var worksheet = package.Workbook.Worksheets[0];
+            var csvContent = new StringBuilder();
+            int rowCount = worksheet.Dimension.Rows;
+            int colCount = worksheet.Dimension.Columns;
+
+            for (int row = 1; row <= rowCount; row++)
+            {
+                for (int col = 1; col <= colCount; col++)
+                {
+                    var cellValue = worksheet.Cells[row, col].Value?.ToString() ?? "";
+                    if (cellValue.Contains(",") || cellValue.Contains("\"") || cellValue.Contains("\n"))
+                    {
+                        cellValue = "\"" + cellValue.Replace("\"", "\"\"") + "\"";
+                    }
+                    csvContent.Append(cellValue + (col == colCount ? "" : ","));
+                }
+                csvContent.AppendLine();
+            }
+            File.WriteAllText(csvFilePath, csvContent.ToString(), Encoding.UTF8);
+        }
       }
       catch (Exception ex)
       {

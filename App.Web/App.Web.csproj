@@ -266,10 +266,6 @@
     <Reference Include="Microsoft.Net.Http.Headers, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Net.Http.Headers.2.2.0\lib\netstandard2.0\Microsoft.Net.Http.Headers.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Office.Interop.Excel.15.0.4795.1001\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
     <Reference Include="Microsoft.Owin, Version=4.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.4.2.2\lib\net45\Microsoft.Owin.dll</HintPath>
     </Reference>
@@ -588,6 +584,7 @@
     <Compile Include="Helper\SecurityHelper.cs" />
     <Compile Include="Helper\SiteHelper.cs" />
     <Compile Include="Helper\StatusValidator.cs" />
+    <Compile Include="Helper\SftpResponseProcessor.cs" />
     <Compile Include="Helper\UrlEncryption.cs" />
     <Compile Include="ListToDataset.cs" />
     <Compile Include="Logger.cs" />
@@ -1779,7 +1776,7 @@
     <Content Include="Views\Emails\ResponseValidationFileBank.Html.cshtml" />
     <Content Include="Views\MasterPensioner\DuplicateAccounts.cshtml" />
     <Content Include="Views\Account\ApplicantsEdit.cshtml" />
-    <Content Include="Views\Account\ReuploadPermission.cshtml" />
+
     <Content Include="Views\Error\NotFound.cshtml" />
     <Content Include="Views\Account\ChooseFinancialYear.cshtml" />
     <Content Include="Views\ContributorPersonalDetails\_ContributorListForMarriage.cshtml" />

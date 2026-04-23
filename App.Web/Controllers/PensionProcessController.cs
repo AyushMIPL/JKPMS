@@ -11,6 +11,7 @@ using CrystalDecisions.Shared.Json;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using OfficeOpenXml;
 using JKPS.BLL;
 using JKPS.COMMON;
 using JKPS.CommonUtilities;
@@ -3182,13 +3183,7 @@ namespace App.Web.Controllers
 
                 batchId = Convert.ToInt32(batch_value);
 
-                bool isReuploadPermission = db.Media_Queue.AsNoTracking().Where(x => x.RecordId == batchId
-                && (x.Districts + "").Trim().ToUpper() == distict_value.Trim().ToUpper()).Select(y => y.IsReUploaded).FirstOrDefault();
 
-                if (!isReuploadPermission)
-                {
-                    return Json("Already uploaded.");
-                }
 
                 object[] parameters1 = new object[2];
                 parameters1[0] = batch_value;
@@ -3281,6 +3276,7 @@ namespace App.Web.Controllers
                     //wb.SaveAs(excelFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlOpenXMLWorkbook);
                     //wb.Close(false);
                     //app.Quit();
+                    /*
                     var workbook = new XLWorkbook();
                     var worksheet = workbook.Worksheets.Add("Sheet1");
 
@@ -3296,6 +3292,19 @@ namespace App.Web.Controllers
                     }
 
                     workbook.SaveAs(excelFilePath);
+                    */
+
+                    using (var package = new ExcelPackage())
+                    {
+                        var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+                        var format = new ExcelTextFormat
+                        {
+                            Delimiter = ',',
+                            Encoding = Encoding.UTF8
+                        };
+                        worksheet.Cells["A1"].LoadFromText(new FileInfo(csvFilePath), format);
+                        package.SaveAs(new FileInfo(excelFilePath));
+                    }
 
                     // delete file in safe way
                     bool isCsvFileDeleted = fileHelper.TryDeleteFile(csvFilePath);
@@ -3475,7 +3484,8 @@ namespace App.Web.Controllers
             int currentYear = DateTime.Now.Year;
             for (int i = currentYear - 2; i <= currentYear + 2; i++)
             {
-                years.Add(new SelectListItem { Text = i.ToString(), Value = i.ToString(), Selected = (i == currentYear) });
+                //years.Add(new SelectListItem { Text = i.ToString(), Value = i.ToString(), Selected = (i == currentYear) });
+                years.Add(new SelectListItem { Text = i.ToString(), Value = i.ToString(), Selected = false });
             }
             ViewBag.Years = years;
 
@@ -3483,11 +3493,106 @@ namespace App.Web.Controllers
             for (int i = 1; i <= 12; i++)
             {
                 string monthName = new DateTime(2000, i, 1).ToString("MMMM");
-                months.Add(new SelectListItem { Text = monthName, Value = monthName, Selected = (i == DateTime.Now.Month) });
+                //months.Add(new SelectListItem { Text = monthName, Value = monthName, Selected = (i == DateTime.Now.Month) });
+                months.Add(new SelectListItem { Text = monthName, Value = monthName, Selected = false });
             }
             ViewBag.Months = months;
 
             return View("~/Views/PensionProcess/DirectDeposits/UploadPensionFile.cshtml");
+        }
+
+        public ActionResult ReceiveSftpResponse()
+        {
+            return View("~/Views/PensionProcess/DirectDeposits/ReceiveSftpResponse.cshtml");
+        }
+
+        [HttpPost]
+        public JsonResult FetchSftpResponseAjax(string responseType)
+        {
+            try
+            {
+                var processor = new SftpResponseProcessor(db);
+                var result = processor.FetchAndProcessResponses(responseType);
+                return Json(new { success = result.Success, message = result.Message });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred: " + ex.Message });
+            }
+        }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetSftpHistoryAjaxHandler(JQueryDataTableParamModel param, string responseType = "Disbursement")
+        {
+            try
+            {
+                IQueryable<SftpResponseHistory> history = db.SftpResponseHistory.AsNoTracking();
+
+                if (!string.IsNullOrEmpty(responseType))
+                {
+                    history = history.Where(x => x.FileType == responseType);
+                }
+
+                if (!string.IsNullOrEmpty(param.sSearch))
+                {
+                    history = history.Where(x => x.FileName.Contains(param.sSearch) || x.Status.Contains(param.sSearch) || x.Remarks.Contains(param.sSearch));
+                }
+
+                var totalRecords = history.Count();
+
+                var displayedHistory = history.OrderByDescending(x => x.ProcessDate)
+                                              .Skip(param.iDisplayStart)
+                                              .Take(param.iDisplayLength)
+                                              .ToList();
+
+                var result = from h in displayedHistory
+                             select new[]
+                             {
+                                 h.FileName,
+                                 h.FileType,
+                                 h.ProcessDate.ToString("dd/MM/yyyy HH:mm"),
+                                 h.Status,
+                                 h.Remarks,
+                                 h.Id.ToString()
+                             };
+
+                return Json(new
+                {
+                    sEcho = param.sEcho,
+                    iTotalRecords = totalRecords,
+                    iTotalDisplayRecords = totalRecords,
+                    aaData = result
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    sEcho = param.sEcho,
+                    iTotalRecords = 0,
+                    iTotalDisplayRecords = 0,
+                    aaData = new List<string[]>(),
+                    error = "Server Error: " + ex.Message
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        public ActionResult DownloadSftpResponseFile(int id)
+        {
+            try
+            {
+                var history = db.SftpResponseHistory.Find(id);
+                if (history != null && !string.IsNullOrEmpty(history.FilePath) && System.IO.File.Exists(history.FilePath))
+                {
+                    return File(history.FilePath, System.Net.Mime.MediaTypeNames.Application.Octet, history.FileName);
+                }
+                return HttpNotFound("File not found on server.");
+            }
+            catch (Exception ex)
+            {
+                return Content("Error downloading file: " + ex.Message);
+            }
         }
 
         [HttpPost]
@@ -3758,31 +3863,39 @@ namespace App.Web.Controllers
             }
         }
 
+        [HttpGet]
         public ActionResult DownloadUploadedPensionFile(int id)
         {
-            var history = db.PensionFileUploadHistory.Find(id);
-            if (history != null)
+            try
             {
-                if (System.IO.File.Exists(history.FilePath))
+                var history = db.PensionFileUploadHistory.Find(id);
+                if (history != null)
                 {
-                    byte[] fileBytes = System.IO.File.ReadAllBytes(history.FilePath);
-                    return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, history.FileName);
-                }
-                else
-                {
-                    // Check fallback (web server)
+                    // 1. Try absolute FilePath
+                    if (!string.IsNullOrEmpty(history.FilePath) && System.IO.File.Exists(history.FilePath))
+                    {
+                        return File(history.FilePath, System.Net.Mime.MediaTypeNames.Application.Octet, history.FileName);
+                    }
+                    
+                    // 2. Try Fallback (Web Server Directory)
                     var region = GetRegionName();
                     var directoryName = region == "KASHMIR REGION" ? "K_Disbursement" : "J_Disbursement";
                     string webPath = Path.Combine(Helper.Helper.GetAllFilesPath(region, directoryName), history.FileName);
                     
                     if (System.IO.File.Exists(webPath))
                     {
-                        byte[] fileBytes = System.IO.File.ReadAllBytes(webPath);
-                        return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, history.FileName);
+                        return File(webPath, System.Net.Mime.MediaTypeNames.Application.Octet, history.FileName);
                     }
+
+                    return HttpNotFound("The requested file could not be found on the server at path: " + history.FilePath);
                 }
+                return HttpNotFound("File record not found in database.");
             }
-            return HttpNotFound("The requested file could not be found on the server.");
+            catch (Exception ex)
+            {
+                // Return a friendly error message or log
+                return Content("Error downloading file: " + ex.Message);
+            }
         }
 
         private string getUserName(int Id)
@@ -3943,6 +4056,7 @@ namespace App.Web.Controllers
                 // Save the byte array to a temporary CSV file
                 System.IO.File.WriteAllBytes(csvFilePath, csvFileBytes);
 
+                /*
                 // Start Excel application
                 var excelApp = new Microsoft.Office.Interop.Excel.Application();
                 excelApp.Visible = false;
@@ -3961,6 +4075,19 @@ namespace App.Web.Controllers
                 // Release COM objects
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
+                */
+
+                using (var package = new ExcelPackage())
+                {
+                    var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+                    var format = new ExcelTextFormat
+                    {
+                        Delimiter = ',',
+                        Encoding = Encoding.UTF8
+                    };
+                    worksheet.Cells["A1"].LoadFromText(new FileInfo(csvFilePath), format);
+                    package.SaveAs(new FileInfo(excelFilePath));
+                }
 
                 // Read the Excel file into a byte array
                 byte[] excelFileBytes = System.IO.File.ReadAllBytes(excelFilePath);
@@ -4416,12 +4543,49 @@ namespace App.Web.Controllers
 
         static void SaveExcelAsCsv(string excelFilePath, string csvFilePath)
         {
-            Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
-            Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(excelFilePath);
-            wb.SaveAs(csvFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlCSVWindows);
-            wb.Close(false);
-            app.Quit();
+            try
+            {
+                /*
+                Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
+                Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(excelFilePath);
+                wb.SaveAs(csvFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlCSVWindows);
+                wb.Close(false);
+                app.Quit();
+                */
 
+                using (var stream = new FileStream(excelFilePath, FileMode.Open, FileAccess.Read))
+                {
+                    using (var package = new ExcelPackage(stream))
+                    {
+                        var worksheet = package.Workbook.Worksheets[1];
+                        var csvBuilder = new StringBuilder();
+                        if (worksheet.Dimension != null)
+                        {
+                            int rowCount = worksheet.Dimension.End.Row;
+                            int colCount = worksheet.Dimension.End.Column;
+
+                            for (int row = 1; row <= rowCount; row++)
+                            {
+                                var values = new List<string>();
+                                for (int col = 1; col <= colCount; col++)
+                                {
+                                    string text = worksheet.Cells[row, col].Value?.ToString() ?? "";
+                                    text = text.Replace("\"", "\"\"");
+                                    if (text.Contains(",") || text.Contains("\"") || text.Contains("\n"))
+                                        text = $"\"{text}\"";
+                                    values.Add(text);
+                                }
+                                csvBuilder.AppendLine(string.Join(",", values));
+                            }
+                        }
+                        System.IO.File.WriteAllText(csvFilePath, csvBuilder.ToString(), Encoding.UTF8);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
         private string UploadDataFile(byte[] fileContents, string fileName)
         {
@@ -4686,11 +4850,25 @@ namespace App.Web.Controllers
                                     FileHelper fileHelper = new FileHelper();
                                     bool isFileDeleted = fileHelper.TryDeleteFile(excelFilePath);
 
+                                    /*
                                     Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
                                     Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(csvFilePath);
                                     wb.SaveAs(excelFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlOpenXMLWorkbook);
                                     wb.Close(false);
                                     app.Quit();
+                                    */
+
+                                    using (var package = new ExcelPackage())
+                                    {
+                                        var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+                                        var format = new ExcelTextFormat
+                                        {
+                                            Delimiter = ',',
+                                            Encoding = Encoding.UTF8
+                                        };
+                                        worksheet.Cells["A1"].LoadFromText(new FileInfo(csvFilePath), format);
+                                        package.SaveAs(new FileInfo(excelFilePath));
+                                    }
 
                                     // delete file in safe way
                                     bool isCsvFileDeleted = fileHelper.TryDeleteFile(csvFilePath);

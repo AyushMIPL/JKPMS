@@ -164,6 +164,7 @@ namespace App.Data
             modelBuilder.Entity<TxnDetail>().ToTable("txnDetail");
             modelBuilder.Entity<MailTemplate>().ToTable("MailTemplates");
             modelBuilder.Entity<PensionFileUploadHistory>().ToTable("PensionFileUploadHistory");
+            modelBuilder.Entity<SftpResponseHistory>().ToTable("SftpResponseHistory");
         }
 
         public override async Task<int> SaveChangesAsync()
@@ -543,6 +544,7 @@ namespace App.Data
         public DbSet<Widgets> Widgets { get; set; }
         public DbSet<MailTemplate> MailTemplates { get; set; }
         public DbSet<PensionFileUploadHistory> PensionFileUploadHistory { get; set; }
+        public DbSet<SftpResponseHistory> SftpResponseHistory { get; set; }
         public DbSet<MasterEmail> MasterEmails { get; set; }
         public DbSet<MasterProcessKey> MasterProcessKeys { get; set; }
         public IEnumerable<object> AppUser { get; set; }

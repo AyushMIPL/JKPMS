@@ -398,50 +398,6 @@ namespace App.Web.Helper
 
 
 
-        //public string ConvertExcelBytesToCsv(byte[] ExcelFileBytes, string csvFileName, string exelFileName, string tempFolderPath)
-        //{
-        //    // Temporary folder paths
-        //    Directory.CreateDirectory(tempFolderPath);
-
-        //    // Define paths for temporary CSV and Excel files
-        //    string excelFilePath = Path.Combine(tempFolderPath, exelFileName ?? "temp.xlsx");
-
-        //    string csvFilePath = Path.Combine(tempFolderPath, Path.GetFileNameWithoutExtension(excelFilePath) + ".csv");
-
-
-        //    try
-        //    {
-        //        // Save the byte array to a temporary CSV file
-        //        System.IO.File.WriteAllBytes(excelFilePath, ExcelFileBytes);
-
-        //        // Start Excel application
-        //        var excelApp = new Microsoft.Office.Interop.Excel.Application();
-        //        excelApp.Visible = false;
-        //        excelApp.DisplayAlerts = false;
-
-        //        // Open the xlsx file
-        //        Microsoft.Office.Interop.Excel.Workbook workbook = excelApp.Workbooks.Open(excelFilePath);
-
-        //        // Save as Excel file (.csv)
-        //        workbook.SaveAs(csvFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlCSV);
-
-        //        // Close the workbook and quit the Excel application
-        //        workbook.Close(false);
-        //        excelApp.Quit();
-
-        //        // Release COM objects
-        //        System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
-        //        System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
-
-        //        // Read the Excel file into a byte array
-        //        byte[] excelFileBytes = System.IO.File.ReadAllBytes(excelFilePath);
-        //        return csvFilePath;
-        //    }
-        //    catch
-        //    {
-        //        return string.Empty;
-        //    }
-        //}
 
         static System.Data.DataTable ConvertCsvToDataTable(string fileName)
         {
@@ -547,20 +503,46 @@ namespace App.Web.Helper
     //    return dataTable;
 
     //}
-    static void SaveExcelAsCsv(string excelFilePath, string csvFilePath)
+        static void SaveExcelAsCsv(string excelFilePath, string csvFilePath)
         {
             try
             {
+                /*
                 Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
                 Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(excelFilePath);
                 wb.SaveAs(csvFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlCSVWindows);
                 wb.Close(false);
                 app.Quit();
+                */
 
+                using (var package = new ExcelPackage(new FileInfo(excelFilePath)))
+                {
+                    var worksheet = package.Workbook.Worksheets[0];
+                    var csvContent = new StringBuilder();
+                    if (worksheet.Dimension != null)
+                    {
+                        int rowCount = worksheet.Dimension.End.Row;
+                        int colCount = worksheet.Dimension.End.Column;
+
+                        for (int row = 1; row <= rowCount; row++)
+                        {
+                            for (int col = 1; col <= colCount; col++)
+                            {
+                                string text = worksheet.Cells[row, col].Value?.ToString() ?? "";
+                                if (text.Contains(",") || text.Contains("\"") || text.Contains("\n"))
+                                {
+                                    text = "\"" + text.Replace("\"", "\"\"") + "\"";
+                                }
+                                csvContent.Append(text + (col == colCount ? "" : ","));
+                            }
+                            csvContent.AppendLine();
+                        }
+                    }
+                    File.WriteAllText(csvFilePath, csvContent.ToString(), Encoding.UTF8);
+                }
             }
             catch (Exception ex)
             {
-
                 throw;
             }
         }
