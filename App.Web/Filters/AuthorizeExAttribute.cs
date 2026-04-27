@@ -1,4 +1,4 @@
-﻿using App.Data;
+using App.Data;
 using App.Data.Entities;
 using App.Data.ViewModels;
 using Microsoft.AspNet.Identity;
@@ -101,7 +101,7 @@ namespace App.Web.Filters
                 {
                   authorize = true;
                 }
-               else if (actionName.Contains("Index") || actionName.Contains("Ajax") || actionName.Contains("Edit") || actionName.Contains("Details") || actionName == result.ActionName)
+               else if (actionName.Contains("Index") || actionName.Contains("Ajax") || actionName.Contains("Edit") || actionName.Contains("Details") || actionName.Contains("Download") || actionName == result.ActionName)
                 {
                   authorize = true;
                 }
