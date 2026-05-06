@@ -12,5 +12,6 @@ namespace App.Data.Entities
         public string Status { get; set; } // "Success", "Failed", "Partial"
         public string Remarks { get; set; }
         public string FilePath { get; set; }
+        public int? RecordCount { get; set; }
     }
 }

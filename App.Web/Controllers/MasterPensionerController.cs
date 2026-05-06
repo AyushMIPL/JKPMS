@@ -6939,14 +6939,14 @@ namespace App.Web.Controllers
 
       return dataTables;
     }
-    private void SaveDownloadMediaDetail(string fileName, bool IsProcessed, Int32 recordIdstr, Int32 benif_Count, Int32 Validated_count, Int32 Notvalidated_count, string remark = "")
+    private void SaveDownloadMediaDetail(string fileName, bool IsProcessed, Int32 recordIdstr, Int32 benif_Count, Int32 Validated_count, Int32 Notvalidated_count, string remark = "", string region = "", string period = "")
     {
       try
       {
         DALBaseClassHelper objDALBaseClassHelper = new DALBaseClassHelper();
         DALBaseClass objDalBaseClass = objDALBaseClassHelper.GetDAL();
 
-        object[] parameters = new object[16];
+        object[] parameters = new object[18];
         parameters[0] = fileName; // FileName 
         parameters[1] = true; // HasDownoaded
         parameters[2] = IsProcessed; // IsProcessed
@@ -6964,6 +6964,8 @@ namespace App.Web.Controllers
         parameters[13] = Convert.ToInt32(Validated_count);
         parameters[14] = Convert.ToInt32(Notvalidated_count);
         parameters[15] = remark;
+        parameters[16] = region; // Region
+        parameters[17] = period; // Period
 
         // Execute the stored procedure
         objDalBaseClass.ExecuteProcedure(ref parameters, "SaveDownloadMediaDetail");
@@ -7080,7 +7082,8 @@ namespace App.Web.Controllers
             string uploadformattedName = $"{DateTime.Now:yyyyMMdd_HHmmss}_{regionFirstName}_Validation{Path.GetExtension(excelFilePath)}";
 
             bool IsGeneratePensionWithoutSfp = IsGeneratePensionWithoutSftp;
-            if (!IsGeneratePensionWithoutSfp)
+            bool isSendValidationFileToSftp = IsSendValidationFileToSftp;
+            if (!IsGeneratePensionWithoutSfp && isSendValidationFileToSftp)
             {
               UploadValidationFile(excelFilePath, uploadformattedName);
             }
@@ -7135,7 +7138,7 @@ namespace App.Web.Controllers
 
             // Specify the file's content type (MIME type)
             string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"; // Use the appropriate MIME type for your file
-            if (IsGeneratePensionWithoutSfp)
+            if (IsGeneratePensionWithoutSfp || (!IsGeneratePensionWithoutSfp && !isSendValidationFileToSftp))
             {
               FileContentResult content = File(excelFileData, System.Net.Mime.MediaTypeNames.Application.Octet, uploadformattedName);
               StringBuildobj.Add(content);
@@ -7329,7 +7332,8 @@ namespace App.Web.Controllers
           string uploadformattedName = $"{DateTime.Now:yyyyMMdd_HHmmss}_{regionFirstName}_Validation{Path.GetExtension(excelFilePath)}";
 
           bool IsGeneratePensionWithoutSfp = IsGeneratePensionWithoutSftp;
-          if (!IsGeneratePensionWithoutSfp)
+          bool isSendValidationFileToSftp = IsSendValidationFileToSftp;
+          if (!IsGeneratePensionWithoutSfp && isSendValidationFileToSftp)
           {
             UploadValidationFile(excelFilePath, uploadformattedName);
           }
@@ -7384,7 +7388,7 @@ namespace App.Web.Controllers
 
           // Specify the file's content type (MIME type)
           string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"; // Use the appropriate MIME type for your file
-          if (IsGeneratePensionWithoutSfp)
+          if (IsGeneratePensionWithoutSfp || (!IsGeneratePensionWithoutSfp && !isSendValidationFileToSftp))
           {
             FileContentResult content = File(excelFileData, System.Net.Mime.MediaTypeNames.Application.Octet, uploadformattedName);
             return content;
@@ -7561,7 +7565,7 @@ namespace App.Web.Controllers
           string username = ftpSetting["sftpUsername"];
           string password = ftpSetting["sftpPassword"];
           string localFilePath = excelFilePath;
-          string remoteDirectory = ftpSetting["sftpFilePath"] + "/AccountValidation/Outbox";
+          string remoteDirectory = ftpSetting["sftpFilePath"] + "/TestAccountValidation/Outbox";
           string localfilepathSFTP = Server.MapPath("~/" + ftpSetting["sftpPrivateKeyPath"]);
           var keyFile = new PrivateKeyFile(localfilepathSFTP);
           var keyFiles = new[] { keyFile };
@@ -7853,12 +7857,25 @@ namespace App.Web.Controllers
         DataSet ds = new DataSet();
         StringBuilder SQL = new StringBuilder();
 
-        SQL.Append(" select distinct eb.bank_acct_no as AccountNo,eb.BankName,eb.APPLICANT_BANK_IFSC_CODE as [IFSCCode] ");
-        SQL.Append(" ,dd.pay_date as PaidOn,dd.amount,dd.[Status],dd.[Reason/Remarks], eb.empl_code, eb.Application_Reference_no, me.PresentAddress, eb.bank_code,eb.BranchName,Concat(me.first_Name,' ',me.middle_name,' ',me.last_Name) as [Name], dd.pay_doc_no AS PayDocNo  from Process_DirectDeposit_Details dd ");
-        SQL.Append(" left join MasterEmpBankDetails eb on dd.empl_code = eb.empl_code ");
-        SQL.Append(" left join masterEmployee me on me.Empl_Code  =  eb.Empl_code ");
+        SQL.Append(" SELECT eb.bank_acct_no AS AccountNo, eb.BankName, eb.APPLICANT_BANK_IFSC_CODE AS IFSCCode, ");
+        SQL.Append(" CAST(dd.pay_date AS DATETIME) AS PaidOn, CAST(dd.amount AS VARCHAR(50)) AS amount, dd.[Status], dd.[Reason/Remarks], eb.empl_code, eb.Application_Reference_no, me.PresentAddress, eb.bank_code, eb.BranchName, CONCAT(me.first_Name, ' ', me.middle_name, ' ', me.last_Name) AS [Name], ");
+        SQL.Append(" CAST(dd.pay_doc_no AS VARCHAR(50)) AS PayDocNo ");
+        SQL.Append(" FROM Process_DirectDeposit_Details dd ");
+        SQL.Append(" LEFT JOIN MasterEmpBankDetails eb ON dd.empl_code = eb.empl_code ");
+        SQL.Append(" LEFT JOIN masterEmployee me ON me.Empl_Code = eb.Empl_code ");
         if (!string.IsNullOrEmpty(PensionerID))
-          SQL.Append(" where dd.empl_code = '" + PensionerID + "'");
+          SQL.Append(" WHERE dd.empl_code = '" + PensionerID + "' ");
+
+        SQL.Append(" UNION ALL ");
+
+        SQL.Append(" SELECT eb.bank_acct_no AS AccountNo, eb.BankName, eb.APPLICANT_BANK_IFSC_CODE AS IFSCCode, ");
+        SQL.Append(" TRY_CAST(td.TransactionDate AS DATETIME) AS PaidOn, CAST(td.Amount AS VARCHAR(50)) AS amount, td.[Status], td.Remarks AS [Reason/Remarks], eb.empl_code, eb.Application_Reference_no, me.PresentAddress, eb.bank_code, eb.BranchName, CONCAT(me.first_Name, ' ', me.middle_name, ' ', me.last_Name) AS [Name], ");
+        SQL.Append(" CAST(td.TransactionReference AS VARCHAR(50)) AS PayDocNo ");
+        SQL.Append(" FROM txnDetail td ");
+        SQL.Append(" INNER JOIN MasterEmpBankDetails eb ON td.[Application Reference No#] = CAST(eb.Application_Reference_no AS NVARCHAR(50)) ");
+        SQL.Append(" LEFT JOIN masterEmployee me ON me.Empl_Code = eb.Empl_code ");
+        if (!string.IsNullOrEmpty(PensionerID))
+          SQL.Append(" WHERE eb.empl_code = '" + PensionerID + "' ");
         //string con = WebConfigurationManager.AppSettings["SQLConn"];
         string con = ConnectionStringProvider.GetConnectionString();
         SqlDataAdapter da = new SqlDataAdapter(SQL.ToString(), con);

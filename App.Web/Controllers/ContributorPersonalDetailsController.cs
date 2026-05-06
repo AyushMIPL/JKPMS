@@ -9862,9 +9862,36 @@ namespace App.Web.Controllers
       }
     }
 
-
+    [HttpGet]
+    public ActionResult DownloadFormatFile()
+    {
+        using (var package = new OfficeOpenXml.ExcelPackage())
+        {
+            var worksheet = package.Workbook.Worksheets.Add("Format");
+            string[] headers = {
+                "SNo", "Application Reference No", "Submission Location", "Submission Date", "Applied By", 
+                "Select Tehsil Social Welfare Office (TSWO)", "Select District", "Name Of The Applicant", 
+                "Date Of Birth", "Age In Years", "Mobile Number", "Do You Have BPL Card", 
+                "Father / Husband / Guardian Name", "EMail", "Category", "Gender", "Present Address", 
+                "Present District", "Present Village Name", "Pincode", 
+                "Present Halqa Panchayat / Municipality Name", "Present Tehsil", "Permanent Address", 
+                "Permanent District", "Permanent Tehsil", "Permanent Halqa Panchayat / Municipality Name", 
+                "Permanent Village Name", "Branch Name", "IFSC Code", "Account No Of The Applicant", 
+                "Bank Name", "Select Pension Type", "Percentage Of Disability", "Civil Condition", 
+                "Are You Previously Taking Pension From JK-ISSS-GOI-NSAP", "Bank Name1", "Branch Name1", 
+                "IFSC Code1", "Account Number", "Application Sanctioned Under Scheme Name", 
+                "Current Task", "Current Status", "Last Task", "Version No", "Last Pay Date", 
+                "Application Approve On", "Action On Date"
+            };
+            for (int i = 0; i < headers.Length; i++)
+            {
+                worksheet.Cells[1, i + 1].Value = headers[i];
+            }
+            var stream = new System.IO.MemoryStream(package.GetAsByteArray());
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Contribution_Format.xlsx");
+        }
+    }
   }
-
 }
 
 

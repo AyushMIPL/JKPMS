@@ -1,4 +1,4 @@
-﻿@model List<App.Data.ViewModels.ExcelFileViewModel>
+@model List<App.Data.ViewModels.ExcelFileViewModel>
 @using App.Web.Helper;
 @{
     ViewBag.Title = "ContributionExcelUpload";
@@ -97,10 +97,10 @@
                 </div>
                 @Html.Hidden("regiontext", "", new { @class = "form-control", name = "regiontext" })
 
-                <div class="col-sm-2">
+                <div class="col-sm-3">
                     <button type="button" class="btn btn-success px-5 height display_none mmargin-top " title="Please Wait While We Process Your Request" id="btn_File_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
-                    <button type="submit" class="btn btn-success height mr-2 px-5 mmargin-top  @(ViewBag.AddPermission == true ? "" : "disabled")" id="UploadBtn"><i class="fa fa-upload fa-lg"></i> Upload File</button>
-
+                    <button type="submit" class="btn btn-success height mr-2 px-3 mmargin-top  @(ViewBag.AddPermission == true ? "" : "disabled")" id="UploadBtn"><i class="fa fa-upload fa-lg"></i> Upload File</button>
+                    <a href="@Url.Action("DownloadFormatFile", "ContributorPersonalDetails")" class="btn btn-info height mmargin-top px-3"><i class="fa fa-download"></i> Format</a>
                 </div>
             }
             @using (Html.BeginForm("AddExcelSheetIntoDatabase", "ContributorPersonalDetails", FormMethod.Post, new { enctype = "multipart/form-data", id = "form1" }))

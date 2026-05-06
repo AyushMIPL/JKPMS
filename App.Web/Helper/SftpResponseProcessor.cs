@@ -45,11 +45,11 @@ namespace App.Web.Helper
                 string remoteDirectory = "";
                 if (responseType == "Disbursement")
                 {
-                    remoteDirectory = ftpSetting["sftpFilePath"] + "/PaymentFiles/Inbox/";
+                    remoteDirectory = ftpSetting["sftpFilePath"] + "/TestPaymentFiles/Inbox/";
                 }
                 else
                 {
-                    remoteDirectory = ftpSetting["sftpFilePath"] + "/AccountValidation/Inbox/";
+                    remoteDirectory = ftpSetting["sftpFilePath"] + "/TestAccountValidation/Inbox/";
                 }
 
                 string currentDirectoryPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).Replace("file:\\", "").Replace("\\bin", "");
@@ -89,6 +89,14 @@ namespace App.Web.Helper
                         {
                             sftpClient.DownloadFile(file.FullName, fileStream);
                         }
+                        
+                        FileInfo fileInfo = new FileInfo(localPath);
+                        if (fileInfo.Length == 0)
+                        {
+                            // Empty file
+                            File.Delete(localPath);
+                            continue;
+                        }
 
                         SftpProcessResult processResult;
                         if (responseType == "Disbursement")
@@ -104,8 +112,14 @@ namespace App.Web.Helper
                             ProcessDate = DateTime.Now,
                             Status = processResult.Success ? "Success" : "Failed",
                             Remarks = processResult.Message,
-                            FilePath = localPath
+                            FilePath = localPath,
+                            RecordCount = 0
                         };
+                        try {
+                            DataTable dtCount = ConvertCsvToDataTable(localPath.Replace(".xlsx", ".csv").Replace(".xls", ".csv"));
+                            history.RecordCount = dtCount.Rows.Count;
+                        } catch { }
+
                         _db.SftpResponseHistory.Add(history);
                         _db.SaveChanges();
 
@@ -114,12 +128,16 @@ namespace App.Web.Helper
                             successCount++;
                             MoveToProcessed(sftpClient, remoteDirectory, file.Name, responseType, ftpSetting);
                         }
+                        //else
+                        //{
+                        //    return new SftpProcessResult { Success = false, Message = $"{processResult.Message}!" };
+                        //}
 
                         // We don't delete localPath here anymore because we want it available for download
                     }
 
                     sftpClient.Disconnect();
-                    return new SftpProcessResult { Success = true, Message = $"Processed {successCount} file(s)." };
+                    return new SftpProcessResult { Success = successCount > 0 ? true : false, Message = $"Processed {successCount} file(s)." };
                 }
             }
             catch (Exception ex)
@@ -221,16 +239,36 @@ namespace App.Web.Helper
                     SaveExcelAsCsv(localPath, csvFilePath);
                 }
 
+                // Validation against headers
+                DataTable dtVal = ConvertCsvToDataTable(csvFilePath);
+                string[] expectedHeaders = { "APPLICATION_REFERENCE_NO", "DISTRICT", "BENE_IFSC", "NAME_OF_APPLICANT", "ACCOUNTNO", "CATEGORY", "CBS_NAME", "BRANCH_CODE", "ACCOUNT_STATUS", "AADHAAR_STATUS", "ACCT_SCHEME_TYPE" };
+                
+                foreach (var h in expectedHeaders)
+                {
+                    if (!dtVal.Columns.Contains(h))
+                        return new SftpProcessResult { Success = false, Message = "Validation Error: Missing header " + h };
+                }
+
+                foreach (DataRow row in dtVal.Rows)
+                {
+                    foreach (var h in expectedHeaders)
+                    {
+                        if (string.IsNullOrWhiteSpace(row[h]?.ToString()))
+                            return new SftpProcessResult { Success = false, Message = $"Validation Error: Missing data in column {h} for Application Ref {row["APPLICATION_REFERENCE_NO"]}" };
+                    }
+                }
+
                 byte[] bytes = File.ReadAllBytes(csvFilePath);
                 UploadToDatabaseServer(bytes, csvFileName, "MasterEmployeeUploads", ftpSetting);
 
                 string dbPath = ftpSetting["localFilePath"] + "/DataFiles/MasterEmployeeUploads/" + csvFileName;
                 
                 DALBaseClass objDal = new DALBaseClassHelper().GetDAL();
-                object[] spParams = new object[2];
+                object[] spParams = new object[3];
                 spParams[0] = dbPath;
                 spParams[1] = 1; // Default User ID
-                objDal.ExecuteProcedure(ref spParams, "UpdateEmpMasterEmpBankDetails");
+                spParams[2] = fileName;
+                objDal.ExecuteProcedure(ref spParams, "USP_ProcessValidationResponseFile");
 
                 // Get counts for history
                 DataTable dt = ConvertCsvToDataTable(csvFilePath);
@@ -265,10 +303,11 @@ namespace App.Web.Helper
                 string dbPath = ftpSetting["localFilePath"] + $"/DataFiles/{dirName}/" + csvFileName;
                 
                 DALBaseClass objDal = new DALBaseClassHelper().GetDAL();
-                object[] spParams = new object[2];
+                object[] spParams = new object[3];
                 spParams[0] = dbPath;
                 spParams[1] = 1; // Default User ID
-                objDal.ExecuteProcedure(ref spParams, "UpdateBankMediaExcelDatabase");
+                spParams[2] = fileName;
+                objDal.ExecuteProcedure(ref spParams, "USP_ProcessDisbursementResponseFile");
 
                 // Legacy status updates
                 try {
@@ -306,7 +345,7 @@ namespace App.Web.Helper
                 // For validation, also handle outbox renaming if exists
                 if (type == "Validation")
                 {
-                    string outboxSource = ftpSetting["sftpFilePath"] + "/AccountValidation/Outbox/";
+                    string outboxSource = ftpSetting["sftpFilePath"] + "/TestAccountValidation/Outbox/";
                     string outboxProcessed = outboxSource + "Processed/";
                     if (client.Exists(outboxSource))
                     {

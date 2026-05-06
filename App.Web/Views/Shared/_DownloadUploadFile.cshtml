@@ -18,8 +18,8 @@
             <div id="collapseOne" @*class="panel-collapse collapse"*@>
                 <div class="panel-body">
                     <div class="row py-12">
-                        @if (IsGeneratePensionWithoutSftp)
-                        {
+                        @*@if (IsGeneratePensionWithoutSftp)
+                        {*@
                             <div class="col-sm-4">
                                 <div class="control-label mb-2 mt-3" for="EmpType"> &nbsp; </div>
                                 <div class="upload-file">
@@ -30,24 +30,28 @@
                                 </div>
 
                             </div>
-                        }
-                        <div class="col-sm-4">
-                            <div class="control-label mb-2 mt-3" for="EmpType"> &nbsp; </div>
+                        @*}*@
+                    <div class="col-sm-8">
+                        <div class="control-label mb-2 mt-3" for="EmpType"> &nbsp; </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
                             @if (IsGeneratePensionWithoutSftp)
                             {
                                 <button type="button" class="btn btn-success px-5 height display_none" title="Please Wait While We Process Your Request" id="btn_Verification_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
-                                <button type="button" class="btn btn-success height px-5 border-raduis mr-2 @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")" id="MasterEmployeeExcelUpload"><i class="fa fa-save"> </i> Upload</button>
+                                <button type="button" class="btn btn-success height px-5 border-raduis @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")" id="MasterEmployeeExcelUpload"><i class="fa fa-save"> </i> Upload</button>
                             }
                             else
                             {
                                 <button type="button" class="btn btn-success px-5 height display_none" title="Please Wait While We Process Your Request" id="btn_Verification_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
-                                <button type="button" class="btn btn-success height px-5 border-raduis mr-2 @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")" id="MasterEmployeeExcelUpload"><i class="fa fa-save"> </i> Process Response via SFTP</button>
+                                <button type="button" class="btn btn-success height px-5 border-raduis @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")" id="MasterEmployeeExcelUpload"><i class="fa fa-save"> </i> Upload</button>
+                                <button type="button" class="btn btn-success px-5 height display_none" title="Please Wait While We Process Your Request" id="btn_SFTP_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
+                                <button type="button" class="btn btn-success height px-5 border-raduis @(ViewBag.AddPermission == true ? "" : "disabled") @(ViewBag.EditPermission == true ? "" : "disabled")" id="MasterEmployeeSFTPUpload"><i class="fa fa-save"> </i> Process Response via SFTP</button>
                             }
                             <button type="button" class="btn btn-success px-5 height display_none" title="Please Wait While We Process Your Request" id="btn_Saved_loading"><i class="fa fa-spinner fa-spin"></i> Processing</button>
-                            <button type="button" class="btn btn-success height px-5 border-raduis mr-2 display_none" id="MasterEmployeeExcelSave"><i class="fa fa-save"> </i> Save&nbsp;<i class="fa fa-spinner fa-spin display_none"></i></button>
+                            <button type="button" class="btn btn-success height px-5 border-raduis display_none" id="MasterEmployeeExcelSave"><i class="fa fa-save"> </i> Save&nbsp;<i class="fa fa-spinner fa-spin display_none"></i></button>
 
-                            <button type="button" class="btn btn-primary height px-5 border-raduis mr-2 display_none" id="MasterEmployeeExcelCancel"><i class="fa fa-times-circle"> </i> Cancel</button>
+                            <button type="button" class="btn btn-primary height px-5 border-raduis display_none" id="MasterEmployeeExcelCancel"><i class="fa fa-times-circle"> </i> Cancel</button>
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -601,40 +605,43 @@ else if (ViewBag.DownloadNUploadFile == DownloadNUploadFile.DownloadbaknkMedia.T
       });
     }
 
+    if (document.getElementById("MasterEmployeeSFTPUpload") != null && document.getElementById("MasterEmployeeSFTPUpload") != undefined) {
+      document.getElementById("MasterEmployeeSFTPUpload").addEventListener("click", function () {
+        MasterEmployeeSFTPUpload();
+      });
+    }
+
+    function MasterEmployeeSFTPUpload(evt) {
+        $('#btn_SFTP_loading').show();
+        $('#MasterEmployeeSFTPUpload').hide();
+
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("UpdateValidationResponseAjax", "PensionProcess")',
+            success: function (response) {
+                if (response === "Validation Response Uploaded") {
+                    toasterSuccessMessage("Validation Response from SFTP Processed Successfully.");
+                    location.reload();
+                } else if (response.error) {
+                    toasterErrorMessage("Error: " + response.error);
+                    $('#btn_SFTP_loading').hide();
+                    $('#MasterEmployeeSFTPUpload').show();
+                } else {
+                    toasterErrorMessage("Oops! Something went wrong.");
+                    $('#btn_SFTP_loading').hide();
+                    $('#MasterEmployeeSFTPUpload').show();
+                }
+            },
+            error: function () {
+                toasterErrorMessage("Failed to process validation response from SFTP.");
+                $('#btn_SFTP_loading').hide();
+                $('#MasterEmployeeSFTPUpload').show();
+            }
+        });
+    }
+
     //UploadVerification File beneficiary details
     function MasterEmployeeExcelUpload(evt) {
-        var isGeneratePensionWithoutSftp = '@ViewBag.IsGeneratePensionWithoutSftp'.toLowerCase() === 'true';
-
-        // If SFTP is ENABLED (WithoutSftp is FALSE), then trigger SFTP pull instead of local upload.
-        if (!isGeneratePensionWithoutSftp) {
-            $('#btn_Verification_loading').show();
-            $('#MasterEmployeeExcelUpload').hide();
-
-            $.ajax({
-                type: "GET",
-                url: '@Url.Action("UpdateValidationResponseAjax", "PensionProcess")',
-                success: function (response) {
-                    if (response === "Validation Response Uploaded") {
-                        toasterSuccessMessage("Validation Response from SFTP Processed Successfully.");
-                        location.reload();
-                    } else if (response.error) {
-                        toasterErrorMessage("Error: " + response.error);
-                        $('#btn_Verification_loading').hide();
-                        $('#MasterEmployeeExcelUpload').show();
-                    } else {
-                        toasterErrorMessage("Oops! Something went wrong.");
-                        $('#btn_Verification_loading').hide();
-                        $('#MasterEmployeeExcelUpload').show();
-                    }
-                },
-                error: function () {
-                    toasterErrorMessage("Failed to process validation response from SFTP.");
-                    $('#btn_Verification_loading').hide();
-                    $('#MasterEmployeeExcelUpload').show();
-                }
-            });
-            return; // Skip normal file upload
-        }
 
         var IsFile = $("#file").val();
         //$(evt.target).find("i.fa-spinner").show();

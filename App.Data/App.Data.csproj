@@ -327,6 +327,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Entities\AppUserManager.cs" />
+    <Compile Include="Entities\SftpProcessingLog.cs" />
     <Compile Include="Entities\SftpResponseHistory.cs" />
     <Compile Include="Entities\TxnDetail.cs" />
     <Compile Include="Entities\TxnHeader.cs" />

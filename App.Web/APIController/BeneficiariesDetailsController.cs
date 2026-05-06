@@ -647,7 +647,7 @@ namespace App.Web.APIController
           string username = ftpSetting["sftpUsername"];
           string password = ftpSetting["sftpPassword"];
           string localFilePath = excelFilePath;
-          string remoteDirectory = ftpSetting["sftpFilePath"] + "/AccountValidation/Outbox";
+          string remoteDirectory = ftpSetting["sftpFilePath"] + "/TestAccountValidation/Outbox";
 
           var keyFile = new PrivateKeyFile(ftpSetting["sftpPrivateKeyPath"]);
           var keyFiles = new[] { keyFile };

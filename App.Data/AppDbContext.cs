@@ -545,6 +545,7 @@ namespace App.Data
         public DbSet<MailTemplate> MailTemplates { get; set; }
         public DbSet<PensionFileUploadHistory> PensionFileUploadHistory { get; set; }
         public DbSet<SftpResponseHistory> SftpResponseHistory { get; set; }
+        public DbSet<SftpProcessingLog> SftpProcessingLogs { get; set; }
         public DbSet<MasterEmail> MasterEmails { get; set; }
         public DbSet<MasterProcessKey> MasterProcessKeys { get; set; }
         public IEnumerable<object> AppUser { get; set; }

@@ -1,4 +1,4 @@
-﻿using App.Data;
+using App.Data;
 using App.Data.Entities;
 using Microsoft.Owin.Security;
 using System.Web;
@@ -338,6 +338,24 @@ namespace App.Web.Controllers
         }
 
         return IsGeneratePensionWithoutSftp;
+      }
+    }
+
+    public bool IsSendValidationFileToSftp
+    {
+      get
+      {
+        bool IsSendValidationFileToSftp = true;
+        string IsSendValidationFileToSftp_String = ConfigurationManager.AppSettings["IsSendValidationFileToSftp"];
+        if (!string.IsNullOrEmpty(IsSendValidationFileToSftp_String))
+        {
+          if (IsSendValidationFileToSftp_String == "0" || IsSendValidationFileToSftp_String.ToLower() == "false")
+          {
+            IsSendValidationFileToSftp = false;
+          }
+        }
+
+        return IsSendValidationFileToSftp;
       }
     }
   }

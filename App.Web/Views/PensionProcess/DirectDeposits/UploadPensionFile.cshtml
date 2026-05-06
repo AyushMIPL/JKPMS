@@ -181,6 +181,9 @@
                         <i class="fa fa-cloud-upload"></i> <span id="btnText">Upload & Send to Bank</span>
                         <i id="uploadSpinner" class="fa fa-spinner fa-spin" style="display:none;"></i>
                     </button>
+                    <button type="button" id="btnDownloadFormat" class="btn btn-info px-4 shadow-sm ml-2" style="margin-left: 10px;">
+                        <i class="fa fa-download"></i> Download Format
+                    </button>
                 </div>
             </div>
         </div>
@@ -294,6 +297,10 @@
             var activeFormId = currentUploadType === "Disbursement" ? "#disbursementForm" : "#validationForm";
             var form = $(activeFormId)[0];
             handleFormSubmission(form);
+        });
+
+        $(document).on('click', '#btnDownloadFormat', function () {
+            window.location.href = '@Url.Action("DownloadFormatFile", "PensionProcess")?type=' + currentUploadType;
         });
 
         function toggleColumns() {

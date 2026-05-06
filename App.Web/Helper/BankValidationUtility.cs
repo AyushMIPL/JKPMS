@@ -156,11 +156,11 @@ namespace App.Web.Helper
           int port = Convert.ToInt32(ftpSetting["sftpPort"]); //SFTP default port is 22
           string username = ftpSetting["sftpUsername"];
           string password = ftpSetting["sftpPassword"];
-          string remoteDirectory = ftpSetting["sftpFilePath"] + "/AccountValidation/Inbox/";
+          string remoteDirectory = ftpSetting["sftpFilePath"] + "/TestAccountValidation/Inbox/";
 
-          string inboxDestinationDir = ftpSetting["sftpFilePath"] + "/AccountValidation/Inbox/Processed/";
-          string outboxSourceDir = ftpSetting["sftpFilePath"] + "/AccountValidation/Outbox/";
-          string outboxDestinationDir = ftpSetting["sftpFilePath"] + "/AccountValidation/Outbox/Processed/";
+          string inboxDestinationDir = ftpSetting["sftpFilePath"] + "/TestAccountValidation/Inbox/Processed/";
+          string outboxSourceDir = ftpSetting["sftpFilePath"] + "/TestAccountValidation/Outbox/";
+          string outboxDestinationDir = ftpSetting["sftpFilePath"] + "/TestAccountValidation/Outbox/Processed/";
           string currentDirectoryPath1 = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).Replace("file:\\", "").Replace("\\bin", "");
           string localfilepathSFTP = Path.Combine(currentDirectoryPath1 + ftpSetting["sftpPrivateKeyPath"]);
 

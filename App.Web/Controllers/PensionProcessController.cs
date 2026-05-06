@@ -3628,6 +3628,71 @@ namespace App.Web.Controllers
                 string webPath = Path.Combine(serverMapPath, uniqueFileName);
                 model.UploadedFile.SaveAs(webPath);
 
+                if (isValidation)
+                {
+                    try
+                    {
+                        System.Data.DataTable dtVal;
+                        if (extension == ".xlsx")
+                        {
+                            using (var package = new OfficeOpenXml.ExcelPackage(new System.IO.FileInfo(webPath)))
+                            {
+                                var worksheet = package.Workbook.Worksheets[1];
+                                dtVal = new System.Data.DataTable();
+                                if (worksheet.Dimension != null)
+                                {
+                                    for (int c = 1; c <= worksheet.Dimension.End.Column; c++)
+                                    {
+                                        dtVal.Columns.Add(worksheet.Cells[1, c].Value?.ToString()?.Trim() ?? "");
+                                    }
+                                    for (int r = 2; r <= worksheet.Dimension.End.Row; r++)
+                                    {
+                                        var dr = dtVal.NewRow();
+                                        for (int c = 1; c <= Math.Min(dtVal.Columns.Count, worksheet.Dimension.End.Column); c++)
+                                        {
+                                            dr[c - 1] = worksheet.Cells[r, c].Value?.ToString()?.Trim() ?? "";
+                                        }
+                                        dtVal.Rows.Add(dr);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            dtVal = ConvertCsvToDataTable(webPath);
+                        }
+
+                        string[] expectedHeaders = { "APPLICATION_REFERENCE_NO", "DISTRICT", "BENE_IFSC", "NAME_OF_APPLICANT", "ACCOUNTNO", "CATEGORY", "CBS_NAME", "BRANCH_CODE", "ACCOUNT_STATUS", "AADHAAR_STATUS", "ACCT_SCHEME_TYPE" };
+                        string[] requiredHeaders = { "APPLICATION_REFERENCE_NO", "DISTRICT", "BENE_IFSC", "NAME_OF_APPLICANT", "ACCOUNTNO", "CATEGORY" };
+
+                        foreach (var h in expectedHeaders)
+                        {
+                            if (!dtVal.Columns.Contains(h))
+                            {
+                                System.IO.File.Delete(webPath);
+                                return Json(new { success = false, message = "Validation Error: Missing header " + h });
+                            }
+                        }
+
+                        foreach (System.Data.DataRow row in dtVal.Rows)
+                        {
+                            foreach (var h in requiredHeaders)
+                            {
+                                if (string.IsNullOrWhiteSpace(row[h]?.ToString()))
+                                {
+                                    System.IO.File.Delete(webPath);
+                                    return Json(new { success = false, message = $"Validation Error: Missing data in column {h}." });
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.IO.File.Delete(webPath);
+                        return Json(new { success = false, message = "File Validation failed: " + ex.Message });
+                    }
+                }
+
                 // Construct Period from Month and Year
                 if (!isValidation)
                 {
@@ -3733,7 +3798,7 @@ namespace App.Web.Controllers
                 int port = Convert.ToInt32(ftpSetting["sftpPort"]);
                 string username = ftpSetting["sftpUsername"];
                 string password = ftpSetting["sftpPassword"];
-                string remoteDirectory = ftpSetting["sftpFilePath"] + "/AccountValidation/Outbox";
+                string remoteDirectory = ftpSetting["sftpFilePath"] + "/TestAccountValidation/Outbox";
                 string localfilepathSFTP = Server.MapPath("~/" + ftpSetting["sftpPrivateKeyPath"]);
                 
                 var keyFile = new PrivateKeyFile(localfilepathSFTP);
@@ -8244,6 +8309,28 @@ namespace App.Web.Controllers
 
         }
 
-
+        [HttpGet]
+        public ActionResult DownloadFormatFile(string type)
+        {
+            using (var package = new OfficeOpenXml.ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Format");
+                string[] headers;
+                if (type == "Validation")
+                {
+                    headers = new string[] { "Account Number", "IFSC Code", "Name", "Status", "Reason" };
+                }
+                else
+                {
+                    headers = new string[] { "Account Number", "IFSC Code", "Name", "Amount", "Status", "Transaction ID", "Remarks" };
+                }
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    worksheet.Cells[1, i + 1].Value = headers[i];
+                }
+                var stream = new System.IO.MemoryStream(package.GetAsByteArray());
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", (type ?? "Pension") + "_Format.xlsx");
+            }
+        }
     }
 }
