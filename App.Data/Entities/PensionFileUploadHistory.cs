@@ -15,5 +15,6 @@ namespace App.Data.Entities
         public string Region { get; set; }
         public string Period { get; set; }
         public string UploadType { get; set; } // Disbursement, Validation
+        public int? DistrictId { get; set; }
     }
 }

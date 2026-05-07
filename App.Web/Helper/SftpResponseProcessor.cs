@@ -45,11 +45,11 @@ namespace App.Web.Helper
                 string remoteDirectory = "";
                 if (responseType == "Disbursement")
                 {
-                    remoteDirectory = ftpSetting["sftpFilePath"] + "/TestPaymentFiles/Inbox/";
+                    remoteDirectory = Helper.GetRegionBasedPaymentPath(ftpSetting["sftpFilePath"], region) + "/Inbox/";
                 }
                 else
                 {
-                    remoteDirectory = ftpSetting["sftpFilePath"] + "/TestAccountValidation/Inbox/";
+                    remoteDirectory = Helper.GetRegionBasedValidationPath(ftpSetting["sftpFilePath"], region) + "/Inbox/";
                 }
 
                 string currentDirectoryPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).Replace("file:\\", "").Replace("\\bin", "");
@@ -345,7 +345,7 @@ namespace App.Web.Helper
                 // For validation, also handle outbox renaming if exists
                 if (type == "Validation")
                 {
-                    string outboxSource = ftpSetting["sftpFilePath"] + "/TestAccountValidation/Outbox/";
+                    string outboxSource = Helper.GetRegionBasedValidationPath(ftpSetting["sftpFilePath"], _regionProvider.GetCurrentRegion()) + "/Outbox/";
                     string outboxProcessed = outboxSource + "Processed/";
                     if (client.Exists(outboxSource))
                     {

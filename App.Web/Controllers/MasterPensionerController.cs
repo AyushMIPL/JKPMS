@@ -7529,6 +7529,7 @@ namespace App.Web.Controllers
         Dictionary<string, string> ftpSetting = Helper.Helper.GetFTPSetting();
         // Get the file name
 
+        var region = GetRegionName();
         bool IsFTP = Convert.ToBoolean(ftpSetting["IsFTP"]);
         if (IsFTP)
         {
@@ -7539,7 +7540,6 @@ namespace App.Web.Controllers
           //var region = Session["RegionName"].ToString();
 
           //var region = GetRegionName();
-          var region = GetRegionName();
 
           var directoryName = (region.Trim().ToUpper() == "KASHMIR REGION" || region.Trim().ToUpper() == "KASHMIR") ? "K_Validation" : "J_Validation";
           //string ftpServerUrl = ftpSetting["sftpServerUrl"] + $"/DataFiles/{directoryName}/Outbox/" + formattedName;
@@ -7565,7 +7565,7 @@ namespace App.Web.Controllers
           string username = ftpSetting["sftpUsername"];
           string password = ftpSetting["sftpPassword"];
           string localFilePath = excelFilePath;
-          string remoteDirectory = ftpSetting["sftpFilePath"] + "/TestAccountValidation/Outbox";
+          string remoteDirectory = Helper.Helper.GetRegionBasedValidationPath(ftpSetting["sftpFilePath"], region) + "/Outbox";
           string localfilepathSFTP = Server.MapPath("~/" + ftpSetting["sftpPrivateKeyPath"]);
           var keyFile = new PrivateKeyFile(localfilepathSFTP);
           var keyFiles = new[] { keyFile };

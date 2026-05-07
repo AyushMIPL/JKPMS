@@ -2659,6 +2659,7 @@ namespace App.Web.Controllers
         Dictionary<string, string> ftpSetting = Helper.Helper.GetFTPSetting();
         // Get the file name
 
+        var region = GetRegionName();
         bool IsFTP = Convert.ToBoolean(ftpSetting["IsFTP"]);
         if (IsFTP)
         {
@@ -2670,8 +2671,6 @@ namespace App.Web.Controllers
           //long fileSizeInBytes = fileContents.Length;
           //fileSizeInKB = fileSizeInBytes / 1024.0;
 
-          //var region = GetRegionName();
-          var region = GetRegionName();
           var directoryName = region == "KASHMIR REGION" ? "K_Disbursement" : "J_Disbursement";
           //string ftpServerUrl = ftpSetting["sftpServerUrl"] + $"/DataFiles/{directoryName}/Outbox/" + formattedName;
           string ftpServerUrl = Helper.Helper.UploadValidationFilePath(region, directoryName, formattedName);
@@ -2696,7 +2695,7 @@ namespace App.Web.Controllers
           string username = ftpSetting["sftpUsername"];
           string password = ftpSetting["sftpPassword"];
           string localFilePath = excelFilePath;
-          string remoteDirectory = ftpSetting["sftpFilePath"] + "/PaymentFiles/Outbox";
+          string remoteDirectory = Helper.Helper.GetRegionBasedPaymentPath(ftpSetting["sftpFilePath"], region) + "/Outbox";
 
           var keyFile = new PrivateKeyFile(ftpSetting["sftpPrivateKeyPath"]);
           var keyFiles = new[] { keyFile };

@@ -220,11 +220,11 @@ namespace App.Web.Helper
                     int port = Convert.ToInt32(ftpSetting["sftpPort"]); //SFTP default port is 22
                     string username = ftpSetting["sftpUsername"];
                     string password = ftpSetting["sftpPassword"];
-                    string remoteDirectory = ftpSetting["sftpFilePath"] + "/PaymentFiles/Inbox/";
+                    string remoteDirectory = Helper.GetRegionBasedPaymentPath(ftpSetting["sftpFilePath"], regions) + "/Inbox/";
 
-                    string inboxDestinationDir = ftpSetting["sftpFilePath"] + "/PaymentFiles/Inbox/Processed/";
-                    string outboxSourceDir = ftpSetting["sftpFilePath"] + "/PaymentFiles/Outbox/";
-                    string outboxDestinationDir = ftpSetting["sftpFilePath"] + "/PaymentFiles/Outbox/Processed/";
+                    string inboxDestinationDir = Helper.GetRegionBasedPaymentPath(ftpSetting["sftpFilePath"], regions) + "/Inbox/Processed/";
+                    string outboxSourceDir = Helper.GetRegionBasedPaymentPath(ftpSetting["sftpFilePath"], regions) + "/Outbox/";
+                    string outboxDestinationDir = Helper.GetRegionBasedPaymentPath(ftpSetting["sftpFilePath"], regions) + "/Outbox/Processed/";
                     string currentDirectoryPath1 = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).Replace("file:\\", "").Replace("\\bin", "");
                     string localfilepathSFTP = Path.Combine(currentDirectoryPath1 + ftpSetting["sftpPrivateKeyPath"]);
                     var keyFile = new PrivateKeyFile(localfilepathSFTP);

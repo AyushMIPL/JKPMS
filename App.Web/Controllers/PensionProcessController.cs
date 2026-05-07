@@ -3468,16 +3468,41 @@ namespace App.Web.Controllers
 
         public ActionResult UploadPensionFile()
         {
-            // Requirement 3: Source District list filtered by the currently logged-in region
-            var currentRegion = GetRegionName();
-            ViewBag.Regions = (from r in db.MasterRegion.Where(x => x.Name == currentRegion)
+            // Requirement 3: Source District list filtered by the currently logged-in region or user district assignment
+            int userid = AppUserManager.GetUserId();
+            var userRole = db.UserRole.FirstOrDefault(x => x.UserId == userid);
+            bool isDistrictUser = userRole != null && db.Roles.Any(x => x.Id == userRole.RoleId && x.Name == "Districts");
+
+            List<SelectListItem> regionsList;
+
+            if (isDistrictUser)
+            {
+                var userDistrictId = db.SecRoleLocationModule.Where(x => x.UserId == userid && x.IsActive).Select(x => x.DistrictID).FirstOrDefault();
+                regionsList = db.MasterDistrict.Where(d => d.Id == userDistrictId && d.IsActive)
+                                               .OrderBy(d => d.Name)
+                                               .Select(d => new SelectListItem
+                                               {
+                                                   Text = d.Name,
+                                                   Value = d.Name
+                                               }).ToList();
+            }
+            else
+            {
+                var currentRegion = GetRegionName();
+                regionsList = (from r in db.MasterRegion.Where(x => x.Name == currentRegion)
                                join d in db.MasterDistrict on r.Id equals d.RegionId
+                               where d.IsActive
                                orderby d.Name
                                select new SelectListItem
                                {
                                    Text = d.Name,
                                    Value = d.Name
                                }).ToList();
+            }
+
+            ViewBag.Regions = regionsList;
+            ViewBag.IsDistrictUser = isDistrictUser;
+            ViewBag.UserDistrictName = isDistrictUser ? regionsList.FirstOrDefault()?.Value : null;
 
             // Requirement 6: Year and Month selection
             var years = new List<SelectListItem>();
@@ -3614,6 +3639,7 @@ namespace App.Web.Controllers
                 }
 
                 bool isValidation = model.UploadType == "Validation";
+                string districtNameInFile = null;
                 var region = string.IsNullOrEmpty(model.Region) ? GetRegionName() : model.Region;
                 var directoryName = region.Contains("KASHMIR") ? (isValidation ? "K_Validation" : "K_Disbursement") : (isValidation ? "J_Validation" : "J_Disbursement");
                 
@@ -3685,6 +3711,11 @@ namespace App.Web.Controllers
                                 }
                             }
                         }
+
+                        if (dtVal.Rows.Count > 0)
+                        {
+                            districtNameInFile = dtVal.Rows[0]["DISTRICT"]?.ToString()?.Trim();
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -3709,6 +3740,57 @@ namespace App.Web.Controllers
                 }
                 catch (Exception) { }
 
+                int userid = AppUserManager.GetUserId();
+                int? uploadDistrictId = null;
+
+                // Support district selection from dropdown for both tabs (Disbursement and Validation)
+                if (!string.IsNullOrEmpty(model.Region))
+                {
+                    var district = db.MasterDistrict.FirstOrDefault(x => x.Name == model.Region);
+                    if (district != null)
+                    {
+                        uploadDistrictId = district.Id;
+                    }
+                }
+
+                // Fallback to parsed Excel/CSV district name for Validation files if dropdown selection was empty
+                if (!uploadDistrictId.HasValue && isValidation && !string.IsNullOrEmpty(districtNameInFile))
+                {
+                    var district = db.MasterDistrict.FirstOrDefault(x => x.Name == districtNameInFile);
+                    if (district != null)
+                    {
+                        uploadDistrictId = district.Id;
+                        model.Region = districtNameInFile;
+                    }
+                }
+
+                // Override/Fallback for District users to strictly enforce their assigned district
+                var userRole = db.UserRole.FirstOrDefault(x => x.UserId == userid);
+                bool isDistrictUser = userRole != null && db.Roles.Any(x => x.Id == userRole.RoleId && x.Name == "Districts");
+                if (isDistrictUser)
+                {
+                    var userDistrictId = db.SecRoleLocationModule.Where(x => x.UserId == userid && x.IsActive).Select(x => x.DistrictID).FirstOrDefault();
+                    if (userDistrictId > 0)
+                    {
+                        uploadDistrictId = userDistrictId;
+                        
+                        // Set model.Region to the assigned district name to guarantee it is recorded correctly
+                        var distName = db.MasterDistrict.Where(d => d.Id == userDistrictId).Select(d => d.Name).FirstOrDefault();
+                        if (!string.IsNullOrEmpty(distName))
+                        {
+                            model.Region = distName;
+                        }
+                    }
+                }
+                else
+                {
+                    // For state level users, if validation and Region is not empty, use Region, else fallback to districtNameInFile
+                    if (isValidation && string.IsNullOrEmpty(model.Region) && !string.IsNullOrEmpty(districtNameInFile))
+                    {
+                        model.Region = districtNameInFile;
+                    }
+                }
+
                 var history = new PensionFileUploadHistory
                 {
                     FileName = fileName,
@@ -3719,10 +3801,11 @@ namespace App.Web.Controllers
                     UploadType = model.UploadType,
                     Status = "Pending",
                     IsActive = true,
-                    CreatedBy = AppUserManager.GetUserId(),
+                    CreatedBy = userid,
                     CreatedOn = DateTime.Now,
-                    ModifiedBy = AppUserManager.GetUserId(),
-                    ModifiedOn = DateTime.Now
+                    ModifiedBy = userid,
+                    ModifiedOn = DateTime.Now,
+                    DistrictId = uploadDistrictId
                 };
 
                 db.PensionFileUploadHistory.Add(history);
@@ -3798,7 +3881,8 @@ namespace App.Web.Controllers
                 int port = Convert.ToInt32(ftpSetting["sftpPort"]);
                 string username = ftpSetting["sftpUsername"];
                 string password = ftpSetting["sftpPassword"];
-                string remoteDirectory = ftpSetting["sftpFilePath"] + "/TestAccountValidation/Outbox";
+                // Dynamic validation upload path
+                string remoteDirectory = Helper.Helper.GetRegionBasedValidationPath(ftpSetting["sftpFilePath"], region) + "/";
                 string localfilepathSFTP = Server.MapPath("~/" + ftpSetting["sftpPrivateKeyPath"]);
                 
                 var keyFile = new PrivateKeyFile(localfilepathSFTP);
@@ -3830,6 +3914,24 @@ namespace App.Web.Controllers
             try
             {
                 var history = db.PensionFileUploadHistory.AsNoTracking().Where(x => x.IsActive);
+
+                // Apply district-based query filtering for District role users
+                int userid = AppUserManager.GetUserId();
+                var userRole = db.UserRole.FirstOrDefault(x => x.UserId == userid);
+                bool isDistrictUser = userRole != null && db.Roles.Any(x => x.Id == userRole.RoleId && x.Name == "Districts");
+
+                if (isDistrictUser)
+                {
+                    var userDistrictId = db.SecRoleLocationModule.Where(x => x.UserId == userid && x.IsActive).Select(x => x.DistrictID).FirstOrDefault();
+                    if (userDistrictId > 0)
+                    {
+                        history = history.Where(x => x.CreatedBy == userid || (x.DistrictId.HasValue && x.DistrictId == userDistrictId));
+                    }
+                    else
+                    {
+                        history = history.Where(x => x.CreatedBy == userid);
+                    }
+                }
 
                 // Requirement 5: Filter by type
                 history = history.Where(x => (x.UploadType ?? "Disbursement") == uploadType);
@@ -3892,6 +3994,12 @@ namespace App.Web.Controllers
                     return Json(new { success = false, message = "Record not found." });
                 }
 
+                int userid = AppUserManager.GetUserId();
+                if (!IsUserAuthorizedForHistory(db, history, userid))
+                {
+                    return Json(new { success = false, message = "Access Denied: You do not have permission to retry this file." });
+                }
+
                 if (!System.IO.File.Exists(history.FilePath))
                 {
                     return Json(new { success = false, message = "Source file no longer exists on server." });
@@ -3936,6 +4044,11 @@ namespace App.Web.Controllers
                 var history = db.PensionFileUploadHistory.Find(id);
                 if (history != null)
                 {
+                    int userid = AppUserManager.GetUserId();
+                    if (!IsUserAuthorizedForHistory(db, history, userid))
+                    {
+                        return new HttpStatusCodeResult(System.Net.HttpStatusCode.Forbidden, "Access Denied: You do not have permission to download this file.");
+                    }
                     // 1. Try absolute FilePath
                     if (!string.IsNullOrEmpty(history.FilePath) && System.IO.File.Exists(history.FilePath))
                     {
@@ -5042,6 +5155,7 @@ namespace App.Web.Controllers
             try
             {
                 Dictionary<string, string> ftpSetting = Helper.Helper.GetFTPSetting();
+                var region = GetRegionName();
                 // Get the file name
 
                 bool IsFTP = Convert.ToBoolean(ftpSetting["IsFTP"]);
@@ -5056,7 +5170,6 @@ namespace App.Web.Controllers
                     //fileSizeInKB = fileSizeInBytes / 1024.0;
 
                     //var region = Session["RegionName"].ToString();
-                    var region = GetRegionName();
                     var directoryName = region == "KASHMIR REGION" ? "K_Disbursement" : "J_Disbursement";
                     //string ftpServerUrl = ftpSetting["sftpServerUrl"] + $"/DataFiles/{directoryName}/Outbox/" + formattedName;
                     string ftpServerUrl = Helper.Helper.GetUploadDataFile(region, directoryName, formattedName);
@@ -5090,7 +5203,8 @@ namespace App.Web.Controllers
                         string username = ftpSetting["sftpUsername"];
                         string password = ftpSetting["sftpPassword"];
                         string localFilePath = excelFilePath;
-                        string remoteDirectory = ftpSetting["sftpFilePath"] + "/PaymentFiles/Outbox";
+                        // Dynamic region-based payment path
+                        string remoteDirectory = Helper.Helper.GetRegionBasedPaymentPath(ftpSetting["sftpFilePath"], region) + "/Inbox/";
                         string localfilepathSFTP = Server.MapPath("~/" + ftpSetting["sftpPrivateKeyPath"]);
 
                         var nn = Path.Combine(remoteDirectory, formattedName);
@@ -8331,6 +8445,26 @@ namespace App.Web.Controllers
                 var stream = new System.IO.MemoryStream(package.GetAsByteArray());
                 return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", (type ?? "Pension") + "_Format.xlsx");
             }
+        }
+
+        private bool IsUserAuthorizedForHistory(AppDbContext db, PensionFileUploadHistory history, int userid)
+        {
+            if (history == null) return false;
+
+            var userRole = db.UserRole.FirstOrDefault(x => x.UserId == userid);
+            bool isDistrictUser = userRole != null && db.Roles.Any(x => x.Id == userRole.RoleId && x.Name == "Districts");
+
+            if (isDistrictUser)
+            {
+                int? userDistrictId = db.SecRoleLocationModule.Where(x => x.UserId == userid && x.IsActive).Select(x => x.DistrictID).FirstOrDefault();
+                
+                bool isUploader = (history.CreatedBy == userid);
+                bool matchesDistrict = (userDistrictId > 0 && history.DistrictId.HasValue && history.DistrictId.Value == userDistrictId);
+
+                return isUploader || matchesDistrict;
+            }
+
+            return true;
         }
     }
 }

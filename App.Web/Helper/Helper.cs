@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -119,6 +119,32 @@ namespace App.Web.Helper
                 htmlString += endDate == null ? String.Format("{0:dd/MM/yyyy}", DateTime.Now) : String.Format("{0:dd/MM/yyyy}", endDate);
             }
             return new MvcHtmlString(htmlString);
+        }
+
+        public static string GetRegionBasedPaymentPath(string basePath, string region = null)
+        {
+            if (string.IsNullOrEmpty(region))
+            {
+                var provider = new App.Data.CurrentRegionProvider();
+                region = provider.GetCurrentRegion();
+            }
+            
+            return (region.Trim().ToUpper() == "KASHMIR REGION" || region.Trim().ToUpper() == "KASHMIR")
+                ? $"{basePath}/Kashmir/PaymentFiles"
+                : $"{basePath}/Jammu/PaymentFiles";
+        }
+
+        public static string GetRegionBasedValidationPath(string basePath, string region = null)
+        {
+            if (string.IsNullOrEmpty(region))
+            {
+                var provider = new App.Data.CurrentRegionProvider();
+                region = provider.GetCurrentRegion();
+            }
+            
+            return (region.Trim().ToUpper() == "KASHMIR REGION" || region.Trim().ToUpper() == "KASHMIR")
+                ? $"{basePath}/Kashmir/AccountValidation"
+                : $"{basePath}/Jammu/AccountValidation";
         }
 
         public static Dictionary<string, string> GetFTPSetting()

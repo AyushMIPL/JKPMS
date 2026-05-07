@@ -652,7 +652,7 @@ namespace App.API.Controllers
                     string username = ftpSetting["sftpUsername"];
                     string password = ftpSetting["sftpPassword"];
                     string localFilePath = excelFilePath;
-                    string remoteDirectory = ftpSetting["sftpFilePath"] + "/TestAccountValidation/Outbox";
+                    string remoteDirectory = Helper.Helper.GetRegionBasedValidationPath(ftpSetting["sftpFilePath"], region) + "/Outbox";
 
                     var keyFile = new PrivateKeyFile(ftpSetting["sftpPrivateKeyPath"]);
                     var keyFiles = new[] { keyFile };
