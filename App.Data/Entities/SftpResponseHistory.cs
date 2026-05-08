@@ -13,5 +13,9 @@ namespace App.Data.Entities
         public string Remarks { get; set; }
         public string FilePath { get; set; }
         public int? RecordCount { get; set; }
+
+        public int? DistrictId { get; set; }
+        public string Region { get; set; } // district name
+        public int? UploadHistoryId { get; set; }
     }
 }

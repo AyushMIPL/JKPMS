@@ -3528,16 +3528,61 @@ namespace App.Web.Controllers
 
         public ActionResult ReceiveSftpResponse()
         {
+            int userid = AppUserManager.GetUserId();
+            var userRole = db.UserRole.FirstOrDefault(x => x.UserId == userid);
+            bool isDistrictUser = userRole != null && db.Roles.Any(x => x.Id == userRole.RoleId && x.Name == "Districts");
+
+            List<SelectListItem> regionsList;
+
+            if (isDistrictUser)
+            {
+                var userDistrictId = db.SecRoleLocationModule.Where(x => x.UserId == userid && x.IsActive).Select(x => x.DistrictID).FirstOrDefault();
+                regionsList = db.MasterDistrict.Where(d => d.Id == userDistrictId && d.IsActive)
+                                               .OrderBy(d => d.Name)
+                                               .Select(d => new SelectListItem
+                                               {
+                                                   Text = d.Name,
+                                                   Value = d.Name
+                                               }).ToList();
+            }
+            else
+            {
+                var currentRegion = GetRegionName();
+                regionsList = (from r in db.MasterRegion.Where(x => x.Name == currentRegion)
+                               join d in db.MasterDistrict on r.Id equals d.RegionId
+                               where d.IsActive
+                               orderby d.Name
+                               select new SelectListItem
+                               {
+                                   Text = d.Name,
+                                   Value = d.Name
+                               }).ToList();
+            }
+
+            ViewBag.Regions = regionsList;
+            ViewBag.IsDistrictUser = isDistrictUser;
+            ViewBag.UserDistrictName = isDistrictUser ? regionsList.FirstOrDefault()?.Value : null;
+
             return View("~/Views/PensionProcess/DirectDeposits/ReceiveSftpResponse.cshtml");
         }
 
         [HttpPost]
-        public JsonResult FetchSftpResponseAjax(string responseType)
+        public JsonResult FetchSftpResponseAjax(string responseType, string region)
         {
             try
             {
+                int userid = AppUserManager.GetUserId();
+                var userRole = db.UserRole.FirstOrDefault(x => x.UserId == userid);
+                bool isDistrictUser = userRole != null && db.Roles.Any(x => x.Id == userRole.RoleId && x.Name == "Districts");
+
+                if (isDistrictUser)
+                {
+                    var userDistrictId = db.SecRoleLocationModule.Where(x => x.UserId == userid && x.IsActive).Select(x => x.DistrictID).FirstOrDefault();
+                    region = db.MasterDistrict.Where(d => d.Id == userDistrictId && d.IsActive).Select(d => d.Name).FirstOrDefault();
+                }
+
                 var processor = new SftpResponseProcessor(db);
-                var result = processor.FetchAndProcessResponses(responseType);
+                var result = processor.FetchAndProcessResponses(responseType, region);
                 return Json(new { success = result.Success, message = result.Message });
             }
             catch (Exception ex)
@@ -3547,11 +3592,38 @@ namespace App.Web.Controllers
         }
 
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult GetSftpHistoryAjaxHandler(JQueryDataTableParamModel param, string responseType = "Disbursement")
+        public JsonResult GetSftpHistoryAjaxHandler(JQueryDataTableParamModel param, string responseType = "Disbursement", string region = null)
         {
             try
             {
                 IQueryable<SftpResponseHistory> history = db.SftpResponseHistory.AsNoTracking();
+
+                int userid = AppUserManager.GetUserId();
+                var userRole = db.UserRole.FirstOrDefault(x => x.UserId == userid);
+                bool isDistrictUser = userRole != null && db.Roles.Any(x => x.Id == userRole.RoleId && x.Name == "Districts");
+
+                string targetDistrict = region;
+
+                if (isDistrictUser)
+                {
+                    var userDistrictId = db.SecRoleLocationModule.Where(x => x.UserId == userid && x.IsActive).Select(x => x.DistrictID).FirstOrDefault();
+                    targetDistrict = db.MasterDistrict.Where(d => d.Id == userDistrictId && d.IsActive).Select(d => d.Name).FirstOrDefault();
+                }
+
+                if (!string.IsNullOrEmpty(targetDistrict))
+                {
+                    var targetDistObj = db.MasterDistrict.FirstOrDefault(d => d.Name == targetDistrict);
+                    int? targetDistrictId = targetDistObj?.Id;
+
+                    string prefix = targetDistrict.Trim().ToUpper() + "_";
+
+                    // Use database mapping metadata, with backward compatibility fallback to prefix matching
+                    history = history.Where(x => 
+                        (x.DistrictId.HasValue && targetDistrictId.HasValue && x.DistrictId.Value == targetDistrictId.Value) ||
+                        (!string.IsNullOrEmpty(x.Region) && x.Region.ToUpper() == targetDistrict.ToUpper()) ||
+                        x.FileName.ToUpper().StartsWith(prefix)
+                    );
+                }
 
                 if (!string.IsNullOrEmpty(responseType))
                 {
@@ -3633,9 +3705,9 @@ namespace App.Web.Controllers
                 string fileName = Path.GetFileName(model.UploadedFile.FileName);
                 string extension = Path.GetExtension(fileName).ToLower();
 
-                if (extension != ".csv" && extension != ".xlsx")
+                if (extension != ".csv" && extension != ".xlsx" && extension != ".xls")
                 {
-                    return Json(new { success = false, message = "Invalid file format. Only .csv and .xlsx are allowed." });
+                    return Json(new { success = false, message = "Invalid file format. Only .csv, .xlsx and .xls are allowed." });
                 }
 
                 bool isValidation = model.UploadType == "Validation";
@@ -3683,36 +3755,17 @@ namespace App.Web.Controllers
                                 }
                             }
                         }
+                        else if (extension == ".xls")
+                        {
+                            dtVal = ReadXlsUsingOleDb(webPath);
+                        }
                         else
                         {
                             dtVal = ConvertCsvToDataTable(webPath);
                         }
 
-                        string[] expectedHeaders = { "APPLICATION_REFERENCE_NO", "DISTRICT", "BENE_IFSC", "NAME_OF_APPLICANT", "ACCOUNTNO", "CATEGORY", "CBS_NAME", "BRANCH_CODE", "ACCOUNT_STATUS", "AADHAAR_STATUS", "ACCT_SCHEME_TYPE" };
-                        string[] requiredHeaders = { "APPLICATION_REFERENCE_NO", "DISTRICT", "BENE_IFSC", "NAME_OF_APPLICANT", "ACCOUNTNO", "CATEGORY" };
-
-                        foreach (var h in expectedHeaders)
-                        {
-                            if (!dtVal.Columns.Contains(h))
-                            {
-                                System.IO.File.Delete(webPath);
-                                return Json(new { success = false, message = "Validation Error: Missing header " + h });
-                            }
-                        }
-
-                        foreach (System.Data.DataRow row in dtVal.Rows)
-                        {
-                            foreach (var h in requiredHeaders)
-                            {
-                                if (string.IsNullOrWhiteSpace(row[h]?.ToString()))
-                                {
-                                    System.IO.File.Delete(webPath);
-                                    return Json(new { success = false, message = $"Validation Error: Missing data in column {h}." });
-                                }
-                            }
-                        }
-
-                        if (dtVal.Rows.Count > 0)
+                        // Header validation has been shifted to response processing page (/PensionProcess/ReceiveSftpResponse)
+                        if (dtVal.Rows.Count > 0 && dtVal.Columns.Contains("DISTRICT"))
                         {
                             districtNameInFile = dtVal.Rows[0]["DISTRICT"]?.ToString()?.Trim();
                         }
@@ -3721,6 +3774,130 @@ namespace App.Web.Controllers
                     {
                         System.IO.File.Delete(webPath);
                         return Json(new { success = false, message = "File Validation failed: " + ex.Message });
+                    }
+                }
+                else
+                {
+                    // Strict 12-column verification for Disbursement file upload (No Headers expected)
+                    try
+                    {
+                        int columnCount = 0;
+                        if (extension == ".xlsx")
+                        {
+                            using (var package = new OfficeOpenXml.ExcelPackage(new System.IO.FileInfo(webPath)))
+                            {
+                                var worksheet = package.Workbook.Worksheets[1];
+                                if (worksheet.Dimension != null)
+                                {
+                                    for (int r = 1; r <= worksheet.Dimension.End.Row; r++)
+                                    {
+                                        // Skip completely empty rows
+                                        bool isEmptyRow = true;
+                                        for (int c = 1; c <= worksheet.Dimension.End.Column; c++)
+                                        {
+                                            if (worksheet.Cells[r, c].Value != null && !string.IsNullOrWhiteSpace(worksheet.Cells[r, c].Value.ToString()))
+                                            {
+                                                isEmptyRow = false;
+                                                break;
+                                            }
+                                        }
+                                        if (isEmptyRow) continue;
+
+                                        columnCount = worksheet.Dimension.End.Column;
+                                        if (columnCount != 12)
+                                        {
+                                            System.IO.File.Delete(webPath);
+                                            return Json(new { success = false, message = $"Validation Error: The uploaded disbursement file must contain exactly 12 columns of data. Found {columnCount} columns at row {r}." });
+                                        }
+                                    }
+                                    if (columnCount == 0)
+                                    {
+                                        System.IO.File.Delete(webPath);
+                                        return Json(new { success = false, message = "Validation Error: The uploaded disbursement file is empty." });
+                                    }
+                                }
+                                else
+                                {
+                                    System.IO.File.Delete(webPath);
+                                    return Json(new { success = false, message = "Validation Error: The uploaded disbursement file contains no worksheets or data." });
+                                }
+                            }
+                        }
+                        else if (extension == ".xls")
+                        {
+                            DataTable dtDisb = ReadXlsUsingOleDbNoHeaders(webPath);
+                            if (dtDisb != null && dtDisb.Rows.Count > 0)
+                            {
+                                int rNum = 0;
+                                foreach (DataRow row in dtDisb.Rows)
+                                {
+                                    rNum++;
+                                    // Skip completely empty rows
+                                    bool isEmptyRow = true;
+                                    for (int c = 0; c < dtDisb.Columns.Count; c++)
+                                    {
+                                        if (row[c] != null && !string.IsNullOrWhiteSpace(row[c].ToString()))
+                                        {
+                                            isEmptyRow = false;
+                                            break;
+                                        }
+                                    }
+                                    if (isEmptyRow) continue;
+
+                                    columnCount = dtDisb.Columns.Count;
+                                    if (columnCount != 12)
+                                    {
+                                        System.IO.File.Delete(webPath);
+                                        return Json(new { success = false, message = $"Validation Error: The uploaded disbursement file must contain exactly 12 columns of data. Found {columnCount} columns at row {rNum}." });
+                                    }
+                                }
+                                if (columnCount == 0)
+                                {
+                                    System.IO.File.Delete(webPath);
+                                    return Json(new { success = false, message = "Validation Error: The uploaded disbursement file is empty." });
+                                }
+                            }
+                            else
+                            {
+                                System.IO.File.Delete(webPath);
+                                return Json(new { success = false, message = "Validation Error: The uploaded disbursement file contains no worksheets or data." });
+                            }
+                        }
+                        else
+                        {
+                            // Parse CSV lines
+                            using (var sr = new StreamReader(webPath))
+                            {
+                                int lineNumber = 0;
+                                while (!sr.EndOfStream)
+                                {
+                                    string line = sr.ReadLine();
+                                    lineNumber++;
+                                    if (string.IsNullOrWhiteSpace(line)) continue;
+
+                                    string[] columns = line.Split(',');
+                                    columnCount = columns.Length;
+
+                                    if (columnCount != 12)
+                                    {
+                                        sr.Close();
+                                        System.IO.File.Delete(webPath);
+                                        return Json(new { success = false, message = $"Validation Error: The uploaded disbursement file must contain exactly 12 columns of data. Found {columnCount} columns at line {lineNumber}." });
+                                    }
+                                }
+                                if (lineNumber == 0)
+                                {
+                                    sr.Close();
+                                    System.IO.File.Delete(webPath);
+                                    return Json(new { success = false, message = "Validation Error: The uploaded disbursement file is empty." });
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.IO.File.Delete(webPath);
+                        return Json(new { success = false, message = "Disbursement file validation failed: " + ex.Message });
                     }
                 }
 
@@ -3853,6 +4030,23 @@ namespace App.Web.Controllers
 
         private string ForwardValidationFileToSftp(string localFilePath, string formattedName, string region)
         {
+            try
+            {
+                using (var dbContext = new AppDbContext(new ConnectionStringProvider().GetConnectionString()))
+                {
+                    var district = dbContext.MasterDistrict.FirstOrDefault(d => d.Name.ToUpper() == region.Trim().ToUpper());
+                    if (district != null)
+                    {
+                        var parentRegionObj = dbContext.MasterRegion.FirstOrDefault(r => r.Id == district.RegionId);
+                        if (parentRegionObj != null)
+                        {
+                            region = parentRegionObj.Name;
+                        }
+                    }
+                }
+            }
+            catch { }
+
             Dictionary<string, string> ftpSetting = Helper.Helper.GetFTPSetting();
             bool IsFTP = Convert.ToBoolean(ftpSetting["IsFTP"]);
             string fileReturn = "";
@@ -3882,7 +4076,7 @@ namespace App.Web.Controllers
                 string username = ftpSetting["sftpUsername"];
                 string password = ftpSetting["sftpPassword"];
                 // Dynamic validation upload path
-                string remoteDirectory = Helper.Helper.GetRegionBasedValidationPath(ftpSetting["sftpFilePath"], region) + "/";
+                string remoteDirectory = Helper.Helper.GetRegionBasedValidationPath(ftpSetting["sftpFilePath"], region) + "/Outbox/";
                 string localfilepathSFTP = Server.MapPath("~/" + ftpSetting["sftpPrivateKeyPath"]);
                 
                 var keyFile = new PrivateKeyFile(localfilepathSFTP);
@@ -4723,40 +4917,40 @@ namespace App.Web.Controllers
         {
             try
             {
-                /*
-                Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
-                Microsoft.Office.Interop.Excel.Workbook wb = app.Workbooks.Open(excelFilePath);
-                wb.SaveAs(csvFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlCSVWindows);
-                wb.Close(false);
-                app.Quit();
-                */
-
-                using (var stream = new FileStream(excelFilePath, FileMode.Open, FileAccess.Read))
+                string ext = Path.GetExtension(excelFilePath).ToLower();
+                if (ext == ".xls")
                 {
-                    using (var package = new ExcelPackage(stream))
+                    SaveXlsAsCsv(excelFilePath, csvFilePath);
+                }
+                else
+                {
+                    using (var stream = new FileStream(excelFilePath, FileMode.Open, FileAccess.Read))
                     {
-                        var worksheet = package.Workbook.Worksheets[1];
-                        var csvBuilder = new StringBuilder();
-                        if (worksheet.Dimension != null)
+                        using (var package = new ExcelPackage(stream))
                         {
-                            int rowCount = worksheet.Dimension.End.Row;
-                            int colCount = worksheet.Dimension.End.Column;
-
-                            for (int row = 1; row <= rowCount; row++)
+                            var worksheet = package.Workbook.Worksheets[1];
+                            var csvBuilder = new StringBuilder();
+                            if (worksheet.Dimension != null)
                             {
-                                var values = new List<string>();
-                                for (int col = 1; col <= colCount; col++)
+                                int rowCount = worksheet.Dimension.End.Row;
+                                int colCount = worksheet.Dimension.End.Column;
+
+                                for (int row = 1; row <= rowCount; row++)
                                 {
-                                    string text = worksheet.Cells[row, col].Value?.ToString() ?? "";
-                                    text = text.Replace("\"", "\"\"");
-                                    if (text.Contains(",") || text.Contains("\"") || text.Contains("\n"))
-                                        text = $"\"{text}\"";
-                                    values.Add(text);
+                                    var values = new List<string>();
+                                    for (int col = 1; col <= colCount; col++)
+                                    {
+                                        string text = worksheet.Cells[row, col].Value?.ToString() ?? "";
+                                        text = text.Replace("\"", "\"\"");
+                                        if (text.Contains(",") || text.Contains("\"") || text.Contains("\n"))
+                                            text = $"\"{text}\"";
+                                        values.Add(text);
+                                    }
+                                    csvBuilder.AppendLine(string.Join(",", values));
                                 }
-                                csvBuilder.AppendLine(string.Join(",", values));
                             }
+                            System.IO.File.WriteAllText(csvFilePath, csvBuilder.ToString(), Encoding.UTF8);
                         }
-                        System.IO.File.WriteAllText(csvFilePath, csvBuilder.ToString(), Encoding.UTF8);
                     }
                 }
             }
@@ -4764,6 +4958,115 @@ namespace App.Web.Controllers
             {
                 throw;
             }
+        }
+
+        private static DataTable ReadXlsUsingOleDb(string xlsPath)
+        {
+            string connString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={xlsPath};Extended Properties='Excel 8.0;HDR=YES;IMEX=1;'";
+            try
+            {
+                using (var conn = new System.Data.OleDb.OleDbConnection(connString))
+                {
+                    conn.Open();
+                    var schemaTable = conn.GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Tables, null);
+                    if (schemaTable != null && schemaTable.Rows.Count > 0)
+                    {
+                        string sheetName = schemaTable.Rows[0]["TABLE_NAME"].ToString();
+                        using (var cmd = new System.Data.OleDb.OleDbCommand($"SELECT * FROM [{sheetName}]", conn))
+                        using (var adapter = new System.Data.OleDb.OleDbDataAdapter(cmd))
+                        {
+                            var dt = new DataTable();
+                            adapter.Fill(dt);
+                            return dt;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                string fallbackConnString = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={xlsPath};Extended Properties='Excel 8.0;HDR=YES;IMEX=1;'";
+                using (var conn = new System.Data.OleDb.OleDbConnection(fallbackConnString))
+                {
+                    conn.Open();
+                    var schemaTable = conn.GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Tables, null);
+                    if (schemaTable != null && schemaTable.Rows.Count > 0)
+                    {
+                        string sheetName = schemaTable.Rows[0]["TABLE_NAME"].ToString();
+                        using (var cmd = new System.Data.OleDb.OleDbCommand($"SELECT * FROM [{sheetName}]", conn))
+                        using (var adapter = new System.Data.OleDb.OleDbDataAdapter(cmd))
+                        {
+                            var dt = new DataTable();
+                            adapter.Fill(dt);
+                            return dt;
+                        }
+                    }
+                }
+            }
+            return new DataTable();
+        }
+
+        private static DataTable ReadXlsUsingOleDbNoHeaders(string xlsPath)
+        {
+            string connString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={xlsPath};Extended Properties='Excel 8.0;HDR=NO;IMEX=1;'";
+            try
+            {
+                using (var conn = new System.Data.OleDb.OleDbConnection(connString))
+                {
+                    conn.Open();
+                    var schemaTable = conn.GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Tables, null);
+                    if (schemaTable != null && schemaTable.Rows.Count > 0)
+                    {
+                        string sheetName = schemaTable.Rows[0]["TABLE_NAME"].ToString();
+                        using (var cmd = new System.Data.OleDb.OleDbCommand($"SELECT * FROM [{sheetName}]", conn))
+                        using (var adapter = new System.Data.OleDb.OleDbDataAdapter(cmd))
+                        {
+                            var dt = new DataTable();
+                            adapter.Fill(dt);
+                            return dt;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                string fallbackConnString = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={xlsPath};Extended Properties='Excel 8.0;HDR=NO;IMEX=1;'";
+                using (var conn = new System.Data.OleDb.OleDbConnection(fallbackConnString))
+                {
+                    conn.Open();
+                    var schemaTable = conn.GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Tables, null);
+                    if (schemaTable != null && schemaTable.Rows.Count > 0)
+                    {
+                        string sheetName = schemaTable.Rows[0]["TABLE_NAME"].ToString();
+                        using (var cmd = new System.Data.OleDb.OleDbCommand($"SELECT * FROM [{sheetName}]", conn))
+                        using (var adapter = new System.Data.OleDb.OleDbDataAdapter(cmd))
+                        {
+                            var dt = new DataTable();
+                            adapter.Fill(dt);
+                            return dt;
+                        }
+                    }
+                }
+            }
+            return new DataTable();
+        }
+
+        private static void SaveXlsAsCsv(string excelFilePath, string csvFilePath)
+        {
+            var dt = ReadXlsUsingOleDbNoHeaders(excelFilePath);
+            var csvBuilder = new StringBuilder();
+            foreach (DataRow row in dt.Rows)
+            {
+                var values = new List<string>();
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    string val = row[i]?.ToString() ?? "";
+                    if (val.Contains(",") || val.Contains("\"") || val.Contains("\n"))
+                        val = $"\"{val.Replace("\"", "\"\"")}\"";
+                    values.Add(val);
+                }
+                csvBuilder.AppendLine(string.Join(",", values));
+            }
+            System.IO.File.WriteAllText(csvFilePath, csvBuilder.ToString(), Encoding.UTF8);
         }
         private string UploadDataFile(byte[] fileContents, string fileName)
         {
@@ -5204,7 +5507,7 @@ namespace App.Web.Controllers
                         string password = ftpSetting["sftpPassword"];
                         string localFilePath = excelFilePath;
                         // Dynamic region-based payment path
-                        string remoteDirectory = Helper.Helper.GetRegionBasedPaymentPath(ftpSetting["sftpFilePath"], region) + "/Inbox/";
+                        string remoteDirectory = Helper.Helper.GetRegionBasedPaymentPath(ftpSetting["sftpFilePath"], region) + "/Outbox/";
                         string localfilepathSFTP = Server.MapPath("~/" + ftpSetting["sftpPrivateKeyPath"]);
 
                         var nn = Path.Combine(remoteDirectory, formattedName);

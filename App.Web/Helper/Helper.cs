@@ -128,6 +128,25 @@ namespace App.Web.Helper
                 var provider = new App.Data.CurrentRegionProvider();
                 region = provider.GetCurrentRegion();
             }
+            else
+            {
+                try
+                {
+                    using (var db = new AppDbContext(new ConnectionStringProvider().GetConnectionString()))
+                    {
+                        var district = db.MasterDistrict.FirstOrDefault(d => d.Name.ToUpper() == region.Trim().ToUpper());
+                        if (district != null)
+                        {
+                            var parentRegionObj = db.MasterRegion.FirstOrDefault(r => r.Id == district.RegionId);
+                            if (parentRegionObj != null)
+                            {
+                                region = parentRegionObj.Name;
+                            }
+                        }
+                    }
+                }
+                catch { }
+            }
             
             return (region.Trim().ToUpper() == "KASHMIR REGION" || region.Trim().ToUpper() == "KASHMIR")
                 ? $"{basePath}/Kashmir/PaymentFiles"
@@ -140,6 +159,25 @@ namespace App.Web.Helper
             {
                 var provider = new App.Data.CurrentRegionProvider();
                 region = provider.GetCurrentRegion();
+            }
+            else
+            {
+                try
+                {
+                    using (var db = new AppDbContext(new ConnectionStringProvider().GetConnectionString()))
+                    {
+                        var district = db.MasterDistrict.FirstOrDefault(d => d.Name.ToUpper() == region.Trim().ToUpper());
+                        if (district != null)
+                        {
+                            var parentRegionObj = db.MasterRegion.FirstOrDefault(r => r.Id == district.RegionId);
+                            if (parentRegionObj != null)
+                            {
+                                region = parentRegionObj.Name;
+                            }
+                        }
+                    }
+                }
+                catch { }
             }
             
             return (region.Trim().ToUpper() == "KASHMIR REGION" || region.Trim().ToUpper() == "KASHMIR")

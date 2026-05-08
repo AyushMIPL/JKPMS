@@ -44,6 +44,9 @@
         font-weight: 600;
         color: #555;
     }
+    .select2-container {
+        width: 100% !important;
+    }
 </style>
 
 <div class="panel panel-default">
@@ -51,6 +54,24 @@
         <h4 class="headline">Receive Response from SFTP</h4>
     </div>
     <div class="panel-body pb-5">
+        <!-- District Selection Dropdown -->
+        <div class="row" style="margin-bottom: 25px;">
+            <div class="col-sm-6 col-sm-offset-3">
+                <div class="form-group">
+                    <label class="control-label" style="display: block; margin-bottom: 8px;">District *</label>
+                    @if (ViewBag.IsDistrictUser == true)
+                    {
+                        @Html.DropDownList("Region", (IEnumerable<SelectListItem>)ViewBag.Regions, new { @class = "form-control district-select select2", disabled = "disabled", id = "Region" })
+                        <input type="hidden" id="HiddenRegion" name="Region" value="@ViewBag.UserDistrictName" />
+                    }
+                    else
+                    {
+                        @Html.DropDownList("Region", (IEnumerable<SelectListItem>)ViewBag.Regions, "Select District", new { @class = "form-control district-select select2", required = "required", id = "Region" })
+                    }
+                </div>
+            </div>
+        </div>
+
         <ul class="nav nav-tabs">
             <li class="active">
                 <a href="#disbursementTab" data-type="Disbursement">
@@ -116,6 +137,20 @@
         var currentTabType = "Disbursement";
 
         $(document).ready(function () {
+            // Apply select2 to district dropdown if not already initialized
+            if ($.fn.select2) {
+                $('#Region').select2({
+                    placeholder: "Select District",
+                    allowClear: true
+                });
+            }
+
+            $('#Region').on('change', function () {
+                if (historyTable) {
+                    historyTable.fnDraw();
+                }
+            });
+
             $('.nav-tabs li a').on('click', function (e) {
                 e.preventDefault();
                 var target = $(this).attr('href');
@@ -134,7 +169,12 @@
                 "bServerSide": true,
                 "sAjaxSource": '@Url.Action("GetSftpHistoryAjaxHandler", "PensionProcess")',
                 "fnServerParams": function (aoData) {
+                    var selectedRegion = $('#Region').val();
+                    if (!selectedRegion && $('#HiddenRegion').length > 0) {
+                        selectedRegion = $('#HiddenRegion').val();
+                    }
                     aoData.push({ "name": "responseType", "value": currentTabType });
+                    aoData.push({ "name": "region", "value": selectedRegion || "" });
                 },
                 "bProcessing": true,
                 "sPaginationType": "full_numbers",
@@ -168,7 +208,17 @@
                 var type = btn.data('type');
                 var spinner = btn.find('.fetch-spinner');
 
-                if (!confirm('Are you sure you want to fetch and process responses for ' + type + '?')) return;
+                var selectedRegion = $('#Region').val();
+                if (!selectedRegion && $('#HiddenRegion').length > 0) {
+                    selectedRegion = $('#HiddenRegion').val();
+                }
+
+                if (!selectedRegion) {
+                    toasterErrorMessage("Please select a District first.");
+                    return;
+                }
+
+                if (!confirm('Are you sure you want to fetch and process responses for ' + type + ' (' + selectedRegion + ')?')) return;
 
                 btn.prop('disabled', true);
                 spinner.show();
@@ -176,7 +226,7 @@
                 $.ajax({
                     url: '@Url.Action("FetchSftpResponseAjax", "PensionProcess")',
                     type: 'POST',
-                    data: { responseType: type },
+                    data: { responseType: type, region: selectedRegion },
                     success: function (response) {
                         spinner.hide();
                         btn.prop('disabled', false);

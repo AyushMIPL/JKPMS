@@ -29,9 +29,103 @@ namespace App.Web.Helper
         public SftpResponseProcessor(AppDbContext context)
         {
             _db = context;
+            EnsureSftpResponseHistoryColumnsExist();
         }
 
-        public SftpProcessResult FetchAndProcessResponses(string responseType)
+        private void EnsureSftpResponseHistoryColumnsExist()
+        {
+            try
+            {
+                _db.Database.ExecuteSqlCommand(@"
+                    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[SftpResponseHistory]') AND name = N'DistrictId')
+                    BEGIN
+                        ALTER TABLE [dbo].[SftpResponseHistory] ADD [DistrictId] INT NULL;
+                    END
+
+                    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[SftpResponseHistory]') AND name = N'Region')
+                    BEGIN
+                        ALTER TABLE [dbo].[SftpResponseHistory] ADD [Region] NVARCHAR(150) NULL;
+                    END
+
+                    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[SftpResponseHistory]') AND name = N'UploadHistoryId')
+                    BEGIN
+                        ALTER TABLE [dbo].[SftpResponseHistory] ADD [UploadHistoryId] INT NULL;
+                    END
+                ");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failed to alter SftpResponseHistory table", ex);
+            }
+        }
+
+        private PensionFileUploadHistory GetMatchingUploadHistory(string responseFileName)
+        {
+            try
+            {
+                // Extract the unique timestamp prefix (first two segments of filename separated by '_')
+                // e.g., "20260507_120000" from "20260507_120000_DODA_response.xlsx"
+                int firstUnderscore = responseFileName.IndexOf('_');
+                if (firstUnderscore > 0)
+                {
+                    int secondUnderscore = responseFileName.IndexOf('_', firstUnderscore + 1);
+                    if (secondUnderscore > 0)
+                    {
+                        string prefix = responseFileName.Substring(0, secondUnderscore);
+                        
+                        // Query the database for an upload history record whose file path contains this prefix
+                        var match = _db.PensionFileUploadHistory
+                                       .AsNoTracking()
+                                       .FirstOrDefault(x => x.FilePath.Contains(prefix));
+                        if (match != null)
+                        {
+                            return match;
+                        }
+                    }
+                }
+
+                // Fallback: Check if responseFileName contains any original sent file name as a substring
+                string respNameWithoutExt = Path.GetFileNameWithoutExtension(responseFileName).ToUpper();
+                var recentUploads = _db.PensionFileUploadHistory
+                                       .AsNoTracking()
+                                       .OrderByDescending(x => x.Id)
+                                       .Take(1000)
+                                       .ToList();
+
+                foreach (var upload in recentUploads)
+                {
+                    if (!string.IsNullOrEmpty(upload.FileName))
+                    {
+                        string sentNameWithoutExt = Path.GetFileNameWithoutExtension(upload.FileName).ToUpper();
+                        if (!string.IsNullOrEmpty(sentNameWithoutExt) && sentNameWithoutExt.Length >= 3)
+                        {
+                            if (respNameWithoutExt.Contains(sentNameWithoutExt))
+                            {
+                                return upload;
+                            }
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(upload.FilePath))
+                    {
+                        string sentNameFromPath = Path.GetFileNameWithoutExtension(upload.FilePath).ToUpper();
+                        if (!string.IsNullOrEmpty(sentNameFromPath) && sentNameFromPath.Length >= 3)
+                        {
+                            if (respNameWithoutExt.Contains(sentNameFromPath))
+                            {
+                                return upload;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error matching upload history for file: " + responseFileName, ex);
+            }
+            return null;
+        }
+
+        public SftpProcessResult FetchAndProcessResponses(string responseType, string selectedRegion = null)
         {
             try
             {
@@ -40,16 +134,38 @@ namespace App.Web.Helper
                 int port = Convert.ToInt32(ftpSetting["sftpPort"]);
                 string username = ftpSetting["sftpUsername"];
                 string password = ftpSetting["sftpPassword"];
-                string region = _regionProvider.GetCurrentRegion();
 
-                string remoteDirectory = "";
-                if (responseType == "Disbursement")
+                string district = string.IsNullOrEmpty(selectedRegion) ? _regionProvider.GetCurrentRegion() : selectedRegion;
+
+                string parentRegion = "JAMMU REGION"; // Default fallback
+                var distObj = _db.MasterDistrict.FirstOrDefault(d => d.Name == district);
+                if (distObj != null)
                 {
-                    remoteDirectory = Helper.GetRegionBasedPaymentPath(ftpSetting["sftpFilePath"], region) + "/Inbox/";
+                    var regObj = _db.MasterRegion.FirstOrDefault(r => r.Id == distObj.RegionId);
+                    if (regObj != null)
+                    {
+                        parentRegion = regObj.Name;
+                    }
                 }
                 else
                 {
-                    remoteDirectory = Helper.GetRegionBasedValidationPath(ftpSetting["sftpFilePath"], region) + "/Inbox/";
+                    // Fallback to current region provider
+                    parentRegion = _regionProvider.GetCurrentRegion();
+                }
+
+                bool isKashmir = parentRegion.ToUpper().Contains("KASHMIR");
+
+                string remoteDirectory = "";
+                string sftpBase = ftpSetting["sftpFilePath"]; // usually "/JKBSWD" or similar
+                string targetRegionName = isKashmir ? "KASHMIR REGION" : "JAMMU REGION";
+
+                if (responseType == "Disbursement")
+                {
+                    remoteDirectory = Helper.GetRegionBasedPaymentPath(sftpBase, targetRegionName) + "/Inbox/";
+                }
+                else
+                {
+                    remoteDirectory = Helper.GetRegionBasedValidationPath(sftpBase, targetRegionName) + "/Inbox/";
                 }
 
                 string currentDirectoryPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).Replace("file:\\", "").Replace("\\bin", "");
@@ -73,10 +189,63 @@ namespace App.Web.Helper
                         .OrderByDescending(f => f.LastWriteTime)
                         .ToList();
 
-                    if (!files.Any()) return new SftpProcessResult { Success = false, Message = "No new response files found on SFTP." };
+                    // Filter files based on District metadata mapping
+                    var filesToProcess = new List<Renci.SshNet.Sftp.SftpFile>();
+
+                    foreach (var file in files)
+                    {
+                        var matchingUpload = GetMatchingUploadHistory(file.Name);
+                        if (matchingUpload != null)
+                        {
+                            // If we have a matching upload record, filter by its DistrictId or District Name
+                            if (!string.IsNullOrEmpty(district))
+                            {
+                                bool matchesDistrict = false;
+                                if (matchingUpload.DistrictId.HasValue)
+                                {
+                                    var selDist = _db.MasterDistrict.FirstOrDefault(d => d.Name == district);
+                                    if (selDist != null && matchingUpload.DistrictId.Value == selDist.Id)
+                                    {
+                                        matchesDistrict = true;
+                                    }
+                                }
+                                if (!matchesDistrict && matchingUpload.Region != null && matchingUpload.Region.Trim().ToUpper() == district.Trim().ToUpper())
+                                {
+                                    matchesDistrict = true;
+                                }
+
+                                if (matchesDistrict)
+                                {
+                                    filesToProcess.Add(file);
+                                }
+                            }
+                            else
+                            {
+                                filesToProcess.Add(file);
+                            }
+                        }
+                        else
+                        {
+                            // Backward Compatibility Fallback: If no database mapping is found, fall back to filename-based prefix matching
+                            if (!string.IsNullOrEmpty(district))
+                            {
+                                string districtPrefix = district.Trim().ToUpper() + "_";
+                                if (file.Name.ToUpper().StartsWith(districtPrefix))
+                                {
+                                    filesToProcess.Add(file);
+                                }
+                            }
+                            else
+                            {
+                                filesToProcess.Add(file);
+                            }
+                        }
+                    }
+
+                    if (!filesToProcess.Any()) return new SftpProcessResult { Success = false, Message = "No new response files found on SFTP." };
 
                     int successCount = 0;
-                    foreach (var file in files)
+                    foreach (var file in filesToProcess)
                     {
                         if (IsFileAlreadyProcessed(file.Name)) continue;
 
@@ -100,21 +269,43 @@ namespace App.Web.Helper
 
                         SftpProcessResult processResult;
                         if (responseType == "Disbursement")
-                            processResult = ProcessDisbursementFile(localPath, file.Name, region, ftpSetting);
+                            processResult = ProcessDisbursementFile(localPath, file.Name, parentRegion, ftpSetting);
                         else
-                            processResult = ProcessValidationFile(localPath, file.Name, region, ftpSetting);
+                            processResult = ProcessValidationFile(localPath, file.Name, parentRegion, ftpSetting);
 
-                        // Log history
+                        var matchingUpload = GetMatchingUploadHistory(file.Name);
+                        int? finalDistrictId = null;
+                        string finalRegionName = null;
+
+                        if (matchingUpload != null)
+                        {
+                            finalDistrictId = matchingUpload.DistrictId;
+                            finalRegionName = matchingUpload.Region;
+                        }
+                        else if (!string.IsNullOrEmpty(district))
+                        {
+                            var selDist = _db.MasterDistrict.FirstOrDefault(d => d.Name == district);
+                            finalDistrictId = selDist?.Id;
+                            finalRegionName = district;
+                        }
+
+                        // Log history with metadata
                         var history = new SftpResponseHistory
                         {
                             FileName = file.Name,
                             FileType = responseType,
                             ProcessDate = DateTime.Now,
-                            Status = processResult.Success ? "Success" : "Failed",
-                            Remarks = processResult.Message,
+                             Status = processResult.Success ? "Success" : 
+                                      (processResult.Message.Contains("required 16 columns") ? "Column Validation Failed" : 
+                                      (processResult.Message.Contains("expected response format") ? "Header Validation Failed" : "Failed")),
+                             Remarks = processResult.Message,
                             FilePath = localPath,
-                            RecordCount = 0
+                            RecordCount = 0,
+                            DistrictId = finalDistrictId,
+                            Region = finalRegionName,
+                            UploadHistoryId = matchingUpload?.Id
                         };
+
                         try {
                             DataTable dtCount = ConvertCsvToDataTable(localPath.Replace(".xlsx", ".csv").Replace(".xls", ".csv"));
                             history.RecordCount = dtCount.Rows.Count;
@@ -128,12 +319,6 @@ namespace App.Web.Helper
                             successCount++;
                             MoveToProcessed(sftpClient, remoteDirectory, file.Name, responseType, ftpSetting);
                         }
-                        //else
-                        //{
-                        //    return new SftpProcessResult { Success = false, Message = $"{processResult.Message}!" };
-                        //}
-
-                        // We don't delete localPath here anymore because we want it available for download
                     }
 
                     sftpClient.Disconnect();
@@ -149,7 +334,15 @@ namespace App.Web.Helper
 
         private bool IsFileAlreadyProcessed(string fileName)
         {
-            return _db.SftpResponseHistory.Any(x => x.FileName == fileName && x.Status == "Success");
+            string targetNameNoExt = Path.GetFileNameWithoutExtension(fileName).ToUpper();
+            string prefix = targetNameNoExt.Length > 3 ? targetNameNoExt.Substring(0, 3) : targetNameNoExt;
+
+            var successFiles = _db.SftpResponseHistory
+                                  .Where(x => x.Status == "Success" && x.FileName.StartsWith(prefix))
+                                  .Select(x => x.FileName)
+                                  .ToList();
+
+            return successFiles.Any(x => Path.GetFileNameWithoutExtension(x).ToUpper() == targetNameNoExt);
         }
 
         private List<string> ListFtpFiles(string host, string user, string pass, string dir)
@@ -239,14 +432,37 @@ namespace App.Web.Helper
                     SaveExcelAsCsv(localPath, csvFilePath);
                 }
 
-                // Validation against headers
+                // Validation against headers (Enforced strictly at response processing stage)
                 DataTable dtVal = ConvertCsvToDataTable(csvFilePath);
-                string[] expectedHeaders = { "APPLICATION_REFERENCE_NO", "DISTRICT", "BENE_IFSC", "NAME_OF_APPLICANT", "ACCOUNTNO", "CATEGORY", "CBS_NAME", "BRANCH_CODE", "ACCOUNT_STATUS", "AADHAAR_STATUS", "ACCT_SCHEME_TYPE" };
+                string[] expectedHeaders = { 
+                    "APPLICATION_REFERENCE_NO", 
+                    "DISTRICT", 
+                    "BENE_IFSC", 
+                    "NAME_OF_APPLICANT", 
+                    "ACCOUNTNO", 
+                    "CATEGORY", 
+                    "CBS_NAME", 
+                    "BRANCH_CODE", 
+                    "ACCOUNT_STATUS", 
+                    "AADHAAR_STATUS", 
+                    "ACCT_SCHEME_TYPE" 
+                };
                 
+                bool headerValidationPassed = true;
                 foreach (var h in expectedHeaders)
                 {
                     if (!dtVal.Columns.Contains(h))
-                        return new SftpProcessResult { Success = false, Message = "Validation Error: Missing header " + h };
+                    {
+                        headerValidationPassed = false;
+                        break;
+                    }
+                }
+
+                if (!headerValidationPassed)
+                {
+                    string finalUserMessage = "Account Validation response file processing failed because the file structure does not match the expected response format. Required headers are missing or invalid. The file has been saved to history for review.";
+                    Logger.Error($"Account Validation file validation failed for {fileName}. Required headers were missing or invalid.");
+                    return new SftpProcessResult { Success = false, Message = finalUserMessage };
                 }
 
                 foreach (DataRow row in dtVal.Rows)
@@ -254,7 +470,11 @@ namespace App.Web.Helper
                     foreach (var h in expectedHeaders)
                     {
                         if (string.IsNullOrWhiteSpace(row[h]?.ToString()))
-                            return new SftpProcessResult { Success = false, Message = $"Validation Error: Missing data in column {h} for Application Ref {row["APPLICATION_REFERENCE_NO"]}" };
+                        {
+                            string finalUserMessage = "Account Validation response file processing failed because the file structure does not match the expected response format. Required headers are missing or invalid. The file has been saved to history for review.";
+                            Logger.Error($"Account Validation file data check failed: missing value in required column '{h}' at reference {row["APPLICATION_REFERENCE_NO"]}.");
+                            return new SftpProcessResult { Success = false, Message = finalUserMessage };
+                        }
                     }
                 }
 
@@ -294,6 +514,19 @@ namespace App.Web.Helper
                 if (Path.GetExtension(localPath).ToLower() != ".csv")
                 {
                     SaveExcelAsCsv(localPath, csvFilePath);
+                }
+
+                // Strictly validate Disbursement column structure (Expected: exactly 16 columns per row)
+                int actualCols = 0;
+                string validationError = "";
+                if (!ValidateDisbursementColumnCount(csvFilePath, out actualCols, out validationError))
+                {
+                    string userErrorMessage = "File validation failed. The uploaded disbursement response file does not contain the required 16 columns and cannot be processed. The file has been saved to history for review and can be downloaded for correction.";
+                    return new SftpProcessResult
+                    {
+                        Success = false,
+                        Message = userErrorMessage
+                    };
                 }
 
                 var dirName = region == "KASHMIR REGION" ? "K_BankMediaFileUpload" : "J_BankMediaFileUpload";
@@ -342,19 +575,28 @@ namespace App.Web.Helper
                 if (!client.Exists(inboxProcessed)) client.CreateDirectory(inboxProcessed);
                 client.RenameFile(remoteDir + fileName, inboxProcessed + fileName);
 
-                // For validation, also handle outbox renaming if exists
+                bool isKashmir = remoteDir.ToUpper().Contains("KASHMIR");
+                string sftpBase = ftpSetting["sftpFilePath"];
+                string targetRegionName = isKashmir ? "KASHMIR REGION" : "JAMMU REGION";
+
+                string outboxSource = "";
                 if (type == "Validation")
                 {
-                    string outboxSource = Helper.GetRegionBasedValidationPath(ftpSetting["sftpFilePath"], _regionProvider.GetCurrentRegion()) + "/Outbox/";
-                    string outboxProcessed = outboxSource + "Processed/";
-                    if (client.Exists(outboxSource))
+                    outboxSource = Helper.GetRegionBasedValidationPath(sftpBase, targetRegionName) + "/Outbox/";
+                }
+                else if (type == "Disbursement")
+                {
+                    outboxSource = Helper.GetRegionBasedPaymentPath(sftpBase, targetRegionName) + "/Outbox/";
+                }
+
+                if (!string.IsNullOrEmpty(outboxSource) && client.Exists(outboxSource))
+                {
+                    var sentFile = GetSentFileName(fileName);
+                    if (!string.IsNullOrEmpty(sentFile) && client.Exists(outboxSource + sentFile))
                     {
-                        var sentFile = GetSentFileName(fileName);
-                        if (!string.IsNullOrEmpty(sentFile) && client.Exists(outboxSource + sentFile))
-                        {
-                            if (!client.Exists(outboxProcessed)) client.CreateDirectory(outboxProcessed);
-                            client.RenameFile(outboxSource + sentFile, outboxProcessed + fileName);
-                        }
+                        string outboxProcessed = outboxSource + "Processed/";
+                        if (!client.Exists(outboxProcessed)) client.CreateDirectory(outboxProcessed);
+                        client.RenameFile(outboxSource + sentFile, outboxProcessed + fileName);
                     }
                 }
             } catch { }
@@ -375,27 +617,99 @@ namespace App.Web.Helper
 
         private void SaveExcelAsCsv(string excelPath, string csvPath)
         {
-            using (var package = new OfficeOpenXml.ExcelPackage(new FileInfo(excelPath)))
+            string ext = Path.GetExtension(excelPath).ToLower();
+            if (ext == ".xls")
             {
-                var worksheet = package.Workbook.Worksheets[1];
-                var csvBuilder = new StringBuilder();
-                if (worksheet.Dimension != null)
+                SaveXlsAsCsv(excelPath, csvPath);
+            }
+            else
+            {
+                using (var package = new OfficeOpenXml.ExcelPackage(new FileInfo(excelPath)))
                 {
-                    for (int r = 1; r <= worksheet.Dimension.End.Row; r++)
+                    var worksheet = package.Workbook.Worksheets[1];
+                    var csvBuilder = new StringBuilder();
+                    if (worksheet.Dimension != null)
                     {
-                        var values = new List<string>();
-                        for (int c = 1; c <= worksheet.Dimension.End.Column; c++)
+                        for (int r = 1; r <= worksheet.Dimension.End.Row; r++)
                         {
-                            string val = worksheet.Cells[r, c].Value?.ToString() ?? "";
-                            if (val.Contains(",") || val.Contains("\"") || val.Contains("\n"))
-                                val = $"\"{val.Replace("\"", "\"\"")}\"";
-                            values.Add(val);
+                            var values = new List<string>();
+                            for (int c = 1; c <= worksheet.Dimension.End.Column; c++)
+                            {
+                                string val = worksheet.Cells[r, c].Value?.ToString() ?? "";
+                                if (val.Contains(",") || val.Contains("\"") || val.Contains("\n"))
+                                    val = $"\"{val.Replace("\"", "\"\"")}\"";
+                                values.Add(val);
+                            }
+                            csvBuilder.AppendLine(string.Join(",", values));
                         }
-                        csvBuilder.AppendLine(string.Join(",", values));
+                    }
+                    File.WriteAllText(csvPath, csvBuilder.ToString(), Encoding.UTF8);
+                }
+            }
+        }
+
+        private void SaveXlsAsCsv(string excelPath, string csvPath)
+        {
+            string connString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={excelPath};Extended Properties='Excel 8.0;HDR=NO;IMEX=1;'";
+            try
+            {
+                using (var conn = new System.Data.OleDb.OleDbConnection(connString))
+                {
+                    conn.Open();
+                    var schemaTable = conn.GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Tables, null);
+                    if (schemaTable != null && schemaTable.Rows.Count > 0)
+                    {
+                        string sheetName = schemaTable.Rows[0]["TABLE_NAME"].ToString();
+                        using (var cmd = new System.Data.OleDb.OleDbCommand($"SELECT * FROM [{sheetName}]", conn))
+                        using (var adapter = new System.Data.OleDb.OleDbDataAdapter(cmd))
+                        {
+                            var dt = new DataTable();
+                            adapter.Fill(dt);
+                            WriteDataTableToCsv(dt, csvPath);
+                            return;
+                        }
                     }
                 }
-                File.WriteAllText(csvPath, csvBuilder.ToString(), Encoding.UTF8);
             }
+            catch
+            {
+                string fallbackConnString = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={excelPath};Extended Properties='Excel 8.0;HDR=NO;IMEX=1;'";
+                using (var conn = new System.Data.OleDb.OleDbConnection(fallbackConnString))
+                {
+                    conn.Open();
+                    var schemaTable = conn.GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Tables, null);
+                    if (schemaTable != null && schemaTable.Rows.Count > 0)
+                    {
+                        string sheetName = schemaTable.Rows[0]["TABLE_NAME"].ToString();
+                        using (var cmd = new System.Data.OleDb.OleDbCommand($"SELECT * FROM [{sheetName}]", conn))
+                        using (var adapter = new System.Data.OleDb.OleDbDataAdapter(cmd))
+                        {
+                            var dt = new DataTable();
+                            adapter.Fill(dt);
+                            WriteDataTableToCsv(dt, csvPath);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void WriteDataTableToCsv(DataTable dt, string csvPath)
+        {
+            var csvBuilder = new StringBuilder();
+            foreach (DataRow row in dt.Rows)
+            {
+                var values = new List<string>();
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    string val = row[i]?.ToString() ?? "";
+                    if (val.Contains(",") || val.Contains("\"") || val.Contains("\n"))
+                        val = $"\"{val.Replace("\"", "\"\"")}\"";
+                    values.Add(val);
+                }
+                csvBuilder.AppendLine(string.Join(",", values));
+            }
+            File.WriteAllText(csvPath, csvBuilder.ToString(), Encoding.UTF8);
         }
 
         private void SaveDownloadMediaDetail(string fileName, bool isProcessed, int recordId, int total, int validated, int notValidated, string remark, int mediaType, string region = "", string period = "")
@@ -428,12 +742,29 @@ namespace App.Web.Helper
         private string GetSentFileName(string fileName)
         {
             try {
+                var matchingUpload = GetMatchingUploadHistory(fileName);
+                if (matchingUpload != null)
+                {
+                    if (!string.IsNullOrEmpty(matchingUpload.FileName))
+                    {
+                        return matchingUpload.FileName;
+                    }
+                    if (!string.IsNullOrEmpty(matchingUpload.FilePath))
+                    {
+                        return Path.GetFileName(matchingUpload.FilePath);
+                    }
+                }
+
+                // Fallback to old behavior
                 int index = fileName.IndexOf('_', fileName.IndexOf('_') + 1);
-                string prefix = fileName.Substring(0, index);
-                DALBaseClass objDal = new DALBaseClassHelper().GetDAL();
-                var ds = objDal.GetData("SELECT TOP 1 FilePath FROM [dbo].[Media_Queue] WHERE FilePath LIKE '%" + prefix + "%' ORDER BY CreatedOn DESC");
-                if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-                    return Path.GetFileName(ds.Tables[0].Rows[0]["FilePath"].ToString());
+                if (index > 0)
+                {
+                    string prefix = fileName.Substring(0, index);
+                    DALBaseClass objDal = new DALBaseClassHelper().GetDAL();
+                    var ds = objDal.GetData("SELECT TOP 1 FilePath FROM [dbo].[Media_Queue] WHERE FilePath LIKE '%" + prefix + "%' ORDER BY CreatedOn DESC");
+                    if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                        return Path.GetFileName(ds.Tables[0].Rows[0]["FilePath"].ToString());
+                }
             } catch { }
             return "";
         }
@@ -474,6 +805,55 @@ namespace App.Web.Helper
                 }
             }
             return dt;
+        }
+
+        private bool ValidateDisbursementColumnCount(string csvFilePath, out int columnCount, out string errorMessage)
+        {
+            columnCount = 0;
+            errorMessage = "";
+            try
+            {
+                if (!File.Exists(csvFilePath))
+                {
+                    errorMessage = "File does not exist.";
+                    return false;
+                }
+
+                using (var sr = new StreamReader(csvFilePath))
+                {
+                    int lineNumber = 0;
+                    while (!sr.EndOfStream)
+                    {
+                        string line = sr.ReadLine();
+                        lineNumber++;
+                        if (string.IsNullOrWhiteSpace(line)) continue;
+
+                        string[] columns = line.Split(',');
+                        columnCount = columns.Length;
+
+                        if (columnCount != 16)
+                        {
+                            errorMessage = $"Disbursement file validation failed. Expected 16 columns but found {columnCount} columns at line {lineNumber}.";
+                            Logger.Error(errorMessage);
+                            return false;
+                        }
+                    }
+                    
+                    if (lineNumber == 0)
+                    {
+                        errorMessage = "Disbursement file is empty.";
+                        Logger.Error(errorMessage);
+                        return false;
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                errorMessage = "Error validating column count: " + ex.Message;
+                Logger.Error(errorMessage, ex);
+                return false;
+            }
         }
     }
 }

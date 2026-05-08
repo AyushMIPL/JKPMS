@@ -7869,7 +7869,7 @@ namespace App.Web.Controllers
         SQL.Append(" UNION ALL ");
 
         SQL.Append(" SELECT eb.bank_acct_no AS AccountNo, eb.BankName, eb.APPLICANT_BANK_IFSC_CODE AS IFSCCode, ");
-        SQL.Append(" TRY_CAST(td.TransactionDate AS DATETIME) AS PaidOn, CAST(td.Amount AS VARCHAR(50)) AS amount, td.[Status], td.Remarks AS [Reason/Remarks], eb.empl_code, eb.Application_Reference_no, me.PresentAddress, eb.bank_code, eb.BranchName, CONCAT(me.first_Name, ' ', me.middle_name, ' ', me.last_Name) AS [Name], ");
+        SQL.Append(" TRY_CONVERT(DATETIME, td.TransactionDate, 105) AS PaidOn, CAST(td.Amount AS VARCHAR(50)) AS amount, td.[Status], td.Remarks AS [Reason/Remarks], eb.empl_code, eb.Application_Reference_no, me.PresentAddress, eb.bank_code, eb.BranchName, CONCAT(me.first_Name, ' ', me.middle_name, ' ', me.last_Name) AS [Name], ");
         SQL.Append(" CAST(td.TransactionReference AS VARCHAR(50)) AS PayDocNo ");
         SQL.Append(" FROM txnDetail td ");
         SQL.Append(" INNER JOIN MasterEmpBankDetails eb ON td.[Application Reference No#] = CAST(eb.Application_Reference_no AS NVARCHAR(50)) ");
