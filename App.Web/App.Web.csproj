@@ -60,6 +60,12 @@
     <Reference Include="Antlr3.Runtime, Version=3.5.0.2, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
       <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="ExcelDataReader">
+      <HintPath>..\packages\ExcelDataReader.3.8.0\lib\net462\ExcelDataReader.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelDataReader.DataSet">
+      <HintPath>..\packages\ExcelDataReader.DataSet.3.8.0\lib\net462\ExcelDataReader.DataSet.dll</HintPath>
+    </Reference>
     <Reference Include="Aspose.Email, Version=24.3.0.0, Culture=neutral, PublicKeyToken=716fcc553a201e56, processorArchitecture=MSIL">
       <HintPath>..\packages\Aspose.Email.24.3.0\lib\net45\Aspose.Email.dll</HintPath>
     </Reference>

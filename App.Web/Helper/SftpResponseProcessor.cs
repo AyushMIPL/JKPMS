@@ -11,6 +11,7 @@ using System.Net;
 using System.Text;
 using System.Web;
 using JKPS.DL;
+using ExcelDataReader;
 
 namespace App.Web.Helper
 {
@@ -465,23 +466,23 @@ namespace App.Web.Helper
                     return new SftpProcessResult { Success = false, Message = finalUserMessage };
                 }
 
-                foreach (DataRow row in dtVal.Rows)
-                {
-                    foreach (var h in expectedHeaders)
-                    {
-                        if (string.IsNullOrWhiteSpace(row[h]?.ToString()))
-                        {
-                            string finalUserMessage = "Account Validation response file processing failed because the file structure does not match the expected response format. Required headers are missing or invalid. The file has been saved to history for review.";
-                            Logger.Error($"Account Validation file data check failed: missing value in required column '{h}' at reference {row["APPLICATION_REFERENCE_NO"]}.");
-                            return new SftpProcessResult { Success = false, Message = finalUserMessage };
-                        }
-                    }
-                }
-
+                //foreach (DataRow row in dtVal.Rows)
+                //{
+                //    foreach (var h in expectedHeaders)
+                //    {
+                //        if (string.IsNullOrWhiteSpace(row[h]?.ToString()))
+                //        {
+                //            string finalUserMessage = "Account Validation response file processing failed because the file structure does not match the expected response format. Required headers are missing or invalid. The file has been saved to history for review.";
+                //            Logger.Error($"Account Validation file data check failed: missing value in required column '{h}' at reference {row["APPLICATION_REFERENCE_NO"]}.");
+                //            return new SftpProcessResult { Success = false, Message = finalUserMessage };
+                //        }
+                //    }
+                //}
+                var dirName = region == "KASHMIR REGION" ? "K_MasterEmployeeUploads" : "J_MasterEmployeeUploads";
                 byte[] bytes = File.ReadAllBytes(csvFilePath);
-                UploadToDatabaseServer(bytes, csvFileName, "MasterEmployeeUploads", ftpSetting);
+                UploadToDatabaseServer(bytes, csvFileName, dirName, ftpSetting);
 
-                string dbPath = ftpSetting["localFilePath"] + "/DataFiles/MasterEmployeeUploads/" + csvFileName;
+                string dbPath = ftpSetting["localFilePath"] + $"/DataFiles/{dirName}/" + csvFileName;
                 
                 DALBaseClass objDal = new DALBaseClassHelper().GetDAL();
                 object[] spParams = new object[3];
@@ -605,14 +606,39 @@ namespace App.Web.Helper
         private void UploadToDatabaseServer(byte[] contents, string fileName, string subDir, Dictionary<string, string> ftpSetting)
         {
             string url = ftpSetting["ftpServerUrl"] + "/DataFiles/" + subDir + "/" + fileName;
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create(url);
-            request.Method = WebRequestMethods.Ftp.UploadFile;
-            request.Credentials = new NetworkCredential(ftpSetting["ftpUsername"], ftpSetting["ftpPassword"]);
-            using (Stream stream = request.GetRequestStream())
+            
+            System.Net.ServicePointManager.SecurityProtocol |= System.Net.SecurityProtocolType.Tls12 | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls;
+
+            int maxRetries = 3;
+            for (int i = 0; i < maxRetries; i++)
             {
-                stream.Write(contents, 0, contents.Length);
+                try
+                {
+                    FtpWebRequest request = (FtpWebRequest)WebRequest.Create(url);
+                    request.Method = WebRequestMethods.Ftp.UploadFile;
+                    request.Credentials = new NetworkCredential(ftpSetting["ftpUsername"], ftpSetting["ftpPassword"]);
+                    request.KeepAlive = false;
+                    request.UseBinary = true;
+                    request.UsePassive = (i % 2 == 0); // Try Passive, then Active on retry
+
+                    using (Stream stream = request.GetRequestStream())
+                    {
+                        stream.Write(contents, 0, contents.Length);
+                    }
+                    using (var resp = (FtpWebResponse)request.GetResponse()) { }
+                    
+                    break; // Success
+                }
+                catch (Exception ex)
+                {
+                    if (i == maxRetries - 1)
+                    {
+                        Logger.Error($"Failed to upload to DB server via FTP after {maxRetries} attempts: {url}", ex);
+                        throw;
+                    }
+                    System.Threading.Thread.Sleep(1000);
+                }
             }
-            using (var resp = (FtpWebResponse)request.GetResponse()) { }
         }
 
         private void SaveExcelAsCsv(string excelPath, string csvPath)
@@ -650,47 +676,33 @@ namespace App.Web.Helper
 
         private void SaveXlsAsCsv(string excelPath, string csvPath)
         {
-            string connString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={excelPath};Extended Properties='Excel 8.0;HDR=NO;IMEX=1;'";
             try
             {
-                using (var conn = new System.Data.OleDb.OleDbConnection(connString))
+                using (var stream = File.Open(excelPath, FileMode.Open, FileAccess.Read))
                 {
-                    conn.Open();
-                    var schemaTable = conn.GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Tables, null);
-                    if (schemaTable != null && schemaTable.Rows.Count > 0)
+                    using (var reader = ExcelDataReader.ExcelReaderFactory.CreateReader(stream))
                     {
-                        string sheetName = schemaTable.Rows[0]["TABLE_NAME"].ToString();
-                        using (var cmd = new System.Data.OleDb.OleDbCommand($"SELECT * FROM [{sheetName}]", conn))
-                        using (var adapter = new System.Data.OleDb.OleDbDataAdapter(cmd))
+                        var result = reader.AsDataSet(new ExcelDataReader.ExcelDataSetConfiguration()
                         {
-                            var dt = new DataTable();
-                            adapter.Fill(dt);
+                            ConfigureDataTable = (_) => new ExcelDataReader.ExcelDataTableConfiguration()
+                            {
+                                UseHeaderRow = false
+                            }
+                        });
+
+                        if (result.Tables.Count > 0)
+                        {
+                            var dt = result.Tables[0];
                             WriteDataTableToCsv(dt, csvPath);
                             return;
                         }
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                string fallbackConnString = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={excelPath};Extended Properties='Excel 8.0;HDR=NO;IMEX=1;'";
-                using (var conn = new System.Data.OleDb.OleDbConnection(fallbackConnString))
-                {
-                    conn.Open();
-                    var schemaTable = conn.GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Tables, null);
-                    if (schemaTable != null && schemaTable.Rows.Count > 0)
-                    {
-                        string sheetName = schemaTable.Rows[0]["TABLE_NAME"].ToString();
-                        using (var cmd = new System.Data.OleDb.OleDbCommand($"SELECT * FROM [{sheetName}]", conn))
-                        using (var adapter = new System.Data.OleDb.OleDbDataAdapter(cmd))
-                        {
-                            var dt = new DataTable();
-                            adapter.Fill(dt);
-                            WriteDataTableToCsv(dt, csvPath);
-                            return;
-                        }
-                    }
-                }
+                Logger.Error("Error converting XLS to CSV using ExcelDataReader", ex);
+                throw new Exception("Error reading XLS file: " + ex.Message, ex);
             }
         }
 
@@ -792,15 +804,46 @@ namespace App.Web.Helper
             DataTable dt = new DataTable();
             using (StreamReader sr = new StreamReader(filePath))
             {
-                string line = sr.ReadLine();
-                if (string.IsNullOrEmpty(line)) return dt;
-                string[] headers = line.Split(',');
-                foreach (string header in headers) dt.Columns.Add(header.Trim());
+                string[] headers = null;
+                var csvSplitPattern = new System.Text.RegularExpressions.Regex(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+
                 while (!sr.EndOfStream)
                 {
-                    string[] rows = sr.ReadLine().Split(',');
+                    string line = sr.ReadLine();
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+                    
+                    string[] fields = csvSplitPattern.Split(line).Select(s => s.Trim().Trim('"').Replace("\"\"", "\"")).ToArray();
+                    if (fields.All(string.IsNullOrWhiteSpace)) continue;
+                    
+                    int nonEmptyCount = fields.Count(f => !string.IsNullOrWhiteSpace(f));
+                    if (nonEmptyCount <= 1) continue; // skip title row
+                    
+                    headers = fields;
+                    foreach (string header in headers)
+                    {
+                        string colName = header;
+                        int copyIdx = 1;
+                        while(dt.Columns.Contains(colName)) { colName = header + "_" + copyIdx++; }
+                        dt.Columns.Add(colName);
+                    }
+                    break;
+                }
+
+                if (headers == null) return dt;
+
+                while (!sr.EndOfStream)
+                {
+                    string line = sr.ReadLine();
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+                    
+                    string[] fields = csvSplitPattern.Split(line).Select(s => s.Trim().Trim('"').Replace("\"\"", "\"")).ToArray();
+                    if (fields.All(string.IsNullOrWhiteSpace)) continue;
+                    
                     DataRow dr = dt.NewRow();
-                    for (int i = 0; i < Math.Min(headers.Length, rows.Length); i++) dr[i] = rows[i].Trim();
+                    for (int i = 0; i < Math.Min(headers.Length, fields.Length); i++)
+                    {
+                        dr[i] = fields[i];
+                    }
                     dt.Rows.Add(dr);
                 }
             }
