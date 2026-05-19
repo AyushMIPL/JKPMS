@@ -4076,7 +4076,7 @@ namespace App.Web.Controllers
                 string username = ftpSetting["sftpUsername"];
                 string password = ftpSetting["sftpPassword"];
                 // Dynamic validation upload path
-                string remoteDirectory = Helper.Helper.GetRegionBasedValidationPath(ftpSetting["sftpFilePath"], region) + "/Outbox/";
+                string remoteDirectory = Helper.Helper.GetSftpPath(ftpSetting["sftpFilePath"], region, Helper.Helper.SftpModule.Validation, Helper.Helper.SftpFolder.Request);
                 string localfilepathSFTP = Server.MapPath("~/" + ftpSetting["sftpPrivateKeyPath"]);
                 
                 var keyFile = new PrivateKeyFile(localfilepathSFTP);
@@ -5507,7 +5507,7 @@ namespace App.Web.Controllers
                         string password = ftpSetting["sftpPassword"];
                         string localFilePath = excelFilePath;
                         // Dynamic region-based payment path
-                        string remoteDirectory = Helper.Helper.GetRegionBasedPaymentPath(ftpSetting["sftpFilePath"], region) + "/Outbox/";
+                        string remoteDirectory = Helper.Helper.GetSftpPath(ftpSetting["sftpFilePath"], region, Helper.Helper.SftpModule.Payment, Helper.Helper.SftpFolder.Request);
                         string localfilepathSFTP = Server.MapPath("~/" + ftpSetting["sftpPrivateKeyPath"]);
 
                         var nn = Path.Combine(remoteDirectory, formattedName);

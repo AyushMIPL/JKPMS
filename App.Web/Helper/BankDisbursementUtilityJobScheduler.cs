@@ -167,11 +167,11 @@ namespace App.Web.Helper
             int port = Convert.ToInt32(ftpSetting["sftpPort"]); //SFTP default port is 22
             string username = ftpSetting["sftpUsername"];
             string password = ftpSetting["sftpPassword"];
-            string remoteDirectory = Helper.GetRegionBasedPaymentPath(ftpSetting["sftpFilePath"], region) + "/Inbox/";
+            string remoteDirectory = Helper.GetSftpPath(ftpSetting["sftpFilePath"], region, Helper.SftpModule.Payment, Helper.SftpFolder.Response);
 
-            string inboxDestinationDir = Helper.GetRegionBasedPaymentPath(ftpSetting["sftpFilePath"], region) + "/Inbox/Processed/";
-            string outboxSourceDir = Helper.GetRegionBasedPaymentPath(ftpSetting["sftpFilePath"], region) + "/Outbox/";
-            string outboxDestinationDir = Helper.GetRegionBasedPaymentPath(ftpSetting["sftpFilePath"], region) + "/Outbox/Processed/";
+            string inboxDestinationDir = remoteDirectory + "Processed/";
+            string outboxSourceDir = Helper.GetSftpPath(ftpSetting["sftpFilePath"], region, Helper.SftpModule.Payment, Helper.SftpFolder.Request);
+            string outboxDestinationDir = outboxSourceDir + "Processed/";
 
 
             var keyFile = new PrivateKeyFile(ftpSetting["sftpPrivateKeyPath"]);

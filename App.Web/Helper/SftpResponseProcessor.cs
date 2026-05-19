@@ -162,11 +162,11 @@ namespace App.Web.Helper
 
                 if (responseType == "Disbursement")
                 {
-                    remoteDirectory = Helper.GetRegionBasedPaymentPath(sftpBase, targetRegionName) + "/Inbox/";
+                    remoteDirectory = Helper.GetSftpPath(sftpBase, targetRegionName, Helper.SftpModule.Payment, Helper.SftpFolder.Response);
                 }
                 else
                 {
-                    remoteDirectory = Helper.GetRegionBasedValidationPath(sftpBase, targetRegionName) + "/Inbox/";
+                    remoteDirectory = Helper.GetSftpPath(sftpBase, targetRegionName, Helper.SftpModule.Validation, Helper.SftpFolder.Response);
                 }
 
                 string currentDirectoryPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).Replace("file:\\", "").Replace("\\bin", "");
@@ -583,11 +583,11 @@ namespace App.Web.Helper
                 string outboxSource = "";
                 if (type == "Validation")
                 {
-                    outboxSource = Helper.GetRegionBasedValidationPath(sftpBase, targetRegionName) + "/Outbox/";
+                    outboxSource = Helper.GetSftpPath(sftpBase, targetRegionName, Helper.SftpModule.Validation, Helper.SftpFolder.Request);
                 }
                 else if (type == "Disbursement")
                 {
-                    outboxSource = Helper.GetRegionBasedPaymentPath(sftpBase, targetRegionName) + "/Outbox/";
+                    outboxSource = Helper.GetSftpPath(sftpBase, targetRegionName, Helper.SftpModule.Payment, Helper.SftpFolder.Request);
                 }
 
                 if (!string.IsNullOrEmpty(outboxSource) && client.Exists(outboxSource))
@@ -615,6 +615,7 @@ namespace App.Web.Helper
                 try
                 {
                     FtpWebRequest request = (FtpWebRequest)WebRequest.Create(url);
+
                     request.Method = WebRequestMethods.Ftp.UploadFile;
                     request.Credentials = new NetworkCredential(ftpSetting["ftpUsername"], ftpSetting["ftpPassword"]);
                     request.KeepAlive = false;

@@ -185,6 +185,47 @@ namespace App.Web.Helper
                 : $"{basePath}/Jammu/AccountValidation";
         }
 
+        public enum SftpModule { Payment, Validation }
+        public enum SftpFolder { Request, Response }
+
+        public static string GetSftpPath(string basePath, string region, SftpModule module, SftpFolder folder)
+        {
+            if (string.IsNullOrEmpty(region))
+            {
+                var provider = new App.Data.CurrentRegionProvider();
+                region = provider.GetCurrentRegion();
+            }
+            else
+            {
+                try
+                {
+                    using (var db = new AppDbContext(new ConnectionStringProvider().GetConnectionString()))
+                    {
+                        var district = db.MasterDistrict.FirstOrDefault(d => d.Name.ToUpper() == region.Trim().ToUpper());
+                        if (district != null)
+                        {
+                            var parentRegionObj = db.MasterRegion.FirstOrDefault(r => r.Id == district.RegionId);
+                            if (parentRegionObj != null)
+                            {
+                                region = parentRegionObj.Name;
+                            }
+                        }
+                    }
+                }
+                catch { }
+            }
+
+            bool isTest = ConfigurationManager.AppSettings["sftptest"] == "true";
+            string testSegment = isTest ? "/Test" : "";
+            
+            string moduleSegment = module == SftpModule.Payment ? "PaymentFiles" : "AccountValidation";
+            string regionSegment = (region.Trim().ToUpper() == "KASHMIR REGION" || region.Trim().ToUpper() == "KASHMIR") ? "Kashmir" : "Jammu";
+            string folderSegment = folder.ToString();
+            
+            string path = $"{basePath}{testSegment}/{regionSegment}/{moduleSegment}/{folderSegment}/";
+            return path.Replace("//", "/");
+        }
+
         public static Dictionary<string, string> GetFTPSetting()
         {
             string ftpServerUrl = System.Web.Configuration.WebConfigurationManager.AppSettings["ftpServerUrl"];
