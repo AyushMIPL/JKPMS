@@ -42,6 +42,7 @@ using System.Web.SessionState;
 using System.Web.UI.WebControls;
 using System.Web.WebPages;
 using static App.Web.Helper.Helper;
+using log4net;
 
 namespace App.Web.Controllers
 {
@@ -80,7 +81,9 @@ namespace App.Web.Controllers
         private ConnectionStringProvider ConnectionStringProvider = new ConnectionStringProvider();
         private AppDbContext db;
         private AppDbContext _DbContext;
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(BankDisbursementUtility));
 
+        Logger _logger = new Logger();
         public PensionProcessController()
         {
             db = new AppDbContext(ConnectionStringProvider.GetConnectionString());
@@ -3646,8 +3649,11 @@ namespace App.Web.Controllers
         {
             try
             {
+                _logger.WriteInformation($"File Upload START ({model.UploadType}) @{DateTime.Now.ToString()} for district {model.Region}");
+
                 if (model.UploadedFile == null || model.UploadedFile.ContentLength == 0)
                 {
+                    _logger.WriteWarning("UploadPensionFileAjax: Uploaded file is null or empty.");
                     return Json(new { success = false, message = "Please select a valid file." });
                 }
 
@@ -3656,6 +3662,7 @@ namespace App.Web.Controllers
 
                 if (extension != ".csv" && extension != ".xlsx" && extension != ".xls")
                 {
+                    _logger.WriteWarning($"UploadPensionFileAjax: Invalid file format '{extension}' for file '{fileName}'.");
                     return Json(new { success = false, message = "Invalid file format. Only .csv, .xlsx and .xls are allowed." });
                 }
 
@@ -3722,6 +3729,7 @@ namespace App.Web.Controllers
                     catch (Exception ex)
                     {
                         System.IO.File.Delete(webPath);
+                        _logger.WriteError("UploadPensionFileAjax: File Validation failed", ex);
                         return Json(new { success = false, message = "File Validation failed: " + ex.Message });
                     }
                 }
@@ -3846,6 +3854,7 @@ namespace App.Web.Controllers
                     catch (Exception ex)
                     {
                         System.IO.File.Delete(webPath);
+                        _logger.WriteError("UploadPensionFileAjax: Disbursement file validation failed", ex);
                         return Json(new { success = false, message = "Disbursement file validation failed: " + ex.Message });
                     }
                 }
@@ -3950,6 +3959,7 @@ namespace App.Web.Controllers
                     {
                         history.Status = "Failed";
                         history.Remarks = "SFTP Forwarding failed: " + ex.Message;
+                        _logger.WriteError("UploadPensionFileAjax: SFTP Forwarding failed for validation file", ex);
                     }
                 }
                 else
@@ -3965,14 +3975,17 @@ namespace App.Web.Controllers
                     {
                         history.Status = "Failed";
                         history.Remarks = "Error sending to bank: " + ex.Message;
+                        _logger.WriteError("UploadPensionFileAjax: Error sending disbursement file to bank", ex);
                     }
                 }
 
                 db.SaveChanges();
+                _logger.WriteInformation($"UploadPensionFileAjax ({model.UploadType}): File {uniqueFileName} successfully processed. Status: {history.Status}");
                 return Json(new { success = true, status = history.Status, message = history.Remarks });
             }
             catch (Exception ex)
             {
+                _logger.WriteError("UploadPensionFileAjax: An unexpected error occurred", ex);
                 return Json(new { success = false, message = "An error occurred: " + ex.Message });
             }
         }

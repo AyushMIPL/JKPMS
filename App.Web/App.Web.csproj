@@ -1783,7 +1783,6 @@
     <Content Include="Views\Emails\ResponseValidationFileBank.Html.cshtml" />
     <Content Include="Views\MasterPensioner\DuplicateAccounts.cshtml" />
     <Content Include="Views\Account\ApplicantsEdit.cshtml" />
-
     <Content Include="Views\Error\NotFound.cshtml" />
     <Content Include="Views\Account\ChooseFinancialYear.cshtml" />
     <Content Include="Views\ContributorPersonalDetails\_ContributorListForMarriage.cshtml" />
@@ -1912,6 +1911,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Logs\" />
     <Folder Include="Views\Shared\DisplayTemplates\" />
   </ItemGroup>
   <ItemGroup>
