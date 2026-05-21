@@ -29,6 +29,10 @@ namespace App.Web
             BundleTable.EnableOptimizations = false;
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             AutoMapperConfig.Register();
+            
+            // Initialize log4net
+            log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo(Server.MapPath("~/Log4Net.config")));
+
             //--Captcha-- 
             var captchaManager = (DefaultCaptchaManager)CaptchaUtils.CaptchaManager;
             //-- this will generate  alphanumeric string------------------
