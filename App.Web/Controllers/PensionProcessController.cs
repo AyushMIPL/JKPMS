@@ -2613,11 +2613,10 @@ namespace App.Web.Controllers
                 // new code 
                 if (generatePensionProcessModel.PayDate != null)
                 {
-                    string paydate = generatePensionProcessModel.PayDate.Value.ToShortDateString();
-                    DateTime parsedDate = Convert.ToDateTime(paydate, System.Globalization.CultureInfo.GetCultureInfo("ur-PK").DateTimeFormat);
+                    DateTime parsedDate = generatePensionProcessModel.PayDate.Value;
 
-                    string Paymonth = parsedDate.ToString("MM");
-                    string Payyear = parsedDate.ToString("yyyy");
+                    string Paymonth = parsedDate.ToString("MM", System.Globalization.CultureInfo.InvariantCulture);
+                    string Payyear = parsedDate.ToString("yyyy", System.Globalization.CultureInfo.InvariantCulture);
                     string[] regions = generatePensionProcessModel.RegionNames.Split(',').Select(region => region.Trim()).ToArray();
                     var filteredRegions = regions.Where(region => region != "JAMMU REGION" && region != "KASHMIR REGION");
                     string Paydistricts = string.Join(", ", filteredRegions);
@@ -2796,27 +2795,11 @@ namespace App.Web.Controllers
                 Paysearch = ShowActiveBatch();
 
                 #region Execute Report
-                //Added by Neeraj on 16/07/2015 , To implement batch process, Nedd to add
-                //A parameter 'ref pObjBatch' in 'GetPayslipDetails' function
-                //and remove comment from the code written for batch process logic in 'PYBatchManagement' region.
-                //and remove comment from 'pObjBatch.searchcriteria'.
-                #region PYBatchManagement
-
-
-                //Get Payroll Active batch,if any. 
                 List<DVOPYBatchProcessStybatchr> objBatchList = BLLPYBatchProcessStybatchr.GetActiveBatch();
-
 
                 if (generatePensionProcessModel.DepositDate == null)
                 {
-                    //TempData["error"] = "Select Deposit Date First";
-                    generatePensionProcessModel.DepositDate = DVOApplicationUserInfo.DateConvertion(generatePensionProcessModel.DepositDate); ;
-                    //return PartialView("~/Views/PensionProcess/DirectDeposits/PrintBankListing.cshtml", generatePensionProcessModel);
-                }
-                if (string.IsNullOrWhiteSpace(generatePensionProcessModel.BanckCode))
-                {
-                    //TempData["error"] = "Select Bank Code First";
-                    //return PartialView("~/Views/PensionProcess/DirectDeposits/PrintBankListing.cshtml", generatePensionProcessModel);
+                    generatePensionProcessModel.DepositDate = DVOApplicationUserInfo.DateConvertion(generatePensionProcessModel.DepositDate);
                 }
 
                 if (objBatchList != null && objBatchList.Count > 0)
@@ -2825,16 +2808,12 @@ namespace App.Web.Controllers
                 }
                 else
                 {
-                    //Utilities.ShowMessage("No Active Batch for Payroll Process,Please Create a New Batch", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     TempData["error"] = "No Active Batch for Payroll Process,Please Create a New Batch";
-                    //return PartialView("~/Views/PensionProcess/DirectDeposits/PrintBankListing.cshtml", generatePensionProcessModel);
                 }
                 #endregion PYBatchManagement
 
-
-                //Get data from database and bind with report                 
+                // Get data from database and bind with report                 
                 DVOddmStypddreAndStypddrd objSearch = new DVOddmStypddreAndStypddrd();
-
 
                 if (!string.IsNullOrWhiteSpace(generatePensionProcessModel.EmpType))
                 {
@@ -2848,6 +2827,7 @@ namespace App.Web.Controllers
                 {
                     objSearch.District = generatePensionProcessModel.RegionNames.Replace(", ", ",");
                 }
+
                 if (generatePensionProcessModel.DepositDate != null)
                 {
                     string payDate = Convert.ToDateTime(generatePensionProcessModel.DepositDate).ToString(DVOApplicationUserInfo.DateFormat, System.Globalization.CultureInfo.InvariantCulture);
@@ -2864,63 +2844,33 @@ namespace App.Web.Controllers
                     Paysearch.EOPDate = DVOApplicationUserInfo.DateConvertion(DateTime.Now);
                 }
 
-                //function of BLL layer will return DataSet which contains result of search process.            
-                DataSet ds = ReportingUtilities.GetDirectDepositeListing(ref objSearch, Paysearch, true);
-                //ds.WriteXmlSchema(@"D:\Sujeet_Sir\Project\JKPS\App.Web\Reports\DSDDL.xsd");
-                ViewBag.pybatchid = Paysearch.pybatchid;
-                if (ds.Tables[0].Rows.Count != 0)
+                // Capture required properties for background execution
+                int currentUserId = AppUserManager.GetUserId();
+                string currentRegion = GetRegionName();
+
+                // Start background process
+                HostingEnvironment.QueueBackgroundWorkItem(ct =>
                 {
-
-                    //List<string> districtList = generatePensionProcessModel.RegionNames.Split(',').Select(d => d.Trim().ToUpper()).ToList();
-
-                    //var District = db.MasterEmployees.Where(x => districtList.Any(b => b == x.SelectDistrict.Trim().ToUpper())).AsEnumerable().GroupBy(p => p.SelectDistrict.Trim().ToUpper()).Select(a => a.FirstOrDefault().SelectDistrict.Trim().ToUpper()).ToList();
-                    var districtList = new HashSet<string>(generatePensionProcessModel.RegionNames.Split(',').Select(d => d.Trim().ToUpper()).ToList());
-                    var District = db.MasterEmployees.AsNoTracking().Where(x => districtList.Contains(x.SelectDistrict.Trim().ToUpper()))
-                        .Select(x => x.SelectDistrict.Trim().ToUpper()).Distinct().ToList();
-
-                    bool GenerateCheques_user = false;
-
-                    for (int i = 0; i < District.Count; i++)
+                    try
                     {
-                        if (i == District.Count - 1)
-                        {
-                            GenerateCheques_user = false;
-                        }
-
-
-                        DirectGenerateBankMedia(Paysearch, generatePensionProcessModel, District[i], GenerateCheques_user);
+                        App.Web.Helper.PensionBackgroundJob.ExecutePensionGeneration(objSearch, Paysearch, generatePensionProcessModel, currentRegion, currentUserId);
                     }
+                    catch (Exception)
+                    {
+                        // Background job failed
+                    }
+                });
 
-                    // code added on 19 sep 2024 to update Process_DirectDeposit_Header (create_date,used)
-                    DataSet dsIsUsed_ = new DataSet();
-                    StringBuilder SQLisUsed = new StringBuilder();
-                    DALBaseClassHelper objDALBaseClassHelperisUsed = new DALBaseClassHelper();
-                    DALBaseClass objDalBaseClass = objDALBaseClassHelperisUsed.GetDAL();
-                    object objTransaction = objDALBaseClassHelperisUsed.GetTransactionObject();
-
-                    SQLisUsed.Append("UPDATE Process_DirectDeposit_Header SET used='Y' where pybatchid=" + Paysearch.pybatchid.ToString() + "");
-
-                    SqlDataAdapter daisUsed = new SqlDataAdapter(SQLisUsed.ToString(), objDalBaseClass.ConnectionString);
-                    daisUsed.Fill(dsIsUsed_);
-                    TempData["success"] = "File has been successfully sent.";
-                }
-                else
-                {
-                    TempData["error"] = "No records to process";
-                }
+                TempData["success"] = "Pension generation process has been started in the background. Please check the status after some time.";
+                
                 ViewBagPensionDetailByMonthYear = BLLPYBatchProcessStybatchr.PensionDetailByMonthYear();
                 ViewBag.CurrentMonthBatch = ViewBagPensionDetailByMonthYear;
                 IsPendioGenrated = true;
                 ViewBag.ispensiongenerated = IsPendioGenrated;
                 return PartialView("~/Views/PensionProcess/DirectDeposits/PrintBankListing.cshtml", generatePensionProcessModel);
-                #endregion
             }
             catch (Exception ex)
             {
-                //ReportViewer.ReportSource = null;
-                //SatyaPay.StyleUtility.Reports_Splasher.Close();
-                //ExceptionManagement.ExceptionManager.Publish(ex);
-                //MessageBox.Show(ex.Message, "Satya Pay.", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 TempData["error"] = "Please Try Again..." + ex.Message;
                 return PartialView("~/Views/PensionProcess/DirectDeposits/PrintBankListing.cshtml", generatePensionProcessModel);
             }
@@ -3016,10 +2966,9 @@ namespace App.Web.Controllers
                     {
                         Paysearch.PayrollDate = DVOApplicationUserInfo.DateConvertion(DateTime.Now);
                     }
-                    string paydate = Paysearch.PayrollDate.Value.ToShortDateString();
-                    DateTime parsedDate = Convert.ToDateTime(paydate, System.Globalization.CultureInfo.GetCultureInfo("ur-PK").DateTimeFormat);
+                    DateTime parsedDate = Paysearch.PayrollDate.Value;
                     objDVOddmStypddreAndStypddrd.District = disData;
-                    string Paydate_value = parsedDate.ToString("MM/dd/yyyy");
+                    string Paydate_value = parsedDate.ToString("MM/dd/yyyy", System.Globalization.CultureInfo.InvariantCulture);
                     DataTable objDataTable;
 
                     #region Create excel file with 4 empty column

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -15,21 +15,31 @@ namespace App.Data
         public string GetConnectionString()
         {
             string connection = "AppConnection";
+            string RegionName = null;
+
             if (HttpContext.Current !=null && HttpContext.Current.Session != null)
             {
                 var Region = HttpContext.Current.Session["RegionName"];
                 if (Region != null)
                 {
-                    string RegionName = HttpContext.Current.Session["RegionName"] as string;
-                    if (!string.IsNullOrEmpty(RegionName))
-                    {
-                        if (RegionName == "KASHMIR REGION")
-                            connection = "AppConnection1";
-                        else
-                            connection = "AppConnection";
-                    }
+                    RegionName = HttpContext.Current.Session["RegionName"] as string;
                 }
             }
+
+            // Fallback for background threads
+            if (string.IsNullOrEmpty(RegionName))
+            {
+                RegionName = System.Runtime.Remoting.Messaging.CallContext.LogicalGetData("RegionName") as string;
+            }
+
+            if (!string.IsNullOrEmpty(RegionName))
+            {
+                if (RegionName.Trim().ToUpper() == "KASHMIR REGION" || RegionName.Trim().ToUpper() == "KASHMIR")
+                    connection = "AppConnection1";
+                else
+                    connection = "AppConnection";
+            }
+            
             return ConfigurationManager.ConnectionStrings[connection].ConnectionString;
         }
 

@@ -1,0 +1,2 @@
+20-05-2026 18:05:26 Error in DirectGenerateBankMediaBackground: System.NullReferenceException: Object reference not set to an instance of an object.
+   at App.Web.Helper.PensionBackgroundJob.DirectGenerateBankMediaBackground(PensionProcessViewModel Paysearch, GeneratePensionProcessModel generatePensionProcessModel, String District, Boolean GenerateCheques_user, String region, Int32 userId, String connectionString) in D:\Ayush\SourceCode\Official\JKPMS_Git\App.Web\Helper\PensionBackgroundJob.cs:line 118

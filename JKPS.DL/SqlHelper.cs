@@ -958,7 +958,7 @@ namespace JKPS.DL
       }
       catch (Exception ex)
       {
-        //throw ex;//Commented by Neeraj on dated 26Nov2020
+        throw ex;
       }
       return ds;
     }
