@@ -115,7 +115,9 @@ namespace App.Web.Helper
                 List<DVOMasterBankDetails> listDVOMasterBankDetails = new List<DVOMasterBankDetails>();
                 System.Collections.ArrayList _arrBankCodes = new System.Collections.ArrayList();
                 
-                string[] bankCodeArr = generatePensionProcessModel.BanckCode.Split(',');
+                string[] bankCodeArr = string.IsNullOrEmpty(generatePensionProcessModel.BanckCode) 
+                    ? new string[0] 
+                    : generatePensionProcessModel.BanckCode.Split(',');
                 string _selectedBankCodes = string.Empty;
                 foreach (var b in bankCodeArr)
                 {

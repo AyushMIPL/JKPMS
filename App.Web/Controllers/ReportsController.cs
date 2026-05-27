@@ -1,4 +1,4 @@
-﻿using App.Data;
+using App.Data;
 using App.Data.Entities;
 using App.Data.ViewModels;
 using App.Web.Entities;
@@ -518,10 +518,10 @@ namespace App.Web.Controllers
                 SQL.Append(" ELSE '' END ) as ApplicantName, SelectDistrict from MasterEmployee LEFT JOIN MasterDistrict on MasterDistrict.[Name] = MasterEmployee.SelectDistrict where MasterDistrict.Id in (select DistrictId from SecRoleLocationModule where RoleId = " + RoleId + " and UserId = " + UserId + ") )select distinct me.empl_code,me.Gender,me.Age_InYears,me.ApplicantName,et.[Description] as SchemeType, ");
                 SQL.Append(" me.ApplicationReferenceNo as ApprovalDate,me.[Address],eb.bank_acct_no as [AccountNo],eb.BankName,eb.APPLICANT_BANK_IFSC_CODE as [IFSC_Code], ");
                 SQL.Append(" pe.pay_date as PaidOn,pe.amount as [Amount],isnull(pe.[Status],'Status Not Updated') as [Status],CONCAT(isnull(pe.[Reason/Remarks],''),' ',(CASE WHEN isnull(pe.[Status],'Status Not Updated') = 'OK' AND ISNULL(Process_PayIncomes.amount, 0) != 0 THEN CONCAT('( Arrear : ',CAST(FORMAT(ISNULL(Process_PayIncomes.amount, 0), 'N2') AS NVARCHAR(50)), ')') ELSE '' END) )  as [Reason], SelectDistrict as [District], pe.pay_doc_no AS PayDocNo, pe.[TransactionRefrenceNo.] as TransactionRefrenceNo from cte me ");
-                SQL.Append(" left join Process_DirectDeposit_Details pe on  pe.empl_code = me.empl_code LEFT JOIN Process_PayIncomes ON Process_PayIncomes.doc_no = pe.pay_doc_no AND Process_PayIncomes.inc_code = (SELECT TOP 1 inc_code FROM MasterIncCodes WHERE [description] = 'Arrear') ");
+                SQL.Append(" left join (SELECT empl_code, pay_date, amount, [Status], [Reason/Remarks], CAST(pay_doc_no AS VARCHAR(50)) AS pay_doc_no, CAST([TransactionRefrenceNo.] AS VARCHAR(100)) AS [TransactionRefrenceNo.] FROM Process_DirectDeposit_Details UNION ALL SELECT eb.empl_code, th.TxnDate AS pay_date, TRY_CAST(td.Amount AS DECIMAL(18,2)) AS amount, td.[Status], td.Remarks AS [Reason/Remarks], CAST(td.TransactionReference AS VARCHAR(50)) AS pay_doc_no, CAST(td.TransactionReference AS VARCHAR(100)) AS [TransactionRefrenceNo.] FROM txnDetail td INNER JOIN txnHeader th ON td.HeaderId = th.HeaderId INNER JOIN MasterEmpBankDetails eb ON td.[Application Reference No#] = CAST(eb.Application_Reference_no AS NVARCHAR(50))) pe on pe.empl_code = me.empl_code LEFT JOIN Process_PayIncomes ON Process_PayIncomes.doc_no = TRY_CAST(pe.pay_doc_no AS BIGINT) AND Process_PayIncomes.inc_code = (SELECT TOP 1 inc_code FROM MasterIncCodes WHERE [description] = 'Arrear') ");
                 SQL.Append(" left join MasterEmpBankDetails eb on eb.empl_code = me.empl_code ");
                 SQL.Append(" left join MasterEmpType et on et.type_code = me.type_code ");
-                SQL.Append(" left join Process_PayEmployee PPE ON PPE.doc_no = pe.pay_doc_no AND PPE.ok_to_post = 'P' ");
+                SQL.Append(" left join Process_PayEmployee PPE ON PPE.doc_no = TRY_CAST(pe.pay_doc_no AS BIGINT) AND PPE.ok_to_post = 'P' ");
                 SQL.Append(" AND PPE.print_check = 'N'");
                 SQL.Append(" AND PPE.deposit = 'Y' ");
                 if (!string.IsNullOrEmpty(WhereClause))
@@ -540,10 +540,10 @@ namespace App.Web.Controllers
                 NewSQL.Append(" ELSE '' END ) as ApplicantName, SelectDistrict from MasterEmployee LEFT JOIN MasterDistrict on MasterDistrict.[Name] = MasterEmployee.SelectDistrict where MasterDistrict.Id in (select DistrictId from SecRoleLocationModule where RoleId = " + RoleId + " and UserId = " + UserId + ") )select distinct me.empl_code,me.Gender,me.Age_InYears,me.ApplicantName,et.[Description] as SchemeType, ");
                 NewSQL.Append(" me.ApplicationReferenceNo as ApprovalDate,me.[Address],eb.bank_acct_no as [AccountNo],eb.BankName,eb.APPLICANT_BANK_IFSC_CODE as [IFSC_Code], ");
                 NewSQL.Append(" pe.pay_date as PaidOn,pe.amount as [Amount],isnull(pe.[Status],'Status Not Updated') as [Status],CONCAT(isnull(pe.[Reason/Remarks],''),' ',(CASE WHEN isnull(pe.[Status],'Status Not Updated') = 'OK' AND ISNULL(Process_PayIncomes.amount, 0) != 0 THEN CONCAT('( Arrear : ',CAST(FORMAT(ISNULL(Process_PayIncomes.amount, 0), 'N2') AS NVARCHAR(50)), ')') ELSE '' END) )  as [Reason], SelectDistrict as [District], pe.pay_doc_no AS PayDocNo, pe.[TransactionRefrenceNo.] as TransactionRefrenceNo, COUNT(*) OVER() AS TotalRecordCount from cte me ");
-                NewSQL.Append(" left join Process_DirectDeposit_Details pe on  pe.empl_code = me.empl_code LEFT JOIN Process_PayIncomes ON Process_PayIncomes.doc_no = pe.pay_doc_no AND Process_PayIncomes.inc_code = (SELECT TOP 1 inc_code FROM MasterIncCodes WHERE [description] = 'Arrear') ");
+                NewSQL.Append(" left join (SELECT empl_code, pay_date, amount, [Status], [Reason/Remarks], CAST(pay_doc_no AS VARCHAR(50)) AS pay_doc_no, CAST([TransactionRefrenceNo.] AS VARCHAR(100)) AS [TransactionRefrenceNo.] FROM Process_DirectDeposit_Details UNION ALL SELECT eb.empl_code, th.TxnDate AS pay_date, TRY_CAST(td.Amount AS DECIMAL(18,2)) AS amount, td.[Status], td.Remarks AS [Reason/Remarks], CAST(td.TransactionReference AS VARCHAR(50)) AS pay_doc_no, CAST(td.TransactionReference AS VARCHAR(100)) AS [TransactionRefrenceNo.] FROM txnDetail td INNER JOIN txnHeader th ON td.HeaderId = th.HeaderId INNER JOIN MasterEmpBankDetails eb ON td.[Application Reference No#] = CAST(eb.Application_Reference_no AS NVARCHAR(50))) pe on pe.empl_code = me.empl_code LEFT JOIN Process_PayIncomes ON Process_PayIncomes.doc_no = TRY_CAST(pe.pay_doc_no AS BIGINT) AND Process_PayIncomes.inc_code = (SELECT TOP 1 inc_code FROM MasterIncCodes WHERE [description] = 'Arrear') ");
                 NewSQL.Append(" left join MasterEmpBankDetails eb on eb.empl_code = me.empl_code ");
                 NewSQL.Append(" left join MasterEmpType et on et.type_code = me.type_code ");
-                NewSQL.Append(" left join Process_PayEmployee PPE ON PPE.doc_no = pe.pay_doc_no AND PPE.ok_to_post = 'P' ");
+                NewSQL.Append(" left join Process_PayEmployee PPE ON PPE.doc_no = TRY_CAST(pe.pay_doc_no AS BIGINT) AND PPE.ok_to_post = 'P' ");
                 NewSQL.Append(" AND PPE.print_check = 'N'");
                 NewSQL.Append(" AND PPE.deposit = 'Y' ");
                 if (!string.IsNullOrEmpty(WhereClause))
@@ -684,10 +684,10 @@ namespace App.Web.Controllers
             SQL.Append(" ELSE '' END ) as ApplicantName from MasterEmployee LEFT JOIN MasterDistrict on MasterDistrict.[Name] = MasterEmployee.SelectDistrict where MasterDistrict.Id in (select DistrictId from SecRoleLocationModule where RoleId = " + RoleId + " and UserId = " + UserId + ") )select distinct me.empl_code,me.Gender,me.Age_InYears,me.ApplicantName,et.[Description] as SchemeType, ");
             SQL.Append(" me.ApplicationReferenceNo as ApprovalDate,me.[Address],eb.bank_acct_no as [AccountNo],eb.BankName,eb.APPLICANT_BANK_IFSC_CODE as [IFSC_Code], ");
             SQL.Append(" pe.pay_date as PaidOn,pe.amount as [Amount],isnull(pe.[Status],'Status Not Updated') as [Status],isnull(pe.[Reason/Remarks],'') as [Reason] from cte me ");
-            SQL.Append(" left join Process_DirectDeposit_Details pe on  pe.empl_code = me.empl_code ");
+            SQL.Append(" left join (SELECT empl_code, pay_date, amount, [Status], [Reason/Remarks], CAST(pay_doc_no AS VARCHAR(50)) AS pay_doc_no, CAST([TransactionRefrenceNo.] AS VARCHAR(100)) AS [TransactionRefrenceNo.] FROM Process_DirectDeposit_Details UNION ALL SELECT eb.empl_code, th.TxnDate AS pay_date, TRY_CAST(td.Amount AS DECIMAL(18,2)) AS amount, td.[Status], td.Remarks AS [Reason/Remarks], CAST(td.TransactionReference AS VARCHAR(50)) AS pay_doc_no, CAST(td.TransactionReference AS VARCHAR(100)) AS [TransactionRefrenceNo.] FROM txnDetail td INNER JOIN txnHeader th ON td.HeaderId = th.HeaderId INNER JOIN MasterEmpBankDetails eb ON td.[Application Reference No#] = CAST(eb.Application_Reference_no AS NVARCHAR(50))) pe on pe.empl_code = me.empl_code ");
             SQL.Append(" left join MasterEmpBankDetails eb on eb.empl_code = me.empl_code ");
             SQL.Append(" left join MasterEmpType et on et.type_code = me.type_code ");
-            SQL.Append(" left join Process_PayEmployee PPE ON PPE.doc_no = pe.pay_doc_no AND PPE.ok_to_post = 'P' ");
+            SQL.Append(" left join Process_PayEmployee PPE ON PPE.doc_no = TRY_CAST(pe.pay_doc_no AS BIGINT) AND PPE.ok_to_post = 'P' ");
             SQL.Append(" AND PPE.print_check = 'N'");
             SQL.Append(" AND PPE.deposit = 'Y' ");
             if (!string.IsNullOrEmpty(WhereClause))
@@ -745,10 +745,10 @@ namespace App.Web.Controllers
             SQL.Append(" ELSE '' END ) as ApplicantName from MasterEmployee LEFT JOIN MasterDistrict on MasterDistrict.[Name] = MasterEmployee.SelectDistrict where MasterDistrict.Id in (select DistrictId from SecRoleLocationModule where RoleId = " + RoleId + " and UserId = " + UserId + ") )select distinct me.empl_code,me.Gender,me.Age_InYears,me.ApplicantName,et.[Description] as SchemeType, ");
             SQL.Append(" me.ApplicationReferenceNo as ApprovalDate,me.[Address],eb.bank_acct_no as [AccountNo],eb.BankName,eb.APPLICANT_BANK_IFSC_CODE as [IFSC_Code], ");
             SQL.Append(" pe.pay_date as PaidOn,pe.amount as [Amount],isnull(pe.[Status],'Status Not Updated') as [Status],isnull(pe.[Reason/Remarks],'') as [Reason] from cte me ");
-            SQL.Append(" left join Process_DirectDeposit_Details pe on  pe.empl_code = me.empl_code ");
+            SQL.Append(" left join (SELECT empl_code, pay_date, amount, [Status], [Reason/Remarks], CAST(pay_doc_no AS VARCHAR(50)) AS pay_doc_no, CAST([TransactionRefrenceNo.] AS VARCHAR(100)) AS [TransactionRefrenceNo.] FROM Process_DirectDeposit_Details UNION ALL SELECT eb.empl_code, th.TxnDate AS pay_date, TRY_CAST(td.Amount AS DECIMAL(18,2)) AS amount, td.[Status], td.Remarks AS [Reason/Remarks], CAST(td.TransactionReference AS VARCHAR(50)) AS pay_doc_no, CAST(td.TransactionReference AS VARCHAR(100)) AS [TransactionRefrenceNo.] FROM txnDetail td INNER JOIN txnHeader th ON td.HeaderId = th.HeaderId INNER JOIN MasterEmpBankDetails eb ON td.[Application Reference No#] = CAST(eb.Application_Reference_no AS NVARCHAR(50))) pe on pe.empl_code = me.empl_code ");
             SQL.Append(" left join MasterEmpBankDetails eb on eb.empl_code = me.empl_code ");
             SQL.Append(" left join MasterEmpType et on et.type_code = me.type_code ");
-            SQL.Append(" left join Process_PayEmployee PPE ON PPE.doc_no = pe.pay_doc_no AND PPE.ok_to_post = 'P' ");
+            SQL.Append(" left join Process_PayEmployee PPE ON PPE.doc_no = TRY_CAST(pe.pay_doc_no AS BIGINT) AND PPE.ok_to_post = 'P' ");
             SQL.Append(" AND PPE.print_check = 'N'");
             SQL.Append(" AND PPE.deposit = 'Y' ");
             if (!string.IsNullOrEmpty(WhereClause))
@@ -912,15 +912,22 @@ namespace App.Web.Controllers
             int RoleId = db.UserRole.FirstOrDefault(x => x.UserId == UserId).RoleId;
             DataSet ds = new DataSet();
             StringBuilder SQL = new StringBuilder();
+            SQL.Append("WITH CombinedDeposit AS ( ");
+            SQL.Append("    SELECT empl_code, pay_date, amount, bank_acct_no, [Status], [Reason/Remarks], CAST([TransactionRefrenceNo.] AS VARCHAR(100)) AS [TransactionRefrenceNo.], TransactionDate FROM Process_DirectDeposit_Details ");
+            SQL.Append("    UNION ALL ");
+            SQL.Append("    SELECT eb.empl_code, th.TxnDate AS pay_date, TRY_CAST(td.Amount AS DECIMAL(18,2)) AS amount, eb.bank_acct_no, td.[Status], td.Remarks AS [Reason/Remarks], CAST(td.TransactionReference AS VARCHAR(100)) AS [TransactionRefrenceNo.], th.TxnDate AS TransactionDate FROM txnDetail td ");
+            SQL.Append("    INNER JOIN txnHeader th ON td.HeaderId = th.HeaderId ");
+            SQL.Append("    INNER JOIN MasterEmpBankDetails eb ON td.[Application Reference No#] = CAST(eb.Application_Reference_no AS NVARCHAR(50)) ");
+            SQL.Append(") ");
             SQL.Append("select distinct ApplicationReferenceno,CONCAT(NULLIF(isnull(me.first_name,''), ''), CASE  ");
             SQL.Append("WHEN me.middle_name IS NOT NULL AND me.middle_name != '' THEN ' ' + me.middle_name ELSE '' END, CASE WHEN me.last_name IS NOT NULL AND me.last_name != '' THEN ' ' + me.last_name  ");
             SQL.Append("ELSE '' END ) as ApplicantName,CONVERT(varchar, dd.pay_date, 103) AS pay_date,dd.amount,et.[Description] as type_code,CAST(DATEDIFF(YEAR, birthdate, GETDATE())  AS VARCHAR(10)) AS Age_InYears,Gender,concat(nullif(isnull(PresentVillageName,''),''), case when PresentHalqaPanchayatOrMunicipalityName is not null or PresentHalqaPanchayatOrMunicipalityName != '' ");
             SQL.Append("then ' ' + PresentHalqaPanchayatOrMunicipalityName else '' end, case when PresentTehsil is not null or PresentTehsil != '' ");
             SQL.Append("then ' ' + PresentTehsil else '' end, case when PresentDistrict is not null or PresentDistrict != '' then ");
-            SQL.Append("' ' + PresentDistrict else '' end) as [Address],dd.bank_acct_no,BankName,APPLICANT_BANK_IFSC_CODE as [IFSCCode],dd.[Status],me.SelectDistrict as [District],MONTH(PAY_DATE) AS MONTH,YEAR(PAY_DATE) AS YEAR, '" + fyear + "' AS FinacialYear, dd.[Reason/Remarks], dd.[TransactionRefrenceNo.] as TransactionRefrenceNo , CONVERT(varchar, dd.TransactionDate, 103) as TransactionDate  from Process_DirectDeposit_Details dd ");
+            SQL.Append("' ' + PresentDistrict else '' end) as [Address],dd.bank_acct_no,BankName,APPLICANT_BANK_IFSC_CODE as [IFSCCode],dd.[Status],me.SelectDistrict as [District],MONTH(dd.pay_date) AS MONTH,YEAR(dd.pay_date) AS YEAR, '" + fyear + "' AS FinacialYear, dd.[Reason/Remarks], dd.[TransactionRefrenceNo.] as TransactionRefrenceNo , CONVERT(varchar, dd.TransactionDate, 103) as TransactionDate  from CombinedDeposit dd ");
             SQL.Append("left join masterEmployee me on me.Empl_code = dd.Empl_code left join MasterEmpBankDetails mb on mb.empl_code = me.Empl_code ");
             SQL.Append(" left join MasterEmpType et on me.type_code = et.type_code ");
-            SQL.Append("left join MasterDistrict md on md.[Name] = me.SelectDistrict where Status = 'ok' and md.Id in (select DistrictId from SecRoleLocationModule where RoleId = " + RoleId + " and UserId = " + UserId + ") ");
+            SQL.Append("left join MasterDistrict md on md.[Name] = me.SelectDistrict where dd.Status = 'ok' and md.Id in (select DistrictId from SecRoleLocationModule where RoleId = " + RoleId + " and UserId = " + UserId + ") ");
             if (!string.IsNullOrEmpty(emplrId) && emplrId == "ALL")
                 SQL.Append("");
             //SQL.Append(" AND me.Type_Code = '" + "*" +  "'");
@@ -1039,15 +1046,22 @@ namespace App.Web.Controllers
             int RoleId = db.UserRole.FirstOrDefault(x => x.UserId == UserId).RoleId;
             DataSet ds = new DataSet();
             StringBuilder SQL = new StringBuilder();
+            SQL.Append("WITH CombinedDeposit AS ( ");
+            SQL.Append("    SELECT empl_code, pay_date, amount, bank_acct_no, [Status], [Reason/Remarks], CAST([TransactionRefrenceNo.] AS VARCHAR(100)) AS [TransactionRefrenceNo.], TransactionDate FROM Process_DirectDeposit_Details ");
+            SQL.Append("    UNION ALL ");
+            SQL.Append("    SELECT eb.empl_code, th.TxnDate AS pay_date, TRY_CAST(td.Amount AS DECIMAL(18,2)) AS amount, eb.bank_acct_no, td.[Status], td.Remarks AS [Reason/Remarks], CAST(td.TransactionReference AS VARCHAR(100)) AS [TransactionRefrenceNo.], th.TxnDate AS TransactionDate FROM txnDetail td ");
+            SQL.Append("    INNER JOIN txnHeader th ON td.HeaderId = th.HeaderId ");
+            SQL.Append("    INNER JOIN MasterEmpBankDetails eb ON td.[Application Reference No#] = CAST(eb.Application_Reference_no AS NVARCHAR(50)) ");
+            SQL.Append(") ");
             SQL.Append("select distinct ApplicationReferenceno,CONCAT(NULLIF(isnull(me.first_name,''), ''), CASE  ");
             SQL.Append("WHEN me.middle_name IS NOT NULL AND me.middle_name != '' THEN ' ' + me.middle_name ELSE '' END, CASE WHEN me.last_name IS NOT NULL AND me.last_name != '' THEN ' ' + me.last_name  ");
             SQL.Append("ELSE '' END ) as ApplicantName,CONVERT(varchar, dd.pay_date, 103) AS pay_date,dd.amount,et.[Description] as type_code,CAST(DATEDIFF(YEAR, birthdate, GETDATE())  AS VARCHAR(10)) AS Age_InYears,Gender,concat(nullif(isnull(PresentVillageName,''),''), case when PresentHalqaPanchayatOrMunicipalityName is not null or PresentHalqaPanchayatOrMunicipalityName != '' ");
             SQL.Append("then ' ' + PresentHalqaPanchayatOrMunicipalityName else '' end, case when PresentTehsil is not null or PresentTehsil != '' ");
             SQL.Append("then ' ' + PresentTehsil else '' end, case when PresentDistrict is not null or PresentDistrict != '' then ");
-            SQL.Append("' ' + PresentDistrict else '' end) as [Address],dd.bank_acct_no,BankName,APPLICANT_BANK_IFSC_CODE as [IFSCCode],dd.[Status],me.SelectDistrict as [District],MONTH(ISNULL(TransactionDate, dd.pay_date)) AS Month,YEAR(ISNULL(TransactionDate, dd.pay_date)) AS Year, '" + fyear + "' AS FinacialYear,dd.[Reason/Remarks],[TransactionRefrenceNo.] as TransactionRefrenceNo, CONVERT(varchar, dd.TransactionDate, 103) as TransactionDate from Process_DirectDeposit_Details dd ");
+            SQL.Append("' ' + PresentDistrict else '' end) as [Address],dd.bank_acct_no,BankName,APPLICANT_BANK_IFSC_CODE as [IFSCCode],dd.[Status],me.SelectDistrict as [District],MONTH(ISNULL(dd.TransactionDate, dd.pay_date)) AS Month,YEAR(ISNULL(dd.TransactionDate, dd.pay_date)) AS Year, '" + fyear + "' AS FinacialYear,dd.[Reason/Remarks],dd.[TransactionRefrenceNo.] as TransactionRefrenceNo, CONVERT(varchar, dd.TransactionDate, 103) as TransactionDate from CombinedDeposit dd ");
             SQL.Append("left join masterEmployee me on me.Empl_code = dd.Empl_code left join MasterEmpBankDetails mb on mb.empl_code = me.Empl_code ");
             SQL.Append(" left join MasterEmpType et on me.type_code = et.type_code ");
-            SQL.Append("left join MasterDistrict md on md.[Name] = me.SelectDistrict where Status = 'fail' and md.Id in (select DistrictId from SecRoleLocationModule where RoleId = " + RoleId + " and UserId = " + UserId + ")");
+            SQL.Append("left join MasterDistrict md on md.[Name] = me.SelectDistrict where dd.Status = 'fail' and md.Id in (select DistrictId from SecRoleLocationModule where RoleId = " + RoleId + " and UserId = " + UserId + ")");
 
             //"AND 
             //if (!string.IsNullOrEmpty(emplrId) && emplrId == "ALL")
