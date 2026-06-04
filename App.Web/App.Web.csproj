@@ -559,6 +559,7 @@
     <Compile Include="Controllers\PFRateController.cs" />
     <Compile Include="Controllers\PrefixController.cs" />
     <Compile Include="Controllers\RelationshipTypeController.cs" />
+    <Compile Include="Controllers\ReportsBackgroundHelper.cs" />
     <Compile Include="Controllers\ReportsController.cs" />
     <Compile Include="Controllers\ReportTextController.cs" />
     <Compile Include="Controllers\StateController.cs" />
@@ -574,19 +575,19 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-     <Compile Include="Helper\BankDisbursementWithFileUtility.cs" />
-     <Compile Include="Helper\BankDisbursementUtilityJobScheduler.cs" />
-     <Compile Include="Helper\BankDisbursementUtility.cs" />
-     <Compile Include="Helper\BankValidationUtility.cs" />
-     <Compile Include="Helper\CheckExcelOrCsvFileForInjection.cs" />
-     <Compile Include="Helper\CheckMimeType.cs" />
-     <Compile Include="Helper\CustomCaptchaProvider.cs" />
-     <Compile Include="Helper\ExceptionLogHelper.cs" />
-     <Compile Include="Helper\FileHelper.cs" />
-     <Compile Include="Helper\Helper.cs" />
-     <Compile Include="Helper\JobScheduler.cs" />
-     <Compile Include="Helper\MemoryPostedFile.cs" />
-     <Compile Include="Helper\PensionBackgroundJob.cs" />
+    <Compile Include="Helper\BankDisbursementWithFileUtility.cs" />
+    <Compile Include="Helper\BankDisbursementUtilityJobScheduler.cs" />
+    <Compile Include="Helper\BankDisbursementUtility.cs" />
+    <Compile Include="Helper\BankValidationUtility.cs" />
+    <Compile Include="Helper\CheckExcelOrCsvFileForInjection.cs" />
+    <Compile Include="Helper\CheckMimeType.cs" />
+    <Compile Include="Helper\CustomCaptchaProvider.cs" />
+    <Compile Include="Helper\ExceptionLogHelper.cs" />
+    <Compile Include="Helper\FileHelper.cs" />
+    <Compile Include="Helper\Helper.cs" />
+    <Compile Include="Helper\JobScheduler.cs" />
+    <Compile Include="Helper\MemoryPostedFile.cs" />
+    <Compile Include="Helper\PensionBackgroundJob.cs" />
     <Compile Include="Helper\ResponseCaptureStream.cs" />
     <Compile Include="Helper\SecurityHelper.cs" />
     <Compile Include="Helper\SiteHelper.cs" />

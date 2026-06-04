@@ -368,3 +368,5 @@ FodyWeavers.xsd
 /App.Web/App_Data/SftpResponses
 /App.Web/BankMediaFile/J_Validation
 /App.Web/DataFile/J_MasterEmployeeUploads
+/App.Web/DownloadedExcel
+/App.Web/DownloadedPdf

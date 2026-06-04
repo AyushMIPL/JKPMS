@@ -117,7 +117,7 @@
 <div class="panel panel-default">
     <div class="panel-heading clearfix">
         <h4 class="headline headlineMonthlyPensionSummary">
-            Success Payment Summary
+            Success Payment Summary <span id="recordCountSpan" class="badge badge-info" style="margin-left: 10px;"></span>
         </h4>
     </div>
     <div class="panel-body">
@@ -316,27 +316,68 @@
 
     });            $("#btn_loading").show();
             $("#btnsubmit").hide();
-    $.ajax({
-      url: "@Url.Action("PensionByMonthAjax", "Reports")?emplrId=" + SchemeType + "&empl_code=" + $.makeArray(BeneficiariesId) + "&date1=" + Date1 + "&date2=" + Date2 + "&gender=" + Gender + "&ageInYears=" + AgeInYears + "&regionNames=" + RegionNames + "&finacialYear=" + FinacialYear,
-      type: "GET",
-    }).done(function (result) {
-        debugger;
-        $("#btnsubmit").show();
-        $("#btn_loading").hide();
-      var actionRes = result;
-      if (actionRes == "1") {
-        debugger
-        $('#reportDataAction1').show();
-        $(".alert-warning").hide();
-          $('#reportDataAction1').attr('src', '/ReportForms/ContributionByEmployer.aspx');
-          $(evt.target).find("i.fa-spinner").hide();
-      } else {
-        $(".alert-warning").show();
-        $('#reportDataAction1').hide();
-          toasterInfoMessage("Result not found on this search criteria.");
-          $(evt.target).find("i.fa-spinner").hide();
-      }
-    });
+      $.ajax({
+        url: "@Url.Action("PensionByMonthAjax", "Reports")?emplrId=" + SchemeType + "&empl_code=" + $.makeArray(BeneficiariesId) + "&date1=" + Date1 + "&date2=" + Date2 + "&gender=" + Gender + "&ageInYears=" + AgeInYears + "&regionNames=" + RegionNames + "&finacialYear=" + FinacialYear,
+        type: "GET",
+      }).done(function (result) {
+          if (result.Status === "Processing") {
+              toasterInfoMessage("Report generation started in the background. Please wait...");
+              
+              var pollInterval = setInterval(function() {
+                  $.get("/Reports/CheckReportStatus?jobId=" + result.JobId, function(statusResult) {
+                      if (statusResult.Status.startsWith("Completed:")) {
+                          clearInterval(pollInterval);
+                          var parts = statusResult.Status.split(":");
+                          var fileUrl = parts[1];
+                          var count = parts[2]; // Get record count
+                          
+                          $("#btnsubmit").show();
+                          $("#btn_loading").hide();
+                          $(evt).find("i.fa-spinner").hide();
+                          
+                          $(".alert-warning").hide();
+                          $("#recordCountSpan").text("(" + count + " Records)");
+                          toasterSuccessMessage("Report Generation Complete! Loading report...");
+                          
+                          $('#reportDataAction1').show();
+                          $('#reportDataAction1').css({ "width": "100%", "height": "800px", "border": "none" });
+                          $('#reportDataAction1').attr('src', fileUrl);
+                      } 
+                      else if (statusResult.Status === "Empty") {
+                          clearInterval(pollInterval);
+                          $("#btnsubmit").show();
+                          $("#btn_loading").hide();
+                          $(evt).find("i.fa-spinner").hide();
+                          $(".alert-warning").show();
+                          $('#reportDataAction1').hide();
+                          $("#recordCountSpan").text("");
+                          toasterInfoMessage("Result not found on this search criteria.");
+                      }
+                      else if (statusResult.Status === "Failed") {
+                          clearInterval(pollInterval);
+                          $("#btnsubmit").show();
+                          $("#btn_loading").hide();
+                          $(evt).find("i.fa-spinner").hide();
+                          toasterErrorMessage("Failed to generate report.");
+                      }
+                  });
+              }, 5000); // Poll every 5 seconds
+              return false;
+          }
+          else {
+              $("#btnsubmit").show();
+              $("#btn_loading").hide();
+              $(evt).find("i.fa-spinner").hide();
+              $(".alert-warning").show();
+              $('#reportData').hide();
+              $("#recordCountSpan").text("");
+              toasterInfoMessage("Unexpected response from server.");
+          }
+      }).fail(function() {
+          $("#btnsubmit").show();
+          $("#btn_loading").hide();
+          $(evt).find("i.fa-spinner").hide();
+      });
     }
     $("#EmplCode").on('change', function () {
       debugger

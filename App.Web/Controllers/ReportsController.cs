@@ -39,7 +39,7 @@ using static App.Web.Helper.Helper;
 namespace App.Web.Controllers
 {
     [AuthorizeEx()]
-    public class ReportsController : BaseController
+    public partial class ReportsController : BaseController
     {
         private ConnectionStringProvider ConnectionStringProvider = new ConnectionStringProvider();
         private AppDbContext db;
@@ -913,11 +913,17 @@ namespace App.Web.Controllers
             DataSet ds = new DataSet();
             StringBuilder SQL = new StringBuilder();
             SQL.Append("WITH CombinedDeposit AS ( ");
-            SQL.Append("    SELECT empl_code, pay_date, amount, bank_acct_no, [Status], [Reason/Remarks], CAST([TransactionRefrenceNo.] AS VARCHAR(100)) AS [TransactionRefrenceNo.], TransactionDate FROM Process_DirectDeposit_Details ");
+            SQL.Append("    SELECT empl_code, pay_date, amount, bank_acct_no, [Status], [Reason/Remarks], CAST([TransactionRefrenceNo.] AS VARCHAR(100)) AS [TransactionRefrenceNo.], TransactionDate FROM Process_DirectDeposit_Details WHERE [Status] = 'ok' ");
+            if (!string.IsNullOrEmpty(date1)) SQL.Append(" AND cast(pay_date as date) >= '" + date1.Trim().Replace("'", "''") + "'");
+            if (!string.IsNullOrEmpty(date2)) SQL.Append(" AND cast(pay_date as date) <= '" + date2.Trim().Replace("'", "''") + "'");
+            if (!string.IsNullOrEmpty(empl_code)) SQL.Append(" AND empl_code in (" + empl_code.Trim() + ")");
             SQL.Append("    UNION ALL ");
             SQL.Append("    SELECT eb.empl_code, th.TxnDate AS pay_date, TRY_CAST(td.Amount AS DECIMAL(18,2)) AS amount, eb.bank_acct_no, td.[Status], td.Remarks AS [Reason/Remarks], CAST(td.TransactionReference AS VARCHAR(100)) AS [TransactionRefrenceNo.], th.TxnDate AS TransactionDate FROM txnDetail td ");
             SQL.Append("    INNER JOIN txnHeader th ON td.HeaderId = th.HeaderId ");
-            SQL.Append("    INNER JOIN MasterEmpBankDetails eb ON td.[Application Reference No#] = CAST(eb.Application_Reference_no AS NVARCHAR(50)) ");
+            SQL.Append("    INNER JOIN MasterEmpBankDetails eb ON td.[Application Reference No#] = CAST(eb.Application_Reference_no AS NVARCHAR(50)) WHERE td.[Status] = 'ok' ");
+            if (!string.IsNullOrEmpty(date1)) SQL.Append(" AND cast(th.TxnDate as date) >= '" + date1.Trim().Replace("'", "''") + "'");
+            if (!string.IsNullOrEmpty(date2)) SQL.Append(" AND cast(th.TxnDate as date) <= '" + date2.Trim().Replace("'", "''") + "'");
+            if (!string.IsNullOrEmpty(empl_code)) SQL.Append(" AND eb.empl_code in (" + empl_code.Trim() + ")");
             SQL.Append(") ");
             SQL.Append("select distinct ApplicationReferenceno,CONCAT(NULLIF(isnull(me.first_name,''), ''), CASE  ");
             SQL.Append("WHEN me.middle_name IS NOT NULL AND me.middle_name != '' THEN ' ' + me.middle_name ELSE '' END, CASE WHEN me.last_name IS NOT NULL AND me.last_name != '' THEN ' ' + me.last_name  ");
@@ -956,21 +962,40 @@ namespace App.Web.Controllers
 
             string con = ConnectionStringProvider.GetConnectionString();
          
-            SqlDataAdapter da = new SqlDataAdapter(SQL.ToString(), con);
-            da.SelectCommand.CommandTimeout = 300;
-            da.Fill(ds);
-            //System.IO.StreamWriter writer = new System.IO.StreamWriter(Server.MapPath("/reports/DsPaymentSuccess.xsd"));
-            //ds.WriteXmlSchema(writer);
-            //writer.Close();
-            if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            string jobId = Guid.NewGuid().ToString();
+            ReportJobs.TryAdd(jobId, "Processing");
+            string serverPath = Server.MapPath("~/DownloadedPdf/");
+            string rptPath = Server.MapPath("~/Reports/rptPaymentSuccessReport.rpt");
+            
+            System.Web.Hosting.HostingEnvironment.QueueBackgroundWorkItem(cancellationToken => 
             {
-                //this.HttpContext.Session["ReportName"] = "rptPaymentSuccessReport.rpt";
-                this.HttpContext.Session["ReportName"] = "rptPaymentSuccessReport.rpt";
-                this.HttpContext.Session["ReportName1"] = Path.Combine(Server.MapPath("~/Reports/rptPaymentSuccessReport.rpt"));
-                this.HttpContext.Session["rptSource"] = ds;
-                return Json("1", JsonRequestBehavior.AllowGet);
-            }
-            return Json("0", JsonRequestBehavior.AllowGet);
+                try 
+                {
+                    DataSet dsBG = new DataSet();
+                    using (SqlDataAdapter da = new SqlDataAdapter(SQL.ToString(), con)) {
+                        da.SelectCommand.CommandTimeout = 300;
+                        da.Fill(dsBG);
+                    }
+                    if (dsBG.Tables.Count > 0 && dsBG.Tables[0].Rows.Count > 0)
+                    {
+                        string fileName = "Report_" + jobId + ".pdf";
+                        if (!System.IO.Directory.Exists(serverPath)) System.IO.Directory.CreateDirectory(serverPath);
+                        string filePath = System.IO.Path.Combine(serverPath, fileName);
+                        GeneratePdfToDisk(dsBG, filePath, rptPath);
+                        ReportJobs[jobId] = "Completed:/DownloadedPdf/" + fileName + ":" + dsBG.Tables[0].Rows.Count.ToString();
+                    }
+                    else 
+                    {
+                        ReportJobs[jobId] = "Empty";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ReportJobs[jobId] = "Failed";
+                }
+            });
+
+            return Json(new { Status = "Processing", JobId = jobId }, JsonRequestBehavior.AllowGet);
         }
 
 
@@ -1047,11 +1072,17 @@ namespace App.Web.Controllers
             DataSet ds = new DataSet();
             StringBuilder SQL = new StringBuilder();
             SQL.Append("WITH CombinedDeposit AS ( ");
-            SQL.Append("    SELECT empl_code, pay_date, amount, bank_acct_no, [Status], [Reason/Remarks], CAST([TransactionRefrenceNo.] AS VARCHAR(100)) AS [TransactionRefrenceNo.], TransactionDate FROM Process_DirectDeposit_Details ");
+            SQL.Append("    SELECT empl_code, pay_date, amount, bank_acct_no, [Status], [Reason/Remarks], CAST([TransactionRefrenceNo.] AS VARCHAR(100)) AS [TransactionRefrenceNo.], TransactionDate FROM Process_DirectDeposit_Details WHERE [Status] = 'fail' ");
+            if (!string.IsNullOrEmpty(date1)) SQL.Append(" AND cast(pay_date as date) >= '" + date1.Trim().Replace("'", "''") + "'");
+            if (!string.IsNullOrEmpty(date2)) SQL.Append(" AND cast(pay_date as date) <= '" + date2.Trim().Replace("'", "''") + "'");
+            if (!string.IsNullOrEmpty(empl_code)) SQL.Append(" AND empl_code in (" + empl_code.Trim() + ")");
             SQL.Append("    UNION ALL ");
             SQL.Append("    SELECT eb.empl_code, th.TxnDate AS pay_date, TRY_CAST(td.Amount AS DECIMAL(18,2)) AS amount, eb.bank_acct_no, td.[Status], td.Remarks AS [Reason/Remarks], CAST(td.TransactionReference AS VARCHAR(100)) AS [TransactionRefrenceNo.], th.TxnDate AS TransactionDate FROM txnDetail td ");
             SQL.Append("    INNER JOIN txnHeader th ON td.HeaderId = th.HeaderId ");
-            SQL.Append("    INNER JOIN MasterEmpBankDetails eb ON td.[Application Reference No#] = CAST(eb.Application_Reference_no AS NVARCHAR(50)) ");
+            SQL.Append("    INNER JOIN MasterEmpBankDetails eb ON td.[Application Reference No#] = CAST(eb.Application_Reference_no AS NVARCHAR(50)) WHERE td.[Status] = 'fail' ");
+            if (!string.IsNullOrEmpty(date1)) SQL.Append(" AND cast(th.TxnDate as date) >= '" + date1.Trim().Replace("'", "''") + "'");
+            if (!string.IsNullOrEmpty(date2)) SQL.Append(" AND cast(th.TxnDate as date) <= '" + date2.Trim().Replace("'", "''") + "'");
+            if (!string.IsNullOrEmpty(empl_code)) SQL.Append(" AND eb.empl_code in (" + empl_code.Trim() + ")");
             SQL.Append(") ");
             SQL.Append("select distinct ApplicationReferenceno,CONCAT(NULLIF(isnull(me.first_name,''), ''), CASE  ");
             SQL.Append("WHEN me.middle_name IS NOT NULL AND me.middle_name != '' THEN ' ' + me.middle_name ELSE '' END, CASE WHEN me.last_name IS NOT NULL AND me.last_name != '' THEN ' ' + me.last_name  ");
@@ -1092,22 +1123,40 @@ namespace App.Web.Controllers
             //string con = WebConfigurationManager.AppSettings["SQLConn"];
             string con = ConnectionStringProvider.GetConnectionString();
 
-            SqlDataAdapter da = new SqlDataAdapter(SQL.ToString(), con);
-            da.Fill(ds);
-
-            //System.IO.StreamWriter writer = new System.IO.StreamWriter(Server.MapPath("/reports/DsPaymentFailureReport.xsd"));
-            //ds.WriteXmlSchema(writer);
-            //writer.Close();
-
-            if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            string jobId = Guid.NewGuid().ToString();
+            ReportJobs.TryAdd(jobId, "Processing");
+            string serverPath = Server.MapPath("~/DownloadedPdf/");
+            string rptPath = Server.MapPath("~/Reports/rptPaymentFailedReport.rpt");
+            
+            System.Web.Hosting.HostingEnvironment.QueueBackgroundWorkItem(cancellationToken => 
             {
-                /*this.HttpContext.Session["ReportName"] = "rptPaymentFailedReport.rpt";*/      //"rptPensionDetailsByYear.rpt";
-                this.HttpContext.Session["ReportName"] = "rptPaymentFailedReport.rpt";      //"rptPensionDetailsByYear.rpt";
-                this.HttpContext.Session["ReportName1"] = Path.Combine(Server.MapPath("~/Reports/rptPaymentFailedReport.rpt"));
-                this.HttpContext.Session["rptSource"] = ds;
-                return Json("1", JsonRequestBehavior.AllowGet);
-            }
-            return Json("0", JsonRequestBehavior.AllowGet);
+                try 
+                {
+                    DataSet dsBG = new DataSet();
+                    using (SqlDataAdapter da = new SqlDataAdapter(SQL.ToString(), con)) {
+                        da.SelectCommand.CommandTimeout = 300;
+                        da.Fill(dsBG);
+                    }
+                    if (dsBG.Tables.Count > 0 && dsBG.Tables[0].Rows.Count > 0)
+                    {
+                        string fileName = "Report_" + jobId + ".pdf";
+                        if (!System.IO.Directory.Exists(serverPath)) System.IO.Directory.CreateDirectory(serverPath);
+                        string filePath = System.IO.Path.Combine(serverPath, fileName);
+                        GeneratePdfToDisk(dsBG, filePath, rptPath);
+                        ReportJobs[jobId] = "Completed:/DownloadedPdf/" + fileName + ":" + dsBG.Tables[0].Rows.Count.ToString();
+                    }
+                    else 
+                    {
+                        ReportJobs[jobId] = "Empty";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ReportJobs[jobId] = "Failed";
+                }
+            });
+
+            return Json(new { Status = "Processing", JobId = jobId }, JsonRequestBehavior.AllowGet);
         }
         public ActionResult DirectDepositsToBank()
         {

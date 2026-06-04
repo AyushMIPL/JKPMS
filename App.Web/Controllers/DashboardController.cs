@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -623,8 +623,12 @@ namespace App.Web.Controllers
                 sql.Append(" else '' end, case when me.PresentTehsil is not null or me.PresentTehsil != '' then ' ' + me.PresentTehsil else '' end, case when me.SelectDistrict is not null or ");
                 sql.Append(" me.SelectDistrict != '' then ' ' + me.SelectDistrict else '' end) as [Address],me.Phone,me.Email,meb.bank_acct_no as [BankAcctNo],meb.APPLICANT_BANK_IFSC_CODE as [IFSCCode],meb.BankName,meb.V_DATE as [LastVerified], ");
                 sql.Append(" et.[Description] as [SchemeType],me.empl_code as [EmplCode],[Reason/Remarks] as ReasonForChange from MasterEmployee me left join MasterEmpBankDetails meb on me.Empl_Code = meb.empl_code LEFT JOIN  MasterEmpType et ON me.type_code=et.type_code   ");
-                sql.Append(" inner join (SELECT distinct * FROM ( SELECT Row_number() OVER ( partition BY empl_code ORDER BY pay_date DESC) AS [rn],* FROM   process_directdeposit_details) cte WHERE  ");
-                sql.Append(" rn = 1 ) dd on dd.empl_code = me.empl_code where me.SelectDistrict = '" + District + "' ");
+                sql.Append(" inner join (SELECT * FROM ( SELECT dd.empl_code, dd.pay_date, dd.Status, Row_number() OVER (PARTITION BY dd.empl_code ORDER BY dd.pay_date DESC) AS [rn] ");
+                sql.Append(" FROM ( SELECT pdd.empl_code, pdd.pay_date, pdd.Status FROM process_directdeposit_details pdd UNION ALL ");
+                sql.Append(" SELECT meb.empl_code, th.value_date AS pay_date, td.txn_status AS Status ");
+                sql.Append(" FROM txnDetail td INNER JOIN txnHeader th ON th.txn_header_id = td.txn_header_id ");
+                sql.Append(" INNER JOIN MasterEmpBankDetails meb ON TRY_CAST(meb.APPLICANT_ACCOUNT_NO AS VARCHAR(50)) = TRY_CAST(td.beneficiary_acc_no AS VARCHAR(50)) ");
+                sql.Append(" ) dd ) cte WHERE rn = 1 ) dd on TRY_CAST(dd.empl_code AS BIGINT) = TRY_CAST(me.empl_code AS BIGINT) where me.SelectDistrict = '" + District + "' ");
                 if (Status.ToLower().Trim() == "statusnotupdated")
                     sql.Append("and dd.[Status] is null");
                 else

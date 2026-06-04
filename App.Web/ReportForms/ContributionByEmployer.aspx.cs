@@ -32,6 +32,8 @@ namespace App.Web.ReportForms
         ReportDocument rptDoc;
         protected void Page_Init(object sender, EventArgs e)
         {
+            // jobId caching logic has been moved to PDF generation, so this block is intentionally empty or removed
+
             string ShowCrystalReportsInIframe = ConfigurationManager.AppSettings["ShowCrystalReportsInIframe"];
             if (!string.IsNullOrEmpty(ShowCrystalReportsInIframe))
             {

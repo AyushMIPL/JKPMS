@@ -1,4 +1,4 @@
-﻿@{
+@{
   ViewBag.Title = "PaymentHistory";
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -149,7 +149,7 @@
 <div class="panel panel-default">
   <div class="panel-heading clearfix">
     <h4 class="headline headlineMonthlyPensionSummary">
-      Payment History
+      Payment History <span id="recordCountSpan" class="badge badge-info" style="margin-left: 10px;"></span>
       <ul class="tool-bar">
         <li class="dropdown">
           <a class="dropdown-toggle DownloadDropdown" data-toggle="dropdown" href="#">
@@ -660,11 +660,14 @@
                     if (totalRecords > 0) {
                       $("#reportData").show();
                       $(".alert-warning").hide();
+                      $("#recordCountSpan").text("(" + totalRecords + " Records)");
+                      toasterSuccessMessage("Loading " + totalRecords + " records...");
                       $('#reportData').attr('src', '/ReportForms/ContributionByEmployer.aspx');
                     }
                     else {
                       $("#reportData").hide();
                       $(".alert-warning").show();
+                      $("#recordCountSpan").text("");
                       toasterInfoMessage("Result not found on this search criteria.");
                     }
 
