@@ -578,6 +578,7 @@
     <Compile Include="Helper\BankDisbursementWithFileUtility.cs" />
     <Compile Include="Helper\BankDisbursementUtilityJobScheduler.cs" />
     <Compile Include="Helper\BankDisbursementUtility.cs" />
+    <Compile Include="Helper\SftpResponseJob.cs" />
     <Compile Include="Helper\BankValidationUtility.cs" />
     <Compile Include="Helper\CheckExcelOrCsvFileForInjection.cs" />
     <Compile Include="Helper\CheckMimeType.cs" />

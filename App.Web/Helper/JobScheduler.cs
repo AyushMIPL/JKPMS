@@ -1,4 +1,4 @@
-﻿using Quartz;
+using Quartz;
 using Quartz.Impl;
 using System;
 
@@ -40,6 +40,15 @@ namespace App.Web.Helper
                   )
                 .Build();
              BankValidationScheduler.ScheduleJob(bankValidationJob, bankValidationTrigger); 
+
+            // SFTP Response Job
+            IScheduler SftpResponseScheduler = StdSchedulerFactory.GetDefaultScheduler().Result;
+            SftpResponseScheduler.Start();
+            IJobDetail sftpResponseJob = JobBuilder.Create<SftpResponseJob>().Build();
+            ITrigger sftpResponseTrigger = TriggerBuilder.Create()
+                .WithCronSchedule("0 0 10,17 * * ?")
+                .Build();
+            SftpResponseScheduler.ScheduleJob(sftpResponseJob, sftpResponseTrigger);
 
           }
           catch (Exception ex)

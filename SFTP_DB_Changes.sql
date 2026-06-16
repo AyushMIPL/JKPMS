@@ -130,22 +130,27 @@ BEGIN
     );
 
     INSERT INTO #temp6
-    SELECT ME.Empl_Code, 
-    CONCAT(CASE WHEN ME.first_name IS NOT NULL AND ME.first_name <> '' THEN ME.first_name + ' ' ELSE '' END,CASE WHEN ME.middle_name IS NOT NULL AND ME.middle_name <> '' THEN ME.middle_name + ' ' ELSE '' END, CASE WHEN ME.last_name IS NOT NULL AND ME.last_name <> '' THEN ME.last_name + ' ' ELSE '' END ) AS [CBS_NAME_OF_APPLICANT],
-    MBD.APPLICATION_REFERENCE_NO,
-    MBD.DISTRICT,
-    MBD.BENE_IFSC,
-    MBD.NAME_OF_APPLICANT,
-    MBD.ACCOUNTNO,
-    MBD.CBS_NAME,
-    MBD.BRANCH_CODE,
-    MBD.ACCOUNT_STATUS,
-    MBD.AADHAAR_STATUS,
-    MBD.ACCT_SCHEME_TYPE,
-    MEBD.APPLICANT_BANK_IFSC_CODE
-    FROM [dbo].[Stg_ValidationResponse] MBD
-    JOIN MasterEmployee ME ON ME.ApplicationReferenceNo = MBD.APPLICATION_REFERENCE_NO
-    JOIN MasterEmpBankDetails MEBD ON MEBD.empl_code = ME.Empl_Code;
+    SELECT Empl_Code, [CBS_NAME_OF_APPLICANT], APPLICATION_REFERENCE_NO, DISTRICT, BENE_IFSC, NAME_OF_APPLICANT, ACCOUNTNO, CBS_NAME, BRANCH_CODE, ACCOUNT_STATUS, AADHAAR_STATUS, ACCT_SCHEME_TYPE, APPLICANT_BANK_IFSC_CODE
+    FROM (
+        SELECT ME.Empl_Code, 
+        CONCAT(CASE WHEN ME.first_name IS NOT NULL AND ME.first_name <> '' THEN ME.first_name + ' ' ELSE '' END,CASE WHEN ME.middle_name IS NOT NULL AND ME.middle_name <> '' THEN ME.middle_name + ' ' ELSE '' END, CASE WHEN ME.last_name IS NOT NULL AND ME.last_name <> '' THEN ME.last_name + ' ' ELSE '' END ) AS [CBS_NAME_OF_APPLICANT],
+        MBD.APPLICATION_REFERENCE_NO,
+        MBD.DISTRICT,
+        MBD.BENE_IFSC,
+        MBD.NAME_OF_APPLICANT,
+        MBD.ACCOUNTNO,
+        MBD.CBS_NAME,
+        MBD.BRANCH_CODE,
+        MBD.ACCOUNT_STATUS,
+        MBD.AADHAAR_STATUS,
+        MBD.ACCT_SCHEME_TYPE,
+        MEBD.APPLICANT_BANK_IFSC_CODE,
+        ROW_NUMBER() OVER(PARTITION BY ME.Empl_Code ORDER BY MBD.APPLICATION_REFERENCE_NO) as rn
+        FROM [dbo].[Stg_ValidationResponse] MBD
+        JOIN MasterEmployee ME ON ME.ApplicationReferenceNo = MBD.APPLICATION_REFERENCE_NO
+        JOIN MasterEmpBankDetails MEBD ON MEBD.empl_code = ME.Empl_Code
+    ) t
+    WHERE t.rn = 1;
 
     -- Update MasterEmpBankDetails
     MERGE INTO MasterEmpBankDetails AS target

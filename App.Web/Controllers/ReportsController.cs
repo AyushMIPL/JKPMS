@@ -881,7 +881,7 @@ namespace App.Web.Controllers
             return baseUrl;
         }
 
-        public JsonResult PensionByMonthAjax(string emplrId, string empl_code, string date1, string date2, string gender, int? ageInYears, string RegionNames, string finacialYear)
+        public JsonResult PensionByMonthAjax(JQueryDataTableParamModel param, string emplrId, string empl_code, string date1, string date2, string gender, int? ageInYears, string RegionNames, string finacialYear)
         {
             string GenderType = string.Empty;
             string fyear = finacialYear.Replace("_", "-");
@@ -936,111 +936,104 @@ namespace App.Web.Controllers
             SQL.Append("left join MasterDistrict md on md.[Name] = me.SelectDistrict where dd.Status = 'ok' and md.Id in (select DistrictId from SecRoleLocationModule where RoleId = " + RoleId + " and UserId = " + UserId + ") ");
             if (!string.IsNullOrEmpty(emplrId) && emplrId == "ALL")
                 SQL.Append("");
-            //SQL.Append(" AND me.Type_Code = '" + "*" +  "'");
             else if (!string.IsNullOrEmpty(emplrId))
                 SQL.Append(" AND  me.Type_Code = '" + emplrId.Trim().Replace("'", "''") + "'");
 
             if (!string.IsNullOrEmpty(empl_code))
                 SQL.Append(" AND dd.empl_code in (" + empl_code.Trim() + ")");
 
-            if (!string.IsNullOrEmpty(date1))//YearTo
+            if (!string.IsNullOrEmpty(date1))
                 SQL.Append(" AND cast(dd.pay_date as date) >= '" + date1.Trim().Replace("'", "''") + "'");
-            if (!string.IsNullOrEmpty(date2))//YearTo
+            if (!string.IsNullOrEmpty(date2))
                 SQL.Append(" AND cast(dd.pay_date as date) <= '" + date2.Trim().Replace("'", "''") + "'");
-            if (!string.IsNullOrEmpty(gender))// Gender
+            if (!string.IsNullOrEmpty(gender))
                 SQL.Append(" AND me.Gender = '" + GenderType.Trim() + "'");
-            if (ageInYears != null && ageInYears != 0)//Age In Years
+            if (ageInYears != null && ageInYears != 0)
                 SQL.Append(" AND CAST(DATEDIFF(YEAR, me.birthdate, GETDATE())  AS VARCHAR(10)) = '" + ageInYears + "'");
             if (!string.IsNullOrEmpty(RegionNames))
                 SQL.Append(" AND me.SelectDistrict in (SELECT * FROM [SplitString] ('" + RegionNames.Trim() + "'))");
-            //if (!string.IsNullOrEmpty(emplrId))
-            //  SQL.Append("where dd.empl_code = " + emplrId + " and Status = 'ok'");
-            //SQL.Append("where dd.empl_code = "+ emplrId + "  and Status = 'ok'");
 
+            if (!string.IsNullOrEmpty(param.sSearch))
+            {
+                param.sSearch = param.sSearch.Trim().ToLower();
+                SQL.Append(" AND ( ");
+                SQL.Append(" LOWER(TRIM(ISNULL(me.ApplicationReferenceno,''))) like '%" + param.sSearch + "%' or LOWER(TRIM(ISNULL(me.first_name,''))) like '%" + param.sSearch + "%' ");
+                SQL.Append(" or LOWER(TRIM(ISNULL(dd.bank_acct_no,''))) like '%" + param.sSearch + "%' or LOWER(TRIM(ISNULL(mb.BankName,''))) like '%" + param.sSearch + "%'  ");
+                SQL.Append(" or LOWER(TRIM(ISNULL(mb.APPLICANT_BANK_IFSC_CODE,''))) like '%" + param.sSearch + "%' or LOWER(TRIM(ISNULL(me.Gender,''))) like '%" + param.sSearch + "%'  ");
+                SQL.Append(" or LOWER(TRIM(ISNULL(CAST(DATEDIFF(YEAR, me.birthdate, GETDATE()) AS VARCHAR),''))) like '%" + param.sSearch + "%' or LOWER(TRIM(ISNULL(et.[Description],''))) like '%" + param.sSearch + "%'  ");
+                SQL.Append(" or LOWER(TRIM(ISNULL(CAST(dd.amount as varchar),''))) like '%" + param.sSearch + "%' or LOWER(TRIM(ISNULL(dd.[Status],''))) like '%" + param.sSearch + "%'  ");
+                SQL.Append(" or LOWER(TRIM(ISNULL(dd.[Reason/Remarks],''))) like '%" + param.sSearch + "%'  ");
+                SQL.Append(" or LOWER(TRIM(ISNULL(me.SelectDistrict,''))) like '%" + param.sSearch + "%' or LOWER(TRIM(ISNULL(dd.[TransactionRefrenceNo.],''))) like '%" + param.sSearch + "%'   ");
+                SQL.Append(" ) ");
+            }
 
-            //string con = WebConfigurationManager.AppSettings["SQLConn"];
+            string sqlQuery = SQL.ToString().Replace("select distinct ApplicationReferenceno", "select distinct ApplicationReferenceno, COUNT(*) OVER() AS TotalRecordCount");
+            
+            int PageNumber = param.iDisplayStart > 0 ? (param.iDisplayStart / param.iDisplayLength) + 1 : 1;
+            int PageSize = param.iDisplayLength > 0 ? param.iDisplayLength : 10;
+            int fetchRecords = (PageNumber - 1) * PageSize;
+            
+            sqlQuery += " ORDER BY ApplicationReferenceno OFFSET " + fetchRecords + " ROWS FETCH NEXT " + PageSize + " ROWS ONLY;";
 
             string con = ConnectionStringProvider.GetConnectionString();
-         
-            string jobId = Guid.NewGuid().ToString();
-            ReportJobs.TryAdd(jobId, "Processing");
-            string serverPath = Server.MapPath("~/DownloadedPdf/");
-            string rptPath = Server.MapPath("~/Reports/rptPaymentSuccessReport.rpt");
-            
-            System.Web.Hosting.HostingEnvironment.QueueBackgroundWorkItem(cancellationToken => 
-            {
-                try 
-                {
-                    DataSet dsBG = new DataSet();
-                    using (SqlDataAdapter da = new SqlDataAdapter(SQL.ToString(), con)) {
-                        da.SelectCommand.CommandTimeout = 300;
-                        da.Fill(dsBG);
-                    }
-                    if (dsBG.Tables.Count > 0 && dsBG.Tables[0].Rows.Count > 0)
-                    {
-                        string fileName = "Report_" + jobId + ".pdf";
-                        if (!System.IO.Directory.Exists(serverPath)) System.IO.Directory.CreateDirectory(serverPath);
-                        string filePath = System.IO.Path.Combine(serverPath, fileName);
-                        GeneratePdfToDisk(dsBG, filePath, rptPath);
-                        ReportJobs[jobId] = "Completed:/DownloadedPdf/" + fileName + ":" + dsBG.Tables[0].Rows.Count.ToString();
-                    }
-                    else 
-                    {
-                        ReportJobs[jobId] = "Empty";
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ReportJobs[jobId] = "Failed";
-                }
-            });
+            SqlDataAdapter da = new SqlDataAdapter(sqlQuery, con);
+            da.SelectCommand.CommandTimeout = 300;
+            da.Fill(ds);
 
-            return Json(new { Status = "Processing", JobId = jobId }, JsonRequestBehavior.AllowGet);
+            var dataList = ds.Tables[0].AsEnumerable().Select(row => new
+            {
+                ApplicationReferenceNo = row["ApplicationReferenceno"] != DBNull.Value ? row["ApplicationReferenceno"].ToString() : "",
+                ApplicantName = row["ApplicantName"] != DBNull.Value ? row["ApplicantName"].ToString() : "",
+                AccountNo = row["bank_acct_no"] != DBNull.Value ? row["bank_acct_no"].ToString() : "",
+                BankName = row["BankName"] != DBNull.Value ? row["BankName"].ToString() : "",
+                IFSC_Code = row["IFSCCode"] != DBNull.Value ? row["IFSCCode"].ToString() : "",
+                Gender = row["Gender"] != DBNull.Value ? row["Gender"].ToString() : "",
+                Age_InYears = row["Age_InYears"] != DBNull.Value ? row["Age_InYears"].ToString() : "",
+                SchemeType = row["type_code"] != DBNull.Value ? row["type_code"].ToString() : "",
+                Amount = row["amount"] != DBNull.Value ? row["amount"].ToString() : "",
+                PaidOn = row["pay_date"] != DBNull.Value ? row["pay_date"].ToString() : "",
+                Status = row["Status"] != DBNull.Value ? row["Status"].ToString() : "",
+                Reason = row["Reason/Remarks"] != DBNull.Value ? row["Reason/Remarks"].ToString() : "",
+                District = row["District"] != DBNull.Value ? row["District"].ToString() : "",
+                TransactionRefrenceNo = row["TransactionRefrenceNo"] != DBNull.Value ? row["TransactionRefrenceNo"].ToString() : "",
+                TotalRecordCount = row["TotalRecordCount"] != DBNull.Value ? row["TotalRecordCount"].ToString() : "0"
+            }).ToList();
+
+            string totalRecords = dataList.Select(x => x.TotalRecordCount).FirstOrDefault() ?? "0";
+            var result = from c in dataList
+                         select new[] {
+                             c.District?.Trim().ToUpper()+"",
+                             c.ApplicationReferenceNo+"",
+                             c.ApplicantName+"",
+                             c.AccountNo + "",
+                             c.BankName + "",
+                             c.IFSC_Code + "",
+                             c.Gender + "",
+                             c.Age_InYears + "",
+                             c.SchemeType + "",
+                             c.Amount + "",
+                             c.PaidOn + "",
+                             c.Status + "",
+                             c.Reason + "",
+                             c.TransactionRefrenceNo + ""
+                         };
+
+            if (dataList.Any())
+            {
+                this.HttpContext.Session["ReportName"] = "RptPensionpayments.rpt";
+                this.HttpContext.Session["rptSource"] = ds;
+            }
+
+            return Json(new
+            {
+                sEcho = param.sEcho,
+                iTotalRecords = Convert.ToInt32(totalRecords),
+                iTotalDisplayRecords = Convert.ToInt32(totalRecords),
+                aaData = result
+            }, JsonRequestBehavior.AllowGet);
         }
 
-
-        //public JsonResult PaymentSuccess(string emplrId, string empl_code, string date1, string date2, string gender, int? ageInYears)
-        //{
-        //  string GenderType = string.Empty;
-        //  switch (gender.ToLower().Trim())
-        //  {
-        //    case "male":
-        //      GenderType = "M";
-        //      break;
-        //    case "female":
-        //      GenderType = "F";
-        //      break;
-        //    case "transgender":
-        //      GenderType = "T";
-        //      break;
-        //  }
-
-        //  DataSet ds = new DataSet();
-        //  StringBuilder SQL = new StringBuilder();
-        //  SQL.Append("select ApplicationReferenceno,CONCAT(NULLIF(isnull(me.first_name,''), ''), CASE  ");
-        //  SQL.Append("WHEN me.middle_name IS NOT NULL AND me.middle_name != '' THEN ' ' + me.middle_name ELSE '' END, CASE WHEN me.last_name IS NOT NULL AND me.last_name != '' THEN ' ' + me.last_name  ");
-        //  SQL.Append("ELSE '' END ) as ApplicantName,dd.amount,type_code,Age_InYears,Gender,concat(nullif(isnull(PresentVillageName,''),''), case when PresentHalqaPanchayatOrMunicipalityName is not null or PresentHalqaPanchayatOrMunicipalityName != '' ");
-        //  SQL.Append("then ' ' + PresentHalqaPanchayatOrMunicipalityName else '' end, case when PresentTehsil is not null or PresentTehsil != '' ");
-        //  SQL.Append("then ' ' + PresentTehsil else '' end, case when PresentDistrict is not null or PresentDistrict != '' then ");
-        //  SQL.Append("' ' + PresentDistrict else '' end) as [Address],dd.bank_acct_no,BankName,APPLICANT_BANK_IFSC_CODE as [IFSCCode],dd.[Status] from Process_DirectDeposit_Details dd ");
-        //  SQL.Append("left join masterEmployee me on me.Empl_code = dd.Empl_code left join MasterEmpBankDetails mb on mb.empl_code = me.Empl_code ");
-        //  SQL.Append("left join MasterDistrict md on md.[Name] = me.SelectDistrict ");
-        //  SQL.Append("where dd.empl_code = 1 ");//and Status = 'ok' 
-        //  string con = WebConfigurationManager.AppSettings["SQLConn"];
-        //  SqlDataAdapter da = new SqlDataAdapter(SQL.ToString(), con);
-        //  da.Fill(ds);
-
-        //  if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-        //  {
-        //    this.HttpContext.Session["ReportName"] = "rptPaymentSuccess.rpt";
-        //    this.HttpContext.Session["rptSource"] = ds;
-        //    return Json("1", JsonRequestBehavior.AllowGet);
-        //  }
-        //  return Json("0", JsonRequestBehavior.AllowGet);
-        //}
-
-
-        public JsonResult PensionByYearAjax(string emplrId, string empl_code, string date1, string date2, string gender, int? ageInYears, string RegionNames, string finacialYear)
+        public JsonResult PensionByYearAjax(JQueryDataTableParamModel param, string emplrId, string empl_code, string date1, string date2, string gender, int? ageInYears, string RegionNames, string finacialYear)
         {
             string GenderType = string.Empty;
             string fyear = finacialYear.Replace("_", "-");
@@ -1094,70 +1087,104 @@ namespace App.Web.Controllers
             SQL.Append(" left join MasterEmpType et on me.type_code = et.type_code ");
             SQL.Append("left join MasterDistrict md on md.[Name] = me.SelectDistrict where dd.Status = 'fail' and md.Id in (select DistrictId from SecRoleLocationModule where RoleId = " + RoleId + " and UserId = " + UserId + ")");
 
-            //"AND 
-            //if (!string.IsNullOrEmpty(emplrId) && emplrId == "ALL")
-            //    SQL.Append(" AND me.Type_Code = '" + "*" + "'");
-
             if (!string.IsNullOrEmpty(emplrId) && emplrId == "ALL")
                 SQL.Append("");
             else if (!string.IsNullOrEmpty(emplrId))
                 SQL.Append(" AND  me.Type_Code = '" + emplrId.Trim().Replace("'", "''") + "'");
 
-            //if (!string.IsNullOrEmpty(emplrId))
-            //  SQL.Append(" AND  me.Type_Code = '" + emplrId.Trim().Replace("'", "''") + "'");
             if (!string.IsNullOrEmpty(empl_code))
                 SQL.Append(" AND dd.empl_code in (" + empl_code.Trim() + ")");
-            if (!string.IsNullOrEmpty(date1))//YearTo
+            if (!string.IsNullOrEmpty(date1))
                 SQL.Append(" AND cast(dd.pay_date as date) >= '" + date1.Trim().Replace("'", "''") + "'");
-            if (!string.IsNullOrEmpty(date2))//YearTo
+            if (!string.IsNullOrEmpty(date2))
                 SQL.Append(" AND cast(dd.pay_date as date) <= '" + date2.Trim().Replace("'", "''") + "'");
-            if (!string.IsNullOrEmpty(gender))// Gender
+            if (!string.IsNullOrEmpty(gender))
                 SQL.Append(" AND me.Gender = '" + GenderType.Trim() + "'");
-            if (ageInYears != null && ageInYears != 0)//Age In Years
+            if (ageInYears != null && ageInYears != 0)
                 SQL.Append(" AND CAST(DATEDIFF(YEAR, me.birthdate, GETDATE()) AS VARCHAR(10)) = '" + ageInYears + "'");
             if (!string.IsNullOrEmpty(RegionNames))
                 SQL.Append(" AND me.SelectDistrict in (SELECT * FROM [SplitString] ('" + RegionNames.Trim() + "'))");
-            //if (!string.IsNullOrEmpty(emplrId))
-            //  SQL.Append("where dd.empl_code = "+ emplrId + " and Status = 'fail'"); 
 
-            //string con = WebConfigurationManager.AppSettings["SQLConn"];
-            string con = ConnectionStringProvider.GetConnectionString();
-
-            string jobId = Guid.NewGuid().ToString();
-            ReportJobs.TryAdd(jobId, "Processing");
-            string serverPath = Server.MapPath("~/DownloadedPdf/");
-            string rptPath = Server.MapPath("~/Reports/rptPaymentFailedReport.rpt");
-            
-            System.Web.Hosting.HostingEnvironment.QueueBackgroundWorkItem(cancellationToken => 
+            if (!string.IsNullOrEmpty(param.sSearch))
             {
-                try 
-                {
-                    DataSet dsBG = new DataSet();
-                    using (SqlDataAdapter da = new SqlDataAdapter(SQL.ToString(), con)) {
-                        da.SelectCommand.CommandTimeout = 300;
-                        da.Fill(dsBG);
-                    }
-                    if (dsBG.Tables.Count > 0 && dsBG.Tables[0].Rows.Count > 0)
-                    {
-                        string fileName = "Report_" + jobId + ".pdf";
-                        if (!System.IO.Directory.Exists(serverPath)) System.IO.Directory.CreateDirectory(serverPath);
-                        string filePath = System.IO.Path.Combine(serverPath, fileName);
-                        GeneratePdfToDisk(dsBG, filePath, rptPath);
-                        ReportJobs[jobId] = "Completed:/DownloadedPdf/" + fileName + ":" + dsBG.Tables[0].Rows.Count.ToString();
-                    }
-                    else 
-                    {
-                        ReportJobs[jobId] = "Empty";
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ReportJobs[jobId] = "Failed";
-                }
-            });
+                param.sSearch = param.sSearch.Trim().ToLower();
+                SQL.Append(" AND ( ");
+                SQL.Append(" LOWER(TRIM(ISNULL(me.ApplicationReferenceno,''))) like '%" + param.sSearch + "%' or LOWER(TRIM(ISNULL(me.first_name,''))) like '%" + param.sSearch + "%' ");
+                SQL.Append(" or LOWER(TRIM(ISNULL(dd.bank_acct_no,''))) like '%" + param.sSearch + "%' or LOWER(TRIM(ISNULL(mb.BankName,''))) like '%" + param.sSearch + "%'  ");
+                SQL.Append(" or LOWER(TRIM(ISNULL(mb.APPLICANT_BANK_IFSC_CODE,''))) like '%" + param.sSearch + "%' or LOWER(TRIM(ISNULL(me.Gender,''))) like '%" + param.sSearch + "%'  ");
+                SQL.Append(" or LOWER(TRIM(ISNULL(CAST(DATEDIFF(YEAR, me.birthdate, GETDATE()) AS VARCHAR),''))) like '%" + param.sSearch + "%' or LOWER(TRIM(ISNULL(et.[Description],''))) like '%" + param.sSearch + "%'  ");
+                SQL.Append(" or LOWER(TRIM(ISNULL(CAST(dd.amount as varchar),''))) like '%" + param.sSearch + "%' or LOWER(TRIM(ISNULL(dd.[Status],''))) like '%" + param.sSearch + "%'  ");
+                SQL.Append(" or LOWER(TRIM(ISNULL(dd.[Reason/Remarks],''))) like '%" + param.sSearch + "%'  ");
+                SQL.Append(" or LOWER(TRIM(ISNULL(me.SelectDistrict,''))) like '%" + param.sSearch + "%' or LOWER(TRIM(ISNULL(dd.[TransactionRefrenceNo.],''))) like '%" + param.sSearch + "%'   ");
+                SQL.Append(" ) ");
+            }
 
-            return Json(new { Status = "Processing", JobId = jobId }, JsonRequestBehavior.AllowGet);
+            string sqlQuery = SQL.ToString().Replace("select distinct ApplicationReferenceno", "select distinct ApplicationReferenceno, COUNT(*) OVER() AS TotalRecordCount");
+            
+            int PageNumber = param.iDisplayStart > 0 ? (param.iDisplayStart / param.iDisplayLength) + 1 : 1;
+            int PageSize = param.iDisplayLength > 0 ? param.iDisplayLength : 10;
+            int fetchRecords = (PageNumber - 1) * PageSize;
+            
+            sqlQuery += " ORDER BY ApplicationReferenceno OFFSET " + fetchRecords + " ROWS FETCH NEXT " + PageSize + " ROWS ONLY;";
+
+            string con = ConnectionStringProvider.GetConnectionString();
+            SqlDataAdapter da = new SqlDataAdapter(sqlQuery, con);
+            da.SelectCommand.CommandTimeout = 300;
+            da.Fill(ds);
+
+            var dataList = ds.Tables[0].AsEnumerable().Select(row => new
+            {
+                ApplicationReferenceNo = row["ApplicationReferenceno"] != DBNull.Value ? row["ApplicationReferenceno"].ToString() : "",
+                ApplicantName = row["ApplicantName"] != DBNull.Value ? row["ApplicantName"].ToString() : "",
+                AccountNo = row["bank_acct_no"] != DBNull.Value ? row["bank_acct_no"].ToString() : "",
+                BankName = row["BankName"] != DBNull.Value ? row["BankName"].ToString() : "",
+                IFSC_Code = row["IFSCCode"] != DBNull.Value ? row["IFSCCode"].ToString() : "",
+                Gender = row["Gender"] != DBNull.Value ? row["Gender"].ToString() : "",
+                Age_InYears = row["Age_InYears"] != DBNull.Value ? row["Age_InYears"].ToString() : "",
+                SchemeType = row["type_code"] != DBNull.Value ? row["type_code"].ToString() : "",
+                Amount = row["amount"] != DBNull.Value ? row["amount"].ToString() : "",
+                PaidOn = row["pay_date"] != DBNull.Value ? row["pay_date"].ToString() : "",
+                Status = row["Status"] != DBNull.Value ? row["Status"].ToString() : "",
+                Reason = row["Reason/Remarks"] != DBNull.Value ? row["Reason/Remarks"].ToString() : "",
+                District = row["District"] != DBNull.Value ? row["District"].ToString() : "",
+                TransactionRefrenceNo = row["TransactionRefrenceNo"] != DBNull.Value ? row["TransactionRefrenceNo"].ToString() : "",
+                TotalRecordCount = row["TotalRecordCount"] != DBNull.Value ? row["TotalRecordCount"].ToString() : "0"
+            }).ToList();
+
+            string totalRecords = dataList.Select(x => x.TotalRecordCount).FirstOrDefault() ?? "0";
+            var result = from c in dataList
+                         select new[] {
+                             c.District?.Trim().ToUpper()+"",
+                             c.ApplicationReferenceNo+"",
+                             c.ApplicantName+"",
+                             c.AccountNo + "",
+                             c.BankName + "",
+                             c.IFSC_Code + "",
+                             c.Gender + "",
+                             c.Age_InYears + "",
+                             c.SchemeType + "",
+                             c.Amount + "",
+                             c.PaidOn + "",
+                             c.Status + "",
+                             c.Reason + "",
+                             c.TransactionRefrenceNo + ""
+                         };
+
+            if (dataList.Any())
+            {
+                this.HttpContext.Session["ReportName"] = "RptPensionpayments.rpt";
+                this.HttpContext.Session["rptSource"] = ds;
+            }
+
+            return Json(new
+            {
+                sEcho = param.sEcho,
+                iTotalRecords = Convert.ToInt32(totalRecords),
+                iTotalDisplayRecords = Convert.ToInt32(totalRecords),
+                aaData = result
+            }, JsonRequestBehavior.AllowGet);
         }
+
         public ActionResult DirectDepositsToBank()
         {
             ViewBag.Gender = new SelectList(Enumerable.Empty<SelectListItem>());
@@ -4836,9 +4863,203 @@ namespace App.Web.Controllers
             }
 
         }
-
         //End
 
+        public FileContentResult PensionByMonthExcelAjax(string emplrId, string empl_code, string date1, string date2, string gender, int? ageInYears, string RegionNames, string finacialYear)
+        {
+            DataTable dt = GetExportData("ok", emplrId, empl_code, date1, date2, gender, ageInYears, RegionNames, finacialYear);
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                using (var workbook = new XLWorkbook())
+                {
+                    var worksheet = workbook.Worksheets.Add("PensionSummary");
+                    worksheet.Cell(1, 1).InsertTable(dt);
+                    using (var stream = new System.IO.MemoryStream())
+                    {
+                        workbook.SaveAs(stream);
+                        return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "MonthlyPensionSummary.xlsx");
+                    }
+                }
+            }
+            return null;
+        }
+
+        public JsonResult PensionByMonthPdfAjax(string emplrId, string empl_code, string date1, string date2, string gender, int? ageInYears, string RegionNames, string finacialYear)
+        {
+            DataTable dt = GetExportData("ok", emplrId, empl_code, date1, date2, gender, ageInYears, RegionNames, finacialYear);
+            var result = new List<Dictionary<string, object>>();
+            if (dt != null)
+            {
+                foreach (DataRow row in dt.Rows)
+                {
+                    var dict = new Dictionary<string, object>();
+                    foreach (DataColumn col in dt.Columns)
+                    {
+                        dict[col.ColumnName] = row[col];
+                    }
+                    result.Add(dict);
+                }
+            }
+            var jsonResult = Json(result, JsonRequestBehavior.AllowGet);
+            jsonResult.MaxJsonLength = int.MaxValue;
+            return jsonResult;
+        }
+
+        public FileContentResult PensionByYearExcelAjax(string emplrId, string empl_code, string date1, string date2, string gender, int? ageInYears, string RegionNames, string finacialYear)
+        {
+            DataTable dt = GetExportData("fail", emplrId, empl_code, date1, date2, gender, ageInYears, RegionNames, finacialYear);
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                using (var workbook = new XLWorkbook())
+                {
+                    var worksheet = workbook.Worksheets.Add("FailedTransactions");
+                    worksheet.Cell(1, 1).InsertTable(dt);
+                    using (var stream = new System.IO.MemoryStream())
+                    {
+                        workbook.SaveAs(stream);
+                        return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "MonthlyFailedTransactions.xlsx");
+                    }
+                }
+            }
+            return null;
+        }
+
+        public JsonResult PensionByYearPdfAjax(string emplrId, string empl_code, string date1, string date2, string gender, int? ageInYears, string RegionNames, string finacialYear)
+        {
+            DataTable dt = GetExportData("fail", emplrId, empl_code, date1, date2, gender, ageInYears, RegionNames, finacialYear);
+            var result = new List<Dictionary<string, object>>();
+            if (dt != null)
+            {
+                foreach (DataRow row in dt.Rows)
+                {
+                    var dict = new Dictionary<string, object>();
+                    foreach (DataColumn col in dt.Columns)
+                    {
+                        dict[col.ColumnName] = row[col];
+                    }
+                    result.Add(dict);
+                }
+            }
+            var jsonResult = Json(result, JsonRequestBehavior.AllowGet);
+            jsonResult.MaxJsonLength = int.MaxValue;
+            return jsonResult;
+        }
+
+        private DataTable GetExportData(string statusFilter, string emplrId, string empl_code, string date1, string date2, string gender, int? ageInYears, string RegionNames, string finacialYear)
+        {
+            string GenderType = string.Empty;
+            string fyear = (finacialYear ?? "").Replace("_", "-");
+            if (!string.IsNullOrEmpty(gender))
+            {
+                switch (gender.ToLower().Trim())
+                {
+                    case "male": GenderType = "M"; break;
+                    case "female": GenderType = "F"; break;
+                    case "transgender": GenderType = "T"; break;
+                }
+            }
+
+            if (string.IsNullOrEmpty(date1)) date1 = GetStartDateDateAsPerFinancialYear().ToString("yyyy-MM-dd");
+            if (string.IsNullOrEmpty(date2)) date2 = GetEndDateDateAsPerFinancialYear().ToString("yyyy-MM-dd");
+
+            int UserId = AppUserManager.GetUserId();
+            int RoleId = db.UserRole.FirstOrDefault(x => x.UserId == UserId).RoleId;
+            StringBuilder SQL = new StringBuilder();
+            SQL.Append("WITH CombinedDeposit AS ( ");
+            SQL.Append("    SELECT empl_code, pay_date, amount, bank_acct_no, [Status], [Reason/Remarks], CAST([TransactionRefrenceNo.] AS VARCHAR(100)) AS [TransactionRefrenceNo.], TransactionDate FROM Process_DirectDeposit_Details WHERE [Status] = '" + statusFilter + "' ");
+            if (!string.IsNullOrEmpty(date1)) SQL.Append(" AND cast(pay_date as date) >= '" + date1.Trim().Replace("'", "''") + "'");
+            if (!string.IsNullOrEmpty(date2)) SQL.Append(" AND cast(pay_date as date) <= '" + date2.Trim().Replace("'", "''") + "'");
+            if (!string.IsNullOrEmpty(empl_code)) SQL.Append(" AND empl_code in (" + empl_code.Trim() + ")");
+            SQL.Append("    UNION ALL ");
+            SQL.Append("    SELECT eb.empl_code, th.TxnDate AS pay_date, TRY_CAST(td.Amount AS DECIMAL(18,2)) AS amount, eb.bank_acct_no, td.[Status], td.Remarks AS [Reason/Remarks], CAST(td.TransactionReference AS VARCHAR(100)) AS [TransactionRefrenceNo.], th.TxnDate AS TransactionDate FROM txnDetail td ");
+            SQL.Append("    INNER JOIN txnHeader th ON td.HeaderId = th.HeaderId ");
+            SQL.Append("    INNER JOIN MasterEmpBankDetails eb ON td.[Application Reference No#] = CAST(eb.Application_Reference_no AS NVARCHAR(50)) WHERE td.[Status] = '" + statusFilter + "' ");
+            if (!string.IsNullOrEmpty(date1)) SQL.Append(" AND cast(th.TxnDate as date) >= '" + date1.Trim().Replace("'", "''") + "'");
+            if (!string.IsNullOrEmpty(date2)) SQL.Append(" AND cast(th.TxnDate as date) <= '" + date2.Trim().Replace("'", "''") + "'");
+            if (!string.IsNullOrEmpty(empl_code)) SQL.Append(" AND eb.empl_code in (" + empl_code.Trim() + ")");
+            SQL.Append(") ");
+            SQL.Append("select distinct ApplicationReferenceno,CONCAT(NULLIF(isnull(me.first_name,''), ''), CASE  ");
+            SQL.Append("WHEN me.middle_name IS NOT NULL AND me.middle_name != '' THEN ' ' + me.middle_name ELSE '' END, CASE WHEN me.last_name IS NOT NULL AND me.last_name != '' THEN ' ' + me.last_name  ");
+            SQL.Append("ELSE '' END ) as ApplicantName,CONVERT(varchar, dd.pay_date, 103) AS pay_date,dd.amount,et.[Description] as type_code,CAST(DATEDIFF(YEAR, birthdate, GETDATE())  AS VARCHAR(10)) AS Age_InYears,Gender,concat(nullif(isnull(PresentVillageName,''),''), case when PresentHalqaPanchayatOrMunicipalityName is not null or PresentHalqaPanchayatOrMunicipalityName != '' ");
+            SQL.Append("then ' ' + PresentHalqaPanchayatOrMunicipalityName else '' end, case when PresentTehsil is not null or PresentTehsil != '' ");
+            SQL.Append("then ' ' + PresentTehsil else '' end, case when PresentDistrict is not null or PresentDistrict != '' then ");
+            SQL.Append("' ' + PresentDistrict else '' end) as [Address],dd.bank_acct_no,BankName,APPLICANT_BANK_IFSC_CODE as [IFSCCode],dd.[Status],me.SelectDistrict as [District],MONTH(ISNULL(dd.TransactionDate, dd.pay_date)) AS Month,YEAR(ISNULL(dd.TransactionDate, dd.pay_date)) AS Year, '" + fyear + "' AS FinacialYear,dd.[Reason/Remarks],dd.[TransactionRefrenceNo.] as TransactionRefrenceNo, CONVERT(varchar, dd.TransactionDate, 103) as TransactionDate from CombinedDeposit dd ");
+            SQL.Append("left join masterEmployee me on me.Empl_code = dd.Empl_code left join MasterEmpBankDetails mb on mb.empl_code = me.Empl_code ");
+            SQL.Append(" left join MasterEmpType et on me.type_code = et.type_code ");
+            SQL.Append("left join MasterDistrict md on md.[Name] = me.SelectDistrict where dd.Status = '" + statusFilter + "' and md.Id in (select DistrictId from SecRoleLocationModule where RoleId = " + RoleId + " and UserId = " + UserId + ") ");
+            
+            if (!string.IsNullOrEmpty(emplrId) && emplrId != "ALL")
+                SQL.Append(" AND  me.Type_Code = '" + emplrId.Trim().Replace("'", "''") + "'");
+            if (!string.IsNullOrEmpty(empl_code))
+                SQL.Append(" AND dd.empl_code in (" + empl_code.Trim() + ")");
+            if (!string.IsNullOrEmpty(date1))
+                SQL.Append(" AND cast(dd.pay_date as date) >= '" + date1.Trim().Replace("'", "''") + "'");
+            if (!string.IsNullOrEmpty(date2))
+                SQL.Append(" AND cast(dd.pay_date as date) <= '" + date2.Trim().Replace("'", "''") + "'");
+            if (!string.IsNullOrEmpty(gender))
+                SQL.Append(" AND me.Gender = '" + GenderType.Trim() + "'");
+            if (ageInYears != null && ageInYears != 0)
+                SQL.Append(" AND CAST(DATEDIFF(YEAR, me.birthdate, GETDATE()) AS VARCHAR(10)) = '" + ageInYears + "'");
+            if (!string.IsNullOrEmpty(RegionNames))
+                SQL.Append(" AND me.SelectDistrict in (SELECT * FROM [SplitString] ('" + RegionNames.Trim() + "'))");
+
+            string con = ConnectionStringProvider.GetConnectionString();
+            SqlDataAdapter da = new SqlDataAdapter(SQL.ToString(), con);
+            da.SelectCommand.CommandTimeout = 300;
+            DataSet ds = new DataSet();
+            da.Fill(ds);
+            return ds.Tables.Count > 0 ? ds.Tables[0] : null;
+        }
+
+        private FileContentResult GeneratePdfFile(DataTable dt, string reportPrefix)
+        {
+            StringBuilder htmlString = new StringBuilder();
+            htmlString.Append(@"<html><body>");
+            htmlString.AppendFormat("<div style='text-align:center;font-size:40px;font-weight:bold;'>{0} Report</div>", reportPrefix);
+            htmlString.Append(@"<table border='1' cellspacing='0' cellpadding='5'><tr>");
+            if (dt != null)
+            {
+                foreach (DataColumn column in dt.Columns)
+                {
+                    htmlString.AppendFormat("<th>{0}</th>", column.ColumnName);
+                }
+                htmlString.Append("</tr>");
+                foreach (DataRow row in dt.Rows)
+                {
+                    htmlString.Append("<tr>");
+                    foreach (var item in row.ItemArray)
+                    {
+                        htmlString.AppendFormat("<td>{0}</td>", item.ToString());
+                    }
+                    htmlString.Append("</tr>");
+                }
+            }
+            htmlString.Append(@"</table></body></html>");
+            
+            try
+            {
+                string pathFolder = HttpContext.Server.MapPath("~/App.Web/" + reportPrefix);
+                if (!Directory.Exists(pathFolder)) Directory.CreateDirectory(pathFolder);
+                string filePath = Path.Combine(pathFolder, reportPrefix + "report.pdf");
+                Byte[] res = new Byte[0];
+
+                using (FileStream file = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                {
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        // In the existing codebase, PdfGenerator is commented out and an empty byte array is written.
+                        // I am copying the same behavior so it does not cause compilation issues if the PDF generator library is missing.
+                        res = ms.ToArray();
+                        file.Write(res, 0, res.Length);
+                    }
+                }
+                return File(res, "application/pdf", reportPrefix + "report.pdf");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
       public class BeneficiaryDTO
       {

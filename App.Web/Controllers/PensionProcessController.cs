@@ -8695,10 +8695,10 @@ namespace App.Web.Controllers
             {
                 var worksheet = package.Workbook.Worksheets.Add("Format");
                 string[] headers;
-                if (type == "Validation")
-                {
-                    headers = new string[] { "Account Number", "IFSC Code", "Name", "Status", "Reason" };
-                }
+        if (type == "Validation")
+        {
+            headers = new string[] { "APPLICATION_REFERENCE_NO", "DISTRICT", "BENE_IFSC", "NAME_OF_APPLICANT", "ACCOUNTNO", "CATEGORY" };
+        }
                 else
                 {
                     headers = new string[] { "Account Number", "IFSC Code", "Name", "Amount", "Status", "Transaction ID", "Remarks" };

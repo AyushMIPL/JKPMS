@@ -1,4 +1,4 @@
-﻿@model JKPS.COMMON.DVOMasterEmployee
+@model JKPS.COMMON.DVOMasterEmployee
 @using JKPS.COMMON
 @{
     ViewBag.Title = "MonthlyPensionSummary";
@@ -8,6 +8,20 @@
     /* Hide the remove (x) icon */
     .select2-selection__clear {
         display: none;
+    }
+    
+    #DownloadOptions li a {
+        color: #000 !important;
+        cursor: pointer;
+        padding: 8px 15px;
+        display: block;
+    }
+    #DownloadOptions li a:hover {
+        background-color: #f1f1f1 !important;
+        color: #000 !important;
+    }
+    #DownloadOptions li a i {
+        margin-right: 5px;
     }
 </style>
 
@@ -118,16 +132,53 @@
     <div class="panel-heading clearfix">
         <h4 class="headline headlineMonthlyPensionSummary">
             Success Payment Summary <span id="recordCountSpan" class="badge badge-info" style="margin-left: 10px;"></span>
+            <ul class="tool-bar">
+                <li class="dropdown">
+                    <a class="dropdown-toggle DownloadDropdown" data-toggle="dropdown" href="#">
+                        <span><i class="fa fa-ellipsis-v fa-2x"></i></span>
+                    </a>
+                    <ul class="dropdown-menu" id="DownloadOptions">
+                        <li>
+                            <a tabindex="-1" id="ExcelDownload" onclick="PensionSummaryExcelDownload()"><i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel</a>
+                        </li>
+                        <li>
+                            <a tabindex="-1" id="PdfDownload" onclick="PensionSummaryPdfDownload()"><i class="fa fa-file-pdf-o" aria-hidden="true"></i> Pdf</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </h4>
     </div>
     <div class="panel-body">
         <div class="row py-3">
             <div class="col-sm-12">
-                <div class="alert alert-warning alert-warningMonthlyPensionSummary">
+                <div class="alert alert-warning alert-warningMonthlyPensionSummary display-none">
                     <h4 class="mb-0"> There is no Record Found</h4>
                 </div>
-                <iframe id="reportDataAction1" class="reportDataAction1MonthlyPensionSummary"></iframe>
             </div>
+        </div>
+        <div class="table-responsive" id="PayHistoryList">
+            <table class="table dataTable display-none" id="tblMonthlyPensionSummary" style="width:100%">
+                <thead>
+                    <tr>
+                        <th data-searchable="true">District</th>
+                        <th data-searchable="true">Application Reference Number</th>
+                        <th data-searchable="true">Applicant Name</th>
+                        <th data-searchable="true">Account No</th>
+                        <th data-searchable="true">Bank Name</th>
+                        <th data-searchable="true">IFSC Code</th>
+                        <th data-searchable="true">Gender</th>
+                        <th data-searchable="true">Age</th>
+                        <th data-searchable="true">Scheme</th>
+                        <th data-searchable="true">Amount</th>
+                        <th data-searchable="true">Pension Generated On</th>
+                        <th data-searchable="true">Status</th>
+                        <th data-searchable="true">Reason</th>
+                        <th data-searchable="true">Transaction Reference No</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -140,9 +191,13 @@
 
 
 @section Scripts {
+    <link href="~/Content/endless/css/newdatatablemodified.css" rel="stylesheet" />
+    <script src="~/Content/endless/LatestJS/jquery.dataTables.min.js"></script>
+    <script src="~/Content/endless/LatestJS/pdfmake.min.js"></script>
+    <script src="~/Content/endless/LatestJS/vfs_fonts.js"></script>
     <script nonce="@ViewBag.StyleNonce">
 
-        document.getElementById("btnsubmit").addEventListener("click", ShowReport);
+        document.getElementById("btnsubmit").addEventListener("click", function(e) { e.preventDefault(); ShowReport(this); });
 
 
         jQuery(document).ready(function ($) {
@@ -302,83 +357,171 @@
 
         function ShowReport(evt) {
 
-    var Date1 = $("#From").val();
-    var Date2 = $("#to").val();
-    var SchemeType = $("#EmplCode").val();
-    var Gender = $("#Gender").val();
-    var AgeInYears = $("#AgeInYears").val();
-    var RegionNames = $("#RegionNames").val();
-    //var FinacialYear = $("#FinancialYearDropdown").val();
-            var FinacialYear = $("#hdn_FinancialYear").val();
-   /* var BeneficiaryId = $("#EmployeeId").val();*/
+            var Date1 = $("#From").val();
+            var Date2 = $("#to").val();
+            var SchemeType = $("#EmplCode").val() || "";
+            var Gender = $("#Gender").val() || "";
+            var AgeInYears = $("#AgeInYears").val() || "";
+            var RegionNames = $("#RegionNames").val() || "";
+            var FinacialYear = $("#hdn_FinancialYear").val() || "";
             var BeneficiariesId = $("#RegionNames option:selected").map(function (ind, _el) {
-        return $(_el).val();
-
-    });            $("#btn_loading").show();
+                return $(_el).val();
+            });
+            var benefIdArray = $.makeArray(BeneficiariesId);
+            
+            $("#btn_loading").show();
             $("#btnsubmit").hide();
-      $.ajax({
-        url: "@Url.Action("PensionByMonthAjax", "Reports")?emplrId=" + SchemeType + "&empl_code=" + $.makeArray(BeneficiariesId) + "&date1=" + Date1 + "&date2=" + Date2 + "&gender=" + Gender + "&ageInYears=" + AgeInYears + "&regionNames=" + RegionNames + "&finacialYear=" + FinacialYear,
-        type: "GET",
-      }).done(function (result) {
-          if (result.Status === "Processing") {
-              toasterInfoMessage("Report generation started in the background. Please wait...");
-              
-              var pollInterval = setInterval(function() {
-                  $.get("/Reports/CheckReportStatus?jobId=" + result.JobId, function(statusResult) {
-                      if (statusResult.Status.startsWith("Completed:")) {
-                          clearInterval(pollInterval);
-                          var parts = statusResult.Status.split(":");
-                          var fileUrl = parts[1];
-                          var count = parts[2]; // Get record count
-                          
-                          $("#btnsubmit").show();
-                          $("#btn_loading").hide();
-                          $(evt).find("i.fa-spinner").hide();
-                          
-                          $(".alert-warning").hide();
-                          $("#recordCountSpan").text("(" + count + " Records)");
-                          toasterSuccessMessage("Report Generation Complete! Loading report...");
-                          
-                          $('#reportDataAction1').show();
-                          $('#reportDataAction1').css({ "width": "100%", "height": "800px", "border": "none" });
-                          $('#reportDataAction1').attr('src', fileUrl);
-                      } 
-                      else if (statusResult.Status === "Empty") {
-                          clearInterval(pollInterval);
-                          $("#btnsubmit").show();
-                          $("#btn_loading").hide();
-                          $(evt).find("i.fa-spinner").hide();
-                          $(".alert-warning").show();
-                          $('#reportDataAction1').hide();
-                          $("#recordCountSpan").text("");
-                          toasterInfoMessage("Result not found on this search criteria.");
-                      }
-                      else if (statusResult.Status === "Failed") {
-                          clearInterval(pollInterval);
-                          $("#btnsubmit").show();
-                          $("#btn_loading").hide();
-                          $(evt).find("i.fa-spinner").hide();
-                          toasterErrorMessage("Failed to generate report.");
-                      }
-                  });
-              }, 5000); // Poll every 5 seconds
-              return false;
-          }
-          else {
-              $("#btnsubmit").show();
-              $("#btn_loading").hide();
-              $(evt).find("i.fa-spinner").hide();
-              $(".alert-warning").show();
-              $('#reportData').hide();
-              $("#recordCountSpan").text("");
-              toasterInfoMessage("Unexpected response from server.");
-          }
-      }).fail(function() {
-          $("#btnsubmit").show();
-          $("#btn_loading").hide();
-          $(evt).find("i.fa-spinner").hide();
-      });
-    }
+
+            var ajaxUrl = "@Url.Action("PensionByMonthAjax", "Reports")?emplrId=" + SchemeType + "&empl_code=" + benefIdArray + "&date1=" + Date1 + "&date2=" + Date2 + "&gender=" + Gender + "&ageInYears=" + AgeInYears + "&regionNames=" + RegionNames + "&finacialYear=" + FinacialYear;
+
+            $('#tblMonthlyPensionSummary').dataTable({
+                "bJQueryUI": true,
+                "sPaginationType": "full_numbers",
+                "bServerSide": true,
+                "bDestroy": true,
+                "bAutoWidth": false,
+                "iDisplayLength": 10,
+                "sAjaxSource": ajaxUrl,
+                "fnDrawCallback": function (oSettings) {
+                    var totalRecords = oSettings.fnRecordsTotal();
+                    if (totalRecords > 0) {
+                        $("#tblMonthlyPensionSummary").show();
+                        $(".alert-warning").hide();
+                        $("#recordCountSpan").text("(" + totalRecords + " Records)");
+                    } else {
+                        $("#tblMonthlyPensionSummary").hide();
+                        $(".alert-warning").show();
+                        $("#recordCountSpan").text("");
+                    }
+                    $("#btnsubmit").show();
+                    $("#btn_loading").hide();
+                },
+                "aoColumns": [
+                    { "sName": "District" },
+                    { "sName": "ApplicationReferenceNo" },
+                    { "sName": "ApplicantName" },
+                    { "sName": "AccountNo" },
+                    { "sName": "BankName" },
+                    { "sName": "IFSC_Code" },
+                    { "sName": "Gender" },
+                    { "sName": "Age_InYears" },
+                    { "sName": "SchemeType" },
+                    { "sName": "Amount" },
+                    {
+                        "sName": "PaidOn",
+                        "bSearchable": false,
+                        "bSortable": false,
+                        "render": function (data, type, row, meta) {
+                            if (!row[10]) return "";
+                            var strString = (row[10].split(" ")[0]).split("-").reverse().join("-");
+                            return strString;
+                        }
+                    },
+                    { "sName": "Status" },
+                    { "sName": "Reason" },
+                    { "sName": "TransactionRefrenceNo" }
+                ]
+            });
+        }
+        
+        function PensionSummaryExcelDownload() {
+            var Date1 = $("#From").val();
+            var Date2 = $("#to").val();
+            var SchemeType = $("#EmplCode").val() || "";
+            var Gender = $("#Gender").val() || "";
+            var AgeInYears = $("#AgeInYears").val() || "";
+            var RegionNames = $("#RegionNames").val() || "";
+            var FinacialYear = $("#hdn_FinancialYear").val() || "";
+            var BeneficiariesId = $("#RegionNames option:selected").map(function (ind, _el) {
+                return $(_el).val();
+            });
+            var benefIdArray = $.makeArray(BeneficiariesId);
+            
+            var url = "@Url.Action("PensionByMonthExcelAjax", "Reports")?emplrId=" + SchemeType + "&empl_code=" + benefIdArray + "&date1=" + Date1 + "&date2=" + Date2 + "&gender=" + Gender + "&ageInYears=" + AgeInYears + "&regionNames=" + RegionNames + "&finacialYear=" + FinacialYear;
+            window.location.href = url;
+        }
+
+        function PensionSummaryPdfDownload() {
+            var Date1 = $("#From").val();
+            var Date2 = $("#to").val();
+            var SchemeType = $("#EmplCode").val() || "";
+            var Gender = $("#Gender").val() || "";
+            var AgeInYears = $("#AgeInYears").val() || "";
+            var RegionNames = $("#RegionNames").val() || "";
+            var FinacialYear = $("#hdn_FinancialYear").val() || "";
+            var BeneficiariesId = $("#RegionNames option:selected").map(function (ind, _el) {
+                return $(_el).val();
+            });
+            var benefIdArray = $.makeArray(BeneficiariesId);
+            
+            var url = "@Url.Action("PensionByMonthPdfAjax", "Reports")?emplrId=" + SchemeType + "&empl_code=" + benefIdArray + "&date1=" + Date1 + "&date2=" + Date2 + "&gender=" + Gender + "&ageInYears=" + AgeInYears + "&regionNames=" + RegionNames + "&finacialYear=" + FinacialYear;
+            
+            $("#btn_loading").show();
+            toasterInfoMessage("Generating PDF, please wait...");
+            $.get(url, function (data) {
+                if(data && data.length > 0) {
+                    var docDefinition = {
+                        pageOrientation: 'landscape',
+                        pageSize: 'A4',
+                        content: [
+                            { text: 'Success Payment Summary Report', style: 'header', alignment: 'center', margin: [0, 0, 0, 10] },
+                            {
+                                style: 'tableExample',
+                                table: {
+                                    headerRows: 1,
+                                    widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                                    body: [
+                                        [
+                                            {text: 'District', style: 'tableHeader'},
+                                            {text: 'App Ref', style: 'tableHeader'},
+                                            {text: 'Name', style: 'tableHeader'},
+                                            {text: 'Account No', style: 'tableHeader'},
+                                            {text: 'Bank', style: 'tableHeader'},
+                                            {text: 'IFSC', style: 'tableHeader'},
+                                            {text: 'Gender', style: 'tableHeader'},
+                                            {text: 'Age', style: 'tableHeader'},
+                                            {text: 'Scheme', style: 'tableHeader'},
+                                            {text: 'Amount', style: 'tableHeader'},
+                                            {text: 'Date', style: 'tableHeader'},
+                                            {text: 'Status', style: 'tableHeader'}
+                                        ]
+                                    ]
+                                }
+                            }
+                        ],
+                        styles: {
+                            header: { fontSize: 16, bold: true },
+                            tableHeader: { bold: true, fontSize: 10 },
+                            tableExample: { fontSize: 8 }
+                        }
+                    };
+                    
+                    data.forEach(function (row) {
+                        docDefinition.content[1].table.body.push([
+                            (row.District || '').toString(), 
+                            (row.ApplicationReferenceno || '').toString(), 
+                            (row.ApplicantName || '').toString(), 
+                            (row.bank_acct_no || '').toString(), 
+                            (row.BankName || '').toString(), 
+                            (row.IFSCCode || '').toString(), 
+                            (row.Gender || '').toString(), 
+                            (row.Age_InYears || '').toString(), 
+                            (row.type_code || '').toString(), 
+                            (row.amount || '').toString(), 
+                            (row.pay_date || '').toString(), 
+                            (row.Status || '').toString()
+                        ]);
+                    });
+                    pdfMake.createPdf(docDefinition).download("SuccessPaymentSummary.pdf");
+                } else {
+                    toasterInfoMessage("No records found to generate PDF.");
+                }
+                $("#btn_loading").hide();
+            }).fail(function() {
+                toasterErrorMessage("Failed to generate PDF.");
+                $("#btn_loading").hide();
+            });
+        }
     $("#EmplCode").on('change', function () {
       debugger
       var SchemeType = $("#EmplCode option:selected").val();
